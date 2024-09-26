@@ -1,0 +1,22 @@
+const express = require("express");
+const router = express.Router();
+const scheduleController = require("../controllers/schedule.controller");
+const verifyToken = require("../middleware/verifyToken");
+
+router.post("/add-schedule", verifyToken, scheduleController.addSchedule);
+router.get("/get-schedules", verifyToken, scheduleController.getSchedules);
+router.delete(
+  "/delete-schedule/:id",
+  verifyToken,
+  scheduleController.deleteSchedule
+);
+router.get(
+  "/edit-schedules/:id",
+  verifyToken,
+  scheduleController.deleteSchedule
+);
+
+// PATIENT GET
+router.get("/patient-schedules", verifyToken, scheduleController.getClinicianSched);
+
+module.exports = router;
