@@ -386,7 +386,7 @@ exports.getPatientById = [
 exports.editClinician = [
   verifyToken,
   async (req, res) => {
-    const { firstName, middleName, lastName, address } = req.body;
+    const { firstName, middleName, lastName, address, mobile } = req.body;
     const { id } = req.user;
 
     // Validate input
@@ -410,6 +410,11 @@ exports.editClinician = [
         .status(400)
         .json({ error: true, message: "Clinic address is required." });
     }
+    if (!mobile) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Contact number is required." });
+    }
 
     try {
       // Find the clinician by ID
@@ -426,6 +431,7 @@ exports.editClinician = [
       clinician.middleName = middleName;
       clinician.lastName = lastName;
       clinician.address = address;
+      clinician.mobile = mobile;
 
       // Save the updated clinician information
       await clinician.save();

@@ -6,6 +6,9 @@ import Sidebar from "../../components/Sidebar/SidebarSuper";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 
+// utils
+import { route } from "../../utils/route";
+
 export default function Profile() {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState(null);
@@ -15,22 +18,10 @@ export default function Profile() {
     setIsOpen(!isOpen);
   };
 
-  const [editProfileAPI, setEditProfileAPI] = useState("");
-  const [updateProfilePictureAPI, setUpdateProfilePictureAPI] = useState("");
-  const [getUserAPI, setGetUserAPI] = useState("");
-
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
-    console.log(isPasswordModalOpen);
   };
-
-  // Set API Endpoints
-  useEffect(() => {
-    setEditProfileAPI("super-admin/edit-super-admin");
-    setUpdateProfilePictureAPI("super-admin/update-profile-picture");
-    setGetUserAPI("super-admin/get-super-admin");
-  }, []);
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -41,7 +32,7 @@ export default function Profile() {
         return;
       }
 
-      const endpoint = `http://localhost:8000/${getUserAPI}`;
+      const endpoint = `http://localhost:8000/${route.sudo.fetch}`;
       try {
         const response = await fetch(endpoint, {
           method: "GET",
@@ -68,7 +59,7 @@ export default function Profile() {
     };
 
     fetchUserDetails();
-  }, [getUserAPI]);
+  }, []);
 
   if (error) {
     return <div>{error}</div>;
@@ -86,8 +77,8 @@ export default function Profile() {
         {/* EDIT MODAL */}
         {isOpen && (
           <EditProfile
-            editProfileAPI={editProfileAPI}
-            editPictureAPI={updateProfilePictureAPI}
+            editProfileAPI={route.sudo.edit}
+            editPictureAPI={route.sudo.picture}
             userDetails={userDetails}
             closeModal={handleModal}
             isOwner={true}
@@ -95,7 +86,12 @@ export default function Profile() {
         )}
 
         {/* CHANGE PASS MODAL */}
-        {isPasswordModalOpen && <ChangePassword editPasswordAPI={`super-admin/change-password`} closeModal={handlePasswordModal} />}
+        {isPasswordModalOpen && (
+          <ChangePassword
+            editPasswordAPI={route.sudo.password}
+            closeModal={handlePasswordModal}
+          />
+        )}
 
         <Col xs={{ order: 12 }} lg={{ order: 1 }}>
           <Row className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center">
@@ -159,10 +155,7 @@ export default function Profile() {
                 <button className="action-btn" onClick={handleModal}>
                   Edit Profile
                 </button>
-                <button
-                  className="action-btn"
-                  onClick={handlePasswordModal}
-                >
+                <button className="action-btn" onClick={handlePasswordModal}>
                   Change Password
                 </button>
               </div>
@@ -172,100 +165,6 @@ export default function Profile() {
           </Row>
         </Col>
       </Row>
-      {/* CHANGE PASSWORD MODAL */}
-      {/* <Modal
-        show={showPasswordModal}
-        onHide={handleClosePasswordModal}
-        centered
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Change Password</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <form onSubmit={handleChangePasswordSubmit}>
-            <div className="form-group">
-              <p className="mb-0">Current Password</p>
-              <div className="input-group">
-                <input
-                  type={showCurrentPassword ? "text" : "password"}
-                  className="form-control"
-                  placeholder="Enter current password"
-                  value={currentPassword}
-                  name="currentPassword"
-                  onChange={handlePasswordChange}
-                />
-                <div className="input-group-append">
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                  >
-                    {showCurrentPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <p className="mb-0">New Password</p>
-              <div className="input-group">
-                <input
-                  type={showNewPassword ? "text" : "password"}
-                  className="form-control"
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  name="newPassword"
-                  onChange={handlePasswordChange}
-                />
-                <div className="input-group-append">
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                  >
-                    {showNewPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <p className="mb-0">Confirm New Password</p>
-              <div className="input-group">
-                <input
-                  type={showConfirmPassword ? "text" : "password"}
-                  className="form-control"
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  name="confirmPassword"
-                  onChange={handlePasswordChange}
-                />
-                <div className="input-group-append">
-                  <button
-                    type="button"
-                    className="btn btn-outline-secondary"
-                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  >
-                    {showConfirmPassword ? "Hide" : "Show"}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="action-btn btn-text-blue btn-primary mt-3"
-            >
-              Save
-            </button>
-          </form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClosePasswordModal}>
-            Close
-          </Button>
-        </Modal.Footer>
-      </Modal> */}
     </Container>
   );
 }

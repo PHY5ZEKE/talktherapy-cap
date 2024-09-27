@@ -10,10 +10,11 @@ export default function EditProfile({
   userDetails,
   closeModal,
   isOwner,
-  whatRole
+  whatRole,
 }) {
   const [userData, setUserData] = useState(userDetails);
   const [updatedUser, setUpdatedUser] = useState(null);
+
   const [showModal, setShowModal] = useState(true);
 
   const [profilePicture, setProfilePicture] = useState(null);
@@ -26,14 +27,14 @@ export default function EditProfile({
   const [mobile, setMobile] = useState("");
 
   useEffect(() => {
-    console.log(userDetails);
     if (userData) {
       setFirstName(userData.firstName || "");
       setMiddleName(userData.middleName || "");
       setLastName(userData.lastName || "");
       setAddress(userData.address || "");
+      setMobile(userData.mobile || "");
     }
-  }, [userData]);
+  }, [userData, userDetails]);
 
   // Close Modal
   const handleCloseModal = () => {
@@ -52,7 +53,14 @@ export default function EditProfile({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ firstName, middleName, lastName, address, id: userData._id }),
+        body: JSON.stringify({
+          firstName,
+          middleName,
+          lastName,
+          address,
+          mobile,
+          id: userData._id,
+        }),
       });
 
       const data = await response.json();
@@ -175,29 +183,33 @@ export default function EditProfile({
             />
           </div>
 
-          {isOwner && (<>
-            <div className="form-group">
-            <p className="mb-0">Contact Number</p>
-            <input
-              type="text"
-              className="form-control"
-              name="mobile"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-            />
-          </div>
-          </>)}
+          {isOwner && (
+            <>
+              <div className="form-group">
+                <p className="mb-0">Contact Number</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="mobile"
+                  value={mobile}
+                  onChange={(e) => setMobile(e.target.value)}
+                />
+              </div>
+            </>
+          )}
 
-          <div className="form-group">
-            <p className="mb-0">Clinic Address</p>
-            <input
-              type="text"
-              className="form-control"
-              name="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-            />
-          </div>
+          {whatRole !== "patient" && (
+            <div className="form-group">
+              <p className="mb-0">Clinic Address</p>
+              <input
+                type="text"
+                className="form-control"
+                name="address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+          )}
 
           <button
             type="submit"

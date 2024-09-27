@@ -4,7 +4,6 @@ import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
 export default function ChangePassword({ editPasswordAPI, closeModal }) {
-  console.log("hello");
   const [showPasswordModal, setShowPasswordModal] = useState(true);
   
   const [currentPassword, setCurrentPassword] = useState("");
