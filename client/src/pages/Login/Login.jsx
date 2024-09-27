@@ -11,6 +11,9 @@ import axios from "axios";
 // Modal
 import ChooseRegister from "../../components/Modals/ChooseRegister.jsx";
 
+// Utils
+import { route } from '../../utils/route.js'
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -28,7 +31,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/super-admin/super-admin-login",
+        `http://localhost:8000/${route.system.login}`,
         {
           email,
           password,
@@ -171,7 +174,7 @@ const Login = () => {
                 </Row>
                 <Row>
                   <Col className="text-center">
-                    <Link to="/forgotPassword" className="forgotPassLink">
+                    <Link to="/forgot" className="forgotPassLink">
                       Forgot Password?
                     </Link>
                   </Col>

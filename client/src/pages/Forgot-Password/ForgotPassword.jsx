@@ -6,6 +6,8 @@ import { Form, Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 
+import { route } from '../../utils/route.js'
+
 const ForgotPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
@@ -28,7 +30,7 @@ const ForgotPassword = () => {
     if (step === 1) {
       // Handle forgot password
       const response = await fetch(
-        "http://localhost:8000/super-admin/forgot-password",
+        `http://localhost:8000/${route.system.forgot}`,
         {
           method: "POST",
           headers: {
@@ -47,7 +49,7 @@ const ForgotPassword = () => {
     } else if (step === 2) {
       // Handle verify OTP
       const response = await fetch(
-        "http://localhost:8000/super-admin/verify-otp",
+        `http://localhost:8000/${route.system.otp}`,
         {
           method: "POST",
           headers: {
@@ -66,7 +68,7 @@ const ForgotPassword = () => {
     } else if (step === 3) {
       // Handle reset password
       const response = await fetch(
-        "http://localhost:8000/super-admin/reset-password",
+        `http://localhost:8000/${route.system.reset}`,
         {
           method: "POST",
           headers: {

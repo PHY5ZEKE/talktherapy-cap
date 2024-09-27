@@ -26,4 +26,11 @@ export const route = {
         password: 'patient-SLP/change-password',
         picture: 'patient-SLP/update-profile-picture',
     },
+    system: {
+        login: 'super-admin/super-admin-login',
+        signup: 'super-admin-signup',
+        forgot: 'super-admin-forgot-password',
+        otp: 'super-admin/verify-otp',
+        reset: 'super-admin/reset-password'
+    }
 };
