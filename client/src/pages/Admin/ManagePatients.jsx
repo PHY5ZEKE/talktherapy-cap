@@ -6,7 +6,6 @@ import Form from "react-bootstrap/Form";
 // CSS
 import "./profile.css";
 import "./manage-patients.css";
-// import "./action-btn.css";
 
 import Search from "../../assets/icons/Search";
 import Sort from "../../assets/icons/Sort";

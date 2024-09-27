@@ -146,14 +146,14 @@ export default function Profile() {
 
               <div className="card-container d-flex justify-content-center align-items-center flex-column gap-2 scrollable-div notif-home">
                 {/* BUTTONS */}
-                <a href="/userDeatilsManage">
+                <a href="/sudo/users">
                   <button className="action-btn">Manage Admins</button>
                 </a>
 
-                <a href="/userDeatilsAudit">
+                <a href="/sudo/audit">
                   <button className="action-btn">Audit Logs</button>
                 </a>
-                <a href="/userDeatilsArchival">
+                <a href="/sudo/archival">
                   <button className="action-btn">Archival</button>
                 </a>
                 <button className="action-btn" onClick={handleModal}>

@@ -1,12 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginSuperAdmin from "./pages/Login/LoginSuperAdmin";
+
+// Bootstrap
+import "bootstrap/dist/css/bootstrap.min.css";
+
+// System
+import Login from "./pages/Login/Login";
 import RegisterAdmin from "./pages/Register/RegisterAdmin";
 import RegisterClinician from "./pages/Register/RegisterClinician";
 import RegisterPatientSlp from "./pages/Register/RegisterPatientSlp";
 import ForgotPassword from "./pages/Forgot-Password/ForgotPassword";
-
-// Bootstrap
-import "bootstrap/dist/css/bootstrap.min.css";
 
 // Super Admin TalkTherapy
 import SuperAdminHome from "./pages/SuperAdmin/Home";
@@ -39,22 +41,26 @@ import PatientBook from "./pages/Patient/BookSchedule";
 import PatientProfile from "./pages/Patient/Profile";
 import PatientFeedback from "./pages/Patient/FeedbackDiagnosis";
 import PatientPerform from "./pages/Patient/Perform";
+
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";
 
 const routes = (
   <Router>
     <Routes>
-      <Route path="/registerAdmin" element={<RegisterAdmin />} />
-      <Route path="/registerClinician" element={<RegisterClinician />} />
-      <Route path="/registerPatientSlp" element={<RegisterPatientSlp />} />
+      <Route path="/register/admin" element={<RegisterAdmin />} />
+      <Route path="/register/clinician" element={<RegisterClinician />} />
+      <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
 
-      <Route path="/forgotPassword" element={<ForgotPassword />} />
+      <Route path="/forgot" element={<ForgotPassword />} />
 
-      <Route path="/login" element={<LoginSuperAdmin />} />
+      {/* TO DO: Create a page for landing instead of login */}
+      <Route path="/" element={<Login />} />
+
+      <Route path="/login" element={<Login />} />
       {/* Super Admin */}
       <Route
-        path="/superAdminHome"
+        path="/sudo"
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminHome />
@@ -62,7 +68,7 @@ const routes = (
         }
       />
       <Route
-        path="/superAdminProfile"
+        path="/sudo/profile"
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminProfile />
@@ -70,7 +76,7 @@ const routes = (
         }
       />
       <Route
-        path="/superAdminRegister"
+        path="/sudo/register"
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminRegister />
@@ -78,7 +84,7 @@ const routes = (
         }
       />
       <Route
-        path="/superAdminManage"
+        path="/sudo/users"
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminManage />
@@ -86,7 +92,7 @@ const routes = (
         }
       />
       <Route
-        path="/superAdminArchival"
+        path="/sudo/archival"
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminArchival />
@@ -94,16 +100,17 @@ const routes = (
         }
       />
       <Route
-        path="/superAdminAudit"
+        path="/sudo/audit"
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminAudit />
           </PrivateRoute>
         }
       />
+
       {/*Admin */}
       <Route
-        path="/clinicianRegister"
+        path="/admin/register"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <ClinicianRegister />
@@ -111,7 +118,7 @@ const routes = (
         }
       />
       <Route
-        path="/adminHome"
+        path="/admin"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminHome />
@@ -119,7 +126,7 @@ const routes = (
         }
       />
       <Route
-        path="/adminUsers"
+        path="/admin/users"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminUsers />
@@ -127,7 +134,7 @@ const routes = (
         }
       />
       <Route
-        path="/adminContent"
+        path="/admin/content"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminContent />
@@ -135,7 +142,7 @@ const routes = (
         }
       />
       <Route
-        path="/adminSchedule"
+        path="/admin/schedule"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminSchedule />
@@ -143,7 +150,7 @@ const routes = (
         }
       />
       <Route
-        path="/adminArchival"
+        path="/admin/archival"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminArchival />
@@ -151,7 +158,7 @@ const routes = (
         }
       />
       <Route
-        path="/adminProfile"
+        path="/admin/profile"
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminProfile />
@@ -161,7 +168,7 @@ const routes = (
       {/*Clinician */}
 
       <Route
-        path="/clinicianHome"
+        path="/clinician"
         element={
           <PrivateRoute allowedRoles={["clinician"]}>
             <ClinicianHome />
@@ -169,7 +176,7 @@ const routes = (
         }
       />
       <Route
-        path="/clinicianPatients"
+        path="/clinician/patients"
         element={
           <PrivateRoute allowedRoles={["clinician"]}>
             <ClinicianPatient />
@@ -177,7 +184,7 @@ const routes = (
         }
       />
       <Route
-        path="/clinicianContent"
+        path="/clinician/content"
         element={
           <PrivateRoute allowedRoles={["clinician"]}>
             <ClinicianContent />
@@ -185,7 +192,7 @@ const routes = (
         }
       />
       <Route
-        path="/clinicianProfile"
+        path="/clinician/profile"
         element={
           <PrivateRoute allowedRoles={["clinician"]}>
             <ClinicianProfile />
@@ -193,7 +200,7 @@ const routes = (
         }
       />
       <Route
-        path="/clinicianSchedule"
+        path="/clinician/schedule"
         element={
           <PrivateRoute allowedRoles={["clinician"]}>
             <ClinicianSchedule />
@@ -202,7 +209,7 @@ const routes = (
       />
       {/*Patient */}
       <Route
-        path="/patientHome"
+        path="/patient"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <PatientHome />
@@ -210,7 +217,7 @@ const routes = (
         }
       />
       <Route
-        path="/patientContent"
+        path="/patient/content"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <PatientContent />
@@ -218,7 +225,7 @@ const routes = (
         }
       />
       <Route
-        path="/patientBook"
+        path="/patient/book"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <PatientBook />
@@ -226,7 +233,7 @@ const routes = (
         }
       />
       <Route
-        path="/patientProfile"
+        path="/patient/profile"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <PatientProfile />
@@ -234,7 +241,7 @@ const routes = (
         }
       />
       <Route
-        path="/patientFeedbacks"
+        path="/patient/feedback"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <PatientFeedback />
@@ -242,7 +249,7 @@ const routes = (
         }
       />
       <Route
-        path="/patientPerform"
+        path="/patient/perform"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <PatientPerform />

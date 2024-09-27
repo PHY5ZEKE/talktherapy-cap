@@ -45,16 +45,16 @@ const Login = () => {
         // Redirect based on user role
         switch (response.data.userRole) {
           case "superAdmin":
-            navigate("/superAdminHome");
+            navigate("/sudo");
             break;
           case "admin":
-            navigate("/adminHome");
+            navigate("/admin");
             break;
           case "clinician":
-            navigate("/clinicianHome");
+            navigate("/clinician");
             break;
           case "patientslp":
-            navigate("/patientHome");
+            navigate("/patient");
             break;
           default:
             setError("Invalid user role");

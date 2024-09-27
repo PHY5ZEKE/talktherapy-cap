@@ -300,9 +300,10 @@ export default function Profile() {
                 >
                   Change Password
                 </button>
-                <Link to="/clinicianSchedule">
+                <Link to="/clinician/schedule">
                   <button className="action-btn">Manage Schedule</button>
                 </Link>
+                {/* TO DO: Create Modal for Request Content */}
                 <button className="action-btn">Request Content</button>
               </div>
             </Col>

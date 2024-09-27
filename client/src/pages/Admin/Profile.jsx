@@ -279,7 +279,7 @@ export default function Profile() {
 
               <div className="card-container d-flex justify-content-center align-items-center flex-column gap-2 scrollable-div notif-home">
                 {/* BUTTONS */}
-                <a href="/adminArchival">
+                <a href="/admin/archival">
                   <button className="action-btn">Data Archival</button>
                 </a>
                 <button className="action-btn" onClick={handleShowModal}>

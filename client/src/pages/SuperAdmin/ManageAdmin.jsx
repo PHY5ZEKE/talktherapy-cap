@@ -207,7 +207,7 @@ export default function ManageAdmin() {
                   <p className="m-0">{admins.length}</p>
                   <p className="m-0 fw-bold">Total Admins</p>
                 </div>
-                <a href="/superAdminRegister">
+                <a href="/sudo/register">
                   <button className="action-btn">Register Admin</button>
                 </a>
               </div>

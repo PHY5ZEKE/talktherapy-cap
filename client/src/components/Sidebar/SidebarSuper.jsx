@@ -27,7 +27,7 @@ export default function Sidebar() {
     >
       <div className="d-flex flex-lg-column align-items-center gap-3 flex-sm-row">
         <div className="d-flex flex-lg-column text-center mt-3">
-          <a href="/superAdminHome">
+          <a href="/sudo">
             <p className="d-none d-lg-block text-primary fw-bolder my-0">
               TALK
             </p>
@@ -37,16 +37,16 @@ export default function Sidebar() {
           </a>
         </div>
 
-        <a href="/superAdminHome">
+        <a href="/sudo">
           <Home />
         </a>
-        <a href="/superAdminManage">
+        <a href="/sudo/users">
           <Users />
         </a>
-        <a href="/superAdminAudit">
+        <a href="/sudo/audit">
           <Calendar />
         </a>
-        <a href="/superAdminProfile">
+        <a href="/sudo/profile">
           <Settings />
         </a>
         <div className="d-lg-none">

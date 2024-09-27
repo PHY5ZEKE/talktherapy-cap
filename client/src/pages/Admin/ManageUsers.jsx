@@ -328,7 +328,7 @@ export default function ManageUsers() {
                   <p className="m-0">3</p>
                   <p className="m-0 fw-bold">Total Users</p>
                 </div>
-                <a href="/clinicianRegister">
+                <a href="/admin/register">
                   <button className="action-btn">Register Clinician</button>
                 </a>
               </div>

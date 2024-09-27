@@ -28,7 +28,7 @@ export default function Sidebar() {
     >
       <div className="d-flex flex-lg-column align-items-center gap-3 flex-sm-row">
         <div className="d-flex flex-lg-column text-center mt-3">
-          <a href="/adminHome">
+          <a href="/admin">
             <p className="d-none d-lg-block text-primary fw-bolder my-0">
               TALK
             </p>
@@ -37,19 +37,19 @@ export default function Sidebar() {
             </p>
           </a>
         </div>
-        <a href="/adminHome">
+        <a href="/admin">
           <Home />
         </a>
-        <a href="/adminUsers">
+        <a href="/admin/users">
           <Users />
         </a>
-        <a href="/adminContent">
+        <a href="/admin/content">
           <Content />
         </a>
-        <a href="/adminSchedule">
+        <a href="/admin/schedule">
           <Calendar />
         </a>
-        <a href="/adminProfile">
+        <a href="/admin/profile">
           <Settings />
         </a>
       </div>
