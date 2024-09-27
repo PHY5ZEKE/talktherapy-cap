@@ -1,0 +1,62 @@
+.status-size {
+  width: 120px;
+  padding: 1em;
+}
+
+.status-pending {
+  background-color: #fcf0db;
+  border: 1px solid #f9c49a;
+  border-radius: 25px;
+}
+
+.status-accepted {
+  background-color: #e4ffdd;
+  border: 1px solid #9af9aa;
+  border-radius: 25px;
+}
+
+.status-cancelled {
+  background-color: #ffdddd;
+  border: 1px solid #f99a9a;
+  border-radius: 25px;
+}
+
+.status-pending-2 {
+  background-color: #fffcf5;
+  border: 1px solid #f9c49a;
+  border-radius: 25px;
+}
+
+.status-accepted-2 {
+  background-color: #f3fff0;
+  border: 1px solid #9af9aa;
+  border-radius: 25px;
+}
+
+.status-cancelled-2 {
+  background-color: #fff5f5;
+  border: 1px solid #f99a9a;
+  border-radius: 25px;
+}
+
+.status-text-orange {
+  color: #e09136;
+}
+
+.status-text-green {
+  color: #4caf50;
+}
+
+.status-text-red {
+  color: #f44336;
+}
+
+.status-text {
+  padding: 0.5em 2em;
+  font-weight: bold;
+}
+
+.top-size {
+  width: fit-content;
+}
+

@@ -1,0 +1,130 @@
+import "./modal.css";
+import { useState } from "react";
+
+export default function AddSchedule({ closeModal, onScheduleAdded }) {
+  // Callback Function
+  const handleClose = (e) => {
+    e.preventDefault();
+    closeModal();
+  };
+
+  // Dropdown List
+  const weekdays = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+  const [selectedWeekday, setSelectedWeekday] = useState(weekdays[0]); // Set initial selected weekday to Monday
+  const handleWeekdayChange = (event) => {
+    setSelectedWeekday(event.target.value);
+  };
+
+  // State for Start and End Time
+  const [startTime, setStartTime] = useState("");
+  const [endTime, setEndTime] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Get the selected time
+  const handleStartTimeChange = (event) => {
+    setStartTime(event.target.value);
+  };
+  const handleEndTimeChange = (event) => {
+    setEndTime(event.target.value);
+  };
+
+  // Handle Form Submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
+
+    const schedule = { day: selectedWeekday, startTime, endTime };
+
+    try {
+      const response = await fetch(
+        "http://localhost:8000/schedule/add-schedule",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(schedule),
+        }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        onScheduleAdded(data.schedule);
+        closeModal();
+      } else {
+        setErrorMessage(data.message); // Set error message
+      }
+    } catch (error) {
+      setErrorMessage("An error occurred. Please try again."); // Set generic error message
+    }
+  };
+
+  return (
+    <>
+      <div className="modal-background">
+        <div className="modal-container d-flex flex-column justify-content-center align-content-center">
+          <div className="d-flex flex-column text-center">
+            <h3 className="fw-bold">Add Your Schedule</h3>
+            <p className="mb-0">Please fill up the form accordingly.</p>
+          </div>
+
+          <form onSubmit={handleSubmit}>
+            <div className="container row text-center scrollable-table">
+              <div className="col">
+                <p className="mb-0">Day</p>
+                <select value={selectedWeekday} onChange={handleWeekdayChange}>
+                  {weekdays.map((weekday) => (
+                    <option key={weekday} value={weekday}>
+                      {weekday}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="col">
+                <p className="mb-0">Start Time</p>
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={handleStartTimeChange}
+                  required
+                />
+                <p className="mb-0">End Time</p>
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={handleEndTimeChange}
+                  required
+                />
+              </div>
+            </div>
+
+            {errorMessage && (
+              <div className="alert alert-danger text-center mt-3">
+                {errorMessage}
+              </div>
+            )}
+
+            <div className="d-flex justify-content-center mt-3 gap-3">
+              <button type="submit" className="button-group bg-white">
+                <p className="fw-bold my-0 status">SUBMIT</p>
+              </button>
+              <button onClick={handleClose} className="button-group bg-white">
+                <p className="fw-bold my-0 status">CANCEL</p>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
+  );
+}

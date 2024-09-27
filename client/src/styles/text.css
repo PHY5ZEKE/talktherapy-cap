@@ -1,0 +1,29 @@
+.text-header {
+  display: flex;
+  align-items: center;
+  height: 90px;
+}
+
+.card-text {
+  width: fit-content;
+  margin-left: 0.5em;
+}
+
+.activity-top {
+  width: 100%;
+  border-radius: 25px;
+}
+
+.text-overflow {
+  width: 400px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Media query for 768 and below */
+@media (max-width: 767px) {
+  .text-overflow {
+    width: 200px;
+  }
+}

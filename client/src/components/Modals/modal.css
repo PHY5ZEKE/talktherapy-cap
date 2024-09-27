@@ -1,0 +1,40 @@
+.modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: auto;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.scrollable-table {
+  max-height:300px !important;
+  overflow-y: auto;
+}
+
+/* Media query for 768 and below */
+@media (max-width: 768px) {
+  .modal-container {
+    width: 90%;
+  }
+  /* .div-cal {
+    position: relative;
+    top: 20%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+    transition: z-index 0.3s ease;
+  } */
+}

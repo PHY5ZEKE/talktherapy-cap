@@ -1,0 +1,25 @@
+.search-patients {
+  width: 99%;
+}
+
+.search-patients-container {
+  padding: 15px 10px;
+  border: 1px solid #b9b9b9;
+  border-radius: 20px;
+  margin: 10px 0;
+}
+
+.search-bar-container {
+  flex-grow: 1;
+  margin-left: 10px;
+  width: 80%;
+}
+
+.patient-container {
+  padding: 10px;
+  margin: 10px 0 5px 0;
+  border: 1px solid #b9b9b9;
+  border-radius: 20px;
+  height: auto;
+  width: 100%;
+}
