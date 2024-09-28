@@ -24,6 +24,7 @@ const adminSLPRoutes = require("./routes/adminSLP.route.js");
 const superAdminSLPRoutes = require("./routes/superAdminSLP.route.js");
 const scheduleRoutes = require("./routes/schedule.route.js");
 const contentRoute = require("./routes/content.route.js");
+const appointmentRoute = require("./routes/appointment.route.js");
 
 app.use(express.json());
 app.use("/src", express.static(path.join(__dirname, "../src")));
@@ -48,6 +49,7 @@ app.use("/adminSLP", adminSLPRoutes);
 app.use("/super-admin", superAdminSLPRoutes);
 app.use("/schedule", scheduleRoutes);
 app.use("/api/contents", contentRoute);
+app.use("/appointments", appointmentRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
