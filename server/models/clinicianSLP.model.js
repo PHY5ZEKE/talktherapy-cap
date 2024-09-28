@@ -13,7 +13,7 @@ const clinicianSLPSchema = new Schema({
   email: { type: String },
   profilePicture: {
     type: String,
-    default: "/images/default-profile-picture.png",
+    default: "/src/images/profile-picture/default-profile-picture.png",
   },
   password: { type: String },
   createdOn: { type: Date },

@@ -14,7 +14,7 @@ const {
   updateProfilePicture,
   editPatient,
 } = require("../controllers/patientSLP.controller");
-const { authenticatePatientSlpToken } = require("../utilities/auth");
+
 const verifyToken = require("../middleware/verifyToken");
 
 // Remove SLP Patient

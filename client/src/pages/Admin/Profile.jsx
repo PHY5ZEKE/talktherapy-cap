@@ -30,36 +30,36 @@ export default function Profile() {
   };
 
   // Fetch admin data from the backend
-  useEffect(() => {
-    const fetchAdminData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+  const fetchAdminData = async () => {
+    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
-      try {
-        const response = await fetch(
-         `http://localhost:8000/${route.admin.fetch}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch admin data");
+    try {
+      const response = await fetch(
+        `http://localhost:8000/${route.admin.fetch}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
         }
+      );
 
-        const data = await response.json();
-        setAdminData(data.admin);
-        console.log(data);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch admin data");
       }
-    };
 
+      const data = await response.json();
+      setAdminData(data.admin);
+      console.log(data);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchAdminData();
   }, []);
 
@@ -76,6 +76,7 @@ export default function Profile() {
             userDetails={adminData}
             closeModal={handleModal}
             isOwner={true}
+            onProfileUpdate={fetchAdminData} // Pass the callback function
           />
         )}
 
@@ -146,10 +147,7 @@ export default function Profile() {
                 <button className="action-btn" onClick={handleModal}>
                   Edit Profile
                 </button>
-                <button
-                  className="action-btn"
-                  onClick={handlePasswordModal}
-                >
+                <button className="action-btn" onClick={handlePasswordModal}>
                   Change Password
                 </button>
               </div>

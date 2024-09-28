@@ -15,7 +15,7 @@ const adminSLPSchema = new Schema({
   userRole: { type: String },
   profilePicture: {
     type: String,
-    default: "/public/images/default_profile_picture.png",
+    default: "/src/images/profile-picture/default-profile-picture.png",
   },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

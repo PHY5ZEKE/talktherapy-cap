@@ -11,6 +11,7 @@ export default function EditProfile({
   closeModal,
   isOwner,
   whatRole,
+  onProfileUpdate,
 }) {
   const [userData, setUserData] = useState(userDetails);
   const [updatedUser, setUpdatedUser] = useState(null);
@@ -69,6 +70,7 @@ export default function EditProfile({
         alert("Profile updated successfully.");
         setUpdatedUser(data.userDetails);
         handleCloseModal();
+        onProfileUpdate();
       } else {
         alert(data.message || "Error updating profile.");
       }
@@ -112,6 +114,7 @@ export default function EditProfile({
           ...prevData,
           profilePicture: data.profilePicture,
         }));
+        onProfileUpdate();
       } else {
         alert(data.message || "Error updating profile picture.");
       }

@@ -1,28 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const superAdminController = require("../controllers/superAdminSLP.controller");
-const { authenticateSuperAdminToken } = require("../utilities/auth");
 const verifyToken = require("../middleware/verifyToken");
 
 router.post("/super-admin-signup", superAdminController.signup);
 router.post("/super-admin-login", superAdminController.login);
-router.get(
-  "/get-super-admin",
-  authenticateSuperAdminToken,
-  superAdminController.getSuperAdmin
-);
+router.get("/get-super-admin", verifyToken, superAdminController.getSuperAdmin);
 router.post("/forgot-password", superAdminController.forgotPassword);
 router.post("/verify-otp", superAdminController.verifyOtp);
 router.post("/reset-password", superAdminController.resetPassword);
 router.get("/check-auth", superAdminController.checkAuth);
-router.get(
-  "/getAllAdmins",
-  authenticateSuperAdminToken,
-  superAdminController.getAllAdmins
-);
+router.get("/getAllAdmins", verifyToken, superAdminController.getAllAdmins);
 router.get(
   "/getAdminById/:adminId",
-  authenticateSuperAdminToken,
+  verifyToken,
   superAdminController.getAdminById
 );
 
@@ -44,11 +35,6 @@ router.put(
   superAdminController.updateProfilePicture
 );
 
-router.put(
-  "/edit-admin",
-  verifyToken,
-  superAdminController.editAdmin
-);
-
+router.put("/edit-admin", verifyToken, superAdminController.editAdmin);
 
 module.exports = router;

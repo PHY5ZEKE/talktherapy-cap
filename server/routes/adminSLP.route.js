@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminSLP.controller");
 const verifyToken = require("../middleware/verifyToken");
-const { authenticateAdminToken } = require("../utilities/auth");
 
 router.post("/add-admin", adminController.addAdmin);
 router.post("/remove-admin", adminController.removeAdmin);

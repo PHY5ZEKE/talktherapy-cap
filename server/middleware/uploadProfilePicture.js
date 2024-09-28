@@ -3,10 +3,7 @@ const path = require("path");
 
 // Set up storage engine
 const storage = multer.diskStorage({
-  destination: path.join(
-    __dirname,
-    "../../frontend/web-app/public/images/profile_pictures"
-  ),
+  destination: path.join(__dirname, "../../client/src/images/profile-picture"),
   filename: (req, file, cb) => {
     cb(null, `${req.user.id}_${Date.now()}${path.extname(file.originalname)}`);
   },

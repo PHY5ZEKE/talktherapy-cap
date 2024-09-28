@@ -44,7 +44,7 @@ import PatientPerform from "./pages/Patient/Perform";
 
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";
-
+import PublicRoute from "./pages/Authorization/PublicRoute";
 const routes = (
   <Router>
     <Routes>
@@ -55,10 +55,23 @@ const routes = (
       <Route path="/forgot" element={<ForgotPassword />} />
 
       {/* TO DO: Create a page for landing instead of login */}
-      <Route path="/" element={<Login />} />
+      <Route
+        path="/"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
 
-      <Route path="/login" element={<Login />} />
-      {/* Super Admin */}
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
       <Route
         path="/sudo"
         element={

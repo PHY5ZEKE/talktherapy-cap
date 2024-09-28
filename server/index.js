@@ -1,7 +1,9 @@
-require("dotenv").config();
+const path = require("path");
 
 const config = require("./config.json");
 const mongoose = require("mongoose");
+
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 mongoose
   .connect(config.connectionString)
@@ -15,7 +17,6 @@ mongoose
 const express = require("express");
 const cors = require("cors");
 const app = express();
-const path = require("path");
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
 const clinicianSLPRoutes = require("./routes/clinicianSLP.route.js");
@@ -25,7 +26,7 @@ const scheduleRoutes = require("./routes/schedule.route.js");
 const contentRoute = require("./routes/content.route.js");
 
 app.use(express.json());
-app.use("/public", express.static(path.join(__dirname, "public")));
+app.use("/src", express.static(path.join(__dirname, "../src")));
 
 app.use(
   cors({

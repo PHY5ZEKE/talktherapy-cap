@@ -19,19 +19,19 @@ export default function ChooseRegister({ openModal }) {
             {/* SCHEDULE LIST RENDER */}
             <div className="row text-center">
               <div className="col">
-                <Link to="/registerAdmin" className="registerLink">
+                <Link to="/register/admin" className="registerLink">
                   Admin
                 </Link>
               </div>
 
               <div className="col">
-                <Link to="/registerClinician" className="registerLink">
+                <Link to="/register/clinician" className="registerLink">
                   Clinician
                 </Link>
               </div>
 
               <div className="col">
-                <Link to="/registerPatientSLP" className="registerLink">
+                <Link to="/register/patientslp" className="registerLink">
                   Patient
                 </Link>
               </div>

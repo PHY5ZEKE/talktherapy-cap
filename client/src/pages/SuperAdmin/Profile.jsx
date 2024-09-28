@@ -23,41 +23,41 @@ export default function Profile() {
     setIsPasswordModalOpen(!isPasswordModalOpen);
   };
 
+  const fetchUserDetails = async () => {
+    const token = localStorage.getItem("accessToken");
+
+    if (!token) {
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    const endpoint = `http://localhost:8000/${route.sudo.fetch}`;
+    try {
+      const response = await fetch(endpoint, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserDetails(data.superAdmin);
+      } else if (response.status === 401) {
+        setError("Unauthorized. Please log in again.");
+      } else {
+        const errorText = await response.text();
+        console.error("Failed to fetch super admin data:", errorText);
+        setError("Failed to fetch super admin data");
+      }
+    } catch (error) {
+      console.error("Error fetching super admin data:", error);
+      setError("Error fetching super admin data");
+    }
+  };
+
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      const token = localStorage.getItem("accessToken");
-
-      if (!token) {
-        setError("No token found. Please log in.");
-        return;
-      }
-
-      const endpoint = `http://localhost:8000/${route.sudo.fetch}`;
-      try {
-        const response = await fetch(endpoint, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserDetails(data.superAdmin);
-        } else if (response.status === 401) {
-          setError("Unauthorized. Please log in again.");
-        } else {
-          const errorText = await response.text();
-          console.error("Failed to fetch super admin data:", errorText);
-          setError("Failed to fetch super admin data");
-        }
-      } catch (error) {
-        console.error("Error fetching super admin data:", error);
-        setError("Error fetching super admin data");
-      }
-    };
-
     fetchUserDetails();
   }, []);
 
@@ -82,6 +82,7 @@ export default function Profile() {
             userDetails={userDetails}
             closeModal={handleModal}
             isOwner={true}
+            onProfileUpdate={fetchUserDetails}
           />
         )}
 

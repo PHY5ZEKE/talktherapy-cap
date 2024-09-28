@@ -11,28 +11,9 @@ const {
 const verifyToken = require("../middleware/verifyToken");
 
 const multer = require("multer");
-const path = require("path");
 const upload = require("../middleware/uploadProfilePicture");
 
-const algorithm = "aes-256-cbc";
-const secretKey = "12345678901234567890123456789012"; // Ensure this is 32 bytes
-const iv = crypto.randomBytes(16);
-
-const decrypt = (text) => {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift(), "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    Buffer.from(secretKey),
-    iv
-  );
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-};
-
-// Set up storage engine
+const { decrypt } = require("../middleware/aesUtilities");
 
 exports.addClinician = async (req, res) => {
   const { email } = req.body;
@@ -213,7 +194,7 @@ exports.clinicianSignup = async (req, res) => {
   existingClinician.address = address;
   existingClinician.specialization = specialization;
   existingClinician.profilePicture =
-    "/public/images/default_profile_picture.png";
+    "/src/images/profile-picture/default-profile-picture.png";
   existingClinician.password = hashedPassword;
   existingClinician.createdOn = new Date().getTime();
   existingClinician.userRole = "clinician";
@@ -523,12 +504,10 @@ exports.updateProfilePicture = [
       if (err instanceof multer.MulterError) {
         // A Multer error occurred when uploading.
         if (err.code === "LIMIT_FILE_SIZE") {
-          return res
-            .status(400)
-            .json({
-              error: true,
-              message: "File too large. Maximum size is 1MB.",
-            });
+          return res.status(400).json({
+            error: true,
+            message: "File too large. Maximum size is 1MB.",
+          });
         }
         return res.status(400).json({ error: true, message: err.message });
       } else if (err) {
@@ -558,7 +537,7 @@ exports.updateProfilePicture = [
       }
 
       // Update the profile picture URL
-      clinician.profilePicture = `/images/profile_pictures/${req.file.filename}`;
+      clinician.profilePicture = `/src/images/profile-picture/${req.file.filename}`;
       await clinician.save();
 
       return res.json({

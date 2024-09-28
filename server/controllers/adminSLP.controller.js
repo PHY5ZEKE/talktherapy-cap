@@ -12,33 +12,9 @@ const nodemailer = require("nodemailer");
 const verifyToken = require("../middleware/verifyToken");
 
 const multer = require("multer");
-const path = require("path");
 const upload = require("../middleware/uploadProfilePicture");
 
-const algorithm = "aes-256-cbc";
-const secretKey = "12345678901234567890123456789012";
-const iv = crypto.randomBytes(16);
-
-const encrypt = (text) => {
-  const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey), iv);
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString("hex") + ":" + encrypted.toString("hex");
-};
-
-const decrypt = (text) => {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift(), "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    Buffer.from(secretKey),
-    iv
-  );
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-};
+const { encrypt, decrypt } = require("../middleware/aesUtilities");
 
 exports.addAdmin = async (req, res) => {
   const { email } = req.body;
@@ -203,7 +179,8 @@ exports.adminSignup = async (req, res) => {
   existingAdmin.createdOn = new Date().getTime();
   existingAdmin.active = true;
   existingAdmin.userRole = "admin";
-  existingAdmin.profilePicture = "/images/default-profile-picture.png";
+  existingAdmin.profilePicture =
+    "/src/images/profile-picture/default-profile-picture.png";
 
   await existingAdmin.save();
 
@@ -749,11 +726,11 @@ exports.updateProfilePicture = [
       if (!admin) {
         return res
           .status(404)
-          .json({ error: true, message: "superAdmin not found." });
+          .json({ error: true, message: "Admin not found." });
       }
 
       // Update the profile picture URL
-      admin.profilePicture = `/images/profile_pictures/${req.file.filename}`;
+      admin.profilePicture = `/src/images/profile-picture/${req.file.filename}`;
       await admin.save();
 
       return res.json({

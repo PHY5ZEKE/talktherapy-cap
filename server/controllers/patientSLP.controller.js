@@ -1,5 +1,3 @@
-// controllers/patientSlp.controller.js
-require("dotenv").config();
 const PatientSlp = require("../models/patientSlp.model");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -12,34 +10,9 @@ const {
 const verifyToken = require("../middleware/verifyToken");
 
 const multer = require("multer");
-const path = require("path");
 const upload = require("../middleware/uploadProfilePicture");
-const patientSlpModel = require("../models/patientSlp.model");
 
-const algorithm = "aes-256-cbc";
-const secretKey = "12345678901234567890123456789012";
-const iv = crypto.randomBytes(16);
-
-const encrypt = (text) => {
-  const cipher = crypto.createCipheriv(algorithm, Buffer.from(secretKey), iv);
-  let encrypted = cipher.update(text);
-  encrypted = Buffer.concat([encrypted, cipher.final()]);
-  return iv.toString("hex") + ":" + encrypted.toString("hex");
-};
-
-const decrypt = (text) => {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift(), "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    Buffer.from(secretKey),
-    iv
-  );
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
-};
+const { encrypt, decrypt } = require("../middleware/aesUtilities");
 
 const deactivatePatient = async (req, res) => {
   const { email } = req.body;
@@ -169,7 +142,7 @@ const signupPatient = async (req, res) => {
     password: hashedPassword, // Use the hashed password
     createdOn,
     userRole: "patientslp",
-    profilePicture: "/images/default-profile-picture.png",
+    profilePicture: "/src/images/profile-picture/default-profile-picture.png",
     active: true,
   });
 
@@ -495,7 +468,7 @@ const updateProfilePicture = [
       }
 
       // Update the profile picture URL
-      patient.profilePicture = `/images/profile_pictures/${req.file.filename}`;
+      patient.profilePicture = `/src/images/profile-picture/${req.file.filename}`;
       await patient.save();
 
       return res.json({

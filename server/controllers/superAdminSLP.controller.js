@@ -13,19 +13,11 @@ const {
 const verifyToken = require("../middleware/verifyToken");
 
 const multer = require("multer");
-const path = require("path");
 const upload = require("../middleware/uploadProfilePicture");
 
 exports.signup = async (req, res) => {
-  const {
-    email,
-    password,
-    firstName,
-    middleName,
-    lastName,
-    address,
-    mobile,
-  } = req.body;
+  const { email, password, firstName, middleName, lastName, address, mobile } =
+    req.body;
 
   const requiredFields = {
     email: "Email is required",
@@ -75,7 +67,7 @@ exports.signup = async (req, res) => {
     address,
     mobile,
     userRole: "superAdmin",
-    profilePicture: "/images/default-profile-picture.png",
+    profilePicture: "/src/images/profile-picture/default-profile-picture.png",
   });
 
   await superAdmin.save();
@@ -459,7 +451,7 @@ exports.getAdminById = [
 exports.editSuperAdmin = [
   verifyToken,
   async (req, res) => {
-    const { firstName, middleName, lastName, address } = req.body;
+    const { firstName, middleName, lastName, address, mobile } = req.body;
     const { id } = req.user;
 
     // Validate input
@@ -483,6 +475,11 @@ exports.editSuperAdmin = [
         .status(400)
         .json({ error: true, message: "Clinic address is required." });
     }
+    if (!mobile) {
+      return res
+        .status(400)
+        .json({ error: true, message: "Mobile is required." });
+    }
 
     try {
       // Find the clinician by ID
@@ -499,6 +496,7 @@ exports.editSuperAdmin = [
       superAdmin.middleName = middleName;
       superAdmin.lastName = lastName;
       superAdmin.address = address;
+      superAdmin.mobile = mobile;
 
       // Save the updated clinician information
       await superAdmin.save();
@@ -623,7 +621,7 @@ exports.updateProfilePicture = [
       }
 
       // Update the profile picture URL
-      superAdmin.profilePicture = `/images/profile_pictures/${req.file.filename}`;
+      superAdmin.profilePicture = `/src/images/profile-picture/${req.file.filename}`;
       await superAdmin.save();
 
       return res.json({
@@ -646,7 +644,7 @@ exports.editAdmin = [
   verifyToken,
   async (req, res) => {
     const { firstName, middleName, lastName, address, id } = req.body;
-    
+
     // Validate input
     if (!firstName) {
       return res

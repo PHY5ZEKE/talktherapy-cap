@@ -25,35 +25,35 @@ export default function Profile() {
     setIsPasswordModalOpen(!isPasswordModalOpen);
   };
 
-  useEffect(() => {
-    const fetchClinicianData = async () => {
-      const token = localStorage.getItem("accessToken");
+  const fetchClinicianData = async () => {
+    const token = localStorage.getItem("accessToken");
 
-      try {
-        const response = await fetch(
-          `http://localhost:8000/${route.clinician.fetch}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch clinician data");
+    try {
+      const response = await fetch(
+        `http://localhost:8000/${route.clinician.fetch}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
 
-        const data = await response.json();
-        setClinicianData(data.clinician);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch clinician data");
       }
-    };
 
+      const data = await response.json();
+      setClinicianData(data.clinician);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchClinicianData();
   }, []);
 
@@ -70,6 +70,7 @@ export default function Profile() {
             userDetails={clinicianData}
             closeModal={handleModal}
             isOwner={true}
+            onProfileUpdate={fetchClinicianData} // Pass the callback function
           />
         )}
 
@@ -142,10 +143,7 @@ export default function Profile() {
                 <button className="action-btn" onClick={handleModal}>
                   Edit Profile
                 </button>
-                <button
-                  className="action-btn"
-                  onClick={handlePasswordModal}
-                >
+                <button className="action-btn" onClick={handlePasswordModal}>
                   Change Password
                 </button>
                 <Link to="/clinician/schedule">

@@ -28,36 +28,35 @@ export default function Profile() {
     setIsPasswordModalOpen(!isPasswordModalOpen);
   };
 
-  // Fetch patient data from the backend
-  useEffect(() => {
-    const fetchPatientData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+  const fetchPatientData = async () => {
+    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
-      try {
-        const response = await fetch(
-          `http://localhost:8000/${route.patient.fetch}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch admin data");
+    try {
+      const response = await fetch(
+        `http://localhost:8000/${route.patient.fetch}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
         }
+      );
 
-        const data = await response.json();
-        setPatientData(data.patient);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error("Failed to fetch patient data");
       }
-    };
 
+      const data = await response.json();
+      setPatientData(data.patient);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchPatientData();
   }, []);
 
@@ -73,7 +72,8 @@ export default function Profile() {
             userDetails={patientData}
             closeModal={handleModal}
             isOwner={true}
-            whatRole={'patient'}
+            whatRole={"patient"}
+            onProfileUpdate={fetchPatientData} // Pass the callback function
           />
         )}
 
@@ -94,7 +94,9 @@ export default function Profile() {
           >
             <div>
               <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{patientData?.firstName || "Admin"}</p>
+              <p className="m-0 fw-bold">
+                {patientData?.firstName || "Patient"}
+              </p>
             </div>
           </Row>
 
