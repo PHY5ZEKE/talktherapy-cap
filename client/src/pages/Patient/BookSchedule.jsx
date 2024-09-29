@@ -4,6 +4,8 @@ import Col from "react-bootstrap/Col";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
+import Dropdown from "react-bootstrap/Dropdown";
+import JoinAppointment from "../../components/Modals/JoinAppointment";
 
 // DatePicker
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -23,6 +25,13 @@ export default function BookSchedule() {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const [allSched, setAllSchedule] = useState([]);
+
+  // Modal Handle
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleModal = () => {
+    setIsOpen(!isOpen);
+  };
 
   const handleScheduleAdded = useCallback((newSchedule) => {
     console.log("New schedule added:", newSchedule);
@@ -123,6 +132,9 @@ export default function BookSchedule() {
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
+        {/* Join Appointment Modal */}
+        {isOpen && <JoinAppointment openModal={handleModal} />}
+
         {/* CONTENT */}
         <Col
           xs={{ order: 12 }}
@@ -160,7 +172,21 @@ export default function BookSchedule() {
             <Col lg className="height-responsive">
               {/* CONTENT LIST */}
               <div className="card-container d-flex flex-wrap justify-content-center align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="w-100 d-flex justify-content-center">
+                <div className="w-100 d-grid row justify-content-center">
+                  <div className="mx-auto row justify-content-center">
+                    <div className="col">
+                      <select
+                        className="form-select form-select-lg mb-3"
+                        aria-label=".form-select-lg example"
+                      >
+                        <option selected>Specialization</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                      </select>
+                    </div>
+                  </div>
+
                   <DatePicker
                     selected={startDate}
                     onChange={handleDateChange}
@@ -195,7 +221,7 @@ export default function BookSchedule() {
                       </h5>
                       <p className="mb-0">{schedule.day}</p>
                     </div>
-                    <button className="button-group bg-white">
+                    <button className="button-group bg-white" onClick={handleModal}>
                       <p className="fw-bold my-0 status">JOIN</p>
                     </button>
                   </div>

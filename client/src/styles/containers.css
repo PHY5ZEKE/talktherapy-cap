@@ -73,6 +73,10 @@
   max-width: 330px;
 }
 
+.react-datepicker__month-container {
+  width: 100%;
+}
+
 /* .height-responsive {
   height: auto;
 } */

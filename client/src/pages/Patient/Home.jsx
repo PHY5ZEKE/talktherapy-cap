@@ -17,27 +17,21 @@ import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 import { useState, useEffect } from "react";
 
 export default function Home() {
-
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
   const closeModal = () => {
     setIsConfirm(!isConfirm);
   };
 
-    // Handle Reschedule Modal Open
-    const [isOpen, setIsOpen] = useState(false);
-
-
-    // Handle Choose Schedule Modal
-    const [isChoose, setIsChoose] = useState(false);
-    const closeSchedule = () => {
-      setIsChoose(!isChoose);
-    };
+  // Handle Choose Schedule Modal
+  const [isChoose, setIsChoose] = useState(false);
+  const closeSchedule = () => {
+    setIsChoose(!isChoose);
+  };
 
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -83,7 +77,13 @@ export default function Home() {
           className="d-flex flex-column stretch-flex"
         >
           {/* MODAL */}
-          {isConfirm && <ConfirmReschedule onClick={closeModal} closeModal={closeModal} openResched={closeSchedule} />}
+          {isConfirm && (
+            <ConfirmReschedule
+              onClick={closeModal}
+              closeModal={closeModal}
+              openResched={closeSchedule}
+            />
+          )}
 
           {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
 
