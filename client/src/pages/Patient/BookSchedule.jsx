@@ -221,7 +221,10 @@ export default function BookSchedule() {
                       </h5>
                       <p className="mb-0">{schedule.day}</p>
                     </div>
-                    <button className="button-group bg-white" onClick={handleModal}>
+                    <button
+                      className="button-group bg-white"
+                      onClick={handleModal}
+                    >
                       <p className="fw-bold my-0 status">JOIN</p>
                     </button>
                   </div>
@@ -229,7 +232,33 @@ export default function BookSchedule() {
               </div>
             </Col>
 
-            <Col lg></Col>
+            <Col lg>
+              <div className="card-container d-flex flex-wrap p-4 justify-content-center align-items-center flex-row gap-3 scrollable-div-5 notif-home">
+                <h4 className="text-left fw-bold">Your Appointments</h4>
+                <div className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom">
+                  <div className="w-100">
+                    <h5 className="fw-bold mb-0">TIME</h5>
+                    <p className="mb-0">DAY</p>
+                  </div>
+
+                  {/* IF PENDING */}
+                  <button className="button-group bg-white">
+                    <p className="fw-bold my-0 status">PENDING</p>
+                  </button>
+
+                  {/* IF ACCEPTED */}
+                  <button className="button-group bg-white">
+                    <p className="fw-bold my-0 status">JOIN</p>
+                  </button>
+
+                  <button className="button-group bg-white">
+                    <p className="fw-bold my-0 status">CANCEL</p>
+                  </button>
+
+
+                </div>
+              </div>
+            </Col>
           </Row>
         </Col>
       </Row>

@@ -51,7 +51,6 @@ const routes = (
       <Route path="/register/admin" element={<RegisterAdmin />} />
       <Route path="/register/clinician" element={<RegisterClinician />} />
       <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
-
       <Route path="/forgot" element={<ForgotPassword />} />
 
       {/* TO DO: Create a page for landing instead of login */}
