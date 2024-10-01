@@ -54,6 +54,7 @@
 .status-text {
   padding: 0.5em 2em;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .top-size {

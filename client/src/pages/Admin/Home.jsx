@@ -8,6 +8,7 @@ import "./home.css";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
+import AppointmentDetails from "../../components/Modals/AppointmentDetails";
 
 // Icons
 import Logout from "../../assets/buttons/Logout";
@@ -22,6 +23,12 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedUserType, setSelectedUserType] = useState("patients");
+
+  // Handle Appointment Details Modal
+  const [isConfirm, setIsConfirm] = useState(false);
+  const closeModal = () => {
+    setIsConfirm(!isConfirm);
+  };
 
   useEffect(() => {
     const fetchAdminData = async () => {
@@ -116,6 +123,9 @@ export default function Home() {
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
+        {/* MODAL */}
+        {isConfirm && <AppointmentDetails openModal={closeModal} />}
+
         {/* CONTENT */}
         <Col xs={{ order: 12 }} lg={{ order: 1 }}>
           {/* TOP BAR */}
@@ -180,7 +190,10 @@ export default function Home() {
                       Session of Dr. Reyes with Nicole Oraya has started.
                     </p>
                     <div className="d-flex justify-content-between mt-3">
-                      <p className="status-pending status-text status-text-orange">
+                      <p
+                        className="status-pending status-text status-text-orange"
+                        onClick={closeModal}
+                      >
                         PENDING
                       </p>
                       <p className="fw-bold">Dr. Juan Dela Cruz</p>
