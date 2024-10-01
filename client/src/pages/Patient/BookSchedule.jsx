@@ -25,11 +25,21 @@ export default function BookSchedule() {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const [allSched, setAllSchedule] = useState([]);
+  const [selectedSpecialization, setSelectedSpecialization] = useState("");
 
   // Modal Handle
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedClinician, setSelectedClinician] = useState(null);
+  const [selectedSchedule, setSelectedSchedule] = useState(null);
 
-  const handleModal = () => {
+  // State for storing appointments
+  const [appointments, setAppointments] = useState([]);
+
+  const handleModal = (clinician, schedule) => {
+    console.log("Selected clinician:", clinician);
+    console.log("Selected schedule:", schedule);
+    setSelectedClinician(clinician);
+    setSelectedSchedule(schedule);
     setIsOpen(!isOpen);
   };
 
@@ -43,6 +53,10 @@ export default function BookSchedule() {
     setStartDate(date);
     setSelectedDate(date);
   }, []);
+
+  const handleSpecializationChange = (event) => {
+    setSelectedSpecialization(event.target.value);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
@@ -99,8 +113,35 @@ export default function BookSchedule() {
       }
     };
 
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/appointments/get-appointment",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch appointments");
+        }
+
+        const data = await response.json();
+        console.log("Appointments fetched:", data);
+        setAppointments(data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error.message);
+        setError(error.message);
+      }
+    };
+
     fetchPatientData();
     fetchAll();
+    fetchAppointments();
   }, []);
 
   const getAllSchedulesForSelectedDay = useMemo(() => {
@@ -109,11 +150,14 @@ export default function BookSchedule() {
       weekday: "long",
     });
     const filteredSchedules = allSched.filter(
-      (schedule) => schedule.day === dayOfWeek
+      (schedule) =>
+        schedule.day === dayOfWeek &&
+        (!selectedSpecialization ||
+          schedule.specialization === selectedSpecialization)
     );
     console.log(`Schedules for ${dayOfWeek}:`, filteredSchedules);
     return filteredSchedules;
-  }, [selectedDate, allSched]);
+  }, [selectedDate, allSched, selectedSpecialization]);
 
   const getDayClassName = useCallback(
     (date) => {
@@ -132,8 +176,15 @@ export default function BookSchedule() {
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
-        {/* Join Appointment Modal */}
-        {isOpen && <JoinAppointment openModal={handleModal} />}
+        {/* Book Appointment Modal */}
+        {isOpen && (
+          <JoinAppointment
+            openModal={handleModal}
+            selectedClinician={selectedClinician}
+            selectedSchedule={selectedSchedule}
+            patientId={patientData?._id}
+          />
+        )}
 
         {/* CONTENT */}
         <Col
@@ -178,11 +229,14 @@ export default function BookSchedule() {
                       <select
                         className="form-select form-select-lg mb-3"
                         aria-label=".form-select-lg example"
+                        value={selectedSpecialization}
+                        onChange={handleSpecializationChange}
                       >
-                        <option selected>Specialization</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                        <option value="" disabled selected>
+                          Specialization
+                        </option>
+                        <option value="Aphasia">Aphasia</option>
+                        <option value="Stroke">Stroke</option>
                       </select>
                     </div>
                   </div>
@@ -220,10 +274,13 @@ export default function BookSchedule() {
                         {schedule.startTime} - {schedule.endTime}
                       </h5>
                       <p className="mb-0">{schedule.day}</p>
+                      <h5 className="fw-bold mb-0">{schedule.clinicianName}</h5>
                     </div>
                     <button
                       className="button-group bg-white"
-                      onClick={handleModal}
+                      onClick={() =>
+                        handleModal(schedule.clinicianId, schedule._id)
+                      }
                     >
                       <p className="fw-bold my-0 status">JOIN</p>
                     </button>
@@ -232,31 +289,54 @@ export default function BookSchedule() {
               </div>
             </Col>
 
+            {/* PATIENT APPOINTMENTS */}
             <Col lg>
               <div className="card-container d-flex flex-wrap p-4 justify-content-center align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <h4 className="text-left fw-bold">Your Appointments</h4>
-                <div className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom">
-                  <div className="w-100">
-                    <h5 className="fw-bold mb-0">TIME</h5>
-                    <p className="mb-0">DAY</p>
+                <h4 className="text-left fw-bold">Your Appointment</h4>
+                {appointments.map((appointment, index) => (
+                  <div
+                    key={index}
+                    className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom"
+                  >
+                    <div className="w-100">
+                      <h5 className="fw-bold mb-0">
+                        {appointment.selectedSchedule.startTime} -{" "}
+                        {appointment.selectedSchedule.endTime}
+                      </h5>
+                      <p className="mb-0">{appointment.selectedSchedule.day}</p>
+                      <h5 className="fw-bold mb-0">
+                        Clinician: {appointment.selectedSchedule.clinicianName}
+                      </h5>
+                      {/* IF PENDING */}
+                      {appointment.status === "Pending" && (
+                        <button className="button-group bg-white">
+                          <p className="fw-bold my-0 status">PENDING</p>
+                        </button>
+                      )}
+                      {appointment.status === "Pending" && (
+                        <button className="button-group bg-white">
+                          <p className="fw-bold my-0 status">Edit</p>
+                        </button>
+                      )}
+                      {appointment.status === "Pending" && (
+                        <button className="button-group bg-white">
+                          <p className="fw-bold my-0 status">Delete</p>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* IF ACCEPTED */}
+                    {appointment.status === "Accepted" && (
+                      <button className="button-group bg-white">
+                        <p className="fw-bold my-0 status">JOIN</p>
+                      </button>
+                    )}
+
+                    <button className="button-group bg-white">
+                      <p className="fw-bold my-0 status">CANCEL</p>
+                    </button>
                   </div>
-
-                  {/* IF PENDING */}
-                  <button className="button-group bg-white">
-                    <p className="fw-bold my-0 status">PENDING</p>
-                  </button>
-
-                  {/* IF ACCEPTED */}
-                  <button className="button-group bg-white">
-                    <p className="fw-bold my-0 status">JOIN</p>
-                  </button>
-
-                  <button className="button-group bg-white">
-                    <p className="fw-bold my-0 status">CANCEL</p>
-                  </button>
-
-
-                </div>
+                ))}
               </div>
             </Col>
           </Row>

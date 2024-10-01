@@ -23,12 +23,47 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedUserType, setSelectedUserType] = useState("patients");
+  const [appointments, setAppointments] = useState([]);
 
   // Handle Appointment Details Modal
   const [isConfirm, setIsConfirm] = useState(false);
   const closeModal = () => {
     setIsConfirm(!isConfirm);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/appointments/get-all-appointments",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch appointments");
+        }
+
+        const data = await response.json();
+        console.log("Appointments fetched:", data);
+        setAppointments(data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error.message);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
 
   useEffect(() => {
     const fetchAdminData = async () => {
@@ -118,6 +153,17 @@ export default function Home() {
     setSelectedUserType(type);
   };
 
+  const totalAppointments = appointments.length;
+  const pendingAppointments = appointments.filter(
+    (appointment) => appointment.status === "Pending"
+  ).length;
+  const cancelledAppointments = appointments.filter(
+    (appointment) => appointment.status === "Cancelled"
+  ).length;
+  const acceptedAppointments = appointments.filter(
+    (appointment) => appointment.status === "Accepted"
+  ).length;
+
   return (
     <Container>
       <Row className="min-vh-100 vw-100">
@@ -160,22 +206,22 @@ export default function Home() {
 
               <div className="card-container d-flex flex-column gap-2">
                 <div className="text-center">
-                  <h2 className="fw-bold mb-0">11</h2>
+                  <h2 className="fw-bold mb-0">{totalAppointments}</h2>
                   <h5>Total Appointments</h5>
                 </div>
 
                 {/* STATUS COUNTER */}
                 <div className="text-center d-flex justify-content-center align-content-center gap-4">
                   <div className="status-pending status-size">
-                    <h4 className="mb-0">4</h4>
+                    <h4 className="mb-0">{pendingAppointments}</h4>
                     <p className="mb-0">Pending</p>
                   </div>
                   <div className="status-cancelled status-size">
-                    <h4 className="mb-0">4</h4>
+                    <h4 className="mb-0">{cancelledAppointments}</h4>
                     <p className="mb-0">Cancelled</p>
                   </div>
                   <div className="status-accepted status-size">
-                    <h4 className="mb-0">4</h4>
+                    <h4 className="mb-0">{acceptedAppointments}</h4>
                     <p className="mb-0">Accepted</p>
                   </div>
                 </div>
@@ -183,94 +229,106 @@ export default function Home() {
                 {/* APPOINTMENT COL */}
                 <div className="scrollable-div-3 d-flex flex-column gap-3">
                   {/* PENDING COMPONENT */}
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-pending-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p
-                        className="status-pending status-text status-text-orange"
-                        onClick={closeModal}
+                  {appointments
+                    .filter((appointment) => appointment.status === "Pending")
+                    .map((appointment, index) => (
+                      <div
+                        key={index}
+                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-pending-2"
                       >
-                        PENDING
-                      </p>
-                      <p className="fw-bold">Dr. Juan Dela Cruz</p>
-                    </div>
-                  </div>
+                        <p className="fw-bold mb-0">
+                          {appointment.selectedSchedule.day}
+                        </p>
+                        <p className="mb-0">
+                          {appointment.selectedSchedule.startTime} to{" "}
+                          {appointment.selectedSchedule.endTime}
+                        </p>
+
+                        <p className="mb-0">
+                          {appointment.patientId.firstName}{" "}
+                          {appointment.patientId.middleName}{" "}
+                          {appointment.patientId.lastName} has requested a
+                          session with{" "}
+                          {appointment.selectedSchedule.clinicianName}
+                        </p>
+                        <div className="d-flex justify-content-between mt-3">
+                          <p
+                            className="status-pending status-text status-text-orange"
+                            onClick={closeModal}
+                          >
+                            PENDING
+                          </p>
+                          <p className="fw-bold">
+                            {appointment.selectedSchedule.clinicianName}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
 
                   {/* ACCEPTED COMPONENT */}
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-accepted status-text status-text-green">
-                        PENDING
-                      </p>
-                      <p className="fw-bold">Dr. Juan Dela Cruz</p>
-                    </div>
-                  </div>
+                  {appointments
+                    .filter((appointment) => appointment.status === "Accepted")
+                    .map((appointment, index) => (
+                      <div
+                        key={index}
+                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                      >
+                        <p className="fw-bold mb-0">
+                          {new Date(
+                            appointment.selectedSchedule.date
+                          ).toLocaleDateString()}
+                        </p>
+                        <p className="mb-0">
+                          {new Date(
+                            appointment.selectedSchedule.startTime
+                          ).toLocaleTimeString()}
+                        </p>
+                        <p className="mb-0">
+                          Session of{" "}
+                          {appointment.selectedSchedule.clinicianName} with{" "}
+                          {appointment.patientName} has started.
+                        </p>
+                        <div className="d-flex justify-content-between mt-3">
+                          <p className="status-accepted status-text status-text-green">
+                            ACCEPTED
+                          </p>
+                          <p className="fw-bold">
+                            {appointment.selectedSchedule.clinicianName}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
 
                   {/* CANCELLED COMPONENT */}
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-cancelled status-text status-text-red">
-                        PENDING
-                      </p>
-                      <p className="fw-bold">Dr. Juan Dela Cruz</p>
-                    </div>
-                  </div>
-
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-cancelled status-text status-text-red">
-                        PENDING
-                      </p>
-                      <p className="fw-bold">Dr. Juan Dela Cruz</p>
-                    </div>
-                  </div>
-
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-cancelled status-text status-text-red">
-                        PENDING
-                      </p>
-                      <p className="fw-bold">Dr. Juan Dela Cruz</p>
-                    </div>
-                  </div>
-
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-cancelled status-text status-text-red">
-                        PENDING
-                      </p>
-                      <p className="fw-bold">Dr. Juan Dela Cruz</p>
-                    </div>
-                  </div>
+                  {appointments
+                    .filter((appointment) => appointment.status === "Cancelled")
+                    .map((appointment, index) => (
+                      <div
+                        key={index}
+                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2"
+                      >
+                        <p className="fw-bold mb-0">
+                          {appointment.selectedSchedule.day}
+                        </p>
+                        <p className="mb-0">
+                          {appointment.selectedSchedule.startTime} -{" "}
+                          {appointment.selectedSchedule.endTime}
+                        </p>
+                        <p className="mb-0">
+                          Session of{" "}
+                          {appointment.selectedSchedule.clinicianName} with{" "}
+                          {appointment.patientName} has started.
+                        </p>
+                        <div className="d-flex justify-content-between mt-3">
+                          <p className="status-cancelled status-text status-text-red">
+                            CANCELLED
+                          </p>
+                          <p className="fw-bold">
+                            {appointment.selectedSchedule.clinicianName}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
             </Col>

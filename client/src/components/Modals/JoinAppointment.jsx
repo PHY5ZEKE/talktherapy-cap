@@ -1,12 +1,82 @@
 import "./modal.css";
 import Form from "react-bootstrap/Form";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
+import { useState } from "react";
+import Alert from "react-bootstrap/Alert";
 
-export default function JoinAppointment({ openModal }) {
+export default function JoinAppointment({
+  openModal,
+  selectedClinician,
+  selectedSchedule,
+  patientId,
+}) {
+  const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
+  const [sourceOfReferral, setSourceOfReferral] = useState("");
+  const [chiefComplaint, setChiefComplaint] = useState("");
+  const [referralUpload, setReferralUpload] = useState(null);
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
+
   const handleClose = (e) => {
     e.preventDefault();
     openModal();
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!medicalDiagnosis || !sourceOfReferral || !chiefComplaint) {
+      setAlertMessage("All fields are required.");
+      setAlertVariant("danger");
+      setAlertVisible(true);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("patientId", patientId);
+    formData.append("sourceOfReferral", sourceOfReferral);
+    formData.append("chiefComplaint", chiefComplaint);
+    formData.append("selectedClinician", selectedClinician);
+    formData.append("selectedSchedule", selectedSchedule);
+    formData.append("referralUpload", referralUpload);
+
+    try {
+      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
+
+      const response = await fetch(
+        "http://localhost:8000/appointments/create-appointment",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create appointment");
+      }
+
+      console.log("Appointment created successfully:", data);
+      setAlertMessage("Appointment created successfully.");
+      setAlertVariant("success");
+      setAlertVisible(true);
+      openModal(); // Close the modal on success
+    } catch (error) {
+      console.error("Error creating appointment:", error.message);
+      setAlertMessage(
+        error.message || "Error creating appointment. Please try again."
+      );
+      setAlertVariant("danger");
+      setAlertVisible(true);
+    }
+  };
+
   return (
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-content-center">
@@ -16,18 +86,39 @@ export default function JoinAppointment({ openModal }) {
         </div>
 
         <div className="container">
+          {/* Alert Component */}
+          {alertVisible && (
+            <Alert
+              variant={alertVariant}
+              onClose={() => setAlertVisible(false)}
+              dismissible
+            >
+              {alertMessage}
+            </Alert>
+          )}
+
           {/* Join Appointment Form */}
           <div className="row">
             <div className="col">
-              <Form>
+              <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-bold">Medical Diagnosis</Form.Label>
-                  <Form.Control type="text" placeholder="Ex. Aphasia" />
+                  <Form.Control
+                    type="text"
+                    placeholder="Ex. Aphasia"
+                    value={medicalDiagnosis}
+                    onChange={(e) => setMedicalDiagnosis(e.target.value)}
+                  />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-bold">Referral</Form.Label>
-                  <Form.Control type="text" placeholder="Source of referral" />
+                  <Form.Control
+                    type="text"
+                    placeholder="Source of referral"
+                    value={sourceOfReferral}
+                    onChange={(e) => setSourceOfReferral(e.target.value)}
+                  />
                 </Form.Group>
 
                 <Form.Group className="mb-3">
@@ -37,37 +128,48 @@ export default function JoinAppointment({ openModal }) {
                     label="Chief Complaint"
                     className="mb-3"
                   >
-                    <Form.Control as="textarea" placeholder="Chief complaint" />
+                    <Form.Control
+                      as="textarea"
+                      placeholder="Chief complaint"
+                      value={chiefComplaint}
+                      onChange={(e) => setChiefComplaint(e.target.value)}
+                    />
                   </FloatingLabel>
                 </Form.Group>
 
                 <Form.Group controlId="formFile" className="mb-3">
-                  <Form.Label className="fw-bold">Default file input example</Form.Label>
-                  <Form.Control type="file" />
+                  <Form.Label className="fw-bold">Referral Upload</Form.Label>
+                  <Form.Control
+                    type="file"
+                    onChange={(e) => setReferralUpload(e.target.files[0])}
+                  />
                 </Form.Group>
+
+                <div className="d-flex justify-content-center mt-3 gap-3">
+                  <button type="submit" className="button-group bg-white">
+                    <p className="fw-bold my-0 status">BOOK</p>
+                  </button>
+                  <button
+                    onClick={handleClose}
+                    className="button-group bg-white"
+                  >
+                    <p className="fw-bold my-0 status">CANCEL</p>
+                  </button>
+                </div>
               </Form>
             </div>
           </div>
 
           <div className="row text-center">
-            <div className="col">
+            <div className="col" hidden>
               <p className="fw-bold">Selected Clinician</p>
-              <p>Dr. Juan Dela Cruz</p>
+              <p hidden>{selectedClinician}</p>
             </div>
-            <div className="col">
+            <div className="col" hidden>
               <p className="fw-bold">Selected Schedule</p>
-              <p>September 2, 2024 4:00 PM - 5:00 PM</p>
+              <p hidden>{selectedSchedule}</p>
             </div>
           </div>
-        </div>
-
-        <div className="d-flex justify-content-center mt-3 gap-3">
-          <button className="button-group bg-white">
-            <p className="fw-bold my-0 status">BOOK</p>
-          </button>
-          <button onClick={handleClose} className="button-group bg-white">
-            <p className="fw-bold my-0 status">CANCEL</p>
-          </button>
         </div>
       </div>
     </div>

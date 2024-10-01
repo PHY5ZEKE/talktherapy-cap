@@ -36,12 +36,27 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
     setEndTime(event.target.value);
   };
 
+  // Helper function to convert 24-hour time to 12-hour time with AM/PM
+  const formatTime = (time) => {
+    const [hour, minute] = time.split(":");
+    const hourInt = parseInt(hour, 10);
+    const period = hourInt >= 12 ? "PM" : "AM";
+    const hour12 = hourInt % 12 || 12;
+    return `${hour12}:${minute} ${period}`;
+  };
+
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
 
-    const schedule = { day: selectedWeekday, startTime, endTime };
+    const formattedStartTime = formatTime(startTime);
+    const formattedEndTime = formatTime(endTime);
+    const schedule = {
+      day: selectedWeekday,
+      startTime: formattedStartTime,
+      endTime: formattedEndTime,
+    };
 
     try {
       const response = await fetch(

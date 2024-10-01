@@ -4,7 +4,7 @@ const appointmentSchema = new mongoose.Schema(
   {
     patientId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Patient",
+      ref: "PatientSlp",
       required: true,
     },
     sourceOfReferral: {
@@ -31,7 +31,7 @@ const appointmentSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Pending", "Approved", "Rejected", "Completed"],
+      enum: ["Pending", "Accepted", "Rejected", "Completed"],
       default: "Pending",
     },
   },

@@ -4,6 +4,8 @@ const Schedule = require("../models/schedule.model");
 const multer = require("multer");
 const path = require("path");
 
+const { encrypt, decrypt } = require("../middleware/aesUtilities");
+
 // Set up storage engine
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -39,10 +41,14 @@ const upload = multer({
 exports.createAppointment = async (req, res) => {
   upload(req, res, async function (err) {
     if (err) {
+      console.error("File upload error:", err.message);
       return res.status(400).json({ message: err.message });
     }
 
     try {
+      console.log("Request body:", req.body);
+      console.log("Uploaded file:", req.file);
+
       const {
         patientId,
         sourceOfReferral,
@@ -54,6 +60,10 @@ exports.createAppointment = async (req, res) => {
       // Check if the patient already has an appointment
       const existingAppointment = await Appointment.findOne({ patientId });
       if (existingAppointment) {
+        console.error(
+          "Patient already has an appointment:",
+          existingAppointment
+        );
         return res
           .status(400)
           .json({ message: "Patient already has an appointment" });
@@ -62,11 +72,13 @@ exports.createAppointment = async (req, res) => {
       // Validate selectedClinician and selectedSchedule
       const clinician = await ClinicianSLP.findById(selectedClinician);
       if (!clinician) {
+        console.error("Invalid clinician selected:", selectedClinician);
         return res.status(400).json({ message: "Invalid clinician selected" });
       }
 
       const schedule = await Schedule.findById(selectedSchedule);
       if (!schedule) {
+        console.error("Invalid schedule selected:", selectedSchedule);
         return res.status(400).json({ message: "Invalid schedule selected" });
       }
 
@@ -84,6 +96,7 @@ exports.createAppointment = async (req, res) => {
       // Save the appointment to the database
       await newAppointment.save();
 
+      console.log("Appointment created successfully:", newAppointment);
       res.status(201).json({
         message: "Appointment created successfully",
         appointment: newAppointment,
@@ -97,12 +110,33 @@ exports.createAppointment = async (req, res) => {
 
 exports.getAllAppointments = async (req, res) => {
   try {
-    const appointments = await Appointment.find().populate({
-      path: "selectedSchedule",
-      select: "clinicianName specialization day startTime endTime", // Select the schedule details
+    const appointments = await Appointment.find()
+      .populate({
+        path: "selectedSchedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
+      })
+      .populate({
+        path: "patientId",
+        select: "firstName middleName lastName", // Select the patient details
+      });
+
+    // Decrypt patient details
+    const decryptedAppointments = appointments.map((appointment) => {
+      if (appointment.patientId) {
+        appointment.patientId.firstName = decrypt(
+          appointment.patientId.firstName
+        );
+        appointment.patientId.middleName = decrypt(
+          appointment.patientId.middleName
+        );
+        appointment.patientId.lastName = decrypt(
+          appointment.patientId.lastName
+        );
+      }
+      return appointment;
     });
 
-    res.status(200).json(appointments);
+    res.status(200).json(decryptedAppointments);
   } catch (error) {
     console.error("Error fetching appointments:", error);
     res.status(500).json({ message: "Internal server error" });
