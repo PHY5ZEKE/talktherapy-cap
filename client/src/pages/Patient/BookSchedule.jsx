@@ -13,6 +13,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function BookSchedule() {
+  const [showModal, setShowModal] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertVariant, setAlertVariant] = useState("success");
   // DatePicker Instance
   const [startDate, setStartDate] = useState(new Date());
 
@@ -43,10 +47,13 @@ export default function BookSchedule() {
     setIsOpen(!isOpen);
   };
 
-  const handleScheduleAdded = useCallback((newSchedule) => {
-    console.log("New schedule added:", newSchedule);
-    setSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
-  }, []);
+  const handleSuccess = (message) => {
+    setAlertMessage(message);
+    setAlertVariant("success");
+    setAlertVisible(true);
+    setShowModal(false);
+    window.location.reload(); // Reload the page on success
+  };
 
   const handleDateChange = useCallback((date) => {
     console.log("Date selected:", date);
@@ -183,6 +190,7 @@ export default function BookSchedule() {
             selectedClinician={selectedClinician}
             selectedSchedule={selectedSchedule}
             patientId={patientData?._id}
+            onSuccess={handleSuccess}
           />
         )}
 

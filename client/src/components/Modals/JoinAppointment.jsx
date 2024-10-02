@@ -9,6 +9,7 @@ export default function JoinAppointment({
   selectedClinician,
   selectedSchedule,
   patientId,
+  onSuccess, // Receive the success handler
 }) {
   const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
   const [sourceOfReferral, setSourceOfReferral] = useState("");
@@ -63,10 +64,8 @@ export default function JoinAppointment({
       }
 
       console.log("Appointment created successfully:", data);
-      setAlertMessage("Appointment created successfully.");
-      setAlertVariant("success");
-      setAlertVisible(true);
-      openModal(); // Close the modal on success
+      onSuccess("Appointment created successfully."); // Call the success handler
+      window.location.reload(); // Reload the page on success
     } catch (error) {
       console.error("Error creating appointment:", error.message);
       setAlertMessage(

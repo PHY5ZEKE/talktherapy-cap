@@ -19,6 +19,7 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const [patients, setPatients] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [appointments, setAppointments] = useState([]);
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -104,6 +105,36 @@ export default function Home() {
     fetchClinicianData();
   }, []);
 
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+
+      try {
+        const response = await fetch(
+          "http://localhost:8000/appointments/get-appointment-by-clinician",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch appointments");
+        }
+
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        console.error("Error fetching appointments:", error);
+      }
+    };
+
+    fetchAppointments();
+  }, []);
+
   return (
     <Container>
       {/* MODAL */}
@@ -160,57 +191,49 @@ export default function Home() {
                     type="text"
                     placeholder="Search"
                     className="search-input"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                   />
                 </div>
 
                 <div className="scrollable-div d-flex flex-column">
-                  {/* PENDING COMPONENT */}
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-pending-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-pending status-text status-text-orange">
-                        PENDING
-                      </p>
-
-                      <div>
-                        <button className="button-group bg-white">
-                          <p className="fw-bold my-0 status">ACCEPT</p>
-                        </button>
-                        <button
-                          className="button-group bg-white"
-                          onClick={closeModal}
-                        >
-                          <p className="fw-bold my-0 status">CANCEL</p>
-                        </button>
+                  {appointments
+                    .filter((appointment) => appointment.status === "Accepted")
+                    .map((appointment) => (
+                      <div
+                        key={appointment._id}
+                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                      >
+                        <p className="fw-bold mb-0">
+                          {appointment.selectedSchedule.day}
+                        </p>
+                        <p className="mb-0">
+                          {appointment.selectedSchedule.startTime} -{" "}
+                          {appointment.selectedSchedule.endTime}
+                        </p>
+                        <p className="mb-0">
+                          Scheduled appointment with{" "}
+                          {appointment.patientId.firstName}{" "}
+                          {appointment.patientId.lastName}
+                        </p>
+                        <div className="d-flex justify-content-between mt-3">
+                          <p className="status-accepted status-text status-text-green">
+                            ACCEPTED
+                          </p>
+                          <div>
+                            <button className="button-group bg-white">
+                              <p className="fw-bold my-0 status">JOIN</p>
+                            </button>
+                            <button
+                              className="button-group bg-white"
+                              onClick={() => console.log("Close modal")}
+                            >
+                              <p className="fw-bold my-0 status">CANCEL</p>
+                            </button>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* ACCEPTED COMPONENT */}
-                  <div className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                    <div className="d-flex justify-content-between mt-3">
-                      <p className="status-accepted status-text status-text-green">
-                        ACCEPTED
-                      </p>
-                      <div>
-                        <button className="button-group bg-white">
-                          <p className="fw-bold my-0 status">JOIN</p>
-                        </button>
-                        <button className="button-group bg-white">
-                          <p className="fw-bold my-0 status">CANCEL</p>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                    ))}
                 </div>
               </div>
             </Col>
@@ -249,7 +272,7 @@ export default function Home() {
               </div>
             </Col>
 
-            {/* NOTIFCATION */}
+            {/* NOTIFICATION */}
             <Col lg className="height-responsive">
               {/* HEADING */}
               <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
@@ -257,95 +280,30 @@ export default function Home() {
               </div>
 
               <div className="card-container d-flex flex-column gap-2 scrollable-div-2 notif-home">
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
+                {appointments.map((appointment) => (
+                  <div
+                    key={appointment._id}
+                    className="card-content-bg-dark p-3"
+                  >
+                    <div className="d-flex flex-column g-1 mb-2">
+                      <p className="fw-bold mb-0">
+                        {new Date(appointment.createdAt).toLocaleDateString()}
+                      </p>
+                      <p className="mb-0">
+                        {new Date(appointment.createdAt).toLocaleTimeString()}
+                      </p>
+                      <p className="mb-0">
+                        Session of Dr. {appointment.selectedClinician} with{" "}
+                        {appointment.patientId.firstName}{" "}
+                        {appointment.patientId.lastName} has started.
+                      </p>
+                    </div>
 
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
+                    <div className="button-group bg-white">
+                      <p className="fw-bold my-0 status">ON-GOING</p>
+                    </div>
                   </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </Col>
           </Row>

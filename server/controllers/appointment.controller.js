@@ -22,15 +22,15 @@ const upload = multer({
 }).single("file");
 
 exports.createAppointment = async (req, res) => {
-  upload(req, res, async function (err) {
-    if (err) {
-      console.error("File upload error:", err.message);
-      return res.status(400).json({ message: err.message });
-    }
+  try {
+    // Use multer to handle the file upload and form data
+    upload(req, res, async function (err) {
+      if (err) {
+        return res.status(400).json({ message: err.message });
+      }
 
-    try {
+      // Log the request body to check the form data
       console.log("Request body:", req.body);
-      console.log("Uploaded file:", req.file);
 
       const {
         patientId,
@@ -40,55 +40,54 @@ exports.createAppointment = async (req, res) => {
         selectedSchedule,
       } = req.body;
 
-      // Check if the patient already has an appointment
+      console.log("Selected Clinician ID:", selectedClinician);
+
+      if (!selectedClinician) {
+        return res.status(400).json({ message: "Clinician ID is required" });
+      }
+
+      const clinician = await ClinicianSLP.findById(selectedClinician);
+
+      if (!clinician) {
+        console.error("Clinician not found. ID:", selectedClinician);
+        return res.status(400).json({ message: "Invalid clinician selected" });
+      }
+
+      console.log("Clinician found:", clinician);
+
+      const schedule = await Schedule.findById(selectedSchedule);
+      if (!schedule) {
+        return res.status(400).json({ message: "Invalid schedule selected" });
+      }
+
       const existingAppointment = await Appointment.findOne({ patientId });
       if (existingAppointment) {
-        console.error(
-          "Patient already has an appointment:",
-          existingAppointment
-        );
         return res
           .status(400)
           .json({ message: "Patient already has an appointment" });
       }
 
-      // Validate selectedClinician and selectedSchedule
-      const clinician = await ClinicianSLP.findById(selectedClinician);
-      if (!clinician) {
-        console.error("Invalid clinician selected:", selectedClinician);
-        return res.status(400).json({ message: "Invalid clinician selected" });
-      }
-
-      const schedule = await Schedule.findById(selectedSchedule);
-      if (!schedule) {
-        console.error("Invalid schedule selected:", selectedSchedule);
-        return res.status(400).json({ message: "Invalid schedule selected" });
-      }
-
-      // Create a new appointment
       const newAppointment = new Appointment({
         patientId,
         sourceOfReferral,
         chiefComplaint,
         selectedClinician,
         selectedSchedule,
-        referralUpload: req.file ? req.file.location : "", // Save the S3 file URL
+        referralUpload: req.file ? req.file.location : "",
         status: "Pending",
       });
 
-      // Save the appointment to the database
       await newAppointment.save();
 
-      console.log("Appointment created successfully:", newAppointment);
       res.status(201).json({
         message: "Appointment created successfully",
         appointment: newAppointment,
       });
-    } catch (error) {
-      console.error("Error creating appointment:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 exports.getAllAppointments = async (req, res) => {
@@ -130,7 +129,8 @@ exports.getPatientAppointment = async (req, res) => {
   try {
     const patientId = req.user.id; // Assuming the patient ID is stored in req.user.id after token verification
 
-    const appointments = await Appointment.find().populate({
+    // Find appointments for the logged-in user only
+    const appointments = await Appointment.find({ patientId }).populate({
       path: "selectedSchedule",
       select: "clinicianName specialization day startTime endTime", // Select the schedule details
     });
@@ -278,6 +278,47 @@ exports.updateAppointmentStatus = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.getClinicianAppointments = async (req, res) => {
+  try {
+    const clinicianId = req.user.id; // Assuming the clinician ID is stored in req.user.id after token verification
+
+    // Find appointments for the logged-in clinician with status "Accepted"
+    const appointments = await Appointment.find({
+      selectedClinician: clinicianId,
+      status: "Accepted",
+    })
+      .populate({
+        path: "selectedSchedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
+      })
+      .populate({
+        path: "patientId",
+        select: "firstName middleName lastName", // Select the patient details
+      });
+
+    // Decrypt patient details
+    const decryptedAppointments = appointments.map((appointment) => {
+      if (appointment.patientId) {
+        appointment.patientId.firstName = decrypt(
+          appointment.patientId.firstName
+        );
+        appointment.patientId.middleName = decrypt(
+          appointment.patientId.middleName
+        );
+        appointment.patientId.lastName = decrypt(
+          appointment.patientId.lastName
+        );
+      }
+      return appointment;
+    });
+
+    res.status(200).json(decryptedAppointments);
+  } catch (error) {
+    console.error("Error fetching clinician appointments:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

@@ -34,4 +34,10 @@ router.put(
   appointmentController.updateAppointmentStatus
 );
 
+router.get(
+  "/get-appointment-by-clinician",
+  verifyToken, // Ensure the user is authenticated
+  appointmentController.getClinicianAppointments
+);
+
 module.exports = router;

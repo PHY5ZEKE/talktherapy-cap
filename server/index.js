@@ -27,6 +27,7 @@ const contentRoute = require("./routes/content.route.js");
 const appointmentRoute = require("./routes/appointment.route.js");
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/src", express.static(path.join(__dirname, "../src")));
 
 app.use(
