@@ -13,7 +13,8 @@ const clinicianSLPSchema = new Schema({
   email: { type: String },
   profilePicture: {
     type: String,
-    default: "/src/images/profile-picture/default-profile-picture.png",
+    default:
+      "https://talktherapy-cap.s3.ap-southeast-2.amazonaws.com/profile-pictures/default-profile-picture.png",
   },
   password: { type: String },
   createdOn: { type: Date },

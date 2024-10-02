@@ -8,15 +8,16 @@ const multerS3 = require("multer-s3");
 
 const { encrypt, decrypt } = require("../middleware/aesUtilities");
 
-//
-
 // Initialize upload
 const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: process.env.AWS_S3_BUCKET_NAME,
     key: function (req, file, cb) {
-      cb(null, Date.now().toString() + "-" + file.originalname);
+      const folderName = "referrals"; // Specify your folder name here
+      const fileName = `${Date.now().toString()}-${file.originalname}`;
+      const filePath = `${folderName}/${fileName}`;
+      cb(null, filePath);
     },
   }),
 }).single("file");

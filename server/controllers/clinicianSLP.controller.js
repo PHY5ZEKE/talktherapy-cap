@@ -11,6 +11,9 @@ const {
 const verifyToken = require("../middleware/verifyToken");
 
 const multer = require("multer");
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = require("../config/aws");
+const path = require("path");
 const upload = require("../middleware/uploadProfilePicture");
 
 const { decrypt } = require("../middleware/aesUtilities");
@@ -193,8 +196,6 @@ exports.clinicianSignup = async (req, res) => {
   existingClinician.address = address;
   existingClinician.address = address;
   existingClinician.specialization = specialization;
-  existingClinician.profilePicture =
-    "/src/images/profile-picture/default-profile-picture.png";
   existingClinician.password = hashedPassword;
   existingClinician.createdOn = new Date().getTime();
   existingClinician.userRole = "clinician";
@@ -502,7 +503,6 @@ exports.updateProfilePicture = [
   (req, res, next) => {
     upload.single("profilePicture")(req, res, (err) => {
       if (err instanceof multer.MulterError) {
-        // A Multer error occurred when uploading.
         if (err.code === "LIMIT_FILE_SIZE") {
           return res.status(400).json({
             error: true,
@@ -511,10 +511,8 @@ exports.updateProfilePicture = [
         }
         return res.status(400).json({ error: true, message: err.message });
       } else if (err) {
-        // An unknown error occurred when uploading.
         return res.status(400).json({ error: true, message: err.message });
       }
-      // Everything went fine.
       next();
     });
   },
@@ -536,8 +534,22 @@ exports.updateProfilePicture = [
           .json({ error: true, message: "Clinician not found." });
       }
 
+      // Upload the file to S3
+      const fileName = `${req.user.id}_${Date.now()}${path.extname(
+        req.file.originalname
+      )}`;
+      const uploadParams = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: `profile-pictures/${fileName}`,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+      };
+
+      await s3.send(new PutObjectCommand(uploadParams));
+
       // Update the profile picture URL
-      clinician.profilePicture = `/src/images/profile-picture/${req.file.filename}`;
+      const profilePictureUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${fileName}`;
+      clinician.profilePicture = profilePictureUrl;
       await clinician.save();
 
       return res.json({

@@ -12,7 +12,8 @@ const superAdminSLPSchema = new Schema({
   userRole: { type: String },
   profilePicture: {
     type: String,
-    default: "/src/images/profile-picture/default-profile-picture.png",
+    default:
+      "https://talktherapy-cap.s3.ap-southeast-2.amazonaws.com/profile-pictures/default-profile-picture.png",
   },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

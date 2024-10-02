@@ -11,6 +11,9 @@ const {
   verifyPassword,
 } = require("../utilities/password");
 const verifyToken = require("../middleware/verifyToken");
+const { PutObjectCommand } = require("@aws-sdk/client-s3");
+const s3 = require("../config/aws");
+const path = require("path");
 
 const multer = require("multer");
 const upload = require("../middleware/uploadProfilePicture");
@@ -67,7 +70,6 @@ exports.signup = async (req, res) => {
     address,
     mobile,
     userRole: "superAdmin",
-    profilePicture: "/src/images/profile-picture/default-profile-picture.png",
   });
 
   await superAdmin.save();
@@ -620,8 +622,22 @@ exports.updateProfilePicture = [
           .json({ error: true, message: "superAdmin not found." });
       }
 
+      // Upload the file to S3
+      const fileName = `${req.user.id}_${Date.now()}${path.extname(
+        req.file.originalname
+      )}`;
+      const uploadParams = {
+        Bucket: process.env.AWS_S3_BUCKET_NAME,
+        Key: `profile-pictures/${fileName}`,
+        Body: req.file.buffer,
+        ContentType: req.file.mimetype,
+      };
+
+      await s3.send(new PutObjectCommand(uploadParams));
+
       // Update the profile picture URL
-      superAdmin.profilePicture = `/src/images/profile-picture/${req.file.filename}`;
+      const profilePictureUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${fileName}`;
+      superAdmin.profilePicture = profilePictureUrl;
       await superAdmin.save();
 
       return res.json({
