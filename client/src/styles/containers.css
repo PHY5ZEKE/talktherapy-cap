@@ -77,9 +77,46 @@
   width: 100%;
 }
 
-/* .height-responsive {
-  height: auto;
-} */
+.room-height {
+  height: 100vh;
+  overflow: auto;
+}
+
+.video-remote {
+  /* position: relative; */
+  width: 100%;
+  height: inherit; 
+  object-fit: contain;
+}
+
+.video-local {
+  /* position: absolute; */
+  /* top: -50vh; */
+  width: 100%;
+  height: inherit;
+  overflow: auto;
+  object-fit: cover;
+  z-index: 101;
+}
+
+.video-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-container-2 {
+  height: 0px;
+}
+
+.room-videos {
+  height: 80vh;
+  overflow: auto;
+}
+
+.drag {
+  z-index: 100;
+}
 
 /* Media query for 768 and below */
 @media (max-width: 768px) {
@@ -87,15 +124,10 @@
     max-height: 75vh;
   }
 
+
+
   .card-height {
     height: auto;
   }
 
-  /* .div-cal {
-    position: relative;
-    top: 20%;
-    left: 30%;
-    transform: translate(-50%, -50%);
-    transition: z-index 0.3s ease;
-  } */
 }

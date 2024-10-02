@@ -58,7 +58,7 @@ export default function Profile() {
   }, []);
 
   return (
-    <Container>
+    <div className="container-fluid m-0">
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
@@ -153,9 +153,11 @@ export default function Profile() {
                 <button className="action-btn">Request Content</button>
               </div>
             </Col>
+
+            <Col lg className="height-responsive"></Col>
           </Row>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }

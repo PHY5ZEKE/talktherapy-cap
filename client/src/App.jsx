@@ -45,6 +45,10 @@ import PatientPerform from "./pages/Patient/Perform";
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";
 import PublicRoute from "./pages/Authorization/PublicRoute";
+
+// Teleconference
+import Room from "./pages/System/Room";
+
 const routes = (
   <Router>
     <Routes>
@@ -52,6 +56,8 @@ const routes = (
       <Route path="/register/clinician" element={<RegisterClinician />} />
       <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
       <Route path="/forgot" element={<ForgotPassword />} />
+
+      <Route path="/room/:genID" element={<Room />} />
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route

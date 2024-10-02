@@ -179,7 +179,7 @@ export default function BookSchedule() {
   );
 
   return (
-    <Container>
+    <div className="container-fluid m-0">
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
@@ -350,6 +350,6 @@ export default function BookSchedule() {
           </Row>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }

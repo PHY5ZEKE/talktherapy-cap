@@ -103,7 +103,7 @@ export default function Home() {
   }, []);
 
   return (
-    <Container>
+    <div className="container-fluid m-0">
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
@@ -308,6 +308,6 @@ export default function Home() {
           </Row>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }

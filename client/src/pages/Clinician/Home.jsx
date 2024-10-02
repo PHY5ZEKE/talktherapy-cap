@@ -136,7 +136,7 @@ export default function Home() {
   }, []);
 
   return (
-    <Container>
+    <div className="container-fluid m-0">
       {/* MODAL */}
       {isConfirm && (
         <ConfirmReschedule
@@ -309,6 +309,6 @@ export default function Home() {
           </Row>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }

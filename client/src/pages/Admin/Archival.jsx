@@ -47,7 +47,7 @@ export default function Archival() {
   }, []);
 
   return (
-    <Container>
+    <div className="container-fluid m-0">
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
@@ -158,6 +158,6 @@ export default function Archival() {
           </Row>
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }
