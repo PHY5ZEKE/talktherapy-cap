@@ -3,40 +3,23 @@ const ClinicianSLP = require("../models/clinicianSLP.model");
 const Schedule = require("../models/schedule.model");
 const multer = require("multer");
 const path = require("path");
+const s3 = require("../config/aws");
+const multerS3 = require("multer-s3");
 
 const { encrypt, decrypt } = require("../middleware/aesUtilities");
 
-// Set up storage engine
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, "../../client/src/documents/referrals")); // Specify the new directory to save the uploaded files
-  },
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`); // Use a unique filename
-  },
-});
+//
 
 // Initialize upload
 const upload = multer({
-  storage: storage,
-  fileFilter: function (req, file, cb) {
-    const filetypes = /jpeg|jpg|png|pdf|doc|docx/; // Allowed file types
-    const mimetype = filetypes.test(file.mimetype);
-    const extname = filetypes.test(
-      path.extname(file.originalname).toLowerCase()
-    );
-
-    if (mimetype && extname) {
-      return cb(null, true);
-    } else {
-      cb(
-        new Error(
-          "Only .jpeg, .jpg, .png, .pdf, .doc, and .docx files are allowed!"
-        )
-      );
-    }
-  },
-}).single("referralUpload");
+  storage: multerS3({
+    s3: s3,
+    bucket: process.env.AWS_S3_BUCKET_NAME,
+    key: function (req, file, cb) {
+      cb(null, Date.now().toString() + "-" + file.originalname);
+    },
+  }),
+}).single("file");
 
 exports.createAppointment = async (req, res) => {
   upload(req, res, async function (err) {
@@ -89,7 +72,7 @@ exports.createAppointment = async (req, res) => {
         chiefComplaint,
         selectedClinician,
         selectedSchedule,
-        referralUpload: req.file ? req.file.path : "", // Save the file path
+        referralUpload: req.file ? req.file.location : "", // Save the S3 file URL
         status: "Pending",
       });
 
@@ -231,13 +214,29 @@ exports.getAppointmentById = async (req, res) => {
   try {
     const { appointmentId } = req.params;
 
-    const appointment = await Appointment.findById(appointmentId).populate({
-      path: "selectedSchedule",
-      select: "clinicianName specialization day startTime endTime",
-    });
+    const appointment = await Appointment.findById(appointmentId)
+      .populate({
+        path: "selectedSchedule",
+        select: "clinicianName specialization day startTime endTime",
+      })
+      .populate({
+        path: "patientId",
+        select: "firstName middleName lastName",
+      });
 
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Decrypt patient information
+    if (appointment.patientId) {
+      appointment.patientId.firstName = decrypt(
+        appointment.patientId.firstName
+      );
+      appointment.patientId.middleName = decrypt(
+        appointment.patientId.middleName
+      );
+      appointment.patientId.lastName = decrypt(appointment.patientId.lastName);
     }
 
     res.status(200).json(appointment);
@@ -262,10 +261,10 @@ exports.updateAppointmentStatus = async (req, res) => {
     // Check the current status and update accordingly
     if (
       appointment.status === "Pending" &&
-      (status === "Approved" || status === "Rejected")
+      (status === "Accepted" || status === "Rejected")
     ) {
       appointment.status = status;
-    } else if (appointment.status === "Approved" && status === "Completed") {
+    } else if (appointment.status === "Accepted" && status === "Completed") {
       appointment.status = status;
     } else {
       return res.status(400).json({ message: "Invalid status transition" });

@@ -2,6 +2,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 // CSS
 import "./home.css";
@@ -24,11 +25,29 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [selectedUserType, setSelectedUserType] = useState("patients");
   const [appointments, setAppointments] = useState([]);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   // Handle Appointment Details Modal
   const [isConfirm, setIsConfirm] = useState(false);
-  const closeModal = () => {
-    setIsConfirm(!isConfirm);
+  const closeModal = () => setIsConfirm(false);
+
+  const openModal = async (appointmentId) => {
+    try {
+      const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
+      const response = await axios.get(
+        `http://localhost:8000/appointments/get-appointment-by-id/${appointmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Fetched appointment details:", response.data); // Debugging statement
+      setSelectedAppointment(response.data);
+      setIsConfirm(true);
+    } catch (error) {
+      console.error("Error fetching appointment details:", error);
+    }
   };
 
   useEffect(() => {
@@ -157,8 +176,8 @@ export default function Home() {
   const pendingAppointments = appointments.filter(
     (appointment) => appointment.status === "Pending"
   ).length;
-  const cancelledAppointments = appointments.filter(
-    (appointment) => appointment.status === "Cancelled"
+  const rejectedAppointments = appointments.filter(
+    (appointment) => appointment.status === "Rejected"
   ).length;
   const acceptedAppointments = appointments.filter(
     (appointment) => appointment.status === "Accepted"
@@ -170,7 +189,12 @@ export default function Home() {
         <Sidebar />
 
         {/* MODAL */}
-        {isConfirm && <AppointmentDetails openModal={closeModal} />}
+        {isConfirm && (
+          <AppointmentDetails
+            openModal={closeModal}
+            appointment={selectedAppointment}
+          />
+        )}
 
         {/* CONTENT */}
         <Col xs={{ order: 12 }} lg={{ order: 1 }}>
@@ -217,8 +241,8 @@ export default function Home() {
                     <p className="mb-0">Pending</p>
                   </div>
                   <div className="status-cancelled status-size">
-                    <h4 className="mb-0">{cancelledAppointments}</h4>
-                    <p className="mb-0">Cancelled</p>
+                    <h4 className="mb-0">{rejectedAppointments}</h4>
+                    <p className="mb-0">Rejected</p>
                   </div>
                   <div className="status-accepted status-size">
                     <h4 className="mb-0">{acceptedAppointments}</h4>
@@ -235,6 +259,7 @@ export default function Home() {
                       <div
                         key={index}
                         className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-pending-2"
+                        onClick={() => openModal(appointment._id)}
                       >
                         <p className="fw-bold mb-0">
                           {appointment.selectedSchedule.day}
@@ -259,6 +284,7 @@ export default function Home() {
                             PENDING
                           </p>
                           <p className="fw-bold">
+                            Clinician:{" "}
                             {appointment.selectedSchedule.clinicianName}
                           </p>
                         </div>
@@ -272,21 +298,20 @@ export default function Home() {
                       <div
                         key={index}
                         className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                        onClick={() => openModal(appointment._id)}
                       >
                         <p className="fw-bold mb-0">
-                          {new Date(
-                            appointment.selectedSchedule.date
-                          ).toLocaleDateString()}
+                          {appointment.selectedSchedule.day}
                         </p>
                         <p className="mb-0">
-                          {new Date(
-                            appointment.selectedSchedule.startTime
-                          ).toLocaleTimeString()}
+                          {appointment.selectedSchedule.startTime} to{" "}
+                          {appointment.selectedSchedule.endTime}
                         </p>
                         <p className="mb-0">
-                          Session of{" "}
-                          {appointment.selectedSchedule.clinicianName} with{" "}
-                          {appointment.patientName} has started.
+                          {appointment.patientId.firstName}{" "}
+                          {appointment.patientId.middleName}{" "}
+                          {appointment.patientId.lastName} is assigned to{" "}
+                          {appointment.selectedSchedule.clinicianName}
                         </p>
                         <div className="d-flex justify-content-between mt-3">
                           <p className="status-accepted status-text status-text-green">
@@ -301,11 +326,12 @@ export default function Home() {
 
                   {/* CANCELLED COMPONENT */}
                   {appointments
-                    .filter((appointment) => appointment.status === "Cancelled")
+                    .filter((appointment) => appointment.status === "Rejected")
                     .map((appointment, index) => (
                       <div
                         key={index}
                         className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2"
+                        onClick={() => openModal(appointment._id)}
                       >
                         <p className="fw-bold mb-0">
                           {appointment.selectedSchedule.day}

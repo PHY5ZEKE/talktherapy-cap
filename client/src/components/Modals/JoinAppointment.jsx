@@ -40,7 +40,7 @@ export default function JoinAppointment({
     formData.append("chiefComplaint", chiefComplaint);
     formData.append("selectedClinician", selectedClinician);
     formData.append("selectedSchedule", selectedSchedule);
-    formData.append("referralUpload", referralUpload);
+    formData.append("file", referralUpload);
 
     try {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
@@ -161,13 +161,13 @@ export default function JoinAppointment({
           </div>
 
           <div className="row text-center">
-            <div className="col" hidden>
+            <div className="col">
               <p className="fw-bold">Selected Clinician</p>
-              <p hidden>{selectedClinician}</p>
+              <p>{selectedClinician}</p>
             </div>
-            <div className="col" hidden>
+            <div className="col">
               <p className="fw-bold">Selected Schedule</p>
-              <p hidden>{selectedSchedule}</p>
+              <p>{selectedSchedule}</p>
             </div>
           </div>
         </div>

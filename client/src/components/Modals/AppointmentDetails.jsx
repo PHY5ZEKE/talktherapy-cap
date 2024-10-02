@@ -1,11 +1,92 @@
 import "./modal.css";
-
 import { Link } from "react-router-dom";
-export default function AppointmentDetails({ openModal }) {
+import { useEffect, useState } from "react";
+import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
+
+export default function AppointmentDetails({ openModal, appointment }) {
+  const [loading, setLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState(""); // "success" or "danger"
+
   const handleClose = (e) => {
     e.preventDefault();
     openModal();
   };
+
+  const updateStatus = async (newStatus) => {
+    setLoading(true);
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/appointments/update-status/${appointment._id}`,
+        { status: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+      setAlertMessage("Appointment status updated successfully.");
+      setAlertType("success");
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000); // Reload after 2 seconds
+    } catch (error) {
+      setAlertMessage("Error updating appointment status.");
+      setAlertType("danger");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    console.log("Appointment details in modal:", appointment); // Debugging statement
+  }, [appointment]);
+
+  if (!appointment) {
+    return null; // Return null if no appointment details are available
+  }
+
+  const renderStatusButton = () => {
+    switch (appointment.status) {
+      case "Pending":
+        return (
+          <>
+            <button
+              onClick={() => updateStatus("Accepted")}
+              className="button-group bg-white"
+              disabled={loading}
+            >
+              <p className="fw-bold my-0 status">Accept</p>
+            </button>
+            <button
+              onClick={() => updateStatus("Rejected")}
+              className="button-group bg-white"
+              disabled={loading}
+            >
+              <p className="fw-bold my-0 status">Reject</p>
+            </button>
+          </>
+        );
+      case "Accepted":
+        return (
+          <button
+            onClick={() => updateStatus("Completed")}
+            className="button-group bg-white"
+            disabled={loading}
+          >
+            <p className="fw-bold my-0 status">Complete</p>
+          </button>
+        );
+      case "Completed":
+        return <p className="fw-bold my-0 status">Appointment Completed</p>;
+      case "Rejected":
+        return <p className="fw-bold my-0 status">Appointment Rejected</p>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <div className="modal-background">
@@ -15,43 +96,73 @@ export default function AppointmentDetails({ openModal }) {
             <p className="mb-0">Verify if the following details are correct.</p>
           </div>
 
-          {/* Source of Referral, Chief Complaint, Selected Clinician, Specialization, Schedule, Referral Upload, Status */}
+          {alertMessage && (
+            <div className={`alert alert-${alertType} mt-3`} role="alert">
+              {alertMessage}
+            </div>
+          )}
+
           <div className="container text-center">
-            {/* INFORMATION */}
+            <div className="row text-center">
+              <p className="fw-bold mt-3 mb-0">Patient Name</p>
+              <p>
+                {appointment.patientId.firstName}{" "}
+                {appointment.patientId.middleName}{" "}
+                {appointment.patientId.lastName}
+              </p>
+            </div>
+
             <div className="row text-center">
               <p className="fw-bold mt-3 mb-0">Date</p>
-              <p>July 4, 2024 2:00 PM - 3:00 PM</p>
+              <p>
+                {appointment.selectedSchedule?.day || "N/A"}{" "}
+                {appointment.selectedSchedule?.startTime || "N/A"} -{" "}
+                {appointment.selectedSchedule?.endTime || "N/A"}
+              </p>
             </div>
 
             <div className="row text-center">
               <div className="col">
                 <p className="fw-bold mb-0">Clinician</p>
                 <div>
-                  <p className="">Rico Nieto</p>
-                  {/* <p>Specialization</p> */}
+                  <p className="">
+                    {appointment.selectedSchedule?.clinicianName || "N/A"}
+                  </p>
                 </div>
 
                 <div>
                   <p className="fw-bold mb-0">Status</p>
-                  <p>Approved</p>
+                  <p>{appointment.status || "N/A"}</p>
                 </div>
               </div>
 
               <div className="col">
                 <p className="fw-bold mb-0">Chief Complaint</p>
-                <p>Headache</p>
+                <p>{appointment.chiefComplaint || "N/A"}</p>
                 <p className="fw-bold mb-0">Source of Referral</p>
-                <p>Self</p>
+                <p>{appointment.sourceOfReferral || "N/A"}</p>
               </div>
             </div>
 
             <div className="col">
               <p className="fw-bold mb-0">Referral Upload</p>
-              <p>None</p>
+              {appointment.referralUpload ? (
+                <a
+                  href={appointment.referralUpload}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-link"
+                >
+                  Open Referral Document
+                </a>
+              ) : (
+                <p>None</p>
+              )}
             </div>
           </div>
 
           <div className="d-flex justify-content-center mt-3 gap-3">
+            {renderStatusButton()}
             <button onClick={handleClose} className="button-group bg-white">
               <p className="fw-bold my-0 status">CANCEL</p>
             </button>
