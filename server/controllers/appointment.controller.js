@@ -280,6 +280,16 @@ exports.getAppointmentById = async (req, res) => {
   }
 };
 
+function generateRoomId() {
+  const length = 8;
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
@@ -298,6 +308,7 @@ exports.updateAppointmentStatus = async (req, res) => {
       (status === "Accepted" || status === "Rejected")
     ) {
       appointment.status = status;
+      appointment.roomId = generateRoomId();
     } else if (appointment.status === "Accepted" && status === "Completed") {
       appointment.status = status;
     } else {

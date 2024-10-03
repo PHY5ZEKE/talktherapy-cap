@@ -1,6 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { useNavigate } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -11,6 +12,7 @@ import JoinAppointment from "../../components/Modals/JoinAppointment";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { redirectDocument } from "react-router-dom";
 
 export default function BookSchedule() {
   const [showModal, setShowModal] = useState(false);
@@ -30,6 +32,8 @@ export default function BookSchedule() {
 
   const [allSched, setAllSchedule] = useState([]);
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
+
+  const navigate = useNavigate();
 
   // Modal Handle
   const [isOpen, setIsOpen] = useState(false);
@@ -63,6 +67,11 @@ export default function BookSchedule() {
 
   const handleSpecializationChange = (event) => {
     setSelectedSpecialization(event.target.value);
+  };
+
+  const joinMeeting = (id) => {
+    console.log("Joining meeting with ID:", id);
+    navigate(`/room/${id}`);
   };
 
   useEffect(() => {
@@ -335,7 +344,10 @@ export default function BookSchedule() {
 
                     {/* IF ACCEPTED */}
                     {appointment.status === "Accepted" && (
-                      <button className="button-group bg-white">
+                      <button
+                        className="button-group bg-white"
+                        onClick={() => joinMeeting(appointment.roomId)}
+                      >
                         <p className="fw-bold my-0 status">JOIN</p>
                       </button>
                     )}
