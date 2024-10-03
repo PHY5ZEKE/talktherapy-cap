@@ -172,7 +172,7 @@ export default function BookSchedule() {
       const hasSchedule = schedules.some(
         (schedule) => schedule.day === dayOfWeek
       );
-      console.log(`Checking day: ${dayOfWeek}, hasSchedule: ${hasSchedule}`);
+      // console.log(`Checking day: ${dayOfWeek}, hasSchedule: ${hasSchedule}`);
       return hasSchedule ? { backgroundColor: "green", color: "white" } : {};
     },
     [schedules]

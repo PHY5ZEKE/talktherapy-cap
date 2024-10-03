@@ -22,74 +22,174 @@ const upload = multer({
   }),
 }).single("file");
 
-exports.createAppointment = async (req, res) => {
+// Create a new appointment JSON first
+exports.createAppointmentJSON = async (req, res) => {
   try {
-    // Use multer to handle the file upload and form data
-    upload(req, res, async function (err) {
-      if (err) {
-        return res.status(400).json({ message: err.message });
-      }
+    // Now req.body contains the form fields, and req.file contains the file
+    const {
+      patientId,
+      sourceOfReferral,
+      chiefComplaint,
+      selectedClinician,
+      selectedSchedule,
+    } = req.body;
 
-      // Log the request body to check the form data
-      console.log("Request body:", req.body);
+    // Validate the extracted fields
+    if (!selectedClinician) {
+      return res.status(400).json({ message: "Clinician ID is required" });
+    }
 
-      const {
-        patientId,
-        sourceOfReferral,
-        chiefComplaint,
-        selectedClinician,
-        selectedSchedule,
-      } = req.body;
+    // Check if the clinician exists
+    const clinician = await ClinicianSLP.findById(selectedClinician);
+    if (!clinician) {
+      return res.status(400).json({ message: "Invalid clinician selected" });
+    }
 
-      console.log("Selected Clinician ID:", selectedClinician);
+    // Check if the schedule exists
+    const schedule = await Schedule.findById(selectedSchedule);
+    if (!schedule) {
+      return res.status(400).json({ message: "Invalid schedule selected" });
+    }
 
-      if (!selectedClinician) {
-        return res.status(400).json({ message: "Clinician ID is required" });
-      }
+    // Check if appointment already exists for the patient
+    const existingAppointment = await Appointment.findOne({ patientId });
+    const existingSchedule = await Appointment.findOne({ selectedSchedule });
+    if (existingAppointment && existingSchedule) {
+      return res
+        .status(400)
+        .json({ message: "Patient already has an appointment" });
+    }
 
-      const clinician = await ClinicianSLP.findById(selectedClinician);
+    // Save the JSON without File Upload to DB
+    const newAppointment = new Appointment({
+      patientId,
+      sourceOfReferral,
+      chiefComplaint,
+      selectedClinician,
+      selectedSchedule,
+      referralUpload: "Uploading",
+      status: "Pending",
+    });
 
-      if (!clinician) {
-        console.error("Clinician not found. ID:", selectedClinician);
-        return res.status(400).json({ message: "Invalid clinician selected" });
-      }
+    await newAppointment.save();
 
-      console.log("Clinician found:", clinician);
-
-      const schedule = await Schedule.findById(selectedSchedule);
-      if (!schedule) {
-        return res.status(400).json({ message: "Invalid schedule selected" });
-      }
-
-      const existingAppointment = await Appointment.findOne({ patientId });
-      if (existingAppointment) {
-        return res
-          .status(400)
-          .json({ message: "Patient already has an appointment" });
-      }
-
-      const newAppointment = new Appointment({
-        patientId,
-        sourceOfReferral,
-        chiefComplaint,
-        selectedClinician,
-        selectedSchedule,
-        referralUpload: req.file ? req.file.location : "",
-        status: "Pending",
-      });
-
-      await newAppointment.save();
-
-      res.status(201).json({
-        message: "Appointment created successfully",
-        appointment: newAppointment,
-      });
+    res.status(201).json({
+      message: "Appointment created successfully",
+      appointment: newAppointment,
+      appointmentId: newAppointment._id,
     });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Get JSON and then send file to DB
+exports.createAppointment = async (req, res) => {
+  upload(req, res, async function (err) {
+    if (err) {
+      return res.status(400).json({ message: err.message });
+    }
+    try {
+      // Check if appointment and schedule with patient already exists
+      const existingAppointment = await Appointment.findOne({
+        _id: req.body.appointmentId,
+      });
+      if (existingAppointment) {
+        // Update the appointment with the new details
+        existingAppointment.sourceOfReferral = req.body.sourceOfReferral;
+        existingAppointment.chiefComplaint = req.body.chiefComplaint;
+        existingAppointment.selectedClinician = req.body.selectedClinician;
+        existingAppointment.selectedSchedule = req.body.selectedSchedule;
+        existingAppointment.referralUpload = req.file
+          ? req.file.location
+          : "Uploading";
+
+        // Save the new appointment to mongodb
+        await existingAppointment.save();
+
+        res.status(201).json({
+          message: "Appointment created successfully",
+          appointment: existingAppointment,
+        });
+      } else {
+        return res
+          .status(400)
+          .json({ message: "No appointment found for patient" });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+};
+
+// exports.createAppointment = async (req, res) => {
+//   const {
+//     patientId,
+//     selectedClinician,
+//     selectedSchedule,
+//     sourceOfReferral,
+//     chiefComplaint,
+//     referralUpload,
+//   } =
+//   JSON.stringify(req.body);
+
+//   // Validate the extracted fields
+//   if (!selectedClinician) {
+//     return res.status(400).json({ message: "Clinician ID is required" });
+//   }
+
+//   // Check if the clinician exists
+//   const clinician = await ClinicianSLP.findById(selectedClinician);
+//   if (!clinician) {
+//     return res.status(400).json({ message: "Invalid clinician selected" });
+//   }
+
+//   // Check if the schedule exists
+//   const schedule = await Schedule.findById(selectedSchedule);
+//   if (!schedule) {
+//     return res.status(400).json({ message: "Invalid schedule selected" });
+//   }
+
+//   // Check if appointment already exists for the patient
+//   const existingAppointment = await Appointment.findOne({ patientId });
+//   const existingSchedule = await Appointment.findOne({ selectedSchedule });
+//   if (existingAppointment && existingSchedule) {
+//     return res
+//       .status(400)
+//       .json({ message: "Patient already has an appointment" });
+//   } else {
+//     upload(req, res, async function (err) {
+//       if (err) {
+//         return res.status(400).json({ message: err.message });
+//       }
+//       try {
+//         // Handle the file upload if there is no existing appointment
+//         const referralUpload = req.file ? req.file.location : ""; // Process file if uploaded
+//         // Create a new appointment
+//         const newAppointment = new Appointment({
+//           patientId,
+//           sourceOfReferral,
+//           chiefComplaint,
+//           selectedClinician,
+//           selectedSchedule,
+//           referralUpload,
+//           status: "Pending",
+//         });
+//         // Save the new appointment
+//         await newAppointment.save();
+//         res.status(201).json({
+//           message: "Appointment created successfully",
+//           appointment: newAppointment,
+//         });
+//       } catch (error) {
+//         console.error("Error:", error);
+//         res.status(500).json({ message: "Internal server error" });
+//       }
+//     });
+//   }
+// };
 
 exports.getAllAppointments = async (req, res) => {
   try {

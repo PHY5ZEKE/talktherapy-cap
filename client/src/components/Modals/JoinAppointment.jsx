@@ -43,11 +43,44 @@ export default function JoinAppointment({
     formData.append("selectedSchedule", selectedSchedule);
     formData.append("file", referralUpload);
 
+    const formJson = {
+      patientId: patientId,
+      sourceOfReferral: sourceOfReferral,
+      chiefComplaint: chiefComplaint,
+      selectedClinician: selectedClinician,
+      selectedSchedule: selectedSchedule,
+    };
+
+    console.log("Form data:", JSON.stringify(formData));
     try {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
 
+      // Send JSON to Server
       const response = await fetch(
-        "http://localhost:8000/appointments/create-appointment",
+        "http://localhost:8000/appointments/create-appointment/json",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+          body: JSON.stringify(formJson),
+        }
+      );
+
+      const data = await response.json();
+      console.log("Response data:", data);
+
+      formData.append("appointmentId", data.appointmentId);
+      console.log("appointmentId:", data.appointmentId);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create appointment");
+      }
+
+      // Send File to Server
+      const fileResponse = await fetch(
+        "http://localhost:8000/appointments/create-appointment/file",
         {
           method: "POST",
           headers: {
@@ -57,10 +90,9 @@ export default function JoinAppointment({
         }
       );
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create appointment");
+      const fileData = await fileResponse.json();
+      if (!fileResponse.ok) {
+        throw new Error(fileData.message || "Failed to create appointment");
       }
 
       console.log("Appointment created successfully:", data);
