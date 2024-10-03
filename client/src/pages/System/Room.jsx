@@ -10,7 +10,7 @@ import Camera from "../../assets/buttons/Camera";
 
 export default function Room() {
   // Get Room ID
-  const { genID } = useParams();
+  const { roomid } = useParams();
 
   // Get video stream
   const localVideoRef = useRef();
@@ -205,7 +205,7 @@ export default function Room() {
   }
 
   function muteCam() {
-    // setHidden(!isHidden);
+    setHidden(!isHidden);
     const videoTrack = localStream.current.getVideoTracks()[0];
     if (videoTrack) {
       videoTrack.enabled = !videoTrack.enabled;
@@ -229,9 +229,9 @@ export default function Room() {
               height: "55vh",
             }}
             minWidth={"280px"}
-            minHeight={"190px"}
+            minHeight={"200px"}
             bounds=".room-videos"
-            className="drag"
+            className={isHidden ? `drag bg-black-subtle` : `drag`}
           >
             <video
               ref={localVideoRef}
@@ -251,7 +251,7 @@ export default function Room() {
         <div className="row bg-warning-subtle fixed-bottom">
           <div className="d-flex align-items-center justify-content-center">
             <div className="bg-body-tertiary">
-              <div className="row">
+              <div className="row py-1">
                 <button type="submit" className="button-group bg-white">
                   <p className="fw-bold my-0 status">Disconnect</p>
                 </button>
@@ -263,12 +263,16 @@ export default function Room() {
                   <Camera />
                 </div>
                 <div
-                  className="col"
+                  className="col d-flex align-items-center justify-content-center"
                   onClick={muteMic}
                   style={{ cursor: "pointer" }}
                 >
                   <Mic />
                 </div>
+
+                <button type="submit" className="button-group bg-white">
+                  <p className="fw-bold my-0 status">Messages</p>
+                </button>
 
                 <div></div>
               </div>
