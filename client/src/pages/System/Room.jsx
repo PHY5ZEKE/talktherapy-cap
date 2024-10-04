@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { Rnd } from "react-rnd";
 
 import "../../styles/containers.css";
@@ -9,6 +9,9 @@ import Mic from "../../assets/buttons/Mic";
 import Camera from "../../assets/buttons/Camera";
 
 export default function Room() {
+  // Nav
+  const navigate = useNavigate();
+
   // Get Room ID
   const { roomid } = useParams();
 
@@ -44,16 +47,21 @@ export default function Room() {
   };
 
   useEffect(() => {
-    pageReady();
+    // TODO: Check if room id not valid == errorRoomId
+    if (roomid === "errorRoomId") {
+      navigate("/unauthorized");
+    } else {
+      pageReady();
 
-    return () => {
-      if (peerConnection.current) {
-        peerConnection.current.close();
-      }
-      if (serverConnection.current) {
-        serverConnection.current.close();
-      }
-    };
+      return () => {
+        if (peerConnection.current) {
+          peerConnection.current.close();
+        }
+        if (serverConnection.current) {
+          serverConnection.current.close();
+        }
+      };
+    }
   }, []);
 
   async function pageReady() {
@@ -212,10 +220,28 @@ export default function Room() {
     }
   }
 
+  function handleDisconnect() {
+    localStream.current.getTracks().forEach((track) => track.stop());
+
+    // Close peer and socket connection
+    if (peerConnection.current) {
+      peerConnection.current.close();
+      peerConnection.current = null;
+    }
+
+    if (serverConnection.current) {
+      serverConnection.current.close();
+      serverConnection.current = null;
+    }
+
+    navigate("/");
+  }
+
   return (
     <>
-      <div className="container-fluid mx-auto room-height bg-dark-subtle">
-        <div className="row text-center py-2 bg-warning-subtle sticky-top">
+      <div className="container-fluid mx-auto room-height">
+        <div className="row text-center py-2 border border-start-0 border-[#B9B9B9] sticky-top">
+          {/* TODO: Change names */}
           <p className="mb-0">
             Currently in session with: Dr. Juan Dela Cruz and Nicole E. Oraya
           </p>
@@ -234,8 +260,9 @@ export default function Room() {
             className={isHidden ? `drag bg-black-subtle` : `drag`}
           >
             <video
+              muted
               ref={localVideoRef}
-              className="mx-auto video-local"
+              className="mx-auto video-local bg-warning-subtle"
               autoPlay
             />
           </Rnd>
@@ -248,11 +275,15 @@ export default function Room() {
           ></video>
         </div>
 
-        <div className="row bg-warning-subtle fixed-bottom">
+        <div className="row border border-start-0 border-[#B9B9B9] fixed-bottom">
           <div className="d-flex align-items-center justify-content-center">
-            <div className="bg-body-tertiary">
+            <div className="p-2">
               <div className="row py-1">
-                <button type="submit" className="button-group bg-white">
+                <button
+                  onClick={handleDisconnect}
+                  type="submit"
+                  className="button-group bg-white"
+                >
                   <p className="fw-bold my-0 status">Disconnect</p>
                 </button>
                 <div

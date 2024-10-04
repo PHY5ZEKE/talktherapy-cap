@@ -17,6 +17,7 @@ router.post(
 );
 
 router.get("/get-all-appointments", appointmentController.getAllAppointments);
+
 router.get(
   "/get-appointment",
   verifyToken,

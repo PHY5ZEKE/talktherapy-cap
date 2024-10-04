@@ -49,15 +49,34 @@ import PublicRoute from "./pages/Authorization/PublicRoute";
 // Teleconference
 import Room from "./pages/System/Room";
 
+// Error Handlers
+import NotFound from "./pages/System/NotFound";
+import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
+
 const routes = (
   <Router>
     <Routes>
+      {/* Error Page for No-Match Paths */}
+      <Route path="*" element={<NotFound />} />
+
+      {/* Unauthorized Access Page */}
+      <Route path="/unauthorized" element={<UnauthorizedAccess />} />
+
+      {/* Auth */}
       <Route path="/register/admin" element={<RegisterAdmin />} />
       <Route path="/register/clinician" element={<RegisterClinician />} />
       <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
       <Route path="/forgot" element={<ForgotPassword />} />
 
-      <Route path="/room/:roomid" element={<Room />} />
+      {/* Teleconference */}
+      <Route
+        path="/room/:roomid"
+        element={
+          <PrivateRoute allowedRoles={["patientslp", "clinician"]}>
+            <Room />
+          </PrivateRoute>
+        }
+      />
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route

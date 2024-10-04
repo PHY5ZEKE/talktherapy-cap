@@ -307,10 +307,17 @@ exports.updateAppointmentStatus = async (req, res) => {
       appointment.status === "Pending" &&
       (status === "Accepted" || status === "Rejected")
     ) {
+      // If appointment is Pending and the status to update is Accepted or Rejected
       appointment.status = status;
-      appointment.roomId = generateRoomId();
+      if (status === "Accepted") {
+        appointment.roomId = generateRoomId();
+      } else {
+        appointment.roomId = "errorRoomId";
+      }
     } else if (appointment.status === "Accepted" && status === "Completed") {
+      // If appointment is Accepted and the status to update is Completed
       appointment.status = status;
+      appointment.roomId = "errorRoomId";
     } else {
       return res.status(400).json({ message: "Invalid status transition" });
     }
