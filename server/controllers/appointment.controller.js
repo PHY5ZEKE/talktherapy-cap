@@ -166,7 +166,7 @@ exports.getPatientAppointment = async (req, res) => {
     // Find appointments for the logged-in user only
     const appointments = await Appointment.find({ patientId }).populate({
       path: "selectedSchedule",
-      select: "clinicianName specialization day startTime endTime", // Select the schedule details
+      select: "clinicianName specialization day startTime endTime status", // Select the schedule details
     });
 
     res.status(200).json(appointments);

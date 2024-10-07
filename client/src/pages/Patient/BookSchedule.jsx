@@ -13,6 +13,7 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { redirectDocument } from "react-router-dom";
+import { Exclamation } from "react-bootstrap-icons";
 
 export default function BookSchedule() {
   const [showModal, setShowModal] = useState(false);
@@ -32,6 +33,8 @@ export default function BookSchedule() {
 
   const [allSched, setAllSchedule] = useState([]);
   const [selectedSpecialization, setSelectedSpecialization] = useState("");
+
+  const [hasBooked, setHasBooked] = useState(false);
 
   const navigate = useNavigate();
 
@@ -148,6 +151,8 @@ export default function BookSchedule() {
 
         const data = await response.json();
         console.log("Appointments fetched:", data);
+        // Check if the patient has any appointments that are Accepted if so, set hasBooked to true
+        setHasBooked(isBooked(data));
         setAppointments(data);
       } catch (error) {
         console.error("Error fetching appointments:", error.message);
@@ -159,6 +164,13 @@ export default function BookSchedule() {
     fetchAll();
     fetchAppointments();
   }, []);
+
+  function isBooked(appointments) {
+    // Check if the patient has any appointments that are Accepted if so, return true
+    return appointments.some(
+      (appointment) => appointment.status === "Accepted"
+    );
+  }
 
   const getAllSchedulesForSelectedDay = useMemo(() => {
     if (!selectedDate) return [];
@@ -271,8 +283,26 @@ export default function BookSchedule() {
             {/* PREVIEW SCHEDULE LIST */}
             <Col lg>
               <div className="card-container d-flex flex-wrap align-items-center flex-row scrollable-div-5 notif-home">
-                <div className="p-3 w-100">
-                  <h4 className="fw-bold mb-0">Available Schedule</h4>
+                <div className="p-2 w-100">
+                  <h4 className="fw-bold mb-0">
+                    Available Schedule
+                    {hasBooked && (
+                      // div warning
+                      <div
+                        className="alert alert-warning alert-dismissible fade show fs-6"
+                        role="alert"
+                      >
+                        You have an existing appointment. You can only book one
+                        at a time.
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="alert"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                    )}
+                  </h4>
                   <p className="mb-0">
                     {selectedDate
                       ? selectedDate.toDateString()
@@ -294,7 +324,7 @@ export default function BookSchedule() {
                       <p className="mb-0">Status: {schedule.status}</p>
                       <h5 className="fw-bold mb-0">{schedule.clinicianName}</h5>
                     </div>
-                    {schedule.status !== "Booked" && (
+                    {schedule.status !== "Booked" && !hasBooked && (
                       <button
                         className="button-group bg-white"
                         onClick={() =>

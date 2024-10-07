@@ -42,6 +42,7 @@ export default function Home() {
     setIsChoose(!isChoose);
   };
 
+  // Modal Information
   const openModal = async (appointmentId) => {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
@@ -240,7 +241,6 @@ export default function Home() {
                       <div
                         key={appointment._id}
                         className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
-                        onClick={() => openModal(appointment._id)}
                       >
                         <p className="fw-bold mb-0">
                           {appointment.selectedSchedule.day}
@@ -255,7 +255,10 @@ export default function Home() {
                           {appointment.patientId.lastName}
                         </p>
                         <div className="d-flex justify-content-between mt-3">
-                          <p className="status-accepted status-text status-text-green">
+                          <p
+                            onClick={() => openModal(appointment._id)}
+                            className="status-accepted status-text status-text-green"
+                          >
                             ACCEPTED
                           </p>
                           <div>
@@ -267,7 +270,7 @@ export default function Home() {
                             </button>
                             <button
                               className="button-group bg-white"
-                              onClick={() => console.log("Close modal")}
+                              onClick={() => setIsChoose(!isChoose)}
                             >
                               <p className="fw-bold my-0 status">CANCEL</p>
                             </button>
@@ -282,7 +285,6 @@ export default function Home() {
                       <div
                         key={appointment._id}
                         className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
-                        onClick={() => openModal(appointment._id)}
                       >
                         <p className="fw-bold mb-0">
                           {appointment.selectedSchedule.day}
@@ -298,6 +300,7 @@ export default function Home() {
                         </p>
                         <div className="d-flex justify-content-between mt-3">
                           <p className="status-accepted status-text status-text-green">
+                            onClick={() => openModal(appointment._id)}
                             Completed
                           </p>
                         </div>

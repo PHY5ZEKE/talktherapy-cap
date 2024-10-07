@@ -1,20 +1,56 @@
+import { useEffect, useState } from "react";
 import "./modal.css";
 export default function ChooseSchedule({ closeModal }) {
+  const [schedules, setSchedules] = useState([]);
+
+  const [error, setError] = useState(null);
+
   const handleClose = (e) => {
     e.preventDefault();
     closeModal();
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+    const fetchSchedules = async () => {
+      try {
+        const response = await fetch(
+          "http://localhost:8000/schedule/get-schedules",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch schedules");
+        }
+
+        const data = await response.json();
+        console.log("Schedules fetched:", data);
+        setSchedules(data);
+      } catch (error) {
+        console.error("Error fetching schedules:", error.message);
+        setError(error.message);
+      }
+    };
+
+    fetchSchedules();
+  }, []);
+
   return (
     <>
       <div className="modal-background">
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
             <h3 className="fw-bold">Choose a schedule</h3>
-            <p className="mb-0">
-              The following are available schedules.
-            </p>
+            <p className="mb-0">The following are available schedules.</p>
             <p>
-              This will notify the corresponding user and will be tagged as pending.
+              This will notify the corresponding user and will be tagged as
+              pending.
             </p>
           </div>
 
@@ -30,78 +66,22 @@ export default function ChooseSchedule({ closeModal }) {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row">July 4, 2024</th>
-                    <td>2:30 PM - 3:00 PM</td>
-                    <td>
-                      <button className="button-group bg-white">
-                        <p className="fw-bold my-0 status">ACCEPT</p>
-                      </button>
-                    </td>
-                  </tr>
+                  {schedules.map(
+                    (schedule, index) =>
+                      schedule.status === "Available" && (
+                        <tr key={index}>
+                          <th scope="row">{schedule.day}</th>
+                          <td>
+                            {schedule.startTime} - {schedule.endTime}
+                          </td>
+                          <td>
+                            <button className="button-group bg-white">
+                              <p className="fw-bold my-0 status">ACCEPT</p>
+                            </button>
+                          </td>
+                        </tr>
+                      )
+                  )}
                 </tbody>
               </table>
             </div>
