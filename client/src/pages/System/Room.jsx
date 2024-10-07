@@ -11,6 +11,9 @@ import Camera from "../../assets/buttons/Camera";
 export default function Room() {
   // Error
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
+  const [messages, setMessages] = useState([]); // State for storing messages
+  const [type, setType] = useState("");
 
   // Nav
   const navigate = useNavigate();
@@ -43,7 +46,8 @@ export default function Room() {
     return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4() + s4() + s4()}`;
   }
 
-  const uuid = createUUID();
+  const currentUser = localStorage.getItem("userId");
+  const uuid = currentUser;
 
   const peerConnectionConfig = {
     iceServers: [
@@ -56,7 +60,7 @@ export default function Room() {
     const token = localStorage.getItem("accessToken");
     const role = localStorage.getItem("userRole");
     const currentUser = localStorage.getItem("userId");
-
+    setUserRole(role);
     const fetchAppointment = async () => {
       try {
         const response = await fetch(
@@ -78,12 +82,13 @@ export default function Room() {
 
         // Validate user roles after fetching appointment
         if (
-          ((role === "patientslp" && data.patientId._id !== currentUser) ||
-          (role === "clinician" && data.selectedClinician !== currentUser)) || roomid === "errorRoomId"
+          (role === "patientslp" && data.patientId._id !== currentUser) ||
+          (role === "clinician" && data.selectedClinician !== currentUser) ||
+          roomid === "errorRoomId"
         ) {
           navigate("/unauthorized");
         } else {
-          pageReady()
+          pageReady();
           return () => {
             peerConnection.current?.close();
             serverConnection.current?.close();
@@ -97,13 +102,6 @@ export default function Room() {
 
     // Fetch appointment data on component mount
     fetchAppointment();
-
-    // Check for invalid room ID outside of async function
-    // if (roomid === "errorRoomId") {
-    //   navigate("/unauthorized");
-    // } else {
-
-    // }
   }, []);
 
   async function pageReady() {
@@ -111,10 +109,12 @@ export default function Room() {
       video: true,
       audio: true,
     };
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       const domain = "server-production-2381.up.railway.app";
       localStream.current = stream;
+
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
@@ -165,19 +165,13 @@ export default function Room() {
   }
 
   function gotMessageFromServer(message) {
-    if (!peerConnection.current) start(false);
-
     const signal = JSON.parse(message.data);
-    console.log("Received message from server:", message.data);
 
-    // Ignore messages from ourself
-    if (signal.uuid === uuid) return;
-
+    // Handle WebRTC messages (SDP, ICE candidates)
     if (signal.sdp) {
       peerConnection.current
         .setRemoteDescription(new RTCSessionDescription(signal.sdp))
         .then(() => {
-          // Only create answers in response to offers
           if (signal.sdp.type === "offer") {
             peerConnection.current
               .createAnswer()
@@ -190,7 +184,14 @@ export default function Room() {
       peerConnection.current
         .addIceCandidate(new RTCIceCandidate(signal.ice))
         .catch(errorHandler);
-      console.log("Received ICE candidate:", signal.ice);
+    }
+
+    // Handle text messages
+    if (signal.type === "message") {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { message: signal.message, isSent: false }, // Mark it as received
+      ]);
     }
   }
 
@@ -204,14 +205,14 @@ export default function Room() {
         })
       );
     }
-    console.log(
-      "Sending ICE candidate:",
-      JSON.stringify({
-        ice: event.candidate,
-        uuid: uuid,
-        type: "ice-candidate",
-      })
-    );
+    // console.log(
+    //   "Sending ICE candidate:",
+    //   JSON.stringify({
+    //     ice: event.candidate,
+    //     uuid: uuid,
+    //     type: "ice-candidate",
+    //   })
+    // );
   }
 
   function createdDescription(description) {
@@ -278,6 +279,18 @@ export default function Room() {
     navigate("/");
   }
 
+  // TODO: Change sender name
+  function sendMessage(message) {
+    if (!message || !serverConnection.current) return;
+    serverConnection.current.send(
+      JSON.stringify({ type: "message", message, roomID: roomid, uuid })
+    );
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { message, sender: uuid, isSent: true }, // Mark as sent
+    ]);
+  }
+
   return (
     <>
       <div className="container-fluid mx-auto room-height">
@@ -316,17 +329,20 @@ export default function Room() {
           ></video>
         </div>
 
-        <div className="row border border-start-0 border-[#B9B9B9] fixed-bottom">
+        <div className="row bg-white border border-start-0 border-[#B9B9B9] fixed-bottom">
           <div className="d-flex align-items-center justify-content-center">
             <div className="p-2">
               <div className="row py-1">
-                <button
-                  onClick={handleDisconnect}
-                  type="submit"
-                  className="button-group bg-white"
-                >
-                  <p className="fw-bold my-0 status">Disconnect</p>
-                </button>
+                <div className="col">
+                  <button
+                    onClick={handleDisconnect}
+                    type="submit"
+                    className="button-group bg-white"
+                  >
+                    <p className="fw-bold my-0 status">Disconnect</p>
+                  </button>
+                </div>
+
                 <div
                   className="col"
                   onClick={muteCam}
@@ -334,6 +350,7 @@ export default function Room() {
                 >
                   <Camera />
                 </div>
+
                 <div
                   className="col d-flex align-items-center justify-content-center"
                   onClick={muteMic}
@@ -342,9 +359,105 @@ export default function Room() {
                   <Mic />
                 </div>
 
-                <button type="submit" className="button-group bg-white">
+                {userRole === "clinician" ? (
+                  <>
+                    {/* ACTION BUTTONS */}
+                    <div className="col">
+                      <button
+                        className="button-group bg-white"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                      >
+                        <p className="fw-bold my-0 status">Actions</p>
+                      </button>
+                      <ul className="dropdown-menu">
+                        <li>
+                          <a
+                            role="button"
+                            className="dropdown-item"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasWithBothOptions"
+                            aria-controls="offcanvasWithBothOptions"
+                          >
+                            Message
+                          </a>
+                        </li>
+                        <li>
+                          <a role="button" className="dropdown-item" href="#">
+                            Add Diagnostic
+                          </a>
+                        </li>
+                        <li>
+                          <a role="button" className="dropdown-item" href="#">
+                            Diagnostic Tool
+                          </a>
+                        </li>
+                        <li>
+                          <a role="button" className="dropdown-item" href="#">
+                            End Session
+                          </a>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* CANVAS */}
+                    <div
+                      className="offcanvas offcanvas-start"
+                      data-bs-scroll="true"
+                      tabIndex="-1"
+                      id="offcanvasWithBothOptions"
+                      aria-labelledby="offcanvasWithBothOptionsLabel"
+                    >
+                      <div className="offcanvas-header">
+                        <h5
+                          className="offcanvas-title"
+                          id="offcanvasWithBothOptionsLabel"
+                        >
+                          Messages
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="offcanvas"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div className="offcanvas-body d-flex flex-column justify-content-between overflow-y-auto">
+                        {/* CHAT AREA */}
+
+                        <div>
+                          {messages.map((msg, index) => (
+                            <p key={index}>
+                              <span className="fw-bold">{msg.sender}:</span>
+                              {msg.message}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* INPUT CHAT */}
+                      <div className="input-group position-sticky my-3">
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Type a message..."
+                          onChange={(e) => setType(e.target.value)}
+                        />
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => sendMessage(type)}
+                        >
+                          Send
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                ) : null}
+
+                {/* <button type="submit" className="button-group bg-white">
                   <p className="fw-bold my-0 status">Messages</p>
-                </button>
+                </button> */}
 
                 <div></div>
               </div>
