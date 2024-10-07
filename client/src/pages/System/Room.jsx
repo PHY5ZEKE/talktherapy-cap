@@ -9,11 +9,17 @@ import Mic from "../../assets/buttons/Mic";
 import Camera from "../../assets/buttons/Camera";
 
 export default function Room() {
+  // Error
+  const [error, setError] = useState(null);
+
   // Nav
   const navigate = useNavigate();
 
   // Get Room ID
   const { roomid } = useParams();
+
+  // Get Appointment ID
+  const { appid } = useParams();
 
   // Get video stream
   const localVideoRef = useRef();
@@ -47,21 +53,57 @@ export default function Room() {
   };
 
   useEffect(() => {
-    // TODO: Check if room id not valid == errorRoomId
-    if (roomid === "errorRoomId") {
-      navigate("/unauthorized");
-    } else {
-      pageReady();
+    const token = localStorage.getItem("accessToken");
+    const role = localStorage.getItem("userRole");
+    const currentUser = localStorage.getItem("userId");
 
-      return () => {
-        if (peerConnection.current) {
-          peerConnection.current.close();
+    const fetchAppointment = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:8000/appointments/get-appointment-by-id/${appid}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch appointments");
         }
-        if (serverConnection.current) {
-          serverConnection.current.close();
+
+        const data = await response.json();
+
+        // Validate user roles after fetching appointment
+        if (
+          ((role === "patientslp" && data.patientId._id !== currentUser) ||
+          (role === "clinician" && data.selectedClinician !== currentUser)) || roomid === "errorRoomId"
+        ) {
+          navigate("/unauthorized");
+        } else {
+          pageReady()
+          return () => {
+            peerConnection.current?.close();
+            serverConnection.current?.close();
+          };
         }
-      };
-    }
+      } catch (error) {
+        console.error("Error fetching appointments:", error.message);
+        setError(error.message);
+      }
+    };
+
+    // Fetch appointment data on component mount
+    fetchAppointment();
+
+    // Check for invalid room ID outside of async function
+    // if (roomid === "errorRoomId") {
+    //   navigate("/unauthorized");
+    // } else {
+
+    // }
   }, []);
 
   async function pageReady() {
@@ -69,7 +111,6 @@ export default function Room() {
       video: true,
       audio: true,
     };
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       const domain = "server-production-2381.up.railway.app";

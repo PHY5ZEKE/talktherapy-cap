@@ -1,4 +1,3 @@
-import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useNavigate } from "react-router-dom";
@@ -66,6 +65,7 @@ export default function Home() {
         const appointmentsData = await appointmentsRes.json();
 
         setPatientData(patientData.patient);
+        localStorage.setItem("userId", patientData.patient._id);
         setAppointments(appointmentsData);
         setLoading(false);
       } catch (error) {
@@ -82,9 +82,9 @@ export default function Home() {
     (appointment) => appointment.status === "Accepted"
   );
 
-  const joinMeeting = (id) => {
+  const joinMeeting = (app, id) => {
     console.log("Joining meeting with ID:", id);
-    navigate(`/room/${id}`);
+    navigate(`/room/${app}/${id}`);
   };
 
   return (
@@ -166,7 +166,7 @@ export default function Home() {
                           <div>
                             <button
                               className="button-group bg-white"
-                              onClick={() => joinMeeting(appointment.roomId)}
+                              onClick={() => joinMeeting(appointment._id,appointment.roomId)}
                             >
                               <p className="fw-bold my-0 status">JOIN</p>
                             </button>

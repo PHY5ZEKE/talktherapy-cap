@@ -1,9 +1,10 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function UnauthorizedAccess() {
+  const navigate = useNavigate();
   // TODO: Check user role and redirect back to their homepage
     const handleClose = () => {
-        window.history.back();
+        navigate('/');
     };
   return (
     <div className="container-fluid vh-100 d-flex flex-column align-items-center justify-content-center">

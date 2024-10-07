@@ -86,7 +86,7 @@
   /* position: relative; */
   width: 100%;
   height: inherit; 
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .video-local {
