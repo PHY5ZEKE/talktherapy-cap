@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function AppointmentDetails({ openModal, appointment }) {
+export default function AppointmentDetailsClinician({
+  openModal,
+  appointment,
+}) {
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState(""); // "success" or "danger"
@@ -67,6 +70,16 @@ export default function AppointmentDetails({ openModal, appointment }) {
               <p className="fw-bold my-0 status">Reject</p>
             </button>
           </>
+        );
+      case "Accepted":
+        return (
+          <button
+            onClick={() => updateStatus("Completed")}
+            className="button-group bg-white"
+            disabled={loading}
+          >
+            <p className="fw-bold my-0 status">Complete</p>
+          </button>
         );
       case "Completed":
         return <p className="fw-bold my-0 status">Appointment Completed</p>;

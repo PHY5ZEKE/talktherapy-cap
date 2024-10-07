@@ -38,7 +38,7 @@ exports.addSchedule = async (req, res) => {
       day,
       startTime,
       endTime,
-      status: "available", // Default value
+      status: "Available", // Default value
     });
 
     await newSchedule.save();

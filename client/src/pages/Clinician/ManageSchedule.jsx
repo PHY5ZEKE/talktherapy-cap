@@ -21,7 +21,6 @@ export default function ManageSchedule() {
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 
-
   // Handle Add Schedule Modal Open
   const [isOpen, setIsOpen] = useState(false);
   const handleAdd = useCallback(() => {
@@ -214,14 +213,14 @@ export default function ManageSchedule() {
                         {schedule.startTime} - {schedule.endTime}
                       </h5>
                       <p className="mb-0">{schedule.day}</p>
+                      <p className="mb-0">Status: {schedule.status}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </Col>
 
-            <Col lg>
-            </Col>
+            <Col lg></Col>
           </Row>
         </Col>
       </Row>

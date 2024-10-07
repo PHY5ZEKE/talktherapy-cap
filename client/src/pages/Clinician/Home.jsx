@@ -1,6 +1,8 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -12,6 +14,7 @@ import Sort from "../../assets/icons/Sort";
 // Modal
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
 import ChooseSchedule from "../../components/Modals/ChooseSchedule";
+import AppointmentDetailsClinician from "../../components/Modals/AppointmentDetailsClinician";
 
 // React
 import { useState, useEffect } from "react";
@@ -23,6 +26,9 @@ export default function Home() {
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const navigate = useNavigate();
 
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
@@ -34,6 +40,25 @@ export default function Home() {
   const [isChoose, setIsChoose] = useState(false);
   const closeSchedule = () => {
     setIsChoose(!isChoose);
+  };
+
+  const openModal = async (appointmentId) => {
+    try {
+      const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
+      const response = await axios.get(
+        `http://localhost:8000/appointments/get-appointment-by-id/${appointmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Fetched appointment details:", response.data); // Debugging statement
+      setSelectedAppointment(response.data);
+      setIsConfirm(true);
+    } catch (error) {
+      console.error("Error fetching appointment details:", error);
+    }
   };
 
   useEffect(() => {
@@ -72,6 +97,11 @@ export default function Home() {
       patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.mobile.includes(searchTerm)
   );
+
+  const joinMeeting = (id) => {
+    console.log("Joining meeting with ID:", id);
+    navigate(`/room/${id}`);
+  };
 
   useEffect(() => {
     const fetchClinicianData = async () => {
@@ -148,6 +178,13 @@ export default function Home() {
 
       {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
 
+      {isConfirm && (
+        <AppointmentDetailsClinician
+          openModal={closeModal}
+          appointment={selectedAppointment}
+        />
+      )}
+
       <Row className="min-vh-100 vw-100">
         <Sidebar />
 
@@ -203,6 +240,7 @@ export default function Home() {
                       <div
                         key={appointment._id}
                         className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                        onClick={() => openModal(appointment._id)}
                       >
                         <p className="fw-bold mb-0">
                           {appointment.selectedSchedule.day}
@@ -221,7 +259,10 @@ export default function Home() {
                             ACCEPTED
                           </p>
                           <div>
-                            <button className="button-group bg-white">
+                            <button
+                              className="button-group bg-white"
+                              onClick={() => joinMeeting(appointment.roomId)}
+                            >
                               <p className="fw-bold my-0 status">JOIN</p>
                             </button>
                             <button
@@ -231,6 +272,34 @@ export default function Home() {
                               <p className="fw-bold my-0 status">CANCEL</p>
                             </button>
                           </div>
+                        </div>
+                      </div>
+                    ))}
+
+                  {appointments
+                    .filter((appointment) => appointment.status === "Completed")
+                    .map((appointment) => (
+                      <div
+                        key={appointment._id}
+                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                        onClick={() => openModal(appointment._id)}
+                      >
+                        <p className="fw-bold mb-0">
+                          {appointment.selectedSchedule.day}
+                        </p>
+                        <p className="mb-0">
+                          {appointment.selectedSchedule.startTime} -{" "}
+                          {appointment.selectedSchedule.endTime}
+                        </p>
+                        <p className="mb-0">
+                          Scheduled appointment with{" "}
+                          {appointment.patientId.firstName}{" "}
+                          {appointment.patientId.lastName}
+                        </p>
+                        <div className="d-flex justify-content-between mt-3">
+                          <p className="status-accepted status-text status-text-green">
+                            Completed
+                          </p>
                         </div>
                       </div>
                     ))}

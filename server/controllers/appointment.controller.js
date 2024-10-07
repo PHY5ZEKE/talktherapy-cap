@@ -295,8 +295,10 @@ exports.updateAppointmentStatus = async (req, res) => {
     const { appointmentId } = req.params;
     const { status } = req.body;
 
-    // Find the appointment by appointmentId
-    const appointment = await Appointment.findById(appointmentId);
+    // Find the appointment by appointmentId and populate selectedSchedule
+    const appointment = await Appointment.findById(appointmentId).populate(
+      "selectedSchedule"
+    );
 
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
@@ -311,6 +313,9 @@ exports.updateAppointmentStatus = async (req, res) => {
       appointment.status = status;
       if (status === "Accepted") {
         appointment.roomId = generateRoomId();
+        // Update the selectedSchedule status to "Booked"
+        appointment.selectedSchedule.status = "Booked";
+        await appointment.selectedSchedule.save();
       } else {
         appointment.roomId = "errorRoomId";
       }
@@ -318,6 +323,9 @@ exports.updateAppointmentStatus = async (req, res) => {
       // If appointment is Accepted and the status to update is Completed
       appointment.status = status;
       appointment.roomId = "errorRoomId";
+      // Update the selectedSchedule status to "available"
+      appointment.selectedSchedule.status = "Available";
+      await appointment.selectedSchedule.save();
     } else {
       return res.status(400).json({ message: "Invalid status transition" });
     }
@@ -338,10 +346,10 @@ exports.getClinicianAppointments = async (req, res) => {
   try {
     const clinicianId = req.user.id; // Assuming the clinician ID is stored in req.user.id after token verification
 
-    // Find appointments for the logged-in clinician with status "Accepted"
+    // Find appointments for the logged-in clinician with status "Accepted" or "Completed"
     const appointments = await Appointment.find({
       selectedClinician: clinicianId,
-      status: "Accepted",
+      status: { $in: ["Accepted", "Completed"] },
     })
       .populate({
         path: "selectedSchedule",

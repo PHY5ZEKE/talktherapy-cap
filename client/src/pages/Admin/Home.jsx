@@ -172,7 +172,6 @@ export default function Home() {
     setSelectedUserType(type);
   };
 
-  const totalAppointments = appointments.length;
   const pendingAppointments = appointments.filter(
     (appointment) => appointment.status === "Pending"
   ).length;
@@ -230,8 +229,16 @@ export default function Home() {
 
               <div className="card-container d-flex flex-column gap-2">
                 <div className="text-center">
-                  <h2 className="fw-bold mb-0">{totalAppointments}</h2>
-                  <h5>Total Appointments</h5>
+                  <h5>Appointments</h5>
+                </div>
+
+                <div className="search-bar d-flex align-content-center gap-2">
+                  <Search />
+                  <input
+                    type="text"
+                    placeholder="Search"
+                    className="search-input"
+                  />
                 </div>
 
                 {/* STATUS COUNTER */}
@@ -348,6 +355,37 @@ export default function Home() {
                         <div className="d-flex justify-content-between mt-3">
                           <p className="status-cancelled status-text status-text-red">
                             CANCELLED
+                          </p>
+                          <p className="fw-bold">
+                            {appointment.selectedSchedule.clinicianName}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+
+                  {appointments
+                    .filter((appointment) => appointment.status === "Completed")
+                    .map((appointment, index) => (
+                      <div
+                        key={index}
+                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                        onClick={() => openModal(appointment._id)}
+                      >
+                        <p className="fw-bold mb-0">
+                          {appointment.selectedSchedule.day}
+                        </p>
+                        <p className="mb-0">
+                          {appointment.selectedSchedule.startTime} -{" "}
+                          {appointment.selectedSchedule.endTime}
+                        </p>
+                        <p className="mb-0">
+                          Session of{" "}
+                          {appointment.selectedSchedule.clinicianName} with{" "}
+                          {appointment.patientName} has started.
+                        </p>
+                        <div className="d-flex justify-content-between mt-3">
+                          <p className="status-accepted status-text status-text-green">
+                            Completed
                           </p>
                           <p className="fw-bold">
                             {appointment.selectedSchedule.clinicianName}
