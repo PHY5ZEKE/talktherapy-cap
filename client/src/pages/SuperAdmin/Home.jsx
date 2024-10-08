@@ -50,7 +50,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          "http://54.79.63.159/super-admin/get-super-admin", // Ensure this URL is correct
+          "http://localhost:8000/super-admin/get-super-admin", // Ensure this URL is correct
           {
             method: "GET",
             headers: {
