@@ -50,7 +50,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          "http://localhost:8000/super-admin/get-super-admin", // Ensure this URL is correct
+          "http://54.79.63.159/super-admin/get-super-admin", // Ensure this URL is correct
           {
             method: "GET",
             headers: {
@@ -84,7 +84,7 @@ export default function Home() {
       const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
       try {
         const response = await axios.get(
-          "http://54.79.63.159/super-admin/getAllAdmins",
+          "http://localhost:8000/super-admin/getAllAdmins",
           {
             headers: {
               Authorization: `Bearer ${token}`,
