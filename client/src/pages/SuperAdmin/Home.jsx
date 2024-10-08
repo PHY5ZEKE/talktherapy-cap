@@ -84,7 +84,7 @@ export default function Home() {
       const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
       try {
         const response = await axios.get(
-          "http://localhost:8000/super-admin/getAllAdmins",
+          "http://54.79.63.159/super-admin/getAllAdmins",
           {
             headers: {
               Authorization: `Bearer ${token}`,
