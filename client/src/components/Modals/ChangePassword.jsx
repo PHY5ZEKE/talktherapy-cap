@@ -5,7 +5,9 @@ import Button from "react-bootstrap/Button";
 
 export default function ChangePassword({ editPasswordAPI, closeModal }) {
   const [showPasswordModal, setShowPasswordModal] = useState(true);
-  
+
+  const appURL = import.meta.env.VITE_APP_URL;
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -42,7 +44,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:8000/${editPasswordAPI}`, {
+      const response = await fetch(`${appURL}/${editPasswordAPI}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

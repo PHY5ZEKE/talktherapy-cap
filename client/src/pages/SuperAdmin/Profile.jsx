@@ -12,6 +12,7 @@ import { route } from "../../utils/route";
 export default function Profile() {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
@@ -31,7 +32,7 @@ export default function Profile() {
       return;
     }
 
-    const endpoint = `http://localhost:8000/${route.sudo.fetch}`;
+    const endpoint = `${appURL}/${route.sudo.fetch}`;
     try {
       const response = await fetch(endpoint, {
         method: "GET",

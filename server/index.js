@@ -45,12 +45,12 @@ app.use((req, res, next) => {
 // Use the routes
 
 app.use("/patient-slp", patientSlpRoutes);
-app.use("/clinicianSLP", clinicianSLPRoutes);
-app.use("/adminSLP", adminSLPRoutes);
-app.use("/super-admin", superAdminSLPRoutes);
-app.use("/schedule", scheduleRoutes);
+app.use("/clinician-slp", clinicianSLPRoutes);
+app.use("/admin-slp", adminSLPRoutes);
+app.use("/super-admin-slp", superAdminSLPRoutes);
+app.use("/schedule-slp", scheduleRoutes);
 app.use("/api/contents", contentRoute);
-app.use("/appointments", appointmentRoute);
+app.use("/appointments-slp", appointmentRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

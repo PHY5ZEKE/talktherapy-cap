@@ -219,47 +219,6 @@ exports.clinicianSignup = async (req, res) => {
   });
 };
 
-exports.clinicianLogin = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
-  }
-
-  if (!password) {
-    return res.status(400).json({ message: "Password is required" });
-  }
-
-  const clinicianInfo = await Clinician.findOne({ email: email });
-
-  if (!clinicianInfo) {
-    return res.status(400).json({ message: "User not found" });
-  }
-
-  if (clinicianInfo.active === false) {
-    return res.status(400).json({ message: "User account is deactivated" });
-  }
-
-  if (clinicianInfo.email == email && clinicianInfo.password == password) {
-    const clinician = { clinician: clinicianInfo };
-    const accessToken = jwt.sign(clinician, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "36000m",
-    });
-
-    return res.json({
-      error: false,
-      message: "Login Successful",
-      email,
-      accessToken,
-    });
-  } else {
-    return res.status(400).json({
-      error: true,
-      message: "Invalid email or password",
-    });
-  }
-};
-
 exports.getClinician = async (req, res) => {
   try {
     const clinicianId = req.user.id;

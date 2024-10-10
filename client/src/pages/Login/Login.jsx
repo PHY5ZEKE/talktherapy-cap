@@ -12,7 +12,9 @@ import axios from "axios";
 import ChooseRegister from "../../components/Modals/ChooseRegister.jsx";
 
 // Utils
-import { route } from '../../utils/route.js'
+import { route } from "../../utils/route.js";
+
+const appURL = import.meta.env.VITE_APP_URL;
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,13 +32,10 @@ const Login = () => {
     setError("");
 
     try {
-      const response = await axios.post(
-        `http://localhost:8000/${route.system.login}`,
-        {
-          email,
-          password,
-        }
-      );
+      const response = await axios.post(`${appURL}/${route.system.login}`, {
+        email,
+        password,
+      });
 
       if (response.data.error) {
         setError(response.data.message);

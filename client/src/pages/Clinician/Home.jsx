@@ -18,6 +18,7 @@ import AppointmentDetailsClinician from "../../components/Modals/AppointmentDeta
 
 // React
 import { useState, useEffect } from "react";
+import { route } from "../../utils/route";
 
 export default function Home() {
   const [patients, setPatients] = useState([]);
@@ -47,7 +48,7 @@ export default function Home() {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
       const response = await axios.get(
-        `http://localhost:8000/appointments/get-appointment-by-id/${appointmentId}`,
+        `http://localhost:8000/${route.appointment.getById}/${appointmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -66,7 +67,7 @@ export default function Home() {
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/clinicianSLP/getAllPatients",
+          `http://localhost:8000/${route.patient.getAllPatients}`,
           {
             method: "GET",
             headers: {
@@ -110,7 +111,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          "http://localhost:8000/clinicianSLP/get-clinician",
+          `http://localhost:8000/${route.clinician.fetch}`,
           {
             method: "GET",
             headers: {
@@ -143,7 +144,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          "http://localhost:8000/appointments/get-appointment-by-clinician",
+          `http://localhost:8000/${route.appointment.getByClinician}`,
           {
             method: "GET",
             headers: {
@@ -265,7 +266,9 @@ export default function Home() {
                           <div>
                             <button
                               className="button-group bg-white"
-                              onClick={() => joinMeeting(appointment._id, appointment.roomId)}
+                              onClick={() =>
+                                joinMeeting(appointment._id, appointment.roomId)
+                              }
                             >
                               <p className="fw-bold my-0 status">JOIN</p>
                             </button>

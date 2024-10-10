@@ -5,11 +5,9 @@ const {
   deactivatePatient,
   activatePatient,
   signupPatient,
-  loginPatient,
+
   getPatient,
-  forgotPassword,
-  verifyOtp,
-  resetPassword,
+
   changePassword,
   updateProfilePicture,
   editPatient,
@@ -25,18 +23,6 @@ router.post("/activate-slp-patient", activatePatient);
 
 // Create SLP Patient Account
 router.post("/slp-patient-signup", signupPatient);
-
-// Login SLP Patient
-router.post("/slp-patient-login", loginPatient);
-
-// Request Password Reset
-router.post("/forgot-password", forgotPassword);
-
-// Verify OTP
-router.post("/verify-otp", verifyOtp);
-
-// Reset Password
-router.post("/reset-password", resetPassword);
 
 // Get SLP Patient
 router.get("/get-patient", verifyToken, getPatient);

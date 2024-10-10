@@ -15,6 +15,7 @@ export default function EditProfile({
 }) {
   const [userData, setUserData] = useState(userDetails);
   const [updatedUser, setUpdatedUser] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const [showModal, setShowModal] = useState(true);
 
@@ -48,7 +49,7 @@ export default function EditProfile({
     e.preventDefault();
     const token = localStorage.getItem("accessToken");
     try {
-      const response = await fetch(`http://localhost:8000/${editProfileAPI}`, {
+      const response = await fetch(`${appURL}/${editProfileAPI}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -98,7 +99,7 @@ export default function EditProfile({
     formData.append("profilePicture", profilePicture);
 
     try {
-      const response = await fetch(`http://localhost:8000/${editPictureAPI}`, {
+      const response = await fetch(`${appURL}/${editPictureAPI}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

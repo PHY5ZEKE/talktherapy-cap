@@ -2,6 +2,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useState, useEffect } from "react";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -11,6 +12,7 @@ import Sort from "../../assets/icons/Sort";
 export default function AuditLogs() {
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   //Super Admin
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function AuditLogs() {
 
       try {
         const response = await fetch(
-          "http://localhost:8000/super-admin/get-super-admin", // Ensure this URL is correct
+          `${appURL}/${route.sudo.fetch}`, // Ensure this URL is correct
           {
             method: "GET",
             headers: {

@@ -4,7 +4,7 @@ const superAdminController = require("../controllers/superAdminSLP.controller");
 const verifyToken = require("../middleware/verifyToken");
 
 router.post("/super-admin-signup", superAdminController.signup);
-router.post("/super-admin-login", superAdminController.login);
+router.post("/login", superAdminController.login);
 router.get("/get-super-admin", verifyToken, superAdminController.getSuperAdmin);
 router.post("/forgot-password", superAdminController.forgotPassword);
 router.post("/verify-otp", superAdminController.verifyOtp);

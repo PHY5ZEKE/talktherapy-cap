@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import "./modal.css";
+import { route } from "../../utils/route";
 export default function ChooseSchedule({ closeModal }) {
   const [schedules, setSchedules] = useState([]);
-
+  const appURL = import.meta.env.VITE_APP_URL;
   const [error, setError] = useState(null);
 
   const handleClose = (e) => {
@@ -14,16 +15,13 @@ export default function ChooseSchedule({ closeModal }) {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
     const fetchSchedules = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/schedule/get-schedules",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.schedule.get}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch schedules");

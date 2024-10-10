@@ -15,9 +15,6 @@ router.post("/activate-clinician", clinicianController.activateClinician);
 // Route for clinician signup
 router.post("/signup", clinicianController.clinicianSignup);
 
-// Route for clinician login
-router.post("/login", clinicianController.clinicianLogin);
-
 router.put("/change-password", verifyToken, clinicianController.changePassword);
 
 // Route to get clinician details (requires authentication)

@@ -3,6 +3,7 @@ import Form from "react-bootstrap/Form";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import { useState } from "react";
 import Alert from "react-bootstrap/Alert";
+import { route } from "../../utils/route";
 
 export default function JoinAppointment({
   openModal,
@@ -15,6 +16,7 @@ export default function JoinAppointment({
   const [sourceOfReferral, setSourceOfReferral] = useState("");
   const [chiefComplaint, setChiefComplaint] = useState("");
   const [referralUpload, setReferralUpload] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -57,7 +59,7 @@ export default function JoinAppointment({
 
       // Send JSON to Server
       const response = await fetch(
-        "http://localhost:8000/appointments/create-appointment/json",
+        `${appURL}/${route.appointment.createJSON}`,
         {
           method: "POST",
           headers: {
@@ -80,7 +82,7 @@ export default function JoinAppointment({
 
       // Send File to Server
       const fileResponse = await fetch(
-        "http://localhost:8000/appointments/create-appointment/file",
+        `${appURL}/${route.appointment.createFile}`,
         {
           method: "POST",
           headers: {

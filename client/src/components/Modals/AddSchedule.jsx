@@ -1,5 +1,6 @@
 import "./modal.css";
 import { useState } from "react";
+import { route } from "../../utils/route";
 
 export default function AddSchedule({ closeModal, onScheduleAdded }) {
   // Callback Function
@@ -7,6 +8,8 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
     e.preventDefault();
     closeModal();
   };
+
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Dropdown List
   const weekdays = [
@@ -59,17 +62,14 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/schedule/add-schedule",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify(schedule),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.schedule.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(schedule),
+      });
 
       const data = await response.json();
       if (response.ok) {

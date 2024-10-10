@@ -7,10 +7,7 @@ router.post("/add-admin", adminController.addAdmin);
 router.post("/remove-admin", adminController.removeAdmin);
 router.post("/activate-admin", adminController.activateAdmin);
 router.post("/admin-signup", adminController.adminSignup);
-router.post("/admin-login", adminController.adminLogin);
-router.post("/forgot-password", adminController.forgotPassword);
-router.post("/verify-otp", adminController.verifyOtp);
-router.post("/reset-password", adminController.resetPassword);
+
 router.get("/get-admin", verifyToken, adminController.getAdmin);
 router.get("/getAllClinicians", verifyToken, adminController.getAllClinicians);
 router.get(

@@ -3,6 +3,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import axios from "axios";
+import { route } from "../../utils/route";
 
 // CSS
 import "./home.css";
@@ -25,7 +26,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
-
+  const appURL = import.meta.env.VITE_APP_URL;
   const [userDetails, setUserDetails] = useState(null);
   const [editProfileAPI, setEditProfileAPI] = useState("");
   const [updateProfilePictureAPI, setUpdateProfilePictureAPI] = useState("");
@@ -35,7 +36,7 @@ export default function Home() {
   const handleModal = (user) => {
     setIsOpen(!isOpen);
     setUserDetails(user);
-    setEditProfileAPI('super-admin/edit-admin')
+    setEditProfileAPI("super-admin/edit-admin");
   };
 
   //Super Admin
@@ -49,16 +50,13 @@ export default function Home() {
       }
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/super-admin/get-super-admin", // Ensure this URL is correct
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.sudo.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -84,7 +82,7 @@ export default function Home() {
       const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
       try {
         const response = await axios.get(
-          "http://localhost:8000/super-admin/getAllAdmins",
+          `${appURL}/${route.sudo.getAllAdmins}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -115,7 +113,7 @@ export default function Home() {
             userDetails={userDetails}
             closeModal={handleModal}
             isOwner={false}
-            whatRole={'superAdmin'}
+            whatRole={"superAdmin"}
           />
         )}
 
@@ -166,7 +164,6 @@ export default function Home() {
 
                 <div className="scrollable-div d-flex flex-column gap-3">
                   {admins.map((admin) => (
-                    
                     <div key={admin._id} className="card-content-bg-dark p-3">
                       <div className="d-flex flex-column g-1 mb-2">
                         <p className="fw-bold mb-0">
@@ -178,7 +175,12 @@ export default function Home() {
                       </div>
 
                       <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                        <button className="icon-btn" onClick={()=>{handleModal(admin)}}>
+                        <button
+                          className="icon-btn"
+                          onClick={() => {
+                            handleModal(admin);
+                          }}
+                        >
                           <Edit />
                         </button>
                         <Delete />

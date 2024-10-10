@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { route } from "../../utils/route";
 
 export default function AppointmentDetailsClinician({
   openModal,
@@ -11,6 +12,7 @@ export default function AppointmentDetailsClinician({
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState(""); // "success" or "danger"
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -21,7 +23,7 @@ export default function AppointmentDetailsClinician({
     setLoading(true);
     try {
       const response = await axios.put(
-        `http://localhost:8000/appointments/update-status/${appointment._id}`,
+        `${appURL}/${route.appointment.updateStatus}/${appointment._id}`,
         { status: newStatus },
         {
           headers: {

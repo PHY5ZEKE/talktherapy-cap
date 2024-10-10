@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -18,6 +19,7 @@ export default function ManageAdmin() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   //Super Admin
   useEffect(() => {
@@ -30,16 +32,13 @@ export default function ManageAdmin() {
       }
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/super-admin/get-super-admin", // Ensure this URL is correct
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.sudo.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (response.ok) {
           const data = await response.json();
@@ -64,14 +63,11 @@ export default function ManageAdmin() {
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/super-admin/getAllAdmins",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Assuming token is stored in localStorage
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.sudo.getAllAdmins}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`, // Assuming token is stored in localStorage
+          },
+        });
         const data = await response.json();
 
         if (!data.error) {
@@ -93,7 +89,7 @@ export default function ManageAdmin() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/super-admin/getAdminById/${adminId}`,
+        `${appURL}/${route.sudo.getAdminById}/${adminId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -127,8 +123,8 @@ export default function ManageAdmin() {
 
     try {
       const url = selectedAdmin.active
-        ? "http://localhost:8000/adminSLP/remove-admin"
-        : "http://localhost:8000/adminSLP/activate-admin";
+        ? `${appURL}/${route.sudo.removeAdmin}`
+        : `${appURL}/${route.sudo.activateAdmin}`;
 
       const response = await fetch(url, {
         method: "POST",
