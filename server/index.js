@@ -44,13 +44,13 @@ app.use((req, res, next) => {
 
 // Use the routes
 
-app.use("/api/patient-slp", patientSlpRoutes);
-app.use("/api/clinician-slp", clinicianSLPRoutes);
-app.use("/api/admin-slp", adminSLPRoutes);
-app.use("/api/super-admin-slp", superAdminSLPRoutes);
-app.use("/api/schedule-slp", scheduleRoutes);
+app.use("/patient-slp", patientSlpRoutes);
+app.use("/clinician-slp", clinicianSLPRoutes);
+app.use("/admin-slp", adminSLPRoutes);
+app.use("/super-admin-slp", superAdminSLPRoutes);
+app.use("/schedule-slp", scheduleRoutes);
 app.use("/api/contents", contentRoute);
-app.use("/api/appointments-slp", appointmentRoute);
+app.use("/appointments-slp", appointmentRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
