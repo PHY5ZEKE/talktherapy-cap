@@ -62,6 +62,6 @@ app.get("/", (req, res) => {
   res.json({ data: "hello" });
 });
 
-app.listen(8000, () => {
+app.listen(8000, '0.0.0.0', () => {
   console.log("Server is running on port 8000");
 });
