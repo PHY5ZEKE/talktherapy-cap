@@ -44,13 +44,13 @@ app.use((req, res, next) => {
 
 // Use the routes
 
-app.use("/api/patient-slp", patientSlpRoutes);
-app.use("/api/clinician-slp", clinicianSLPRoutes);
-app.use("/api/admin-slp", adminSLPRoutes);
-app.use("/api/super-admin-slp", superAdminSLPRoutes);
-app.use("/api/schedule-slp", scheduleRoutes);
+app.use("/patient-slp", patientSlpRoutes);
+app.use("/clinician-slp", clinicianSLPRoutes);
+app.use("/admin-slp", adminSLPRoutes);
+app.use("/super-admin-slp", superAdminSLPRoutes);
+app.use("/schedule-slp", scheduleRoutes);
 app.use("/api/contents", contentRoute);
-app.use("/api/appointments-slp", appointmentRoute);
+app.use("/appointments-slp", appointmentRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -63,9 +63,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(8000, () => {
-  console.log("Server is running on port 8000");
-});
-
-app.listen(8000, '0.0.0.0', () => {
   console.log("Server is running on port 8000");
 });
