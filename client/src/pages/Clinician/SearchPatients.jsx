@@ -1,6 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -20,6 +21,7 @@ export default function ManageSchedule() {
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Modal
   const [showModal, setShowModal] = useState(false);
@@ -32,16 +34,13 @@ export default function ManageSchedule() {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/clinicianSLP/get-clinician",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch clinician data");
@@ -63,7 +62,7 @@ export default function ManageSchedule() {
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/clinicianSLP/getAllPatients",
+          `${appURL}/${route.clinician.getAllPatients}`,
           {
             method: "GET",
             headers: {
@@ -101,7 +100,7 @@ export default function ManageSchedule() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/clinicianSLP/getPatientById/${patientId}`,
+        `${appURL}/${route.clinician.getPatientById}${patientId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -132,7 +131,7 @@ export default function ManageSchedule() {
         <Sidebar />
 
         {/* SOAP MODAL */}
-        {showModal && <Soap openModal={handleOpen}/>}
+        {showModal && <Soap openModal={handleOpen} />}
 
         {/* CONTENT */}
         <Col

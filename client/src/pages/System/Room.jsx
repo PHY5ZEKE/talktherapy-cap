@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Rnd } from "react-rnd";
+import { route } from "../../utils/route";
 
 import "../../styles/containers.css";
 
@@ -14,6 +15,7 @@ export default function Room() {
   const [userRole, setUserRole] = useState(null);
   const [messages, setMessages] = useState([]); // State for storing messages
   const [type, setType] = useState("");
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Nav
   const navigate = useNavigate();
@@ -64,7 +66,7 @@ export default function Room() {
     const fetchAppointment = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/appointments/get-appointment-by-id/${appid}`,
+          `${appURL}/${route.appointment.getById}/${appid}`,
           {
             method: "GET",
             headers: {

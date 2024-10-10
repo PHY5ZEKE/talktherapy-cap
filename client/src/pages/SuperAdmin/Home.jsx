@@ -36,7 +36,26 @@ export default function Home() {
   const handleModal = (user) => {
     setIsOpen(!isOpen);
     setUserDetails(user);
-    setEditProfileAPI("super-admin/edit-admin");
+    setEditProfileAPI("super-admin-slp/edit-admin");
+  };
+
+  const onProfileUpdate = async (updatedDetails) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await axios.put(
+        `${appURL}/${editProfileAPI}`,
+        updatedDetails,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      // Handle the response as needed
+      console.log("Profile updated successfully:", response.data);
+    } catch (error) {
+      console.error("Error updating profile:", error);
+    }
   };
 
   //Super Admin
@@ -114,6 +133,7 @@ export default function Home() {
             closeModal={handleModal}
             isOwner={false}
             whatRole={"superAdmin"}
+            onProfileUpdate={onProfileUpdate}
           />
         )}
 

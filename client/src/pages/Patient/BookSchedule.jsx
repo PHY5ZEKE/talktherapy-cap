@@ -2,7 +2,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useNavigate } from "react-router-dom";
-
+import { route } from "../../utils/route";
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -42,6 +42,7 @@ export default function BookSchedule() {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedClinician, setSelectedClinician] = useState(null);
   const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // State for storing appointments
   const [appointments, setAppointments] = useState([]);
@@ -82,16 +83,13 @@ export default function BookSchedule() {
 
     const fetchPatientData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/patient-SLP/get-patient",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.patient.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch admin data");
@@ -108,16 +106,13 @@ export default function BookSchedule() {
 
     const fetchAll = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/schedule/patient-schedules",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch schedules");
@@ -134,16 +129,13 @@ export default function BookSchedule() {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/appointments/get-appointment",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.appointment.get}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
@@ -384,7 +376,9 @@ export default function BookSchedule() {
                           <>
                             <button
                               className="button-group bg-white"
-                              onClick={() => joinMeeting(appointment._id,appointment.roomId)}
+                              onClick={() =>
+                                joinMeeting(appointment._id, appointment.roomId)
+                              }
                             >
                               <p className="fw-bold my-0 status">JOIN</p>
                             </button>

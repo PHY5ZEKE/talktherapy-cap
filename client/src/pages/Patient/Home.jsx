@@ -1,6 +1,7 @@
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useNavigate } from "react-router-dom";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -19,6 +20,7 @@ import { useState, useEffect } from "react";
 export default function Home() {
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
+  const appURL = import.meta.env.VITE_APP_URL;
   const closeModal = () => {
     setIsConfirm(!isConfirm);
   };
@@ -41,14 +43,14 @@ export default function Home() {
 
       try {
         const [patientRes, appointmentsRes] = await Promise.all([
-          fetch("http://localhost:8000/patient-SLP/get-patient", {
+          fetch(`${appURL}/${route.patient.fetch}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${token}`,
             },
           }),
-          fetch("http://localhost:8000/appointments/get-appointment", {
+          fetch(`${appURL}/${route.appointment.get}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -166,7 +168,9 @@ export default function Home() {
                           <div>
                             <button
                               className="button-group bg-white"
-                              onClick={() => joinMeeting(appointment._id,appointment.roomId)}
+                              onClick={() =>
+                                joinMeeting(appointment._id, appointment.roomId)
+                              }
                             >
                               <p className="fw-bold my-0 status">JOIN</p>
                             </button>

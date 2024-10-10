@@ -11,6 +11,7 @@ import Edit from "../../assets/icons/Edit";
 import Delete from "../../assets/icons/Delete";
 
 import EditProfile from "../../components/Modals/EditProfile";
+import { route } from "../../utils/route";
 
 export default function ManageUsers() {
   const [patients, setPatients] = useState(null);
@@ -26,6 +27,7 @@ export default function ManageUsers() {
   const [userDetails, setUserDetails] = useState(null);
   const [editProfileAPI, setEditProfileAPI] = useState("");
   const [updateProfilePictureAPI, setUpdateProfilePictureAPI] = useState("");
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const [isOpen, setIsOpen] = useState(false);
   const [role, setRole] = useState("");
@@ -33,10 +35,10 @@ export default function ManageUsers() {
   const handleModal = (user) => {
     setIsOpen(!isOpen);
     setUserDetails(user);
-    if(role === 'patient') {
-      setEditProfileAPI("adminSLP/edit-patient");
+    if (role === "patient") {
+      setEditProfileAPI("admin-slp/edit-patient");
     } else {
-      setEditProfileAPI("adminSLP/edit-clinician");
+      setEditProfileAPI("admin-slp/edit-clinician");
     }
   };
 
@@ -46,16 +48,13 @@ export default function ManageUsers() {
       const token = localStorage.getItem("accessToken");
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/adminSLP/get-admin",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch admin data");
@@ -78,7 +77,7 @@ export default function ManageUsers() {
     const fetchClinicians = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/adminSLP/getAllClinicians",
+          `${appURL}/${route.admin.getAllClinicians}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -106,7 +105,7 @@ export default function ManageUsers() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/adminSLP/getClinicianById/${clinicianId}`,
+        `${appURL}/${route.admin.getClinicianById}${clinicianId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -132,7 +131,7 @@ export default function ManageUsers() {
 
     try {
       const response = await fetch(
-        `http://localhost:8000/adminSLP/getPatientById/${patientId}`,
+        `${appURL}/${route.admin.getPatientById}${patientId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -158,7 +157,7 @@ export default function ManageUsers() {
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/adminSLP/getAllPatients",
+          `${appURL}/${route.admin.getAllPatients}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -200,8 +199,8 @@ export default function ManageUsers() {
 
     try {
       const url = selectedClinician.active
-        ? "http://localhost:8000/clinicianSLP/remove-clinician"
-        : "http://localhost:8000/clinicianSLP/activate-clinician";
+        ? `${appURL}/${route.clinician.removeClinician}`
+        : `${appURL}/${route.clinician.activateClinician}`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -244,8 +243,8 @@ export default function ManageUsers() {
 
     try {
       const url = selectedPatient.active
-        ? "http://localhost:8000/patient-SLP/remove-slp-patient"
-        : "http://localhost:8000/patient-SLP/activate-slp-patient";
+        ? `${appURL}/${route.patient.deactivate}`
+        : `${appURL}/${route.patient.activate}`;
 
       const response = await fetch(url, {
         method: "POST",

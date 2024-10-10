@@ -67,6 +67,6 @@ export const route = {
     get: "schedule-slp/get-schedules",
     edit: "schedule-slp/edit-schedule",
     delete: "schedule-slp/delete-schedule",
-    patient: "schedule-slp/clinician-schedules",
+    clinician: "schedule-slp/clinician-schedules",
   },
 };

@@ -14,6 +14,7 @@ export default function Profile() {
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
@@ -29,16 +30,13 @@ export default function Profile() {
     const token = localStorage.getItem("accessToken");
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/${route.clinician.fetch}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch clinician data");

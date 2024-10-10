@@ -2,6 +2,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import React, { useState, useEffect } from "react";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
@@ -12,6 +13,7 @@ export default function Archival() {
   const [adminData, setAdminData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Fetch admin data from the backend
   useEffect(() => {
@@ -19,16 +21,13 @@ export default function Archival() {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/adminSLP/get-admin",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch admin data");

@@ -89,7 +89,7 @@ export default function ManageAdmin() {
 
     try {
       const response = await fetch(
-        `${appURL}/${route.sudo.getAdminById}/${adminId}`,
+        `${appURL}/${route.sudo.getAdminById}${adminId}`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -123,8 +123,8 @@ export default function ManageAdmin() {
 
     try {
       const url = selectedAdmin.active
-        ? `${appURL}/${route.sudo.removeAdmin}`
-        : `${appURL}/${route.sudo.activateAdmin}`;
+        ? `${appURL}/${route.admin.removeAdmin}`
+        : `${appURL}/${route.admin.activateAdmin}`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -248,10 +248,7 @@ export default function ManageAdmin() {
                 <div className="card-container d-flex flex-column gap-2 scrollable-div notif-home">
                   <div className="p-3">
                     <div className="profile-img">
-                      <img
-                        src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg"
-                        alt="Profile"
-                      />
+                      <img src={selectedAdmin.profilePicture} alt="Profile" />
                     </div>
                   </div>
 
@@ -261,8 +258,8 @@ export default function ManageAdmin() {
                       {selectedAdmin.lastName}
                     </h3>
                     <p className="mb-0">Admin</p>
-                    <p className="mb-0">{selectedAdmin.clinicAddress}</p>
-                    <p className="mb-0">{selectedAdmin.contactNumber}</p>
+                    <p className="mb-0">{selectedAdmin.address}</p>
+                    <p className="mb-0">{selectedAdmin.mobile}</p>
                     <p className="mb-0">{selectedAdmin.email}</p>
 
                     {/* Dynamic Activate/Deactivate button */}

@@ -11,6 +11,7 @@ import {
 } from "react-bootstrap-icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { route } from "../../utils/route.js";
 
 const RegisterPatientSlp = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +31,7 @@ const RegisterPatientSlp = () => {
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const datePickerRef = useRef(null);
 
@@ -99,16 +101,13 @@ const RegisterPatientSlp = () => {
     };
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/patient-SLP/slp-patient-signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(submissionData),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.patient.signup}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(submissionData),
+      });
 
       const result = await response.json();
 

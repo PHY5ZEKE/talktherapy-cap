@@ -1,6 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -20,6 +21,7 @@ export default function ManageSchedule() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Handle Add Schedule Modal Open
   const [isOpen, setIsOpen] = useState(false);
@@ -43,16 +45,13 @@ export default function ManageSchedule() {
 
     const fetchClinicianData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/clinicianSLP/get-clinician",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch clinician data");
@@ -71,16 +70,13 @@ export default function ManageSchedule() {
 
     const fetchSchedules = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/schedule/get-schedules",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.schedule.get}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch schedules");

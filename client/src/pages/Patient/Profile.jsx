@@ -17,6 +17,7 @@ export default function Profile() {
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
@@ -32,16 +33,13 @@ export default function Profile() {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
     try {
-      const response = await fetch(
-        `http://localhost:8000/${route.patient.fetch}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-          },
-        }
-      );
+      const response = await fetch(`${appURL}/${route.patient.fetch}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+        },
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch patient data");

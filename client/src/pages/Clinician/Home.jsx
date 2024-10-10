@@ -28,6 +28,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const navigate = useNavigate();
 
@@ -48,7 +49,7 @@ export default function Home() {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
       const response = await axios.get(
-        `http://localhost:8000/${route.appointment.getById}/${appointmentId}`,
+        `${appURL}/${route.appointment.getById}/${appointmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -67,7 +68,7 @@ export default function Home() {
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          `http://localhost:8000/${route.patient.getAllPatients}`,
+          `${appURL}/${route.patient.getAllPatients}`,
           {
             method: "GET",
             headers: {
@@ -110,16 +111,13 @@ export default function Home() {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
       try {
-        const response = await fetch(
-          `http://localhost:8000/${route.clinician.fetch}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch clinician data");
@@ -144,7 +142,7 @@ export default function Home() {
 
       try {
         const response = await fetch(
-          `http://localhost:8000/${route.appointment.getByClinician}`,
+          `${appURL}/${route.appointment.getByClinician}`,
           {
             method: "GET",
             headers: {

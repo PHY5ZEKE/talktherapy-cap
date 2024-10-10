@@ -433,6 +433,7 @@ exports.getAdminById = [
           firstName: admin.firstName,
           middleName: admin.middleName,
           lastName: admin.lastName,
+          profilePicture: admin.profilePicture,
           email: admin.email,
           address: admin.address,
           mobile: admin.mobile,

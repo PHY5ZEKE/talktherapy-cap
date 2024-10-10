@@ -5,6 +5,7 @@ import Footer from "../../components/Footer/Footer.jsx";
 import { Form, Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
+import { route } from "../../utils/route.js";
 
 const RegisterAdmin = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -21,6 +22,7 @@ const RegisterAdmin = () => {
   });
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -59,24 +61,21 @@ const RegisterAdmin = () => {
     }
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/adminSLP/admin-signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            firstName,
-            middleName,
-            lastName,
-            email,
-            password,
-            address,
-            mobile,
-          }),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.admin.signup}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName,
+          middleName,
+          lastName,
+          email,
+          password,
+          address,
+          mobile,
+        }),
+      });
 
       const data = await response.json();
 

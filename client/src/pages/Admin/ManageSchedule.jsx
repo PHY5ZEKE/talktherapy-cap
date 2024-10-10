@@ -1,7 +1,7 @@
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-
+import { route } from "../../utils/route";
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 
@@ -23,6 +23,7 @@ export default function ManageSchedule() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clinicians, setClinicians] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Fetch admin data from the backend
   useEffect(() => {
@@ -30,16 +31,13 @@ export default function ManageSchedule() {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/adminSLP/get-admin",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch admin data");
@@ -61,7 +59,7 @@ export default function ManageSchedule() {
     const fetchClinicians = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/adminSLP/getAllClinicians",
+          `${appURL}/${route.admin.getAllClinicians}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

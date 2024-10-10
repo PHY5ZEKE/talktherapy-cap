@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
+import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -13,13 +14,14 @@ export default function RegisterClinician() {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await fetch(
-        "http://localhost:8000/clinicianSLP/add-clinician",
+        `${appURL}/${route.clinician.addClinician}`,
         {
           method: "POST",
           headers: {

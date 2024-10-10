@@ -16,6 +16,7 @@ import Logout from "../../assets/buttons/Logout";
 import HomeBtn from "../../assets/buttons/Home";
 import Sort from "../../assets/icons/Sort";
 import Search from "../../assets/icons/Search";
+import { route } from "../../utils/route";
 
 export default function Home() {
   const [patients, setPatients] = useState(null);
@@ -26,6 +27,7 @@ export default function Home() {
   const [selectedUserType, setSelectedUserType] = useState("patients");
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   // Handle Appointment Details Modal
   const [isConfirm, setIsConfirm] = useState(false);
@@ -35,7 +37,7 @@ export default function Home() {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
       const response = await axios.get(
-        `http://localhost:8000/appointments/get-appointment-by-id/${appointmentId}`,
+        `${appURL}/${route.appointment.updateStatus}/${appointmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,16 +57,13 @@ export default function Home() {
 
     const fetchAppointments = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:8000/appointments/get-all-appointments",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.appointment.getAll}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
@@ -89,16 +88,13 @@ export default function Home() {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
       try {
-        const response = await fetch(
-          "http://localhost:8000/adminSLP/get-admin",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
-            },
-          }
-        );
+        const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          },
+        });
 
         if (!response.ok) {
           throw new Error("Failed to fetch admin data");
@@ -120,7 +116,7 @@ export default function Home() {
     const fetchClinicians = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/adminSLP/getAllClinicians",
+          `${appURL}/${route.admin.getAllClinicians}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
@@ -146,7 +142,7 @@ export default function Home() {
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8000/adminSLP/getAllPatients",
+          `${appURL}/${route.admin.getAllPatients}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken")}`,

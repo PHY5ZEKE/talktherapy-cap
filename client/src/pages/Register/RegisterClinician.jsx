@@ -12,6 +12,7 @@ import {
 } from "react-bootstrap-icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { route } from "../../utils/route";
 
 const RegisterClinician = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -35,6 +36,7 @@ const RegisterClinician = () => {
   });
 
   const datePickerRef = useRef(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -73,19 +75,16 @@ const RegisterClinician = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch(
-        "http://localhost:8000/clinicianSLP/signup",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            ...formData,
-            birthday: selectedDate,
-          }),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.clinician.signup}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...formData,
+          birthday: selectedDate,
+        }),
+      });
 
       const data = await response.json();
 

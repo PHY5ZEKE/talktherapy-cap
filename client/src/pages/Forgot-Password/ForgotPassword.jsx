@@ -6,7 +6,7 @@ import { Form, Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 
-import { route } from '../../utils/route.js'
+import { route } from "../../utils/route.js";
 
 const ForgotPassword = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +17,7 @@ const ForgotPassword = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -29,16 +30,13 @@ const ForgotPassword = () => {
   const handleNext = async () => {
     if (step === 1) {
       // Handle forgot password
-      const response = await fetch(
-        `http://localhost:8000/${route.system.forgot}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.system.forgot}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      });
       const data = await response.json();
       if (data.error) {
         setMessage(data.message);
@@ -48,16 +46,13 @@ const ForgotPassword = () => {
       }
     } else if (step === 2) {
       // Handle verify OTP
-      const response = await fetch(
-        `http://localhost:8000/${route.system.otp}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, otp }),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.system.otp}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
+      });
       const data = await response.json();
       if (data.error) {
         setMessage(data.message);
@@ -67,16 +62,13 @@ const ForgotPassword = () => {
       }
     } else if (step === 3) {
       // Handle reset password
-      const response = await fetch(
-        `http://localhost:8000/${route.system.reset}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, otp, password, confirmPassword }),
-        }
-      );
+      const response = await fetch(`${appURL}/${route.system.reset}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp, password, confirmPassword }),
+      });
       const data = await response.json();
       if (data.error) {
         setMessage(data.message);
