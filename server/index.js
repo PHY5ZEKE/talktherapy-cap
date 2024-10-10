@@ -32,7 +32,7 @@ app.use("/src", express.static(path.join(__dirname, "../src")));
 
 app.use(
   cors({
-    origin: "*",
+    origin: "http://54.79.63.159",
   })
 );
 
