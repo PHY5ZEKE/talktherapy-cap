@@ -192,7 +192,7 @@ export default function Room() {
     if (signal.type === "message") {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { message: signal.message, sender:uuid, isSent: false }, // Mark it as received
+        { message: signal.message, sender:signal.sender, isSent: false }, // Mark it as received
       ]);
     }
   }
@@ -207,14 +207,6 @@ export default function Room() {
         })
       );
     }
-    // console.log(
-    //   "Sending ICE candidate:",
-    //   JSON.stringify({
-    //     ice: event.candidate,
-    //     uuid: uuid,
-    //     type: "ice-candidate",
-    //   })
-    // );
   }
 
   function createdDescription(description) {
@@ -289,9 +281,11 @@ export default function Room() {
       JSON.stringify({ type: "message", message, roomID: roomid, sender: uuid })
     );
 
+    // Get JSON data from websocket broadcast
+
     setMessages((prevMessages) => [
       ...prevMessages,
-      { message, sender: uuid, isSent: true }, // Mark as sent
+      { message, sender:uuid, isSent: true }, // Mark as sent
     ]);
   }
 
