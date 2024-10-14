@@ -361,7 +361,7 @@ export default function Room() {
                   <Mic />
                 </div>
 
-                {userRole === "clinician" ? (
+                {(userRole === "clinician" || userRole === "patientslp") (
                   <>
                     {/* ACTION BUTTONS */}
                     <div className="col">
