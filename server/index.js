@@ -32,9 +32,13 @@ app.use("/src", express.static(path.join(__dirname, "../src")));
 
 app.use(
   cors({
-    origin: ["https://chefsdaughter.online", "http://www.chefsdaughter.online", "http://www.chefsdaughter.online", "http://54.79.63.159", "https://54.79.63.159"],
+    origin: [
+      "https://chefsdaughter.online",
+      "http://www.chefsdaughter.online",
+      "https://www.chefsdaughter.online"
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true // Allow both origins
+    credentials: true
   })
 );
 
