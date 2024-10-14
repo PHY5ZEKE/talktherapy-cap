@@ -192,7 +192,7 @@ export default function Room() {
     if (signal.type === "message") {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { message: signal.message, isSent: false }, // Mark it as received
+        { message: signal.message, sender:uuid, isSent: false }, // Mark it as received
       ]);
     }
   }
@@ -284,9 +284,11 @@ export default function Room() {
   // TODO: Change sender name
   function sendMessage(message) {
     if (!message || !serverConnection.current) return;
+
     serverConnection.current.send(
-      JSON.stringify({ type: "message", message, roomID: roomid, uuid })
+      JSON.stringify({ type: "message", message, roomID: roomid, sender: uuid })
     );
+
     setMessages((prevMessages) => [
       ...prevMessages,
       { message, sender: uuid, isSent: true }, // Mark as sent
@@ -430,7 +432,7 @@ export default function Room() {
                         <div>
                           {messages.map((msg, index) => (
                             <p key={index}>
-                              <span className="fw-bold">{msg.sender}:</span>
+                              <span className="fw-bold">{msg.sender} :</span>
                               {msg.message}
                             </p>
                           ))}
