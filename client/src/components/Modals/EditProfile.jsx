@@ -67,9 +67,12 @@ export default function EditProfile({
 
       const data = await response.json();
 
+      console.log("Response:", response);
+      console.log("Data:", data);
+
       if (response.ok) {
         alert("Profile updated successfully.");
-        setUpdatedUser(data.userDetails);
+        setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
         onProfileUpdate();
       } else {
@@ -80,7 +83,6 @@ export default function EditProfile({
       alert("Error updating profile.");
     }
   };
-
   // Change Profile Picture Listener
   const handleProfilePictureChange = (e) => {
     setProfilePicture(e.target.files[0]);
@@ -202,7 +204,7 @@ export default function EditProfile({
             </>
           )}
 
-          {whatRole !== "patient" && (
+          {whatRole !== "patientslp" && (
             <div className="form-group">
               <p className="mb-0">Clinic Address</p>
               <input

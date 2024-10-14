@@ -10,7 +10,7 @@ const {
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
 const verifyToken = require("../middleware/verifyToken");
-
+const { createAuditLog } = require("../middleware/auditLog.js");
 const multer = require("multer");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = require("../config/aws");
@@ -63,6 +63,12 @@ exports.addAdmin = async (req, res) => {
 
   await newAdmin.save();
 
+  await createAuditLog(
+    "addAdmin",
+    email,
+    `Super Admin created an admin with email ${email}`
+  );
+
   return res.status(201).json({
     error: false,
     message: "Admin email added successfully.",
@@ -91,6 +97,12 @@ exports.removeAdmin = async (req, res) => {
   admin.active = false;
   await admin.save();
 
+  await createAuditLog(
+    "removeAdmin",
+    email,
+    `Super Admin has deactivated account ${email} `
+  );
+
   return res
     .status(200)
     .json({ error: false, message: "Admin deactivated successfully." });
@@ -117,6 +129,12 @@ exports.activateAdmin = async (req, res) => {
 
   admin.active = true;
   await admin.save();
+
+  await createAuditLog(
+    "removeAdmin",
+    email,
+    `Super Admin has re-activated account ${email} `
+  );
 
   return res
     .status(200)
@@ -185,6 +203,12 @@ exports.adminSignup = async (req, res) => {
   existingAdmin.userRole = "admin";
 
   await existingAdmin.save();
+
+  await createAuditLog(
+    "adminSignup",
+    email,
+    `Admin with email ${email} signed up`
+  );
 
   const accessToken = jwt.sign(
     { admin: existingAdmin },
@@ -433,23 +457,28 @@ exports.editAdmin = [
       if (!admin) {
         return res
           .status(404)
-          .json({ error: true, message: " Admin not found." });
+          .json({ error: true, message: "Admin not found." });
       }
 
-      // Update the clinician's information
+      // Update the admin's information
       admin.firstName = firstName;
       admin.middleName = middleName;
       admin.lastName = lastName;
       admin.address = address;
       admin.mobile = mobile;
 
-      // Save the updated clinician information
+      // Save the updated admin information
       await admin.save();
+      await createAuditLog(
+        "editAdmin",
+        admin.email,
+        `${admin.email} edited their profile.`
+      );
 
       return res.json({
         error: false,
-        Admin,
-        message: " Admin information updated successfully.",
+        admin,
+        message: "Admin information updated successfully.",
       });
     } catch (error) {
       return res.status(500).json({
@@ -511,6 +540,11 @@ exports.changePassword = [
       // Update the admin's password
       admin.password = hashedPassword;
       await admin.save();
+      await createAuditLog(
+        "changePasswordAdmin",
+        admin.email,
+        `${admin.email} changed their password.`
+      );
 
       return res.json({
         error: false,
@@ -579,6 +613,11 @@ exports.updateProfilePicture = [
       const profilePictureUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${fileName}`;
       admin.profilePicture = profilePictureUrl;
       await admin.save();
+      await createAuditLog(
+        "adminProfilePicture",
+        admin.email,
+        `${admin.email} updated their profile picture.`
+      );
 
       return res.json({
         error: false,
@@ -599,6 +638,7 @@ exports.editPatient = [
   verifyToken,
   async (req, res) => {
     const { firstName, middleName, lastName, mobile, id } = req.body;
+    const { email } = req.user; // Extract admin email from authenticated user
 
     // Validate input
     if (!firstName) {
@@ -619,7 +659,7 @@ exports.editPatient = [
     if (!mobile) {
       return res
         .status(400)
-        .json({ error: true, message: "Clinic address is required." });
+        .json({ error: true, message: "Contact number is required." });
     }
 
     try {
@@ -628,27 +668,28 @@ exports.editPatient = [
       if (!patient) {
         return res
           .status(404)
-          .json({ error: true, message: " Admin not found." });
+          .json({ error: true, message: "Patient not found." });
       }
 
-      // Update the clinician's information
+      // Update the patient's information
       patient.firstName = encrypt(firstName);
       patient.middleName = encrypt(middleName);
       patient.lastName = encrypt(lastName);
       patient.mobile = encrypt(mobile);
 
-      // Save the updated clinician information
+      // Save the updated patient information
       await patient.save();
 
       return res.json({
         error: false,
-        Patient,
-        message: " Admin information updated successfully.",
+        patient, // Ensure this matches the client expectation
+        message: "Patient information updated successfully.",
       });
     } catch (error) {
+      console.error("Error updating patient information:", error); // Log the error details
       return res.status(500).json({
         error: true,
-        message: "An error occurred while updating Admin information.",
+        message: "An error occurred while updating patient information.",
       });
     }
   },

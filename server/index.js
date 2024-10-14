@@ -32,7 +32,7 @@ app.use("/src", express.static(path.join(__dirname, "../src")));
 
 app.use(
   cors({
-    origin: "http://54.79.63.159",
+    origin: ["http://localhost:8000", "http://localhost:5173"], // Allow both origins
   })
 );
 
@@ -62,6 +62,6 @@ app.get("/", (req, res) => {
   res.json({ data: "hello" });
 });
 
-app.listen(8000, '0.0.0.0', () => {
+app.listen(8000, "0.0.0.0", () => {
   console.log("Server is running on port 8000");
 });

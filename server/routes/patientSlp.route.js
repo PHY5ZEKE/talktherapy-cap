@@ -5,9 +5,7 @@ const {
   deactivatePatient,
   activatePatient,
   signupPatient,
-
   getPatient,
-
   changePassword,
   updateProfilePicture,
   editPatient,
@@ -16,10 +14,10 @@ const {
 const verifyToken = require("../middleware/verifyToken");
 
 // Remove SLP Patient
-router.post("/remove-slp-patient", deactivatePatient);
+router.post("/remove-slp-patient", verifyToken, deactivatePatient);
 
 // Activate SLP Patient
-router.post("/activate-slp-patient", activatePatient);
+router.post("/activate-slp-patient", verifyToken, activatePatient);
 
 // Create SLP Patient Account
 router.post("/slp-patient-signup", signupPatient);

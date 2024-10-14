@@ -32,10 +32,11 @@ export default function ManageUsers() {
   const [isOpen, setIsOpen] = useState(false);
   const [role, setRole] = useState("");
 
-  const handleModal = (user) => {
+  const handleModal = (user, role) => {
     setIsOpen(!isOpen);
     setUserDetails(user);
-    if (role === "patient") {
+    setRole(role);
+    if (role === "patientslp") {
       setEditProfileAPI("admin-slp/edit-patient");
     } else {
       setEditProfileAPI("admin-slp/edit-clinician");
@@ -293,7 +294,7 @@ export default function ManageUsers() {
             userDetails={userDetails}
             closeModal={handleModal}
             isOwner={false}
-            whatRole={""}
+            whatRole={role}
           />
         )}
 
@@ -370,10 +371,7 @@ export default function ManageUsers() {
                       <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
                         <button
                           className="icon-btn"
-                          onClick={() => {
-                            handleModal(patient);
-                            setRole("patient");
-                          }}
+                          onClick={() => handleModal(patient, "patientslp")}
                         >
                           <Edit />
                         </button>
@@ -415,10 +413,7 @@ export default function ManageUsers() {
                       <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
                         <button
                           className="icon-btn"
-                          onClick={() => {
-                            handleModal(clinician);
-                            setRole("clinician");
-                          }}
+                          onClick={() => handleModal(clinician, "clinician")}
                         >
                           <Edit />
                         </button>

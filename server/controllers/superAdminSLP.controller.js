@@ -1,7 +1,9 @@
 const SuperAdmin = require("../models/superAdminSLP.model");
-const Admin = require("../models/adminSLP.model"); // Assuming you have an Admin model
-const Clinician = require("../models/clinicianSLP.model"); // Assuming you have a Clinician model
-const Patient = require("../models/patientSlp.model"); // Assuming you have a Patient model
+const Admin = require("../models/adminSLP.model");
+const Clinician = require("../models/clinicianSLP.model");
+const Patient = require("../models/patientSlp.model");
+const AuditLog = require("../models/auditLogSLP.model");
+const { createAuditLog } = require("../middleware/auditLog.js");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
@@ -150,6 +152,8 @@ exports.login = async (req, res) => {
       expiresIn: "1h",
     });
 
+    await createAuditLog("login", email, `${email} has logged in`);
+
     return res.json({
       error: false,
       message: "Login Successful",
@@ -212,7 +216,7 @@ exports.forgotPassword = async (req, res) => {
   }
   if (!user) {
     user = await Patient.findOne({ email });
-    userRole = "patientslp";
+    userRole = "patient";
   }
 
   if (!user) {
@@ -241,12 +245,17 @@ exports.forgotPassword = async (req, res) => {
     text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\nYour OTP for password reset is: ${otp}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
   };
 
-  transporter.sendMail(mailOptions, (err) => {
+  transporter.sendMail(mailOptions, async (err) => {
     if (err) {
       return res
         .status(500)
         .json({ error: true, message: "Email could not be sent." });
     }
+    await createAuditLog(
+      "forgotPassword",
+      email,
+      `${email} requested a password reset`
+    );
     res.status(200).json({ error: false, message: "Password reset OTP sent." });
   });
 };
@@ -277,6 +286,8 @@ exports.verifyOtp = async (req, res) => {
   if (Date.now() > user.resetPasswordExpires) {
     return res.status(400).json({ error: true, message: "OTP has expired" });
   }
+
+  await createAuditLog("verifyOtp", email, `${email} verified OTP`);
 
   res.status(200).json({ error: false, message: "OTP is valid." });
 };
@@ -342,6 +353,12 @@ exports.resetPassword = async (req, res) => {
   user.resetPasswordExpires = undefined;
 
   await user.save();
+
+  await createAuditLog(
+    "resetPassword",
+    email,
+    `${email} has reset their password`
+  );
 
   res.status(200).json({ error: false, message: "Password has been reset." });
 };
@@ -485,7 +502,7 @@ exports.editSuperAdmin = [
     }
 
     try {
-      // Find the clinician by ID
+      // Find the superAdmin by ID
       const superAdmin = await SuperAdmin.findOne({ _id: id });
 
       if (!superAdmin) {
@@ -494,15 +511,21 @@ exports.editSuperAdmin = [
           .json({ error: true, message: "Super Admin not found." });
       }
 
-      // Update the clinician's information
+      // Update the superAdmin's information
       superAdmin.firstName = firstName;
       superAdmin.middleName = middleName;
       superAdmin.lastName = lastName;
       superAdmin.address = address;
       superAdmin.mobile = mobile;
 
-      // Save the updated clinician information
+      // Save the updated superAdmin information
       await superAdmin.save();
+
+      await createAuditLog(
+        "editSuperAdmin",
+        superAdmin.email,
+        `${superAdmin.email} has updated their profile`
+      );
 
       return res.json({
         error: false,
@@ -512,7 +535,7 @@ exports.editSuperAdmin = [
     } catch (error) {
       return res.status(500).json({
         error: true,
-        message: "An error occurred while updating  Super Admin information.",
+        message: "An error occurred while updating Super Admin information.",
       });
     }
   },
@@ -569,6 +592,11 @@ exports.changePassword = [
       // Update the superAdmin's password
       superAdmin.password = hashedPassword;
       await superAdmin.save();
+      await createAuditLog(
+        "changePassword",
+        superAdmin.email,
+        `${superAdmin.email} has changed their password`
+      );
 
       return res.json({
         error: false,
@@ -640,6 +668,11 @@ exports.updateProfilePicture = [
       const profilePictureUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${fileName}`;
       superAdmin.profilePicture = profilePictureUrl;
       await superAdmin.save();
+      await createAuditLog(
+        "updateProfilePicture",
+        superAdmin.email,
+        `${superAdmin.email} has updated their profile picture`
+      );
 
       return res.json({
         error: false,
@@ -690,22 +723,27 @@ exports.editAdmin = [
       if (!admin) {
         return res
           .status(404)
-          .json({ error: true, message: " Admin not found." });
+          .json({ error: true, message: "Admin not found." });
       }
 
-      // Update the clinician's information
+      // Update the admin's information
       admin.firstName = firstName;
       admin.middleName = middleName;
       admin.lastName = lastName;
       admin.address = address;
 
-      // Save the updated clinician information
+      // Save the updated admin information
       await admin.save();
+      await createAuditLog(
+        "editAdmin",
+        admin.email,
+        `User ${admin.email} profile was updated by Super Admin`
+      );
 
       return res.json({
         error: false,
-        Admin,
-        message: " Admin information updated successfully.",
+        admin,
+        message: "Admin information updated successfully.",
       });
     } catch (error) {
       return res.status(500).json({
@@ -715,3 +753,13 @@ exports.editAdmin = [
     }
   },
 ];
+
+exports.getAuditLogs = async (req, res) => {
+  try {
+    const auditLogs = await AuditLog.find().sort({ timestamp: -1 }); // Fetch logs and sort by timestamp
+    res.json({ auditLogs });
+  } catch (error) {
+    console.error("Error fetching audit logs:", error);
+    res.status(500).json({ error: "Error fetching audit logs" });
+  }
+};

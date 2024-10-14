@@ -31,7 +31,7 @@ const RegisterClinician = () => {
     mobile: "",
     birthday: "",
     gender: "",
-    adrress: "",
+    address: "",
     specialization: "",
   });
 
@@ -389,12 +389,12 @@ const RegisterClinician = () => {
                       <Form.Label className="formLabel">
                         Clinic Address
                       </Form.Label>
-                      <Form.Group controlId="foradrress">
+                      <Form.Group controlId="foraddress">
                         <Form.Control
                           className="inputField"
                           type="text"
-                          name="adrress"
-                          value={formData.adrress}
+                          name="address"
+                          value={formData.address}
                           onChange={handleInputChange}
                         />
                       </Form.Group>

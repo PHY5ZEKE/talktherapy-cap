@@ -1,4 +1,5 @@
 const Clinician = require("../models/clinicianSLP.model");
+const Admin = require("../models/adminSLP.model");
 const Patient = require("../models/patientSlp.model");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
@@ -9,7 +10,7 @@ const {
   verifyPassword,
 } = require("../utilities/password");
 const verifyToken = require("../middleware/verifyToken");
-
+const { createAuditLog } = require("../middleware/auditLog.js");
 const multer = require("multer");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = require("../config/aws");
@@ -61,6 +62,27 @@ exports.addClinician = async (req, res) => {
 
   await newClinician.save();
 
+  try {
+    // Extract user ID from req.user
+    const userId = req.user.id;
+
+    // Find the admin using the extracted ID
+    const admin = await Admin.findOne({ _id: userId });
+
+    if (!admin) {
+      return res.status(404).json({ error: true, message: "Admin not found." });
+    }
+
+    // Use the admin's email in the audit log
+    await createAuditLog(
+      "addClinician",
+      admin.email, // Pass the admin's email
+      `Admin with email ${admin.email} added a new clinician with email ${email}`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
+
   return res.status(201).json({
     error: false,
     message: "Clinician email added successfully.",
@@ -92,6 +114,27 @@ exports.removeClinician = async (req, res) => {
   clinician.active = false;
   await clinician.save();
 
+  try {
+    // Extract user ID from req.user
+    const userId = req.user.id;
+
+    // Find the admin using the extracted ID
+    const admin = await Admin.findOne({ _id: userId });
+
+    if (!admin) {
+      return res.status(404).json({ error: true, message: "Admin not found." });
+    }
+
+    // Use the admin's email in the audit log
+    await createAuditLog(
+      "removeClinician",
+      admin.email, // Pass the admin's email
+      `Admin with email ${admin.email} deactivated the clinician with email ${email}`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
+
   return res
     .status(200)
     .json({ error: false, message: "Clinician deactivated successfully." });
@@ -121,9 +164,30 @@ exports.activateClinician = async (req, res) => {
   clinician.active = true;
   await clinician.save();
 
+  try {
+    // Extract user ID from req.user
+    const userId = req.user.id;
+
+    // Find the admin using the extracted ID
+    const admin = await Admin.findOne({ _id: userId });
+
+    if (!admin) {
+      return res.status(404).json({ error: true, message: "Admin not found." });
+    }
+
+    // Use the admin's email in the audit log
+    await createAuditLog(
+      "removeClinician",
+      admin.email, // Pass the admin's email
+      `Admin with email ${admin.email} re-activated the clinician with email ${email}`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
+
   return res
     .status(200)
-    .json({ error: false, message: "Clinician activated successfully." });
+    .json({ error: false, message: "Clinician deactivated successfully." });
 };
 
 exports.clinicianSignup = async (req, res) => {
@@ -194,7 +258,6 @@ exports.clinicianSignup = async (req, res) => {
   existingClinician.birthday = birthday;
   existingClinician.gender = gender;
   existingClinician.address = address;
-  existingClinician.address = address;
   existingClinician.specialization = specialization;
   existingClinician.password = hashedPassword;
   existingClinician.createdOn = new Date().getTime();
@@ -210,6 +273,17 @@ exports.clinicianSignup = async (req, res) => {
       expiresIn: "15m",
     }
   );
+
+  try {
+    // Create audit log with the clinician's email
+    await createAuditLog(
+      "clinicianSignup",
+      email, // Pass the clinician's email
+      `Clinician with email ${email} signed up successfully`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
 
   return res.json({
     error: false,
@@ -377,6 +451,13 @@ exports.editClinician = [
       // Save the updated clinician information
       await clinician.save();
 
+      // Create audit log with the clinician's email
+      await createAuditLog(
+        "editClinician",
+        clinician.email, // Pass the clinician's email
+        `Clinician ${clinician.email} updated their information`
+      );
+
       return res.json({
         error: false,
         clinician,
@@ -442,6 +523,13 @@ exports.changePassword = [
       // Update the clinician's password
       clinician.password = hashedPassword;
       await clinician.save();
+
+      // Create audit log with the clinician's email
+      await createAuditLog(
+        "changePassword",
+        clinician.email, // Pass the clinician's email
+        `Clinician ${clinician.email} changed their password`
+      );
 
       return res.json({
         error: false,
@@ -510,6 +598,13 @@ exports.updateProfilePicture = [
       const profilePictureUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/profile-pictures/${fileName}`;
       clinician.profilePicture = profilePictureUrl;
       await clinician.save();
+
+      // Create audit log with the clinician's email
+      await createAuditLog(
+        "updateProfilePicture",
+        clinician.email, // Pass the clinician's email
+        `Clinician with ${clinician.email} updated their profile picture`
+      );
 
       return res.json({
         error: false,

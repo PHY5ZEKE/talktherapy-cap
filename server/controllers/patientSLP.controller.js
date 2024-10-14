@@ -1,4 +1,5 @@
 const PatientSlp = require("../models/patientSlp.model");
+const Admin = require("../models/adminSLP.model");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
@@ -8,7 +9,7 @@ const {
   verifyPassword,
 } = require("../utilities/password");
 const verifyToken = require("../middleware/verifyToken");
-
+const { createAuditLog } = require("../middleware/auditLog.js");
 const multer = require("multer");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = require("../config/aws");
@@ -41,6 +42,27 @@ const deactivatePatient = async (req, res) => {
   patientSlp.active = false;
   await patientSlp.save();
 
+  try {
+    // Extract user ID from req.user
+    const userId = req.user.id;
+
+    // Find the admin using the extracted ID
+    const admin = await Admin.findOne({ _id: userId });
+
+    if (!admin) {
+      return res.status(404).json({ error: true, message: "Admin not found." });
+    }
+
+    // Create audit log with the admin's email
+    await createAuditLog(
+      "deactivatePatient",
+      admin.email, // Pass the admin's email
+      `Admin with  ${admin.email} deactivated the patient  ${email}`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
+
   return res
     .status(200)
     .json({ error: false, message: "Patient deactivated successfully." });
@@ -68,9 +90,30 @@ const activatePatient = async (req, res) => {
   patientSlp.active = true;
   await patientSlp.save();
 
+  try {
+    // Extract user ID from req.user
+    const userId = req.user.id;
+
+    // Find the admin using the extracted ID
+    const admin = await Admin.findOne({ _id: userId });
+
+    if (!admin) {
+      return res.status(404).json({ error: true, message: "Admin not found." });
+    }
+
+    // Create audit log with the admin's email
+    await createAuditLog(
+      "deactivatePatient",
+      admin.email, // Pass the admin's email
+      `Admin with ${admin.email} re-activated the patient  ${email}`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
+
   return res
     .status(200)
-    .json({ error: false, message: "Patient activated successfully." });
+    .json({ error: false, message: "Patient deactivated successfully." });
 };
 
 const signupPatient = async (req, res) => {
@@ -151,8 +194,6 @@ const signupPatient = async (req, res) => {
 
   await patientSlp.save();
 
-  await patientSlp.save();
-
   const accessToken = jwt.sign(
     { patientSlp },
     process.env.ACCESS_TOKEN_SECRET,
@@ -160,6 +201,17 @@ const signupPatient = async (req, res) => {
       expiresIn: "2m",
     }
   );
+
+  try {
+    // Create audit log with the patient's email
+    await createAuditLog(
+      "signupPatient",
+      email, // Pass the patient's email
+      `Patient with email ${email} signed up successfully`
+    );
+  } catch (error) {
+    console.error("Error creating audit log:", error); // Log the error details
+  }
 
   return res.json({
     error: false,
@@ -229,7 +281,7 @@ const changePassword = [
       if (!patient) {
         return res
           .status(404)
-          .json({ error: true, message: "patient not found." });
+          .json({ error: true, message: "Patient not found." });
       }
 
       // Verify current password
@@ -249,6 +301,13 @@ const changePassword = [
       // Update the patient's password
       patient.password = hashedPassword;
       await patient.save();
+
+      // Create audit log with the patient's email
+      await createAuditLog(
+        "changePassword",
+        patient.email, // Pass the patient's email
+        `Patient with email ${patient.email} changed their password`
+      );
 
       return res.json({
         error: false,
@@ -318,6 +377,13 @@ const updateProfilePicture = [
       patient.profilePicture = profilePictureUrl;
       await patient.save();
 
+      // Create audit log with the patient's email
+      await createAuditLog(
+        "updateProfilePicture",
+        patient.email, // Pass the patient's email
+        `Patient with  ${patient.email} updated their profile picture`
+      );
+
       return res.json({
         error: false,
         message: "Profile picture updated successfully.",
@@ -362,7 +428,7 @@ const editPatient = [
     }
 
     try {
-      // Find the clinician by ID
+      // Find the patient by ID
       const patient = await PatientSlp.findOne({ _id: id });
 
       if (!patient) {
@@ -371,14 +437,21 @@ const editPatient = [
           .json({ error: true, message: "Patient not found." });
       }
 
-      // Update the clinician's information
+      // Update the patient's information
       patient.firstName = encrypt(firstName);
       patient.middleName = encrypt(middleName);
       patient.lastName = encrypt(lastName);
       patient.mobile = encrypt(mobile);
 
-      // Save the updated clinician information
+      // Save the updated patient information
       await patient.save();
+
+      // Create audit log with the patient's email
+      await createAuditLog(
+        "editPatient",
+        patient.email, // Pass the patient's email
+        `Patient with email ${patient.email} updated their information`
+      );
 
       return res.json({
         error: false,
@@ -386,9 +459,10 @@ const editPatient = [
         message: "Patient information updated successfully.",
       });
     } catch (error) {
+      console.error("Error updating patient information:", error);
       return res.status(500).json({
         error: true,
-        message: "An error occurred while updating Patient information.",
+        message: "An error occurred while updating patient information.",
       });
     }
   },

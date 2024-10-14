@@ -18,7 +18,7 @@ export default function ChooseRegister({ openModal }) {
           <div className="container text-center">
             {/* SCHEDULE LIST RENDER */}
             <div className="row text-center">
-              {/* <div className="col">
+              <div className="col">
                 <Link to="/register/admin" className="registerLink">
                   Admin
                 </Link>
@@ -28,7 +28,7 @@ export default function ChooseRegister({ openModal }) {
                 <Link to="/register/clinician" className="registerLink">
                   Clinician
                 </Link>
-              </div> */}
+              </div>
 
               <div className="col">
                 <Link to="/register/patientslp" className="registerLink">

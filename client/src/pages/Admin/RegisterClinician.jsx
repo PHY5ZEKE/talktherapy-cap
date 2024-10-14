@@ -19,6 +19,8 @@ export default function RegisterClinician() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const accessToken = localStorage.getItem("accessToken"); // Retrieve the token from local storage
+
     try {
       const response = await fetch(
         `${appURL}/${route.clinician.addClinician}`,
@@ -26,6 +28,7 @@ export default function RegisterClinician() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`, // Add the Bearer token here
           },
           body: JSON.stringify({ email }),
         }

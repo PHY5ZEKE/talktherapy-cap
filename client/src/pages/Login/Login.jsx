@@ -162,16 +162,15 @@ const Login = () => {
               <div className="link-group">
                 <Row>
                   <Col className="text-center">
-                    {/* {isOpen && <ChooseRegister openModal={openModal} />} */}
-                    <Link to="/register/patientslp" className="registerLink">
+                    {isOpen && <ChooseRegister openModal={openModal} />}
+
                     <button
                       type="button"
                       className="fw-bold no-bg-text"
-                      // onClick={openModal}
+                      onClick={openModal}
                     >
                       Register
                     </button>
-                    </Link>
                   </Col>
                 </Row>
                 <Row>
