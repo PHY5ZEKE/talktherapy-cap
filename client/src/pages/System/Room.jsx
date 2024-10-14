@@ -361,7 +361,7 @@ export default function Room() {
                   <Mic />
                 </div>
 
-                {(userRole === "clinician" || userRole === "patientslp") (
+                {userRole === "clinician" || userRole === "patientslp" ? (
                   <>
                     {/* ACTION BUTTONS */}
                     <div className="col">
@@ -427,7 +427,6 @@ export default function Room() {
                       </div>
                       <div className="offcanvas-body d-flex flex-column justify-content-between overflow-y-auto">
                         {/* CHAT AREA */}
-
                         <div>
                           {messages.map((msg, index) => (
                             <p key={index}>
