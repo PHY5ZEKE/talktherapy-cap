@@ -1,29 +1,25 @@
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
 import axios from "axios";
-
-// Components
-import Sidebar from "../../components/Sidebar/SidebarPatient";
-import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
-import PatientNav from "../../components/Navbar/PatientNav";
-
-// Icons
-import Search from "../../assets/icons/Search";
-import Sort from "../../assets/icons/Sort";
+import { useState, useEffect } from "react";
 
 // Modal
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
 import ChooseSchedule from "../../components/Modals/ChooseSchedule";
+import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
 
-// React
-import { useState, useEffect } from "react";
+// UI Components
+import Sidebar from "../../components/Sidebar/SidebarPatient";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
+
+// CSS
+import "../../styles/text.css";
 
 export default function Home() {
+  const appURL = import.meta.env.VITE_APP_URL;
+
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
-  const appURL = import.meta.env.VITE_APP_URL;
   const closeModal = () => {
     setIsConfirm(!isConfirm);
   };
@@ -33,6 +29,8 @@ export default function Home() {
   const closeSchedule = () => {
     setIsChoose(!isChoose);
   };
+
+  const [dateToday, setToday] = useState();
 
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -115,98 +113,98 @@ export default function Home() {
       console.error("Error fetching appointment details:", error);
     }
   };
-
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* RESCHEDULE PAGE 1 MODAL */}
+      {isConfirm && (
+        <ConfirmReschedule
+          onClick={closeModal}
+          closeModal={closeModal}
+          openResched={closeSchedule}
+        />
+      )}
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-flex"
-        >
-          {/* RESCHEDULE PAGE 1 MODAL */}
-          {isConfirm && (
-            <ConfirmReschedule
-              onClick={closeModal}
-              closeModal={closeModal}
-              openResched={closeSchedule}
-            />
-          )}
+      {/* RESCHEDULE PAGE 2 MODAL */}
+      {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
 
-          {/* RESCHEDULE PAGE 2 MODAL */}
-          {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
+      {/* VIEW APPOINTMENT DETAILS MODAL */}
+      {isOpen && (
+        <PatientViewAppointment
+          closeModal={() => setIsOpen(false)}
+          appointment={selectedAppointment}
+        />
+      )}
 
-          {/* VIEW APPOINTMENT DETAILS MODAL */}
-          {isOpen && (
-            <PatientViewAppointment
-              closeModal={() => setIsOpen(false)}
-              appointment={selectedAppointment}
-            />
-          )}
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-          {/* USER TOP BAR */}
-          <PatientNav data={patientData?.firstName}/>
-
-          <Row lg md>
-            {/* APPOINTMENT LIST */}
-            <Col lg className="height-responsive">
-              {/* DATE COMPONENT */}
-              <div className="card-content-bg-light p-3 my-3 date-card">
-                <div className="d-flex flex-row justify-content-between g-1 mb-2">
-                  <div className="calendar-text">
-                    <p className="fw-bold mb-0">July</p>
-                    <p className="mb-0">Today is Friday, July 5, 2024</p>
-                  </div>
-                </div>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">{patientData?.firstName}</p>
               </div>
 
-              <div className="card-container d-flex flex-column gap-2">
-                <h5>Your Appointment</h5>
-                <div className="scrollable-div d-flex flex-column">
+              <MenuDropdown />
+            </div>
+
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Today is </p>
+                    <p className="mb-0">Your Appointments</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
                   {loading ? (
-                    <p>Loading appointments...</p>
+                    <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                      <h5 className="mb-0 fw-bold text-center">
+                        Loading your appointments.
+                      </h5>
+                    </div>
                   ) : error ? (
-                    <p>{error}</p>
-                  ) : (
+                    <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                      <h5 className="mb-0 fw-bold text-center">{error}</h5>
+                    </div>
+                  ) : acceptedAppointments.length > 0 ? (
                     acceptedAppointments.map((appointment) => (
                       <div
                         key={appointment._id}
-                        className={`d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-${
-                          appointment.status === "Pending"
-                            ? "pending"
-                            : "accepted"
-                        }-2`}
+                        className="col bg-white border rounded-4 p-3 overflow-auto"
+                        style={{ maxHeight: "75vh"}}
                         onClick={
                           appointment.status === "Pending"
                             ? () => openModal(appointment._id)
                             : null
                         }
                       >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} -{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-                        <p className="mb-0">
-                          Session of{" "}
-                          {appointment.selectedSchedule.clinicianName} with{" "}
-                          {patientData?.firstName}.
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          {appointment.status === "Accepted" ? (
-                            <>
-                              <p className="status-accepted status-text status-text-green">
-                                ACCEPTED
-                              </p>
+                        <div className="mb-3 border border-top-0 border-start-0 border-end-0">
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.day}
+                          </h5>
+                          <p className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.startTime} -{" "}
+                            {appointment.selectedSchedule.endTime}
+                          </p>
+                          <p className="mb-3">
+                            Session of{" "}
+                            {appointment.selectedSchedule.clinicianName} with{" "}
+                            {patientData?.firstName}.
+                          </p>
 
-                              <div>
-                                <button
-                                  className="button-group bg-white"
+                          {appointment.status === "Accepted" ? (
+                            <div className="d-flex justify-content-between flex-wrap gap-3">
+                              <div className="mb-3 text-accepted">ACCEPTED</div>
+
+                              <div className="d-flex gap-3">
+                                <div
+                                  className="mb-3 fw-bold text-button border"
                                   onClick={() =>
                                     joinMeeting(
                                       appointment._id,
@@ -214,101 +212,127 @@ export default function Home() {
                                     )
                                   }
                                 >
-                                  <p className="fw-bold my-0 status">JOIN</p>
-                                </button>
-                                <button
-                                  className="button-group bg-white"
+                                  Join
+                                </div>
+                                <div
+                                  className="mb-3 fw-bold text-button border"
                                   onClick={closeModal}
                                 >
-                                  <p className="fw-bold my-0 status">CANCEL</p>
-                                </button>
+                                  Cancel
+                                </div>
                               </div>
-                            </>
+                            </div>
                           ) : (
-                            <>
-                              <p className="status-pending status-text status-text-orange">
-                                PENDING
-                              </p>
-                            </>
+                            <div className="mb-3 text-pending">PENDING</div>
                           )}
                         </div>
                       </div>
                     ))
+                  ) : (
+                    <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                      <h5 className="mb-0 fw-bold text-center">
+                        You currently don't have any appointments.
+                      </h5>
+                    </div>
                   )}
                 </div>
               </div>
-            </Col>
 
-            {/* VIDEO FAV LIST */}
-            <Col lg className="height-responsive d-none d-lg-block">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">
-                  Favorite Exercises
-                </h4>
-                <Sort />
-              </div>
-
-              <div className="d-flex flex-column gap-3 justify-content-between my-3 py-3 px-3 card-content-bg-light">
-                <div className="search-bar d-flex align-content-center gap-2">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="search-input"
-                  />
-                </div>
-
-                <div className="scrollable-div-4 d-flex flex-column gap-3">
-                  {/* VIDEO CARD COMPONENT */}
-                  <div className="card-content-bg-dark p-3 d-flex justify-content-between">
-                    <div className="d-flex flex-column g-1 mb-2">
-                      <p className="fw-bold mb-0">Video Title</p>
-                      <p className="mb-0">Description</p>
-                      <p className="mb-0">Category</p>
-                    </div>
-
-                    <div>
-                      <img
-                        className="img-col"
-                        src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg"
-                        alt="Profile"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Col>
-
-            {/* NOTIFICATION */}
-            <Col lg className="height-responsive d-none d-lg-block">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Notifications</h4>
-              </div>
-
-              <div className="card-container d-flex flex-column gap-2 scrollable-div-2 notif-home">
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Favorite Exercises</p>
                     <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
+                      Your bookmarked exercises will appear here.
                     </p>
                   </div>
+                </div>
 
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-pending">PENDING</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-accepted">ACCEPTED</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-cancelled">CANCELLED</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* THIRD COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Notifications</p>
+                    <p className="mb-0">
+                      Account related notifications will appear here.
+                    </p>
                   </div>
                 </div>
 
-                {/* Add more notification components as needed */}
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-pending">PENDING</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-accepted">ACCEPTED</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-cancelled">CANCELLED</div>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

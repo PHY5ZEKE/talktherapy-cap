@@ -90,7 +90,7 @@ const Login = () => {
             </p>
           </div>
           <Container fluid className="loginContainer">
-            <Form className="loginForm" onSubmit={handleLogin}>
+            <Form className="loginForm" onSubmit={(e)=>handleLogin(e)}>
               <Row className="form-row">
                 <Col>
                   <Form.Group>

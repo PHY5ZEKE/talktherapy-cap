@@ -1,3 +1,53 @@
+.text-pending {
+  width: 120px;
+  padding: 0.5em;
+  text-align: center;
+  border: #ffa500 1px solid;
+  border-radius: 25px;
+  color: #ffa500;
+  background-color: #fcf0db;
+}
+
+.text-accepted {
+  width: 120px;
+  padding: 0.5em;
+  text-align: center;
+  border: #4caf50 1px solid;
+  border-radius: 25px;
+  color: #4caf50;
+  background-color: #e4ffdd;
+}
+
+.text-cancelled {
+  width: 120px;
+  padding: 0.5em;
+  text-align: center;
+  border: #f44336 1px solid;
+  border-radius: 25px;
+  color: #f44336;
+  background-color: #ffdddd;
+}
+
+.text-link {
+  color: #000;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  color: #1c9dff;
+  text-decoration: none;
+}
+
+.text-button {
+  width: 120px;
+  padding: 0.5em;
+  text-align: center;
+  border-radius: 25px;
+  color: #1C9DFF;
+  background-color: #fff;
+  cursor: pointer;
+}
+
 .text-header {
   display: flex;
   align-items: center;

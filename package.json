@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "cd server && nodemon index.js",
     "client": "cd client && npm run dev",
+    "install": "cd client && npm install && cd ../server && npm install",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "author": "",
@@ -22,6 +23,7 @@
     "dotenv": "^16.4.5",
     "moment": "^2.30.1",
     "multer": "^1.4.5-lts.1",
-    "multer-s3": "^3.0.1"
+    "multer-s3": "^3.0.1",
+    "react-bootstrap-icons": "^1.11.4"
   }
 }

@@ -6,11 +6,10 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
-// Icons
-import Sort from "../../assets/icons/Sort";
-import Search from "../../assets/icons/Search";
-import BookmarkHollow from "../../assets/icons/BookmarkHollow";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 
 export default function ViewContent() {
   const [patientData, setPatientData] = useState(null);
@@ -49,100 +48,86 @@ export default function ViewContent() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{patientData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
-
-          {/* TOAL ADMINS */}
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="m-auto">
-                  <h4 className="fw-bold mb-0">Exercises</h4>
-                </div>
-
-                <div className="d-flex align-items-center gap-2 search-bar d-none d-lg-block">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for content"
-                    className="search-input"
-                  />
-                </div>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">{patientData?.firstName}</p>
               </div>
 
-              <Sort />
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto d-sm-block d-lg-none"
-          >
-            <div className="admin-left d-flex justify-content-center">
-              <div className="d-flex align-items-center gap-2 search-bar">
-                <Search />
-                <input
-                  type="text"
-                  placeholder="Search for content"
-                  className="search-input"
-                />
-              </div>
-            </div>
-          </Row>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Exercises</p>
+                    <p className="mb-0">View exercises and follow along.</p>
+                  </div>
+                </div>
 
-          <Row lg md>
-            {/* PATIENTS */}
-            <Col lg className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="card-container d-flex flex-wrap align-items-center justify-content-start flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                      <div className="progress-pos">
-                        <progress value="32" max="100">
-                          32%
-                        </progress>
+                <div className="row p-3">
+                  <div
+                    className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ minHeight: "85vh" }}
+                  >
+                    <div className="card exercise-container" style={{ width: "18rem" }}>
+                      <img
+                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
+                        className="card-img-top"
+                        alt="..."
+                        style={{height: "16rem", objectFit:"cover"}}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
+                        <p className="">Category</p>
+                        <FontAwesomeIcon icon={faBookmark} />
+                      </div>
+                    </div>
+
+                    <div className="card exercise-container" style={{ width: "18rem" }}>
+                      <img
+                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
+                        className="card-img-top"
+                        alt="..."
+                        style={{height: "16rem", objectFit:"cover"}}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
+                        <p className="">Category</p>
+                        <FontAwesomeIcon icon={faBookmark} />
+                      </div>
+                    </div>
+
+                    <div className="card exercise-container" style={{ width: "18rem" }}>
+                      <img
+                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
+                        className="card-img-top"
+                        alt="..."
+                        style={{height: "16rem", objectFit:"cover"}}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
+                        <p className="">Category</p>
+                        <FontAwesomeIcon icon={faBookmark} />
                       </div>
                     </div>
                   </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <BookmarkHollow />
-                  </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
