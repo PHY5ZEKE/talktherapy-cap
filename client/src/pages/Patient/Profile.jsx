@@ -9,6 +9,7 @@ import React, { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // Utils
 import { route } from "../../utils/route";
@@ -59,97 +60,119 @@ export default function Profile() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
-        {/* EDIT MODAL */}
-        {isOpen && (
-          <EditProfile
-            editProfileAPI={route.patient.edit}
-            editPictureAPI={route.patient.picture}
-            userDetails={patientData}
-            closeModal={handleModal}
-            isOwner={true}
-            whatRole={"patient"}
-            onProfileUpdate={fetchPatientData} // Pass the callback function
-          />
-        )}
+    <>
+      {/* EDIT MODAL */}
+      {isOpen && (
+        <EditProfile
+          editProfileAPI={route.patient.edit}
+          editPictureAPI={route.patient.picture}
+          userDetails={patientData}
+          closeModal={handleModal}
+          isOwner={true}
+          whatRole={"patient"}
+          onProfileUpdate={fetchPatientData} // Pass the callback function
+        />
+      )}
 
-        {/* CHANGE PASS MODAL */}
-        {isPasswordModalOpen && (
-          <ChangePassword
-            editPasswordAPI={route.patient.password}
-            closeModal={handlePasswordModal}
-          />
-        )}
-        {/* CONTENT */}
-        <Col xs={{ order: 12 }} lg={{ order: 1 }}>
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">
-                {patientData?.firstName || "Patient"}
-              </p>
-            </div>
-          </Row>
+      {/* CHANGE PASS MODAL */}
+      {isPasswordModalOpen && (
+        <ChangePassword
+          editPasswordAPI={route.patient.password}
+          closeModal={handlePasswordModal}
+        />
+      )}
 
-          <Row lg md>
-            {/* YOUR PROFILE */}
-            <Col lg className="height-responsive full-height">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Your Profile</h4>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
+
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">Admin</p>
               </div>
 
-              <div className="card-container d-flex flex-column gap-2 notif-home">
-                {/* IMAGE COMPONENT */}
-                <div className="p-3">
-                  <div className="profile-img">
-                    <img src={patientData?.profilePicture} alt="Profile" />
+              <MenuDropdown />
+            </div>
+
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Your Profile</p>
+                    <p className="mb-0">Make changes to your profile.</p>
                   </div>
                 </div>
 
-                {/* NOTIFICATION COMPONENT */}
-                <div className="d-flex flex-column g-1 mb-2 mx-3">
-                  <h3 className="fw-bold mb-0">
-                    {patientData?.firstName} {patientData?.middleName}{" "}
-                    {patientData?.lastName}
-                  </h3>
-                  <p className="mb-0">{patientData?.diagnosis}</p>
-                  <p className="mb-0">{patientData?.birthday}</p>
-                  <p className="mb-0">{patientData?.mobile}</p>
-                  <p className="mb-0">{patientData?.email}</p>
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                    <div className="card">
+                      <img
+                        src={patientData?.profilePicture}
+                        className="card-img-top"
+                        alt="Profile picture"
+                        style={{maxHeight:"320px", objectFit:"cover"}}
+                      />
+                      <div className="card-body">
+                        <h5 className="">
+                          {patientData?.firstName} {patientData?.middleName}{" "}
+                          {patientData?.lastName}
+                        </h5>
+                        <p className="mb-0">{patientData?.diagnosis}</p>
+                        <p className="mb-0">{patientData?.birthday}</p>
+                        <p className="mb-0">{patientData?.mobile}</p>
+                        <p className="mb-0">{patientData?.email}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Col>
 
-            {/* ACTIONS */}
-            <Col lg className="height-responsive">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Actions</h4>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Actions</p>
+                    <p className="mb-0">Perform account changes.</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <div
+                        className="mb-3 fw-bold text-button border w-100"
+                        onClick={handleModal}
+                      >
+                        Edit Profile
+                      </div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <div
+                        className="mb-3 fw-bold text-button border w-100"
+                        onClick={handlePasswordModal}
+                      >
+                        Change Password
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="card-container d-flex justify-content-center align-items-center flex-column gap-2 scrollable-div notif-home">
-                {/* BUTTONS */}
-                <button className="action-btn" onClick={handleModal}>
-                  Edit Profile
-                </button>
-                <button className="action-btn" onClick={handlePasswordModal}>
-                  Change Password
-                </button>
-              </div>
-            </Col>
-
-            <Col lg className="height-responsive"></Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+              {/* THIRD COL */}
+              <div className="col-sm bg-white"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

@@ -1,3 +1,26 @@
+.hover-div:hover {
+  background-color: #f8f8f8;
+}
+
+.exercise-container {
+  height: fit-content;
+}
+
+.exercise-container:hover{
+  transform: scale(1);
+}
+
+.exercise-thumbnail {
+  width: 100%;
+  height: 150px;
+  background-color: antiquewhite;
+}
+
+.exercise-description {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 .full-height {
   max-height: 100%;
 }
@@ -85,7 +108,7 @@
 .video-remote {
   /* position: relative; */
   width: 100%;
-  height: inherit; 
+  height: inherit;
   object-fit: cover;
 }
 
@@ -124,10 +147,7 @@
     max-height: 75vh;
   }
 
-
-
   .card-height {
     height: auto;
   }
-
 }

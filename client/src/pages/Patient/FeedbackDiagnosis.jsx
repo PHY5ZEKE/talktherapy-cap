@@ -1,19 +1,12 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
-
-// Icons
-import Sort from "../../assets/icons/Sort";
-import Edit from "../../assets/icons/Edit";
-import Delete from "../../assets/icons/Delete";
-import Search from "../../assets/icons/Search";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // DatePicker
-import { useState, useEffect } from "react";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -55,117 +48,96 @@ export default function FeedbackDiagnosis() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{patientData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
-
-          {/* 2ND HEADER */}
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="d-flex justify-content-center align-items-center">
-                  <p className="m-0 fw-bold">Feedbacks and Diagnosis</p>
-                </div>
-
-                <div className="d-flex align-items-center gap-2 search-bar d-none d-lg-block">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for clinician"
-                    className="search-input"
-                  />
-                </div>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">{patientData?.firstName}</p>
               </div>
 
-              <Sort />
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto d-sm-block d-lg-none"
-          >
-            <div className="admin-left d-flex justify-content-center">
-              <div className="d-flex align-items-center gap-2 search-bar">
-                <Search />
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="search-input"
-                />
-              </div>
-            </div>
-          </Row>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm-4 bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Feedback and Diagnosis</p>
+                    <p className="mb-0">Your performance and diagnosis.</p>
+                  </div>
+                </div>
 
-          <Row lg md>
-            {/* DIAGNOSIS FEEDBACK LIST */}
-            <Col lg span={1} className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="card-container d-flex flex-wrap align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="card-content-bg-dark w-100 p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">Dr. Juan Dela Cruz</p>
-                    <p className="mb-0">Diagnosis</p>
-                    <p className="mb-0">July 4, 2024</p>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div
+                      className="mb-3 border border border-top-0 border-start-0 border-end-0 hover-div"
+                      style={{ cursor: "pointer" }}
+                    >
+                      <h5 className="mb-0 fw-bold">Dr. Juan Dela Cruz</h5>
+                      <p className="mb-0 fw-bold">Diagnosis</p>
+                      <p className="mb-3">July 4, 2024</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </Col>
 
-            <Col lg span={2}>
-              <div className="card-container d-flex flex-wrap align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="py-1 px-3">
-                  <h4 className="fw-bold">Diagnosis Form</h4>
-                  <p className="fst-italic mb-0">
-                    Written and prescription by Dr. Juan Dela Cruz
-                  </p>
-                  <p>Date here</p>
+              {/* SECOND COL */}
+              <div className="col-sm-8 bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Search</p>
+                    <p className="mb-0">
+                      .
+                    </p>
+                  </div>
+                </div>
 
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    eget fermentum torto r. Nulla facilisi. Maecenas hendrerit
-                    feugiat finibus. Mauris nec diam at risus ullamcorper
-                    pellentesque quis a mauris. Suspendisse id sagittis dolor.
-                    Vivamus tristique tempus leo, sed consectetur ante consequat
-                    eu. Nulla feugiat nisi sed sapien sodales iaculis. Cras
-                    imperdiet turpis massa, id dapibus nulla congue vitae. Morbi
-                    lacus turpis, pellentesque quis velit non, varius luctus
-                    est. Praesent mollis turpis et venenatis placerat. Etiam
-                    tempor faucibus magna, in fringilla metus consectetur eget.
-                    Nam eleifend ex lectus, vel vulputate sem malesuada vel.
-                    Suspendisse vel diam ac nunc sagittis volutpat. Suspendisse
-                    potenti. Aliquam ac molestie sapien. Nam eros tellus,
-                    pulvinar nec nisi eu, luctus tristique ligula.
-                  </p>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh"}}
+                  >
+                    <div className="mb-3">
+                      <h4 className="mb-0 fw-bold">Diagnosis</h4>
+                      <p className="mb-0">Prescription by</p>
+                      <p className="mb-3">July 4, 2024</p>
+                      <p className="text-justify">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        Sed eget fermentum torto r. Nulla facilisi. Maecenas
+                        hendrerit feugiat finibus. Mauris nec diam at risus
+                        ullamcorper pellentesque quis a mauris. Suspendisse id
+                        sagittis dolor. Vivamus tristique tempus leo, sed
+                        consectetur ante consequat eu. Nulla feugiat nisi sed
+                        sapien sodales iaculis. Cras imperdiet turpis massa, id
+                        dapibus nulla congue vitae. Morbi lacus turpis,
+                        pellentesque quis velit non, varius luctus est. Praesent
+                        mollis turpis et venenatis placerat. Etiam tempor
+                        faucibus magna, in fringilla metus consectetur eget. Nam
+                        eleifend ex lectus, vel vulputate sem malesuada vel.
+                        Suspendisse vel diam ac nunc sagittis volutpat.
+                        Suspendisse potenti. Aliquam ac molestie sapien. Nam
+                        eros tellus, pulvinar nec nisi eu, luctus tristique
+                        ligula.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

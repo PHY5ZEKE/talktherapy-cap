@@ -3,6 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
 
+// CSS
+import './styles/text.css'
+import './styles/button.css'
+import './styles/containers.css'
+import './styles/images.css'
+
 // System
 import Login from "./pages/Login/Login";
 import RegisterAdmin from "./pages/Register/RegisterAdmin";
@@ -53,11 +59,18 @@ import Room from "./pages/System/Room";
 import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
+// Test Layout
+import Layout from "./pages/Patient/Home";
+import Home2 from './pages/Patient/Home'
+
 const routes = (
   <Router>
     <Routes>
       {/* Error Page for No-Match Paths */}
       <Route path="*" element={<NotFound />} />
+
+      <Route path="/layout" element={<Layout />} />
+      <Route path="/home2" element={<Home2 />} />
 
       {/* Unauthorized Access Page */}
       <Route path="/unauthorized" element={<UnauthorizedAccess />} />

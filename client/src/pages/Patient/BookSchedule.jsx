@@ -5,21 +5,22 @@ import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
-import Dropdown from "react-bootstrap/Dropdown";
 import JoinAppointment from "../../components/Modals/JoinAppointment";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
+import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
+import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 
 // DatePicker
 import { useState, useEffect, useCallback, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { redirectDocument } from "react-router-dom";
-import { Exclamation } from "react-bootstrap-icons";
 
 export default function BookSchedule() {
   const [showModal, setShowModal] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertVariant, setAlertVariant] = useState("success");
+
   // DatePicker Instance
   const [startDate, setStartDate] = useState(new Date());
 
@@ -47,9 +48,20 @@ export default function BookSchedule() {
   // State for storing appointments
   const [appointments, setAppointments] = useState([]);
 
+  // Handle Confirm Reschedule Modal
+  const [isConfirm, setIsConfirm] = useState(false);
+  const closeModal = () => {
+    setIsConfirm(!isConfirm);
+  };
+
+  // Handle Choose Schedule Modal
+  const [isChoose, setIsChoose] = useState(false);
+  const closeSchedule = () => {
+    setIsChoose(!isChoose);
+  };
+
+
   const handleModal = (clinician, schedule) => {
-    console.log("Selected clinician:", clinician);
-    console.log("Selected schedule:", schedule);
     setSelectedClinician(clinician);
     setSelectedSchedule(schedule);
     setIsOpen(!isOpen);
@@ -184,68 +196,70 @@ export default function BookSchedule() {
       const hasSchedule = schedules.some(
         (schedule) => schedule.day === dayOfWeek
       );
-      // console.log(`Checking day: ${dayOfWeek}, hasSchedule: ${hasSchedule}`);
       return hasSchedule ? { backgroundColor: "green", color: "white" } : {};
     },
     [schedules]
   );
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* Book Appointment Modal */}
+      {isOpen && (
+        <JoinAppointment
+          openModal={handleModal}
+          selectedClinician={selectedClinician}
+          selectedSchedule={selectedSchedule}
+          patientId={patientData?._id}
+          onSuccess={handleSuccess}
+        />
+      )}
 
-        {/* Book Appointment Modal */}
-        {isOpen && (
-          <JoinAppointment
-            openModal={handleModal}
-            selectedClinician={selectedClinician}
-            selectedSchedule={selectedSchedule}
-            patientId={patientData?._id}
-            onSuccess={handleSuccess}
-          />
-        )}
+      {/* RESCHEDULE PAGE 1 MODAL */}
+      {isConfirm && (
+        <ConfirmReschedule
+          onClick={closeModal}
+          closeModal={closeModal}
+          openResched={closeSchedule}
+        />
+      )}
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{patientData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
+      {/* RESCHEDULE PAGE 2 MODAL */}
+      {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
 
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="d-flex justify-content-center align-items-center">
-                  <h5 className="m-0 fw-bold">Book and Manage Appointments</h5>
-                </div>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
+
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">{patientData?.firstName}</p>
               </div>
-            </div>
-          </Row>
 
-          <Row lg md>
-            {/* CALENDAR */}
-            <Col lg className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="card-container d-flex flex-wrap justify-content-center align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="w-100 d-grid row justify-content-center">
-                  <div className="mx-auto row justify-content-center">
-                    <div className="col">
+              <MenuDropdown />
+            </div>
+
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Book an Appointment</p>
+                    <p className="mb-0">
+                      Select a date to view available clinician schedules.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
                       <select
                         className="form-select form-select-lg mb-3"
                         aria-label=".form-select-lg example"
@@ -258,150 +272,166 @@ export default function BookSchedule() {
                         <option value="Aphasia">Aphasia</option>
                         <option value="Stroke">Stroke</option>
                       </select>
+
+                      <DatePicker
+                        selected={startDate}
+                        onChange={handleDateChange}
+                        inline
+                        dayClassName={getDayClassName}
+                      />
                     </div>
                   </div>
-
-                  <DatePicker
-                    selected={startDate}
-                    onChange={handleDateChange}
-                    inline
-                    dayClassName={getDayClassName}
-                  />
                 </div>
               </div>
-            </Col>
 
-            {/* PREVIEW SCHEDULE LIST */}
-            <Col lg>
-              <div className="card-container d-flex flex-wrap align-items-center flex-row scrollable-div-5 notif-home">
-                <div className="p-2 w-100">
-                  <h4 className="fw-bold mb-0">
-                    Available Schedule
-                    {hasBooked && (
-                      // div warning
-                      <div
-                        className="alert alert-warning alert-dismissible fade show fs-6"
-                        role="alert"
-                      >
-                        You have an existing appointment. You can only book one
-                        at a time.
-                        <button
-                          type="button"
-                          className="btn-close"
-                          data-bs-dismiss="alert"
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                    )}
-                  </h4>
-                  <p className="mb-0">
-                    {selectedDate
-                      ? selectedDate.toDateString()
-                      : "Select a date"}
-                  </p>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">List of Schedules</p>
+                    <p className="mb-0">
+                      You are allowed to book one appointment at a time.
+                    </p>
+                  </div>
                 </div>
 
-                {/* DATE COMPONENT */}
-                {getAllSchedulesForSelectedDay.map((schedule, index) => (
+                <div className="row p-3">
                   <div
-                    key={index}
-                    className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom"
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
                   >
-                    <div className="w-100">
-                      <h5 className="fw-bold mb-0">
-                        {schedule.startTime} - {schedule.endTime}
+                    {getAllSchedulesForSelectedDay.length === 0 ? (
+                      <h5 className="mb-0 fw-bold text-center">
+                        No appointments available for the selected date.
                       </h5>
-                      <h6 className="fw-bold mb-0">{schedule.clinicianName}</h6>
-                      <p className="mb-0">{schedule.day}</p>
-                      <p className="mb-0 my-2">Status: <span className="fw-bold">{schedule.status}</span></p>
-                    </div>
-                    {schedule.status !== "Booked" && !hasBooked && (
-                      <button
-                        className="button-group bg-white"
-                        onClick={() =>
-                          handleModal(schedule.clinicianId, schedule._id)
-                        }
-                      >
-                        <p className="fw-bold my-0 status">JOIN</p>
-                      </button>
+                    ) : (
+                      getAllSchedulesForSelectedDay.map((schedule, index) => (
+                        <div
+                          key={index}
+                          className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom"
+                        >
+                          <div className="w-100">
+                            <h5 className="fw-bold mb-0">
+                              {schedule.startTime} - {schedule.endTime}
+                            </h5>
+                            <h6 className="fw-bold mb-0">
+                              {schedule.clinicianName}
+                            </h6>
+                            <p className="mb-0">{schedule.day}</p>
+                            <p className="mb-0 my-2">
+                              Status:{" "}
+                              <span className="fw-bold">{schedule.status}</span>
+                            </p>
+                          </div>
+                          {schedule.status !== "Booked" && !hasBooked && (
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              onClick={() =>
+                                handleModal(schedule.clinicianId, schedule._id)
+                              }
+                            >
+                              Book
+                            </div>
+                          )}
+                        </div>
+                      ))
                     )}
                   </div>
-                ))}
+                </div>
               </div>
-            </Col>
 
-            {/* PATIENT APPOINTMENTS */}
-            <Col lg>
-              <div className="card-container d-flex flex-wrap p-4 justify-content-center align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <h4 className="text-left fw-bold">Your Appointment</h4>
-                {appointments
-                  .filter(
-                    (appointment) =>
-                      appointment.status === "Pending" ||
-                      appointment.status === "Accepted"
-                  )
-                  .map((appointment, index) => (
-                    <div
-                      key={index}
-                      className="w-100 p-2 border-top border-bottom"
-                    >
-                      <div className="w-100">
-                        <h5 className="fw-bold mb-0">
-                          {appointment.selectedSchedule.startTime} -{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </h5>
-                        <h6 className="fw-bold mb-0">
-                          {appointment.selectedSchedule.clinicianName}
-                        </h6>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
+              {/* THIRD COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Your Appointments</p>
+                    <p className="mb-0">View the status of your appointment.</p>
+                  </div>
+                </div>
 
-                        {/* IF PENDING */}
-                        {appointment.status === "Pending" && (
-                          <>
-                            <div className="row p-2">
-                              <div className="button-group bg-white">
-                                <p className="fw-bold my-0 status">Pending</p>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {appointments
+                      .filter(
+                        (appointment) =>
+                          appointment.status === "Pending" ||
+                          appointment.status === "Accepted"
+                      )
+                      .map((appointment, index) => (
+                        <div
+                          key={index}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.day}
+                          </h5>
+                          <p className="fw-bold mb-0">
+                            {appointment.selectedSchedule.startTime} -
+                            {appointment.selectedSchedule.endTime}
+                          </p>
+                          <h6 className=" mb-0">
+                            Session with{" "}
+                            <span className="fw-bold">
+                              {appointment.selectedSchedule.clinicianName}
+                            </span>
+                          </h6>
+
+                          {/* IF PENDING */}
+                          {appointment.status === "Pending" && (
+                            <>
+                              <div className="row p-2">
+                                <div className="d-flex justify-content-between flex-wrap gap-3">
+                                  <div className="mb-3 text-pending">
+                                    PENDING
+                                  </div>
+                                  <div className="d-flex gap-3">
+                                    <div className="mb-3 fw-bold text-button border">
+                                      Edit
+                                    </div>
+                                    <div className="mb-3 fw-bold text-button border">
+                                      Cancel
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
-                              <button className="button-group mx-1 bg-white">
-                                <p className="fw-bold my-0 status">Edit</p>
-                              </button>
-                              <button className="button-group bg-white">
-                                <p className="fw-bold my-0 status">Delete</p>
-                              </button>
-                            </div>
-                          </>
-                        )}
-                        {/* IF ACCEPTED */}
-                        {appointment.status === "Accepted" && (
-                          <>
-                            <div className="row p-2">
-                              <button
-                                className="button-group bg-white"
-                                onClick={() =>
-                                  joinMeeting(
-                                    appointment._id,
-                                    appointment.roomId
-                                  )
-                                }
-                              >
-                                <p className="fw-bold my-0 status">Join</p>
-                              </button>
-                              <button className="button-group mx-1 bg-white">
-                                <p className="fw-bold my-0 status">Cancel</p>
-                              </button>
-                            </div>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                            </>
+                          )}
+                          {/* IF ACCEPTED */}
+                          {appointment.status === "Accepted" && (
+                            <>
+                              <div className="row p-2 gap-3">
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  onClick={() =>
+                                    joinMeeting(
+                                      appointment._id,
+                                      appointment.roomId
+                                    )
+                                  }
+                                >
+                                  Join
+                                </div>
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  onClick={closeModal}
+                                >
+                                  Cancel
+                                </div>
+                              </div>
+                            </>
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
