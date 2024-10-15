@@ -17,6 +17,10 @@ router.get(
 );
 
 // PATIENT GET
-router.get("/patient-schedules", verifyToken, scheduleController.getClinicianSched);
+router.get(
+  "/clinician-schedules",
+  verifyToken,
+  scheduleController.getClinicianSched
+);
 
 module.exports = router;

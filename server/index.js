@@ -35,10 +35,10 @@ app.use(
     origin: [
       "https://chefsdaughter.online",
       "http://www.chefsdaughter.online",
-      "https://www.chefsdaughter.online"
+      "https://www.chefsdaughter.online",
     ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
 
@@ -55,7 +55,7 @@ app.use("/api/clinician-slp", clinicianSLPRoutes);
 app.use("/api/admin-slp", adminSLPRoutes);
 app.use("/api/super-admin-slp", superAdminSLPRoutes);
 app.use("/api/schedule-slp", scheduleRoutes);
-app.use("/api/api/contents", contentRoute);
+app.use("/api/contents", contentRoute);
 app.use("/api/appointments-slp", appointmentRoute);
 
 // Error handling middleware

@@ -60,7 +60,7 @@ export const route = {
     get: "api/appointments-slp/get-appointment",
     edit: "api/appointments-slp/edit-appointment/:appointmentId",
     getById: "api/appointments-slp/get-appointment-by-id",
-    updateStatus: "api/appointments-slp/update-status/:appointmentId",
+    updateStatus: "api/appointments-slp/update-status",
     getByClinician: "api/appointments-slp/get-appointment-by-clinician",
   },
   schedule: {

@@ -37,7 +37,7 @@ export default function Home() {
     try {
       const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
       const response = await axios.get(
-        `${appURL}/${route.appointment.updateStatus}/${appointmentId}`,
+        `${appURL}/${route.appointment.getById}/${appointmentId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

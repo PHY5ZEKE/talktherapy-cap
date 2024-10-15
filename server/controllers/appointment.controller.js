@@ -1,10 +1,13 @@
 const Appointment = require("../models/appointment.model");
+const Admin = require("../models/adminSLP.model"); // Import the Admin model
 const ClinicianSLP = require("../models/clinicianSLP.model");
+const Patient = require("../models/patientSlp.model");
 const Schedule = require("../models/schedule.model");
 const multer = require("multer");
 const path = require("path");
 const s3 = require("../config/aws");
 const multerS3 = require("multer-s3");
+const { createAuditLog } = require("../middleware/auditLog");
 
 const { encrypt, decrypt } = require("../middleware/aesUtilities");
 
@@ -51,6 +54,12 @@ exports.createAppointmentJSON = async (req, res) => {
       return res.status(400).json({ message: "Invalid schedule selected" });
     }
 
+    // Check if the patient exists
+    const patient = await Patient.findById(patientId);
+    if (!patient) {
+      return res.status(400).json({ message: "Invalid patient selected" });
+    }
+
     // Check if appointment already exists for the patient
     const existingAppointment = await Appointment.findOne({ patientId });
     const existingSchedule = await Appointment.findOne({ selectedSchedule });
@@ -72,6 +81,21 @@ exports.createAppointmentJSON = async (req, res) => {
     });
 
     await newAppointment.save();
+
+    try {
+      // Extract schedule details
+      const { day, startTime, endTime } = schedule;
+
+      // Create audit log with the patient's email and clinician's email
+      await createAuditLog(
+        "createAppointment",
+        patient.email, // Pass the patient's email
+        `Patient ${patient.email} has booked a session with clinician ${clinician.email} on ${day} from ${startTime} to ${endTime}`
+      );
+    } catch (auditLogError) {
+      console.error("Error creating audit log:", auditLogError);
+      // Continue without failing the request
+    }
 
     res.status(201).json({
       message: "Appointment created successfully",
@@ -294,6 +318,7 @@ exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { status } = req.body;
+    const adminId = req.user.id; // Assuming the token contains the admin ID
 
     // Find the appointment by appointmentId and populate selectedSchedule
     const appointment = await Appointment.findById(appointmentId).populate(
@@ -302,6 +327,26 @@ exports.updateAppointmentStatus = async (req, res) => {
 
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Fetch admin details
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Fetch patient details
+    const patient = await Patient.findById(appointment.patientId);
+    if (!patient) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    // Fetch clinician details
+    const clinician = await ClinicianSLP.findById(
+      appointment.selectedClinician
+    );
+    if (!clinician) {
+      return res.status(404).json({ message: "Clinician not found" });
     }
 
     // Check the current status and update accordingly
@@ -323,7 +368,7 @@ exports.updateAppointmentStatus = async (req, res) => {
       // If appointment is Accepted and the status to update is Completed
       appointment.status = status;
       appointment.roomId = "errorRoomId";
-      // Update the selectedSchedule status to "available"
+      // Update the selectedSchedule status to "Available"
       appointment.selectedSchedule.status = "Available";
       await appointment.selectedSchedule.save();
     } else {
@@ -331,6 +376,18 @@ exports.updateAppointmentStatus = async (req, res) => {
     }
 
     await appointment.save();
+
+    try {
+      // Create audit log with the admin's email, patient's email, and clinician's email
+      await createAuditLog(
+        "updateAppointmentStatus",
+        admin.email, // Pass the admin's email
+        `Admin ${admin.email} ${status}  the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
+      );
+    } catch (auditLogError) {
+      console.error("Error creating audit log:", auditLogError);
+      // Continue without failing the request
+    }
 
     res.status(200).json({
       message: "Appointment status updated successfully",
