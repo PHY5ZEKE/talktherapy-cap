@@ -11,6 +11,10 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+// Buttons
+import Edit from "../../assets/icons/Edit";
+import Delete from "../../assets/icons/Delete";
+
 import AddSchedule from "../../components/Modals/AddSchedule";
 
 export default function ManageSchedule() {
@@ -210,6 +214,13 @@ export default function ManageSchedule() {
                       </h5>
                       <p className="mb-0">{schedule.day}</p>
                       <p className="mb-0">Status: {schedule.status}</p>
+                    </div>
+
+                    <div>
+                      <button className="icon-btn">
+                        <Edit />
+                      </button>
+                      <Delete />
                     </div>
                   </div>
                 ))}

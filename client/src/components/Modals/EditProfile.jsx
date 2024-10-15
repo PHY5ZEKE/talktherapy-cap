@@ -15,6 +15,7 @@ export default function EditProfile({
 }) {
   const [userData, setUserData] = useState(userDetails);
   const [updatedUser, setUpdatedUser] = useState(null);
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [showModal, setShowModal] = useState(true);
@@ -65,8 +66,8 @@ export default function EditProfile({
         }),
       });
 
-      const data = await response.json();
 
+      const data = await response.json();
       console.log("Response:", response);
       console.log("Data:", data);
 
@@ -74,7 +75,6 @@ export default function EditProfile({
         alert("Profile updated successfully.");
         setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
-        onProfileUpdate();
       } else {
         alert(data.message || "Error updating profile.");
       }

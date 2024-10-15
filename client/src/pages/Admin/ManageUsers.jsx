@@ -37,9 +37,9 @@ export default function ManageUsers() {
     setUserDetails(user);
     setRole(role);
     if (role === "patientslp") {
-      setEditProfileAPI("admin-slp/edit-patient");
+      setEditProfileAPI(route.admin.editPatient);
     } else {
-      setEditProfileAPI("admin-slp/edit-clinician");
+      setEditProfileAPI(route.admin.editClinician);
     }
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Rnd } from "react-rnd";
 import { route } from "../../utils/route";
@@ -36,17 +36,6 @@ export default function Room() {
   const serverConnection = useRef();
 
   const [isHidden, setHidden] = useState(true);
-
-  // UUID
-  function createUUID() {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000)
-        .toString(16)
-        .substring(1);
-    }
-
-    return `${s4() + s4()}-${s4()}-${s4()}-${s4()}-${s4() + s4() + s4()}`;
-  }
 
   const currentUser = localStorage.getItem("userId");
   const uuid = currentUser;
@@ -188,11 +177,16 @@ export default function Room() {
         .catch(errorHandler);
     }
 
+    // Handle Room Maximum Capacity
+    if (signal.type === "room-full") {
+      navigate("/unauthorized");
+    }
+
     // Handle text messages
     if (signal.type === "message") {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { message: signal.message, sender:signal.sender, isSent: false }, // Mark it as received
+        { message: signal.message, sender: signal.sender, isSent: false }, // Mark it as received
       ]);
     }
   }
@@ -285,7 +279,7 @@ export default function Room() {
 
     setMessages((prevMessages) => [
       ...prevMessages,
-      { message, sender:uuid, isSent: true }, // Mark as sent
+      { message, sender: uuid, isSent: true }, // Mark as sent
     ]);
   }
 
@@ -370,32 +364,62 @@ export default function Room() {
                         <p className="fw-bold my-0 status">Actions</p>
                       </button>
                       <ul className="dropdown-menu">
-                        <li>
-                          <a
-                            role="button"
-                            className="dropdown-item"
-                            data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvasWithBothOptions"
-                            aria-controls="offcanvasWithBothOptions"
-                          >
-                            Message
-                          </a>
-                        </li>
-                        <li>
-                          <a role="button" className="dropdown-item" href="#">
-                            Add Diagnostic
-                          </a>
-                        </li>
-                        <li>
-                          <a role="button" className="dropdown-item" href="#">
-                            Diagnostic Tool
-                          </a>
-                        </li>
-                        <li>
-                          <a role="button" className="dropdown-item" href="#">
-                            End Session
-                          </a>
-                        </li>
+                        {userRole === "clinician" ? (
+                          <>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasWithBothOptions"
+                                aria-controls="offcanvasWithBothOptions"
+                              >
+                                Message
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                href="#"
+                              >
+                                Add Diagnostic
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                href="#"
+                              >
+                                Diagnostic Tool
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                href="#"
+                              >
+                                End Session
+                              </a>
+                            </li>
+                          </>
+                        ) : (
+                          <>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasWithBothOptions"
+                                aria-controls="offcanvasWithBothOptions"
+                              >
+                                Message
+                              </a>
+                            </li>
+                          </>
+                        )}
                       </ul>
                     </div>
 

@@ -169,7 +169,7 @@ export default function AppointmentDetailsClinician({
           <div className="d-flex justify-content-center mt-3 gap-3">
             {renderStatusButton()}
             <button onClick={handleClose} className="button-group bg-white">
-              <p className="fw-bold my-0 status">CANCEL</p>
+              <p className="fw-bold my-0 status">Close</p>
             </button>
           </div>
         </div>

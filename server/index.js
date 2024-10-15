@@ -33,6 +33,7 @@ app.use("/src", express.static(path.join(__dirname, "../src")));
 app.use(
   cors({
     origin: [
+      "http://localhost:5173",
       "https://chefsdaughter.online",
       "http://www.chefsdaughter.online",
       "https://www.chefsdaughter.online",

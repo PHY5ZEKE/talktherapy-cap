@@ -232,7 +232,7 @@ export default function BookSchedule() {
             <div className="admin-left d-flex justify-content-between">
               <div className="admin-child d-flex gap-3">
                 <div className="d-flex justify-content-center align-items-center">
-                  <h5 className="m-0 fw-bold">Manage Your Schedule</h5>
+                  <h5 className="m-0 fw-bold">Book and Manage Appointments</h5>
                 </div>
               </div>
             </div>
@@ -311,9 +311,9 @@ export default function BookSchedule() {
                       <h5 className="fw-bold mb-0">
                         {schedule.startTime} - {schedule.endTime}
                       </h5>
+                      <h6 className="fw-bold mb-0">{schedule.clinicianName}</h6>
                       <p className="mb-0">{schedule.day}</p>
-                      <p className="mb-0">Status: {schedule.status}</p>
-                      <h5 className="fw-bold mb-0">{schedule.clinicianName}</h5>
+                      <p className="mb-0 my-2">Status: <span className="fw-bold">{schedule.status}</span></p>
                     </div>
                     {schedule.status !== "Booked" && !hasBooked && (
                       <button
@@ -343,48 +343,55 @@ export default function BookSchedule() {
                   .map((appointment, index) => (
                     <div
                       key={index}
-                      className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom"
+                      className="w-100 p-2 border-top border-bottom"
                     >
                       <div className="w-100">
                         <h5 className="fw-bold mb-0">
                           {appointment.selectedSchedule.startTime} -{" "}
                           {appointment.selectedSchedule.endTime}
                         </h5>
+                        <h6 className="fw-bold mb-0">
+                          {appointment.selectedSchedule.clinicianName}
+                        </h6>
                         <p className="mb-0">
                           {appointment.selectedSchedule.day}
                         </p>
-                        <h5 className="fw-bold mb-0">
-                          Clinician:{" "}
-                          {appointment.selectedSchedule.clinicianName}
-                        </h5>
+
                         {/* IF PENDING */}
                         {appointment.status === "Pending" && (
                           <>
-                            <button className="button-group bg-white">
-                              <p className="fw-bold my-0 status">PENDING</p>
-                            </button>
-                            <button className="button-group bg-white">
-                              <p className="fw-bold my-0 status">Edit</p>
-                            </button>
-                            <button className="button-group bg-white">
-                              <p className="fw-bold my-0 status">Delete</p>
-                            </button>
+                            <div className="row p-2">
+                              <div className="button-group bg-white">
+                                <p className="fw-bold my-0 status">Pending</p>
+                              </div>
+                              <button className="button-group mx-1 bg-white">
+                                <p className="fw-bold my-0 status">Edit</p>
+                              </button>
+                              <button className="button-group bg-white">
+                                <p className="fw-bold my-0 status">Delete</p>
+                              </button>
+                            </div>
                           </>
                         )}
                         {/* IF ACCEPTED */}
                         {appointment.status === "Accepted" && (
                           <>
-                            <button
-                              className="button-group bg-white"
-                              onClick={() =>
-                                joinMeeting(appointment._id, appointment.roomId)
-                              }
-                            >
-                              <p className="fw-bold my-0 status">JOIN</p>
-                            </button>
-                            <button className="button-group bg-white">
-                              <p className="fw-bold my-0 status">CANCEL</p>
-                            </button>
+                            <div className="row p-2">
+                              <button
+                                className="button-group bg-white"
+                                onClick={() =>
+                                  joinMeeting(
+                                    appointment._id,
+                                    appointment.roomId
+                                  )
+                                }
+                              >
+                                <p className="fw-bold my-0 status">Join</p>
+                              </button>
+                              <button className="button-group mx-1 bg-white">
+                                <p className="fw-bold my-0 status">Cancel</p>
+                              </button>
+                            </div>
                           </>
                         )}
                       </div>

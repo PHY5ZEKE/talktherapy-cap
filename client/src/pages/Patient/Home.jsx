@@ -2,9 +2,12 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
+import axios from "axios";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
+import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
+import PatientNav from "../../components/Navbar/PatientNav";
 
 // Icons
 import Search from "../../assets/icons/Search";
@@ -81,12 +84,36 @@ export default function Home() {
 
   // Filter accepted appointments
   const acceptedAppointments = appointments.filter(
-    (appointment) => appointment.status === "Accepted"
+    (appointment) =>
+      appointment.status === "Accepted" || appointment.status === "Pending"
   );
 
   const joinMeeting = (app, id) => {
     console.log("Joining meeting with ID:", id);
     navigate(`/room/${app}/${id}`);
+  };
+
+  // Handle Appointment Details Modal
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const openModal = async (appointmentId) => {
+    try {
+      const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
+      const response = await axios.get(
+        `${appURL}/${route.appointment.getById}/${appointmentId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Fetched appointment details:", response.data); // Debugging statement
+      setSelectedAppointment(response.data);
+      setIsOpen(true);
+    } catch (error) {
+      console.error("Error fetching appointment details:", error);
+    }
   };
 
   return (
@@ -100,7 +127,7 @@ export default function Home() {
           lg={{ order: 1 }}
           className="d-flex flex-column stretch-flex"
         >
-          {/* MODAL */}
+          {/* RESCHEDULE PAGE 1 MODAL */}
           {isConfirm && (
             <ConfirmReschedule
               onClick={closeModal}
@@ -109,23 +136,23 @@ export default function Home() {
             />
           )}
 
+          {/* RESCHEDULE PAGE 2 MODAL */}
           {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
 
+          {/* VIEW APPOINTMENT DETAILS MODAL */}
+          {isOpen && (
+            <PatientViewAppointment
+              closeModal={() => setIsOpen(false)}
+              appointment={selectedAppointment}
+            />
+          )}
+
           {/* USER TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{patientData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
+          <PatientNav data={patientData?.firstName}/>
 
           <Row lg md>
             {/* APPOINTMENT LIST */}
-            <Col lg className="height-responsive d-none d-lg-block">
+            <Col lg className="height-responsive">
               {/* DATE COMPONENT */}
               <div className="card-content-bg-light p-3 my-3 date-card">
                 <div className="d-flex flex-row justify-content-between g-1 mb-2">
@@ -147,7 +174,16 @@ export default function Home() {
                     acceptedAppointments.map((appointment) => (
                       <div
                         key={appointment._id}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
+                        className={`d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-${
+                          appointment.status === "Pending"
+                            ? "pending"
+                            : "accepted"
+                        }-2`}
+                        onClick={
+                          appointment.status === "Pending"
+                            ? () => openModal(appointment._id)
+                            : null
+                        }
                       >
                         <p className="fw-bold mb-0">
                           {appointment.selectedSchedule.day}
@@ -162,25 +198,39 @@ export default function Home() {
                           {patientData?.firstName}.
                         </p>
                         <div className="d-flex justify-content-between mt-3">
-                          <p className="status-accepted status-text status-text-green">
-                            ACCEPTED
-                          </p>
-                          <div>
-                            <button
-                              className="button-group bg-white"
-                              onClick={() =>
-                                joinMeeting(appointment._id, appointment.roomId)
-                              }
-                            >
-                              <p className="fw-bold my-0 status">JOIN</p>
-                            </button>
-                            <button
-                              className="button-group bg-white"
-                              onClick={closeModal}
-                            >
-                              <p className="fw-bold my-0 status">CANCEL</p>
-                            </button>
-                          </div>
+                          {appointment.status === "Accepted" ? (
+                            <>
+                              <p className="status-accepted status-text status-text-green">
+                                ACCEPTED
+                              </p>
+
+                              <div>
+                                <button
+                                  className="button-group bg-white"
+                                  onClick={() =>
+                                    joinMeeting(
+                                      appointment._id,
+                                      appointment.roomId
+                                    )
+                                  }
+                                >
+                                  <p className="fw-bold my-0 status">JOIN</p>
+                                </button>
+                                <button
+                                  className="button-group bg-white"
+                                  onClick={closeModal}
+                                >
+                                  <p className="fw-bold my-0 status">CANCEL</p>
+                                </button>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <p className="status-pending status-text status-text-orange">
+                                PENDING
+                              </p>
+                            </>
+                          )}
                         </div>
                       </div>
                     ))
@@ -231,7 +281,7 @@ export default function Home() {
             </Col>
 
             {/* NOTIFICATION */}
-            <Col lg className="height-responsive">
+            <Col lg className="height-responsive d-none d-lg-block">
               {/* HEADING */}
               <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
                 <h4 className="fw-bold my-0 mx-0 card-text">Notifications</h4>

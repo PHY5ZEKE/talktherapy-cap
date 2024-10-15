@@ -1,9 +1,12 @@
-import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import { useState, useEffect } from "react";
+
+// Calendar
+import Icon from "../../assets/icons/CalendarIcon";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+
 import { route } from "../../utils/route";
 
 // Components
@@ -154,9 +157,12 @@ export default function AuditLogs() {
                     </div>
                     <div className="col">
                       <DatePicker
+                        className="calendar text-center"
+                        showIcon
                         selected={selectedDate}
                         onChange={handleDateChange}
-                        dateFormat="yyyy/MM/dd"
+                        icon={Icon}
+                        dateFormat={"yyyy/MM/dd"}
                       />
                     </div>
                     <div className="col">

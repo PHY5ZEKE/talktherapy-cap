@@ -1,4 +1,3 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Logout() {
@@ -16,8 +15,8 @@ export default function Logout() {
   return (
     <button className="clickable" onClick={handleLogout}>
       <svg
-        width="40"
-        height="40"
+        width="30"
+        height="30"
         viewBox="0 0 40 40"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

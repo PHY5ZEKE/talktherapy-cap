@@ -1,83 +1,28 @@
 import "./modal.css";
-import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { route } from "../../utils/route";
 
-export default function AppointmentDetails({ openModal, appointment }) {
+export default function PatientViewAppointment({
+  openModal,
+  appointment,
+  closeModal,
+}) {
+  const appURL = import.meta.env.VITE_APP_URL;
+
   const [loading, setLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState(""); // "success" or "danger"
-  const appURL = import.meta.env.VITE_APP_URL;
 
   const handleClose = (e) => {
     e.preventDefault();
-    openModal();
+    closeModal();
   };
-
-  const updateStatus = async (newStatus) => {
-    setLoading(true);
-    try {
-      const response = await axios.put(
-        `${appURL}/${route.appointment.updateStatus}/${appointment._id}`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-          },
-        }
-      );
-      setAlertMessage("Appointment status updated successfully.");
-      setAlertType("success");
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000); // Reload after 2 seconds
-    } catch (error) {
-      setAlertMessage("Error updating appointment status.");
-      setAlertType("danger");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    console.log("Appointment details in modal:", appointment); // Debugging statement
-  }, [appointment]);
 
   if (!appointment) {
     return null; // Return null if no appointment details are available
   }
-
-  const renderStatusButton = () => {
-    switch (appointment.status) {
-      case "Pending":
-        return (
-          <>
-            <button
-              onClick={() => updateStatus("Accepted")}
-              className="button-group bg-white"
-              disabled={loading}
-            >
-              <p className="fw-bold my-0 status">Accept</p>
-            </button>
-            <button
-              onClick={() => updateStatus("Rejected")}
-              className="button-group bg-white"
-              disabled={loading}
-            >
-              <p className="fw-bold my-0 status">Reject</p>
-            </button>
-          </>
-        );
-      case "Completed":
-        return <p className="fw-bold my-0 status">Appointment Completed</p>;
-      case "Rejected":
-        return <p className="fw-bold my-0 status">Appointment Rejected</p>;
-      default:
-        return null;
-    }
-  };
 
   return (
     <>
@@ -94,50 +39,63 @@ export default function AppointmentDetails({ openModal, appointment }) {
             </div>
           )}
 
-          <div className="container text-center">
+        <div className="container text-center">
+          <form>
             <div className="row text-center">
-              <p className="fw-bold mt-3 mb-0">Patient Name</p>
+              <label className="fw-bold mt-3 mb-0" htmlFor="patientName">Patient Name</label>
               <p>
                 {appointment.patientId.firstName}{" "}
                 {appointment.patientId.middleName}{" "}
                 {appointment.patientId.lastName}
               </p>
             </div>
-
+        
             <div className="row text-center">
-              <p className="fw-bold mt-3 mb-0">Date</p>
+              <label className="fw-bold mt-3 mb-0" htmlFor="appointmentDate">Date</label>
               <p>
                 {appointment.selectedSchedule?.day || "N/A"}{" "}
                 {appointment.selectedSchedule?.startTime || "N/A"} -{" "}
                 {appointment.selectedSchedule?.endTime || "N/A"}
               </p>
             </div>
-
+        
             <div className="row text-center">
               <div className="col">
-                <p className="fw-bold mb-0">Clinician</p>
+                <label className="fw-bold mb-0" htmlFor="clinician">Clinician</label>
                 <div>
                   <p className="">
                     {appointment.selectedSchedule?.clinicianName || "N/A"}
                   </p>
                 </div>
-
+        
                 <div>
-                  <p className="fw-bold mb-0">Status</p>
+                  <label className="fw-bold mb-0" htmlFor="status">Status</label>
                   <p>{appointment.status || "N/A"}</p>
                 </div>
               </div>
-
+        
               <div className="col">
-                <p className="fw-bold mb-0">Chief Complaint</p>
-                <p>{appointment.chiefComplaint || "N/A"}</p>
-                <p className="fw-bold mb-0">Source of Referral</p>
-                <p>{appointment.sourceOfReferral || "N/A"}</p>
+                <label className="fw-bold mb-0" htmlFor="chiefComplaint">Chief Complaint</label>
+                <input
+                  type="text"
+                  id="chiefComplaint"
+                  name="chiefComplaint"
+                  defaultValue={appointment.chiefComplaint || "N/A"}
+                  className="form-control"
+                />
+                <label className="fw-bold mb-0" htmlFor="sourceOfReferral">Source of Referral</label>
+                <input
+                  type="text"
+                  id="sourceOfReferral"
+                  name="sourceOfReferral"
+                  defaultValue={appointment.sourceOfReferral || "N/A"}
+                  className="form-control"
+                />
               </div>
             </div>
-
+        
             <div className="col">
-              <p className="fw-bold mb-0">Referral Upload</p>
+              <label className="fw-bold mb-0" htmlFor="referralUpload">Referral Upload</label>
               {appointment.referralUpload ? (
                 <a
                   href={appointment.referralUpload}
@@ -151,10 +109,13 @@ export default function AppointmentDetails({ openModal, appointment }) {
                 <p>None</p>
               )}
             </div>
-          </div>
+          </form>
+        </div>
 
           <div className="d-flex justify-content-center mt-3 gap-3">
-            {renderStatusButton()}
+            <button className="button-group bg-white">
+              <p className="fw-bold my-0 status">Save</p>
+            </button>
             <button onClick={handleClose} className="button-group bg-white">
               <p className="fw-bold my-0 status">Close</p>
             </button>
