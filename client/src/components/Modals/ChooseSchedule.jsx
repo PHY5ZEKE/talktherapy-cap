@@ -1,43 +1,90 @@
-import { useEffect, useState } from "react";
-import "./modal.css";
+import React, { useState, useEffect } from "react";
 import { route } from "../../utils/route";
-export default function ChooseSchedule({ closeModal }) {
+
+export default function ChooseSchedule({
+  closeModal,
+  clinicianId,
+  onScheduleSelect,
+  appointment, // Add appointment to props
+}) {
   const [schedules, setSchedules] = useState([]);
+  const [reason, setReason] = useState("");
+  const [selectedSchedule, setSelectedSchedule] = useState(null); // Add state for selected schedule
   const appURL = import.meta.env.VITE_APP_URL;
   const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null); // Add state for success message
 
   const handleClose = (e) => {
     e.preventDefault();
     closeModal();
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+
+    if (!appointment) {
+      setError("No appointment selected");
+      return;
+    }
+    if (!selectedSchedule) {
+      setError("No schedule selected");
+      return;
+    }
+    if (!reason.trim()) {
+      setError("Reason for rescheduling is required");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${appURL}/${route.appointment.requestScheduleChange}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({
+            appointmentId: appointment._id,
+            newScheduleId: selectedSchedule._id,
+            reason,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to request schedule change");
+      }
+
+      const data = await response.json();
+      onScheduleSelect(data.appointment);
+      setSuccessMessage("Schedule change request submitted successfully");
+      closeModal();
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+    const token = localStorage.getItem("accessToken");
     const fetchSchedules = async () => {
       try {
         const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
-          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch schedules");
-        }
-
         const data = await response.json();
-        console.log("Schedules fetched:", data);
         setSchedules(data);
       } catch (error) {
-        console.error("Error fetching schedules:", error.message);
         setError(error.message);
       }
     };
 
     fetchSchedules();
-  }, []);
+  }, [clinicianId]);
 
   return (
     <>
@@ -46,14 +93,10 @@ export default function ChooseSchedule({ closeModal }) {
           <div className="d-flex flex-column text-center">
             <h3 className="fw-bold">Choose a schedule</h3>
             <p className="mb-0">The following are available schedules.</p>
-            <p>
-              This will notify the corresponding user and will be tagged as
-              pending.
-            </p>
+            <p>This will notify the admin</p>
           </div>
 
           <div className="container text-center scrollable-table">
-            {/* SCHEDULE LIST RENDER */}
             <div className="row text-center">
               <table className="table ">
                 <thead>
@@ -67,13 +110,29 @@ export default function ChooseSchedule({ closeModal }) {
                   {schedules.map(
                     (schedule, index) =>
                       schedule.status === "Available" && (
-                        <tr key={index}>
+                        <tr
+                          key={index}
+                          className={
+                            selectedSchedule &&
+                            selectedSchedule._id === schedule._id
+                              ? "table-active" // Add a class to highlight the selected schedule
+                              : ""
+                          }
+                        >
                           <th scope="row">{schedule.day}</th>
                           <td>
                             {schedule.startTime} - {schedule.endTime}
                           </td>
                           <td>
-                            <button className="button-group bg-white">
+                            <button
+                              className={
+                                selectedSchedule &&
+                                selectedSchedule._id === schedule._id
+                                  ? "button-group bg-primary text-white" // Highlight the selected button
+                                  : "button-group bg-white"
+                              }
+                              onClick={() => setSelectedSchedule(schedule)} // Set selected schedule
+                            >
                               <p className="fw-bold my-0 status">SELECT</p>
                             </button>
                           </td>
@@ -85,10 +144,31 @@ export default function ChooseSchedule({ closeModal }) {
             </div>
           </div>
 
-          <div className="d-flex justify-content-center mt-3 gap-3">
-            <button onClick={handleClose} className="button-group bg-white">
-              <p className="fw-bold my-0 status">CANCEL</p>
-            </button>
+          <div className="d-flex justify-content-center">
+            <form className="container" onSubmit={handleSubmit}>
+              <p className="text-center">
+                What is your reason for rescheduling the current session?
+              </p>
+              <textarea
+                className="form-control"
+                aria-label="With textarea"
+                value={reason}
+                onChange={(e) => setReason(e.target.value)}
+                required
+              ></textarea>
+              {error && <p className="text-danger">{error}</p>}
+              {successMessage && (
+                <p className="text-success">{successMessage}</p>
+              )}
+              <div className="d-flex justify-content-center mt-3 gap-3">
+                <button type="submit" className="button-group bg-white">
+                  <p className="fw-bold my-0 status">SUBMIT</p>
+                </button>
+                <button onClick={handleClose} className="button-group bg-white">
+                  <p className="fw-bold my-0 status">CANCEL</p>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

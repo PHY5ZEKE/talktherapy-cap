@@ -1,17 +1,11 @@
-import "./modal.css";
+import React from "react";
+
 export default function ConfirmReschedule({
-  onClick,
   closeModal,
   openResched,
+  appointment,
 }) {
-  const handleClick = (e) => {
-    e.preventDefault();
-    onClick();
-  };
-
-  const handleResched = (e) => {
-    e.preventDefault();
-    onClick();
+  const handleResched = () => {
     closeModal();
     openResched();
   };
@@ -34,38 +28,29 @@ export default function ConfirmReschedule({
             <div className="row">
               <div className="col mb-3">
                 <p className="fw-bold mb-0">Date</p>
-                <p>July 4, 2024</p>
+                <p>{appointment?.selectedSchedule?.day}</p>
               </div>
 
               <div className="col">
                 <p className="fw-bold mb-0">Time</p>
-                <p>2:00 PM - 3:00 PM</p>
+                <p>
+                  {appointment?.selectedSchedule?.startTime} -{" "}
+                  {appointment?.selectedSchedule?.endTime}
+                </p>
               </div>
 
               <div className="col">
-                <p className="fw-bold mb-0">Session</p>
-                <p>Nicole Oraya</p>
+                <p className="fw-bold mb-0">Clinician</p>
+                <p>{appointment?.selectedSchedule?.clinicianName}</p>
               </div>
             </div>
-          </div>
-
-          <div className="d-flex justify-content-center">
-            <form className="container">
-              <p className="text-center">
-                What is your reason for rescheduling the current session?
-              </p>
-              <textarea
-                className="form-control"
-                aria-label="With textarea"
-              ></textarea>
-            </form>
           </div>
 
           <div className="d-flex justify-content-center mt-3 gap-3">
             <button onClick={handleResched} className="button-group bg-white">
               <p className="fw-bold my-0 status">RESCHEDULE</p>
             </button>
-            <button onClick={handleClick} className="button-group bg-white">
+            <button onClick={closeModal} className="button-group bg-white">
               <p className="fw-bold my-0 status">CANCEL</p>
             </button>
           </div>

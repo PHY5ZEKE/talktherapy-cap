@@ -355,7 +355,9 @@ export default function Home() {
                       <>
                         {appointments
                           .filter(
-                            (appointment) => appointment.status === "Pending"
+                            (appointment) =>
+                              appointment.status === "Pending" ||
+                              appointment.status === "Schedule Change Request"
                           )
                           .map((appointment, index) => (
                             <div
@@ -365,20 +367,28 @@ export default function Home() {
                               onClick={() => openModal(appointment._id)}
                             >
                               <h5 className="mb-0 fw-bold">
-                                {appointment.selectedSchedule.day}
+                                {appointment.status ===
+                                "Schedule Change Request"
+                                  ? appointment.newSchedule.day
+                                  : appointment.selectedSchedule.day}
                               </h5>
                               <p className="mb-0">
-                                {appointment.selectedSchedule.startTime} to{" "}
-                                {appointment.selectedSchedule.endTime}
+                                {appointment.status ===
+                                "Schedule Change Request"
+                                  ? `${appointment.newSchedule.startTime} to ${appointment.newSchedule.endTime}`
+                                  : `${appointment.selectedSchedule.startTime} to ${appointment.selectedSchedule.endTime}`}
                               </p>
                               <p className="mb-0">
-                                {appointment.patientId.firstName}{" "}
-                                {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName} has requested a
-                                session with{" "}
-                                {appointment.selectedSchedule.clinicianName}
+                                {appointment.status ===
+                                "Schedule Change Request"
+                                  ? "Ako na to has requested for a change in her schedule"
+                                  : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule.clinicianName}`}
                               </p>
-                              <div className="mb-3 text-pending">PENDING</div>
+                              <div className="mb-3 text-pending">
+                                {appointment.status === "Pending"
+                                  ? "PENDING"
+                                  : "SCHEDULE CHANGE REQUEST"}
+                              </div>
                             </div>
                           ))}
                         {appointments
@@ -430,12 +440,13 @@ export default function Home() {
                               <p className="mb-0">
                                 {appointment.patientId.firstName}{" "}
                                 {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName} has requested a
-                                session with{" "}
-                                {appointment.selectedSchedule.clinicianName}
+                                {appointment.patientId.lastName}
+                                session request with{" "}
+                                {appointment.selectedSchedule.clinicianName} was
+                                rejected
                               </p>
                               <div className="mb-3 text-cancelled">
-                                Cancelled
+                                Rejected
                               </div>
                             </div>
                           ))}

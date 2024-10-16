@@ -54,6 +54,9 @@ export default function BookSchedule() {
   const [isChoose, setIsChoose] = useState(false);
   const [isViewAppointment, setIsViewAppointment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [appointmentToReschedule, setAppointmentToReschedule] = useState(null); // New state
+  const [clinicianIdForReschedule, setClinicianIdForReschedule] =
+    useState(null); // New state
 
   const handleModal = (clinician, schedule) => {
     setSelectedClinician(clinician);
@@ -100,6 +103,12 @@ export default function BookSchedule() {
 
   const closeChooseScheduleModal = () => {
     setIsChoose(false);
+  };
+
+  const openConfirmRescheduleModal = (appointment) => {
+    setAppointmentToReschedule(appointment);
+    setClinicianIdForReschedule(appointment.selectedClinician); // Set the clinician ID for rescheduling
+    setIsConfirm(true);
   };
 
   useEffect(() => {
@@ -156,7 +165,7 @@ export default function BookSchedule() {
         const response = await fetch(`${appURL}/${route.appointment.get}`, {
           method: "GET",
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "application",
             Authorization: `Bearer ${token}`,
           },
         });
@@ -213,6 +222,12 @@ export default function BookSchedule() {
     [schedules]
   );
 
+  const onScheduleSelect = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsChoose(false);
+    handleSuccess("Schedule change request submitted successfully");
+  };
+
   return (
     <>
       {/* Book Appointment Modal */}
@@ -233,11 +248,19 @@ export default function BookSchedule() {
           onClick={closeConfirmModal}
           closeModal={closeConfirmModal}
           openResched={() => setIsChoose(true)}
+          appointment={appointmentToReschedule} // Pass the appointment details
         />
       )}
 
       {/* RESCHEDULE PAGE 2 MODAL */}
-      {isChoose && <ChooseSchedule closeModal={closeChooseScheduleModal} />}
+      {isChoose && (
+        <ChooseSchedule
+          closeModal={closeChooseScheduleModal}
+          clinicianId={clinicianIdForReschedule}
+          onScheduleSelect={onScheduleSelect}
+          appointment={appointmentToReschedule} // Pass the appointment details
+        />
+      )}
 
       {isViewAppointment && (
         <PatientViewAppointment
@@ -379,7 +402,8 @@ export default function BookSchedule() {
                       .filter(
                         (appointment) =>
                           appointment.status === "Pending" ||
-                          appointment.status === "Accepted"
+                          appointment.status === "Accepted" ||
+                          appointment.status === "Schedule Change Request"
                       )
                       .map((appointment, index) => (
                         <div
@@ -387,16 +411,21 @@ export default function BookSchedule() {
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
                           <h5 className="mb-0 fw-bold">
-                            {appointment.selectedSchedule.day}
+                            {appointment.status === "Schedule Change Request"
+                              ? appointment.newSchedule.day
+                              : appointment.selectedSchedule.day}
                           </h5>
                           <p className="fw-bold mb-0">
-                            {appointment.selectedSchedule.startTime} -
-                            {appointment.selectedSchedule.endTime}
+                            {appointment.status === "Schedule Change Request"
+                              ? `${appointment.newSchedule.startTime} - ${appointment.newSchedule.endTime}`
+                              : `${appointment.selectedSchedule.startTime} - ${appointment.selectedSchedule.endTime}`}
                           </p>
                           <h6 className=" mb-0">
                             Session with{" "}
                             <span className="fw-bold">
-                              {appointment.selectedSchedule.clinicianName}
+                              {appointment.status === "Schedule Change Request"
+                                ? appointment.newSchedule.clinicianName
+                                : appointment.selectedSchedule.clinicianName}
                             </span>
                           </h6>
                           <a
@@ -442,9 +471,38 @@ export default function BookSchedule() {
                               </div>
                               <div
                                 className="mb-3 fw-bold text-button border"
-                                onClick={() => setIsConfirm(true)}
+                                onClick={() =>
+                                  openConfirmRescheduleModal(appointment)
+                                }
                               >
-                                Cancel
+                                Change
+                              </div>
+                            </div>
+                          )}
+                          {/* IF SCHEDULE CHANGE REQUEST */}
+                          {appointment.status === "Schedule Change Request" && (
+                            <div className="row p-2 gap-3">
+                              <div className="mb-3 text-pending">
+                                FOR APPROVAL
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() =>
+                                  openConfirmRescheduleModal(appointment)
+                                }
+                              >
+                                Change
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() =>
+                                  joinMeeting(
+                                    appointment._id,
+                                    appointment.roomId
+                                  )
+                                }
+                              >
+                                Join Old Schedule
                               </div>
                             </div>
                           )}

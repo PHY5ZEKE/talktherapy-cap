@@ -62,6 +62,7 @@ export const route = {
     getById: "api/appointments-slp/get-appointment-by-id",
     updateStatus: "api/appointments-slp/update-status",
     getByClinician: "api/appointments-slp/get-appointment-by-clinician",
+    requestScheduleChange: "api/appointments-slp/request-schedule-change",
   },
   schedule: {
     create: "api/schedule-slp/add-schedule",

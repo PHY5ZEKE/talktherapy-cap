@@ -25,13 +25,21 @@ const appointmentSchema = new mongoose.Schema(
       ref: "Schedule",
       required: true,
     },
+    newSchedule: { type: mongoose.Schema.Types.ObjectId, ref: "Schedule" },
+    changeReason: { type: String },
     referralUpload: {
       type: String,
       required: true,
     },
     status: {
       type: String,
-      enum: ["Pending", "Accepted", "Rejected", "Completed"],
+      enum: [
+        "Pending",
+        "Accepted",
+        "Rejected",
+        "Completed",
+        "Schedule Change Request",
+      ],
       default: "Pending",
     },
     roomId: {

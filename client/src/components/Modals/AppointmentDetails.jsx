@@ -52,6 +52,7 @@ export default function AppointmentDetails({ openModal, appointment }) {
   const renderStatusButton = () => {
     switch (appointment.status) {
       case "Pending":
+      case "Schedule Change Request":
         return (
           <>
             <button
@@ -135,6 +136,22 @@ export default function AppointmentDetails({ openModal, appointment }) {
                 <p>{appointment.sourceOfReferral || "N/A"}</p>
               </div>
             </div>
+
+            {appointment.status === "Schedule Change Request" && (
+              <div className="row text-center">
+                <div className="col">
+                  <p className="fw-bold mb-0">New Schedule</p>
+                  <p>
+                    {appointment.newSchedule?.day || "N/A"}{" "}
+                    {appointment.newSchedule?.startTime || "N/A"} -{" "}
+                    {appointment.newSchedule?.endTime || "N/A"}
+                  </p>
+
+                  <p className="fw-bold mb-0">Reason for Reschedule</p>
+                  <p>{appointment.changeReason || "N/A"}</p>
+                </div>
+              </div>
+            )}
 
             <div className="col">
               <p className="fw-bold mb-0">Referral Upload</p>
