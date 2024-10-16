@@ -21,9 +21,11 @@ export default function ConfirmReschedule({
       <div className="modal-background">
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
-            <h3 className="fw-bold">Are you sure you want to cancel?</h3>
+            <h3 className="fw-bold">
+              Are you sure you want to change schedule?
+            </h3>
             <p className="mb-0">
-              You will be cancelling the appointment below.
+              The requested schedule will be subject for approval
             </p>
             <p>Please verify your transaction before proceeding.</p>
           </div>
@@ -50,7 +52,7 @@ export default function ConfirmReschedule({
           <div className="d-flex justify-content-center">
             <form className="container">
               <p className="text-center">
-                What is your reason for cancelling the session?
+                What is your reason for rescheduling the current session?
               </p>
               <textarea
                 className="form-control"

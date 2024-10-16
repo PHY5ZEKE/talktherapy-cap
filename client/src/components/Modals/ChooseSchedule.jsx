@@ -15,7 +15,7 @@ export default function ChooseSchedule({ closeModal }) {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
     const fetchSchedules = async () => {
       try {
-        const response = await fetch(`${appURL}/${route.schedule.get}`, {
+        const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -74,7 +74,7 @@ export default function ChooseSchedule({ closeModal }) {
                           </td>
                           <td>
                             <button className="button-group bg-white">
-                              <p className="fw-bold my-0 status">ACCEPT</p>
+                              <p className="fw-bold my-0 status">SELECT</p>
                             </button>
                           </td>
                         </tr>

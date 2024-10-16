@@ -3,11 +3,6 @@ import { route } from "../../utils/route";
 import axios from "axios";
 import { useState, useEffect } from "react";
 
-// Modal
-import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
-import ChooseSchedule from "../../components/Modals/ChooseSchedule";
-import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
-
 // UI Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/MenuDropdown";
@@ -17,20 +12,6 @@ import "../../styles/text.css";
 
 export default function Home() {
   const appURL = import.meta.env.VITE_APP_URL;
-
-  // Handle Confirm Reschedule Modal
-  const [isConfirm, setIsConfirm] = useState(false);
-  const closeModal = () => {
-    setIsConfirm(!isConfirm);
-  };
-
-  // Handle Choose Schedule Modal
-  const [isChoose, setIsChoose] = useState(false);
-  const closeSchedule = () => {
-    setIsChoose(!isChoose);
-  };
-
-  const [dateToday, setToday] = useState();
 
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -91,50 +72,21 @@ export default function Home() {
     navigate(`/room/${app}/${id}`);
   };
 
-  // Handle Appointment Details Modal
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState(null);
-
-  const openModal = async (appointmentId) => {
-    try {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
-      const response = await axios.get(
-        `${appURL}/${route.appointment.getById}/${appointmentId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log("Fetched appointment details:", response.data); // Debugging statement
-      setSelectedAppointment(response.data);
-      setIsOpen(true);
-    } catch (error) {
-      console.error("Error fetching appointment details:", error);
-    }
+  const getCurrentDate = () => {
+    const date = new Date();
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return date.toLocaleDateString(undefined, options);
   };
+
+  // Handle Appointment Details Modal
+
   return (
     <>
-      {/* RESCHEDULE PAGE 1 MODAL */}
-      {isConfirm && (
-        <ConfirmReschedule
-          onClick={closeModal}
-          closeModal={closeModal}
-          openResched={closeSchedule}
-        />
-      )}
-
-      {/* RESCHEDULE PAGE 2 MODAL */}
-      {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
-
-      {/* VIEW APPOINTMENT DETAILS MODAL */}
-      {isOpen && (
-        <PatientViewAppointment
-          closeModal={() => setIsOpen(false)}
-          appointment={selectedAppointment}
-        />
-      )}
-
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
           {/* SIDEBAR */}
@@ -156,8 +108,8 @@ export default function Home() {
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Today is </p>
-                    <p className="mb-0">Your Appointments</p>
+                    <p className="mb-0 fw-bold">Today is {getCurrentDate()} </p>
+                    <p className="mb-0">Your Appointment</p>
                   </div>
                 </div>
 
@@ -177,12 +129,7 @@ export default function Home() {
                       <div
                         key={appointment._id}
                         className="col bg-white border rounded-4 p-3 overflow-auto"
-                        style={{ maxHeight: "75vh"}}
-                        onClick={
-                          appointment.status === "Pending"
-                            ? () => openModal(appointment._id)
-                            : null
-                        }
+                        style={{ maxHeight: "75vh" }}
                       >
                         <div className="mb-3 border border-top-0 border-start-0 border-end-0">
                           <h5 className="mb-0 fw-bold">
@@ -213,12 +160,6 @@ export default function Home() {
                                   }
                                 >
                                   Join
-                                </div>
-                                <div
-                                  className="mb-3 fw-bold text-button border"
-                                  onClick={closeModal}
-                                >
-                                  Cancel
                                 </div>
                               </div>
                             </div>
