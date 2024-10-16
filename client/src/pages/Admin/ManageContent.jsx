@@ -1,17 +1,9 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
+
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
-
-// Icons
-import Sort from "../../assets/icons/Sort";
-import Edit from "../../assets/icons/Edit";
-import Delete from "../../assets/icons/Delete";
-import Search from "../../assets/icons/Search";
-
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 import AddContent from "../../components/Modals/AddContent";
 
 export default function ManageContent() {
@@ -57,195 +49,101 @@ export default function ManageContent() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
-        {/* MODAL */}
-        {isOpen && <AddContent closeModal={handleAdd} />}
+    <>
+      {/* ADD CONTENT MODAL */}
+      {isOpen && <AddContent closeModal={handleAdd} />}
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{adminData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-          {/* TOAL ADMINS */}
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="d-none d-lg-block">
-                  <p className="m-0 fw-bold">Manage Content</p>
-                  <p className="m-0">31 Materials Uploaded</p>
-                </div>
-
-                <button className="action-btn" onClick={handleAdd}>
-                  Add Content
-                </button>
-
-                <div className="d-flex align-items-center gap-2 search-bar d-none d-lg-block">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for content"
-                    className="search-input"
-                  />
-                </div>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : adminData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {adminData?.firstName} {adminData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
-              <Sort />
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto d-sm-block d-lg-none"
-          >
-            <div className="admin-left d-flex justify-content-center">
-              <div className="d-flex align-items-center gap-2 search-bar">
-                <Search />
-                <input
-                  type="text"
-                  placeholder="Search for content"
-                  className="search-input"
-                />
-              </div>
-            </div>
-          </Row>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <div className="d-flex gap-3">
+                      <div>
+                        <p className="mb-0 fw-bold">Exercises</p>
+                        <p className="mb-0">View exercises and follow along.</p>
+                      </div>
 
-          <Row lg md>
-            {/* PATIENTS */}
-            <Col lg className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="card-container d-flex flex-wrap align-items-center justify-content-start flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
+                      <button
+                        className="text-button border"
+                        onClick={handleAdd}
+                      >
+                        Add Content
+                      </button>
                     </div>
                   </div>
                 </div>
 
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                </div>
+                <div className="row p-3">
+                  <div
+                    className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ minHeight: "85vh" }}
+                  >
+                    <div
+                      className="card exercise-container"
+                      style={{ width: "18rem" }}
+                    >
+                      <img
+                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
+                        className="card-img-top"
+                        alt="..."
+                        style={{ height: "16rem", objectFit: "cover" }}
+                      />
+                      <div className="card-body">
+                        <h5 className="card-title fw-bold mb-0 text-truncate">
+                          Example Long Title Here For Test
+                        </h5>
+                        <p>Category</p>
 
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="card-content-bg-dark content-card">
-                  {/* IMAGE COMPONENT */}
-                  <div className="p-3">
-                    <div className="profile-img">
-                      <img src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    </div>
-                  </div>
-                  <div className="p-3">
-                    <h5 className="fw-bold mb-0">Video Title</h5>
-                    <h5 className="mb-0">Speech exercise description</h5>
-                    <p>Category</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
+                        <div className="d-flex gap-2">
+                          <div
+                            className="fw-bold text-button border"
+                            style={{ cursor: "pointer" }}
+                          >
+                            Edit
+                          </div>
+                          <div
+                            className="fw-bold text-button border"
+                            style={{ cursor: "pointer" }}
+                          >
+                            Delete
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

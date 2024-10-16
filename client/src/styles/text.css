@@ -43,19 +43,24 @@
   padding: 0.5em;
   text-align: center;
   border-radius: 25px;
-  color: #1C9DFF;
+  color: #1c9dff;
   background-color: #fff;
   cursor: pointer;
 }
 
 .text-danger {
-  color:#f44336;
+  color: #f44336;
   background-color: #ffdddd;
 }
 
 .text-success {
-  color:#4caf50;
+  color: #4caf50;
   background-color: #e4ffdd;
+}
+
+.text-warning {
+  color: #ffa500;
+  background-color: #fcf0db;
 }
 
 .text-header {

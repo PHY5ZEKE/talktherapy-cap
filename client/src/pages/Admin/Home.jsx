@@ -1,21 +1,11 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-
-// CSS
-import "./home.css";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import AppointmentDetails from "../../components/Modals/AppointmentDetails";
-
-// Icons
-import Logout from "../../assets/buttons/Logout";
-import HomeBtn from "../../assets/buttons/Home";
-import Sort from "../../assets/icons/Sort";
-import Search from "../../assets/icons/Search";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
+import EditProfile from "../../components/Modals/EditProfile";
 import { route } from "../../utils/route";
 
 export default function Home() {
@@ -27,7 +17,25 @@ export default function Home() {
   const [selectedUserType, setSelectedUserType] = useState("patients");
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  // Handle Edit Profile Modal
+  const [isOpen, setIsOpen] = useState(false);
+  const [role, setRole] = useState("");
+  const [userDetails, setUserDetails] = useState(null);
+  const [editProfileAPI, setEditProfileAPI] = useState("");
+
+  const handleModal = (user, role) => {
+    setIsOpen(!isOpen);
+    setUserDetails(user);
+    setRole(role);
+    if (role === "patientslp") {
+      setEditProfileAPI(route.admin.editPatient);
+    } else {
+      setEditProfileAPI(route.admin.editClinician);
+    }
+  };
 
   // Handle Appointment Details Modal
   const [isConfirm, setIsConfirm] = useState(false);
@@ -178,399 +186,446 @@ export default function Home() {
     (appointment) => appointment.status === "Accepted"
   ).length;
 
+  // Function to toggle activation status
+  const toggleClinicianStatus = async (userData) => {
+    if (!userData) return;
+
+    setIsProcessing(true); // Start processing
+
+    try {
+      const url = userData.active
+        ? `${appURL}/${route.clinician.removeClinician}`
+        : `${appURL}/${route.clinician.activateClinician}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({ email: userData.email }), // Automatically pass the selected clinician's email
+      });
+
+      const data = await response.json();
+
+      if (!data.error) {
+        // Optionally, update the clinicians list to reflect the change
+        setClinicians(
+          clinicians.map((clinician) =>
+            clinician._id === userData._id
+              ? { ...clinician, active: !userData.active }
+              : clinician
+          )
+        );
+      } else {
+        console.error("Failed to toggle clinician status:", data.message);
+      }
+    } finally {
+      setIsProcessing(false); // Stop processing
+    }
+  };
+
+  const togglePatientStatus = async (userData) => {
+    if (!userData) return;
+
+    setIsProcessing(true); // Start processing
+
+    try {
+      const url = userData.active
+        ? `${appURL}/${route.patient.deactivate}`
+        : `${appURL}/${route.patient.activate}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({ email: userData.email }), // Automatically pass the selected patient's email
+      });
+
+      const data = await response.json();
+
+      if (!data.error) {
+        // Optionally, update the patients list to reflect the change
+        setPatients(
+          patients.map((patient) =>
+            patient._id === userData._id
+              ? { ...patient, active: !userData.active }
+              : patient
+          )
+        );
+      } else {
+        console.error("Failed to toggle patient status:", data.message);
+      }
+    } finally {
+      setIsProcessing(false); // Stop processing
+    }
+  };
+
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* VIEW APPOINTMENT DETAILS MODAL */}
+      {isConfirm && (
+        <AppointmentDetails
+          openModal={closeModal}
+          appointment={selectedAppointment}
+        />
+      )}
 
-        {/* MODAL */}
-        {isConfirm && (
-          <AppointmentDetails
-            openModal={closeModal}
-            appointment={selectedAppointment}
-          />
-        )}
+      {/* EDIT PROFILE MODAL */}
+      {isOpen && (
+        <EditProfile
+          editProfileAPI={editProfileAPI}
+          editPictureAPI={""}
+          userDetails={userDetails}
+          closeModal={handleModal}
+          isOwner={false}
+          whatRole={role}
+        />
+      )}
 
-        {/* CONTENT */}
-        <Col xs={{ order: 12 }} lg={{ order: 1 }}>
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex flex-row justify-content-lg-start justify-content-md-around justify-content-sm-around align-items-center"
-          >
-            <div className="top-size">
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{adminData?.firstName || "Admin"}</p>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
+
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : adminData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {adminData?.firstName} {adminData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
+              </div>
+
+              <MenuDropdown />
             </div>
-            <div className="d-lg-none top-size">
-              <Logout />
-            </div>
-            <div className="d-lg-none top-size">
-              <HomeBtn />
-            </div>
-          </Row>
 
-          <Row lg md>
-            <Col lg className="height-responsive d-none d-lg-block">
-              {/* DATE COMPONENT */}
-              <div className="card-content-bg-light p-3 my-3 date-card">
-                <div className="d-flex flex-row justify-content-between g-1 mb-2">
-                  <div className="calendar-text">
-                    <p className="fw-bold mb-0">July</p>
-                    <p className="mb-0">Today is Friday, July 5, 2024</p>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Appointments</p>
+                    <p className="mb-0">See appointments</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <h6 className="text-center fw-bold">Total Appointments</h6>
+
+                    <div className="text-center border border-top-0 border-start-0 border-end-0 pb-3 mb-3 d-flex justify-content-center align-content-center gap-4">
+                      <div className="status-pending status-size">
+                        <h4 className="mb-0">{pendingAppointments}</h4>
+                        <p className="mb-0 fw-bold p-2 border rounded-3 text-warning">
+                          Pending
+                        </p>
+                      </div>
+                      <div className="status-cancelled status-size">
+                        <h4 className="mb-0">{rejectedAppointments}</h4>
+                        <p className="mb-0 fw-bold p-2 border rounded-3 text-danger">
+                          Rejected
+                        </p>
+                      </div>
+                      <div className="status-accepted status-size">
+                        <h4 className="mb-0">{acceptedAppointments}</h4>
+                        <p className="mb-0 fw-bold p-2 border rounded-3 text-success">
+                          Accepted
+                        </p>
+                      </div>
+                    </div>
+
+                    {error ? (
+                      <p>{error}</p>
+                    ) : appointments ? (
+                      <>
+                        {appointments
+                          .filter(
+                            (appointment) => appointment.status === "Pending"
+                          )
+                          .map((appointment, index) => (
+                            <div
+                              key={index}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => openModal(appointment._id)}
+                            >
+                              <h5 className="mb-0 fw-bold">
+                                {appointment.selectedSchedule.day}
+                              </h5>
+                              <p className="mb-0">
+                                {appointment.selectedSchedule.startTime} to{" "}
+                                {appointment.selectedSchedule.endTime}
+                              </p>
+                              <p className="mb-0">
+                                {appointment.patientId.firstName}{" "}
+                                {appointment.patientId.middleName}{" "}
+                                {appointment.patientId.lastName} has requested a
+                                session with{" "}
+                                {appointment.selectedSchedule.clinicianName}
+                              </p>
+                              <div className="mb-3 text-pending">PENDING</div>
+                            </div>
+                          ))}
+                        {appointments
+                          .filter(
+                            (appointment) => appointment.status === "Accepted"
+                          )
+                          .map((appointment, index) => (
+                            <div
+                              key={index}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => openModal(appointment._id)}
+                            >
+                              <h5 className="mb-0 fw-bold">
+                                {appointment.selectedSchedule.day}
+                              </h5>
+                              <p className="mb-0">
+                                {appointment.selectedSchedule.startTime} to{" "}
+                                {appointment.selectedSchedule.endTime}
+                              </p>
+                              <p className="mb-0">
+                                {appointment.patientId.firstName}{" "}
+                                {appointment.patientId.middleName}{" "}
+                                {appointment.patientId.lastName} has requested a
+                                session with{" "}
+                                {appointment.selectedSchedule.clinicianName}
+                              </p>
+                              <div className="mb-3 text-accepted">ACCEPTED</div>
+                            </div>
+                          ))}
+                        {appointments
+                          .filter(
+                            (appointment) => appointment.status === "Rejected"
+                          )
+                          .map((appointment, index) => (
+                            <div
+                              key={index}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => openModal(appointment._id)}
+                            >
+                              <h5 className="mb-0 fw-bold">
+                                {appointment.selectedSchedule.day}
+                              </h5>
+                              <p className="mb-0">
+                                {appointment.selectedSchedule.startTime} to{" "}
+                                {appointment.selectedSchedule.endTime}
+                              </p>
+                              <p className="mb-0">
+                                {appointment.patientId.firstName}{" "}
+                                {appointment.patientId.middleName}{" "}
+                                {appointment.patientId.lastName} has requested a
+                                session with{" "}
+                                {appointment.selectedSchedule.clinicianName}
+                              </p>
+                              <div className="mb-3 text-cancelled">
+                                Cancelled
+                              </div>
+                            </div>
+                          ))}
+                        {appointments
+                          .filter(
+                            (appointment) => appointment.status === "Completed"
+                          )
+                          .map((appointment, index) => (
+                            <div
+                              key={index}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => openModal(appointment._id)}
+                            >
+                              <h5 className="mb-0 fw-bold">
+                                {appointment.selectedSchedule.day}
+                              </h5>
+                              <p className="mb-0">
+                                {appointment.selectedSchedule.startTime} to{" "}
+                                {appointment.selectedSchedule.endTime}
+                              </p>
+                              <p className="mb-0">
+                                {appointment.patientId.firstName}{" "}
+                                {appointment.patientId.middleName}{" "}
+                                {appointment.patientId.lastName} has requested a
+                                session with{" "}
+                                {appointment.selectedSchedule.clinicianName}
+                              </p>
+                              <div className="mb-3 text-accepted">ACCEPTED</div>
+                            </div>
+                          ))}
+                      </>
+                    ) : (
+                      <p>Fetching data.</p>
+                    )}
                   </div>
                 </div>
               </div>
 
-              <div className="card-container d-flex flex-column gap-2">
-                <div className="text-center">
-                  <h5>Appointments</h5>
-                </div>
-
-                <div className="search-bar d-flex align-content-center gap-2">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="search-input"
-                  />
-                </div>
-
-                {/* STATUS COUNTER */}
-                <div className="text-center d-flex justify-content-center align-content-center gap-4">
-                  <div className="status-pending status-size">
-                    <h4 className="mb-0">{pendingAppointments}</h4>
-                    <p className="mb-0">Pending</p>
-                  </div>
-                  <div className="status-cancelled status-size">
-                    <h4 className="mb-0">{rejectedAppointments}</h4>
-                    <p className="mb-0">Rejected</p>
-                  </div>
-                  <div className="status-accepted status-size">
-                    <h4 className="mb-0">{acceptedAppointments}</h4>
-                    <p className="mb-0">Accepted</p>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Users</p>
+                    <p className="mb-0">
+                      View all users registered in the system.
+                    </p>
                   </div>
                 </div>
 
-                {/* APPOINTMENT COL */}
-                <div className="scrollable-div-3 d-flex flex-column gap-3">
-                  {/* PENDING COMPONENT */}
-                  {appointments
-                    .filter((appointment) => appointment.status === "Pending")
-                    .map((appointment, index) => (
-                      <div
-                        key={index}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-pending-2"
-                        onClick={() => openModal(appointment._id)}
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="d-flex justify-content-center gap-3 border border-top-0 border-start-0 border-end-0 mb-3 pb-3">
+                      <button
+                        className={`text-button border ${
+                          selectedUserType === "patients" ? "active" : ""
+                        }`}
+                        onClick={() => handleUserTypeChange("patients")}
                       >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} to{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-
-                        <p className="mb-0">
-                          {appointment.patientId.firstName}{" "}
-                          {appointment.patientId.middleName}{" "}
-                          {appointment.patientId.lastName} has requested a
-                          session with{" "}
-                          {appointment.selectedSchedule.clinicianName}
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          <p
-                            className="status-pending status-text status-text-orange"
-                            onClick={closeModal}
-                          >
-                            PENDING
-                          </p>
-                          <p className="fw-bold">
-                            Clinician:{" "}
-                            {appointment.selectedSchedule.clinicianName}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                  {/* ACCEPTED COMPONENT */}
-                  {appointments
-                    .filter((appointment) => appointment.status === "Accepted")
-                    .map((appointment, index) => (
-                      <div
-                        key={index}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
-                        onClick={() => openModal(appointment._id)}
+                        Patients
+                      </button>
+                      <button
+                        className={`text-button border ${
+                          selectedUserType === "clinicians" ? "active" : ""
+                        }`}
+                        onClick={() => handleUserTypeChange("clinicians")}
                       >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} to{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.patientId.firstName}{" "}
-                          {appointment.patientId.middleName}{" "}
-                          {appointment.patientId.lastName} is assigned to{" "}
-                          {appointment.selectedSchedule.clinicianName}
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          <p className="status-accepted status-text status-text-green">
-                            ACCEPTED
-                          </p>
-                          <p className="fw-bold">
-                            {appointment.selectedSchedule.clinicianName}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
+                        Clinicians
+                      </button>
+                    </div>
 
-                  {/* CANCELLED COMPONENT */}
-                  {appointments
-                    .filter((appointment) => appointment.status === "Rejected")
-                    .map((appointment, index) => (
-                      <div
-                        key={index}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-cancelled-2"
-                        onClick={() => openModal(appointment._id)}
-                      >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} -{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-                        <p className="mb-0">
-                          Session of{" "}
-                          {appointment.selectedSchedule.clinicianName} with{" "}
-                          {appointment.patientName} has started.
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          <p className="status-cancelled status-text status-text-red">
-                            CANCELLED
-                          </p>
-                          <p className="fw-bold">
-                            {appointment.selectedSchedule.clinicianName}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-
-                  {appointments
-                    .filter((appointment) => appointment.status === "Completed")
-                    .map((appointment, index) => (
-                      <div
-                        key={index}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
-                        onClick={() => openModal(appointment._id)}
-                      >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} -{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-                        <p className="mb-0">
-                          Session of{" "}
-                          {appointment.selectedSchedule.clinicianName} with{" "}
-                          {appointment.patientName} has started.
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          <p className="status-accepted status-text status-text-green">
-                            Completed
-                          </p>
-                          <p className="fw-bold">
-                            {appointment.selectedSchedule.clinicianName}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </Col>
-
-            {/* USER LIST */}
-            <Col lg className="height-responsive">
-              {/* DATE COMPONENT */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Users</h4>
-                <Sort />
-              </div>
-
-              <div className="d-flex justify-content-center gap-3 my-3">
-                <button
-                  className={`action-btn ${
-                    selectedUserType === "patients" ? "active" : ""
-                  }`}
-                  onClick={() => handleUserTypeChange("patients")}
-                >
-                  Patients
-                </button>
-                <button
-                  className={`action-btn ${
-                    selectedUserType === "clinicians" ? "active" : ""
-                  }`}
-                  onClick={() => handleUserTypeChange("clinicians")}
-                >
-                  Clinicians
-                </button>
-              </div>
-
-              <div className="d-flex flex-column gap-3 justify-content-between my-3 py-3 px-3 card-content-bg-light">
-                <div className="search-bar d-flex align-content-center gap-2">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder={`Search for ${selectedUserType}`}
-                    className="search-input"
-                  />
-                </div>
-
-                <div className="scrollable-div-4 d-flex flex-column gap-3">
-                  {selectedUserType === "patients" && patients
-                    ? patients.map((patient) => (
+                    {selectedUserType === "patients" && patients ? (
+                      patients.map((patient) => (
                         <div
                           key={patient._id}
-                          className="card-content-bg-dark p-3"
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <div className="d-flex flex-column g-1 mb-2">
-                            <p className="fw-bold mb-0 text-overflow">
-                              {patient.firstName} {patient.middleName}{" "}
-                              {patient.lastName}
-                            </p>
-                            <p className="mb-0">{patient.address}</p>
-                            <p className="mb-0">{patient.mobile}</p>
-                            <p className="mb-0">{patient.email}</p>
+                          <p className="mb-0 fw-bold">
+                            {patient.firstName} {patient.middleName}{" "}
+                            {patient.lastName}
+                          </p>
+                          <p className="mb-0">{patient.email}</p>
+                          <p className="mb-0">{patient.address}</p>
+                          <p className="mb-3">{patient.mobile}</p>
+
+                          <div className="d-flex gap-3">
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleModal(patient, "patientslp")}
+                            >
+                              Edit
+                            </div>
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                            >
+                              Delete
+                            </div>
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => togglePatientStatus(patient)}
+                              disabled={isProcessing}
+                            >
+                              {patient.active ? "Deactivate" : "Activate"}
+                            </div>
                           </div>
                         </div>
                       ))
-                    : selectedUserType === "clinicians" && clinicians
-                    ? clinicians.map((clinician) => (
+                    ) : selectedUserType === "clinicians" && clinicians ? (
+                      clinicians.map((clinician) => (
                         <div
                           key={clinician._id}
-                          className="card-content-bg-dark p-3"
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <div className="d-flex flex-column g-1 mb-2">
-                            <p className="fw-bold mb-0">
-                              {clinician.firstName} {clinician.middleName}{" "}
-                              {clinician.lastName}
-                            </p>
-                            <p className="mb-0">{clinician.address}</p>
-                            <p className="mb-0">{clinician.mobile}</p>
-                            <p className="mb-0">{clinician.email}</p>
+                          <p className="mb-0 fw-bold">
+                            {clinician.firstName} {clinician.middleName}{" "}
+                            {clinician.lastName}
+                          </p>
+                          <p className="mb-0">{clinician.email}</p>
+                          <p className="mb-0">{clinician.address}</p>
+                          <p className="mb-3">{clinician.mobile}</p>
+
+                          <div className="d-flex gap-3">
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                              onClick={() =>
+                                handleModal(clinician, "clinician")
+                              }
+                            >
+                              Edit
+                            </div>
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                            >
+                              Delete
+                            </div>
+                            <div
+                              className="mb-3 fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => toggleClinicianStatus(clinician)}
+                              disabled={isProcessing}
+                            >
+                              {clinician.active ? "Deactivate" : "Activate"}
+                            </div>
                           </div>
                         </div>
                       ))
-                    : null}
-                </div>
-              </div>
-            </Col>
-
-            {/* NOTIFCATION */}
-            <Col lg className="height-responsive">
-              <div className="my-3 py-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 card-text">Notifications</h4>
-              </div>
-
-              <div className="card-container d-flex flex-column gap-2 scrollable-div-5 notif-home">
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        Loading users.
+                      </h5>
+                    )}
                   </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+
+              {/* THIRD COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Notifications</p>
+                    <p className="mb-0">
+                      Account and system related activities will be shown here.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <p className="mb-0 fw-bold">Date and Time</p>
+                      <p className="mb-3">System activity.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

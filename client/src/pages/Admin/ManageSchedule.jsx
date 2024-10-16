@@ -1,15 +1,8 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { route } from "../../utils/route";
+
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
-
-// Icons
-import Sort from "../../assets/icons/Sort";
-import Edit from "../../assets/icons/Edit";
-import Delete from "../../assets/icons/Delete";
-import Search from "../../assets/icons/Search";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // DatePicker
 import { useState, useEffect } from "react";
@@ -69,6 +62,7 @@ export default function ManageSchedule() {
         const data = await response.json();
 
         if (!data.error) {
+          console.log(data.clinicians)
           setClinicians(data.clinicians);
         } else {
           console.error("Failed to fetch clinicians:", data.message);
@@ -82,188 +76,143 @@ export default function ManageSchedule() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{adminData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
-
-          {/* TOAL ADMINS */}
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="d-flex justify-content-center align-items-center">
-                  <p className="m-0 fw-bold">Manage Schedule</p>
-                </div>
-
-                <div className="d-flex align-items-center gap-2 search-bar d-none d-lg-block">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for clinician"
-                    className="search-input"
-                  />
-                </div>
-              </div>
-
-              <Sort />
-            </div>
-          </Row>
-
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto d-sm-block d-lg-none"
-          >
-            <div className="admin-left d-flex justify-content-center">
-              <div className="d-flex align-items-center gap-2 search-bar">
-                <Search />
-                <input
-                  type="text"
-                  placeholder="Search for content"
-                  className="search-input"
-                />
-              </div>
-            </div>
-          </Row>
-
-          <Row lg md>
-            {/* CLINICIAN LIST */}
-            <Col lg className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="card-container d-flex flex-wrap align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                {clinicians && clinicians.length > 0 ? (
-                  clinicians.map((clinician) => (
-                    <div
-                      key={clinician._id}
-                      className="card-content-bg-dark w-100 p-3"
-                    >
-                      <div className="d-flex flex-column g-1 mb-2">
-                        <p className="fw-bold mb-0">
-                          {clinician.firstName} {clinician.middleName}{" "}
-                          {clinician.lastName}
-                        </p>
-                        <p className="mb-0">{clinician.clinicAddress}</p>
-                        <p className="mb-0">{clinician.contactNumber}</p>
-                      </div>
-                    </div>
-                  ))
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : adminData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {adminData?.firstName} {adminData?.lastName}
+                    </p>
+                  </>
                 ) : (
-                  <p>No clinicians available.</p>
+                  <p>Fetching data.</p>
                 )}
               </div>
-            </Col>
 
-            {/* CALENDAR */}
-            <Col lg>
-              <div className="w-100 d-flex justify-content-center">
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  inline
-                />
-              </div>
-            </Col>
+              <MenuDropdown />
+            </div>
 
-            {/* PREVIEW SCHEDULE */}
-            <Col lg>
-              <div className="card-container d-flex flex-wrap align-items-center flex-row scrollable-div-5 notif-home">
-                <div className="p-3 w-100">
-                  <h4 className="fw-bold mb-0">Keila Santiagos Schedule</h4>
-                  <p className="mb-0">July 4, 2024</p>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Pick a Date</p>
+                    <p className="mb-0">
+                      Select a date to view available clinician schedules.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="d-flex justify-content-around align-items-center w-100 p-2 border-top border-bottom">
-                  <div className="w-50">
-                    <h5 className="fw-bold mb-0">12:30 PM - 1:30 PM</h5>
-                    <p>July 4, 2024</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                  <p className="status-accepted status-text status-text-green text-center">
-                    PENDING
-                  </p>
-                </div>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <select
+                        className="form-select form-select-lg mb-3"
+                        aria-label=".form-select-lg example"
+                      >
+                        <option value="" disabled selected>
+                          Specialization
+                        </option>
+                        <option value="Aphasia">Aphasia</option>
+                        <option value="Stroke">Stroke</option>
+                      </select>
 
-                <div className="d-flex justify-content-around align-items-center w-100 p-2 border-top border-bottom">
-                  <div className="w-50">
-                    <h5 className="fw-bold mb-0">12:30 PM - 1:30 PM</h5>
-                    <p>July 4, 2024</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
+                      <DatePicker selected={startDate} inline />
                     </div>
                   </div>
-                  <p className="status-accepted status-text status-text-green text-center">
-                    PENDING
-                  </p>
-                </div>
-                <div className="d-flex justify-content-around align-items-center w-100 p-2 border-top border-bottom">
-                  <div className="w-50">
-                    <h5 className="fw-bold mb-0">12:30 PM - 1:30 PM</h5>
-                    <p>July 4, 2024</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                  <p className="status-accepted status-text status-text-green text-center">
-                    PENDING
-                  </p>
-                </div>
-                <div className="d-flex justify-content-around align-items-center w-100 p-2 border-top border-bottom">
-                  <div className="w-50">
-                    <h5 className="fw-bold mb-0">12:30 PM - 1:30 PM</h5>
-                    <p>July 4, 2024</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                  <p className="status-accepted status-text status-text-green text-center">
-                    PENDING
-                  </p>
-                </div>
-                <div className="d-flex justify-content-around align-items-center w-100 p-2 border-top border-bottom">
-                  <div className="w-50">
-                    <h5 className="fw-bold mb-0">12:30 PM - 1:30 PM</h5>
-                    <p>July 4, 2024</p>
-                    <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                      <Edit />
-                      <Delete />
-                    </div>
-                  </div>
-                  <p className="status-accepted status-text status-text-green text-center">
-                    PENDING
-                  </p>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">List of Clinicians</p>
+                    <p className="mb-0">
+                      Click a clinician to view their schedule.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {clinicians && clinicians.length > 0 ? (
+                      clinicians.map((clinician) => (
+                        <div
+                          key={clinician._id}
+                          className="d-flex justify-content-start align-items-center w-100 p-2 border-top-0 border-bottom"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <div className="w-100">
+                            <h5 className="fw-bold mb-0">
+                              {clinician.firstName} {clinician.middleName}{" "}
+                              {clinician.lastName}
+                            </h5>
+                            <h6 className="fw-bold mb-0">
+                              {clinician.address}
+                            </h6>
+                            <p className="mb-0">{clinician.email}</p>
+                            <p className="mb-0">{clinician.mobile}</p>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        No clinicians loaded.
+                      </h5>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* THIRD COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Your Appointments</p>
+                    <p className="mb-0">View the status of your appointment.</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">DAY</h5>
+                      <p className="fw-bold mb-0">TIME</p>
+                      <p className=" mb-0">
+                        Session with{" "}
+                        <span className="fw-bold">clinician name</span>
+                      </p>
+                      <p>Status: </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

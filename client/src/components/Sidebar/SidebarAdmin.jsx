@@ -1,62 +1,56 @@
-import Col from "react-bootstrap/Col";
+// UI Components
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faHouse,
+  faPhotoFilm,
+  faCalendar,
+  faGear,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 
-// CSS
-import "./sidebar.css";
-import "../../styles/containers.css";
-import "../../styles/text.css";
-import "../../styles/button.css";
-import "../../styles/images.css";
-import "../../assets/buttons/action-btn.css";
-import "../../assets/buttons/icon-btn.css";
-import "../../assets/icons/icon-display.css";
+import { Link, useNavigate } from "react-router-dom";
 
-// Icons
-import Users from "../../assets/buttons/Users";
-import Settings from "../../assets/buttons/Settings";
-import Logout from "../../assets/buttons/Logout";
-import Content from "../../assets/buttons/Content";
-import Calendar from "../../assets/buttons/Calendar";
-import Home from "../../assets/buttons/Home";
+import { page } from "../../utils/page-route";
 
 export default function Sidebar() {
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear the authentication token and user information from local storage
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userRole");
+
+    // Redirect to the login page
+    navigate("/login");
+  };
+
   return (
-    <Col
-      xs={{ order: 1 }}
-      lg={{ order: 1, span: 1 }}
-      className="border justify-content-center border-1 border-[#B9B9B9] sidebar d-flex flex-column
-      justify-content-lg-between align-items-center p-2 height-responsive"
-    >
-      <div className="d-flex flex-lg-column align-items-center gap-3 flex-sm-row">
-        <div className="d-flex flex-lg-column text-center mt-3">
-          <a href="/admin">
-            <p className="d-none d-lg-block text-primary fw-bolder my-0">
-              TALK
-            </p>
-            <p className="d-none d-lg-block text-primary fw-bolder my-0">
-              THERAPY
-            </p>
-          </a>
-        </div>
-        <a href="/admin">
-          <Home />
-        </a>
-        <a href="/admin/users">
-          <Users />
-        </a>
-        <a href="/admin/content">
-          <Content />
-        </a>
-        <a href="/admin/schedule">
-          <Calendar />
-        </a>
-        <a href="/admin/profile">
-          <Settings />
-        </a>
+    <div className="d-none d-md-flex flex-column gap-3 text-center h-100 bg-white p-3">
+      <div className="my-3 ">
+        <Link to={page.admin.home} className="text-link">
+          <p className="mb-0 fw-bold d-block ">TALK</p>
+          <p className="my-0 fw-bold d-block">THERAPY</p>
+        </Link>
       </div>
 
-      <div className="d-none d-lg-block">
-        <Logout />
+      <div className="d-flex flex-column gap-5 mb-auto text-link">
+        <Link to={page.admin.home} className="text-link">
+          <FontAwesomeIcon icon={faHouse} size="xl" />
+        </Link>
+        <Link to={page.admin.content} className="text-link">
+          <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
+        </Link>
+        <Link to={page.admin.schedule} className="text-link">
+          <FontAwesomeIcon icon={faCalendar} size="xl" />
+        </Link>
+        <Link to={page.admin.profile} className="text-link">
+          <FontAwesomeIcon icon={faGear} size="xl" />
+        </Link>
       </div>
-    </Col>
+
+      <div className="my-3 text-link" style={{cursor: "pointer"}} onClick={handleLogout}>
+        <FontAwesomeIcon icon={faRightFromBracket} size="xl" />
+      </div>
+    </div>
   );
 }

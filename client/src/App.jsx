@@ -24,7 +24,6 @@ import SuperAdminAudit from "./pages/SuperAdmin/AuditLogs";
 
 // Admin TalkTherapy
 import AdminHome from "./pages/Admin/Home";
-import AdminUsers from "./pages/Admin/ManageUsers";
 import AdminContent from "./pages/Admin/ManageContent";
 import AdminSchedule from "./pages/Admin/ManageSchedule";
 import AdminArchival from "./pages/Admin/Archival";
@@ -154,14 +153,6 @@ const routes = (
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminHome />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminUsers />
           </PrivateRoute>
         }
       />

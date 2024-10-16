@@ -1,18 +1,17 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import React, { useState, useEffect } from "react";
-import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
+
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 
 // Utils
 import { route } from "../../utils/route";
+import { page } from "../../utils/page-route"
 
 export default function Profile() {
   const [adminData, setAdminData] = useState(null);
@@ -62,99 +61,131 @@ export default function Profile() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* EDIT MODAL */}
+      {/* EDIT MODAL */}
+      {isOpen && (
+        <EditProfile
+          editProfileAPI={route.admin.edit}
+          editPictureAPI={route.admin.picture}
+          userDetails={adminData}
+          closeModal={handleModal}
+          isOwner={true}
+          onProfileUpdate={fetchAdminData} // Pass the callback function
+        />
+      )}
 
-        {/* EDIT MODAL */}
-        {isOpen && (
-          <EditProfile
-            editProfileAPI={route.admin.edit}
-            editPictureAPI={route.admin.picture}
-            userDetails={adminData}
-            closeModal={handleModal}
-            isOwner={true}
-            onProfileUpdate={fetchAdminData} // Pass the callback function
-          />
-        )}
+      {/* CHANGE PASS MODAL */}
+      {isPasswordModalOpen && (
+        <ChangePassword
+          editPasswordAPI={route.admin.password}
+          closeModal={handlePasswordModal}
+        />
+      )}
 
-        {/* CHANGE PASS MODAL */}
-        {isPasswordModalOpen && (
-          <ChangePassword
-            editPasswordAPI={route.admin.password}
-            closeModal={handlePasswordModal}
-          />
-        )}
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col xs={{ order: 12 }} lg={{ order: 1 }}>
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{adminData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
-
-          <Row lg md>
-            {/* YOUR PROFILE */}
-            <Col lg className="height-responsive full-height">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Your Profile</h4>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : adminData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {adminData?.firstName} {adminData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
-              <div className="card-container d-flex flex-column gap-2 notif-home">
-                {/* IMAGE COMPONENT */}
-                <div className="p-3">
-                  <div className="profile-img">
-                    <img src={adminData?.profilePicture} alt="Profile" />
+              <MenuDropdown />
+            </div>
+
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Your Profile</p>
+                    <p className="mb-0">Make changes to your profile.</p>
                   </div>
                 </div>
 
-                {/* NOTIFICATION COMPONENT */}
-                <div className="d-flex flex-column g-1 mb-2 mx-3">
-                  <h3 className="fw-bold mb-0">
-                    {adminData?.firstName} {""}
-                    {adminData?.middleName} {""}
-                    {adminData?.lastName}
-                  </h3>
-                  <p className="mb-0">{adminData?.address}</p>
-                  <p className="mb-0">{adminData?.mobile}</p>
-                  <p className="mb-0">{adminData?.email}</p>
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                    <div className="card">
+                      <img
+                        src={adminData?.profilePicture}
+                        className="card-img-top"
+                        alt="Profile picture"
+                        style={{ maxHeight: "320px", objectFit: "cover" }}
+                      />
+                      <div className="card-body">
+                        <h5 className="">
+                          {adminData?.firstName} {adminData?.middleName}{" "}
+                          {adminData?.lastName}
+                        </h5>
+                        <p className="mb-0">{adminData?.address}</p>
+                        <p className="mb-0">{adminData?.mobile}</p>
+                        <p className="mb-0">{adminData?.email}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Col>
 
-            {/* ACTIONS */}
-            <Col lg className="height-responsive">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Actions</h4>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Actions</p>
+                    <p className="mb-0">Perform account changes.</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+
+                    <Link to={page.admin.archival}>
+                      <div className="mb-3 fw-bold text-button border w-100">
+                        Archival
+                      </div>
+                    </Link>
+
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handleModal}
+                    >
+                      Edit Profile
+                    </div>
+
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handlePasswordModal}
+                    >
+                      Change Password
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="card-container d-flex justify-content-center align-items-center flex-column gap-2 scrollable-div notif-home">
-                {/* BUTTONS */}
-                <a href="/admin/archival">
-                  <button className="action-btn">Data Archival</button>
-                </a>
-                <button className="action-btn" onClick={handleModal}>
-                  Edit Profile
-                </button>
-                <button className="action-btn" onClick={handlePasswordModal}>
-                  Change Password
-                </button>
-              </div>
-            </Col>
-
-            <Col lg></Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+              {/* THIRD COL */}
+              <div className="col-sm bg-white"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

@@ -13,5 +13,12 @@ export const page = {
         book: "/patient/book",
         profile: "/patient/profile"
     },
+    admin: {
+        home: "/admin",
+        content: "/admin/content",
+        schedule: "/admin/schedule",
+        profile: "/admin/profile",
+        archival: "/admin/archival"
+    }
   };
   
