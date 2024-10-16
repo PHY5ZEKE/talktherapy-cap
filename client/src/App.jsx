@@ -57,7 +57,7 @@ import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
 // Test Layout
-import Layout from "./pages/Patient/Home";
+import Layout from "./pages/System/Register";
 import Home2 from './pages/Patient/Home'
 
 const routes = (
