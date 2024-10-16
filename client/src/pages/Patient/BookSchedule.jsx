@@ -7,6 +7,7 @@ import { route } from "../../utils/route";
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import JoinAppointment from "../../components/Modals/JoinAppointment";
 import MenuDropdown from "../../components/Layout/MenuDropdown";
+import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
 import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 
@@ -50,21 +51,14 @@ export default function BookSchedule() {
 
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
-  const closeModal = () => {
-    setIsConfirm(!isConfirm);
-  };
-
-  // Handle Choose Schedule Modal
   const [isChoose, setIsChoose] = useState(false);
-  const closeSchedule = () => {
-    setIsChoose(!isChoose);
-  };
-
+  const [isViewAppointment, setIsViewAppointment] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const handleModal = (clinician, schedule) => {
     setSelectedClinician(clinician);
     setSelectedSchedule(schedule);
-    setIsOpen(!isOpen);
+    setIsOpen(true);
   };
 
   const handleSuccess = (message) => {
@@ -88,6 +82,24 @@ export default function BookSchedule() {
   const joinMeeting = (app, id) => {
     console.log("Joining meeting with ID:", id);
     navigate(`/room/${app}/${id}`);
+  };
+
+  const handleAppointmentClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsViewAppointment(true);
+  };
+
+  const closeViewAppointmentModal = () => {
+    setIsViewAppointment(false);
+    setSelectedAppointment(null);
+  };
+
+  const closeConfirmModal = () => {
+    setIsConfirm(false);
+  };
+
+  const closeChooseScheduleModal = () => {
+    setIsChoose(false);
   };
 
   useEffect(() => {
@@ -211,20 +223,29 @@ export default function BookSchedule() {
           selectedSchedule={selectedSchedule}
           patientId={patientData?._id}
           onSuccess={handleSuccess}
+          closeModal={() => setIsOpen(false)}
         />
       )}
 
       {/* RESCHEDULE PAGE 1 MODAL */}
       {isConfirm && (
         <ConfirmReschedule
-          onClick={closeModal}
-          closeModal={closeModal}
-          openResched={closeSchedule}
+          onClick={closeConfirmModal}
+          closeModal={closeConfirmModal}
+          openResched={() => setIsChoose(true)}
         />
       )}
 
       {/* RESCHEDULE PAGE 2 MODAL */}
-      {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
+      {isChoose && <ChooseSchedule closeModal={closeChooseScheduleModal} />}
+
+      {isViewAppointment && (
+        <PatientViewAppointment
+          openModal={handleAppointmentClick}
+          appointment={selectedAppointment}
+          closeModal={closeViewAppointmentModal}
+        />
+      )}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -378,50 +399,54 @@ export default function BookSchedule() {
                               {appointment.selectedSchedule.clinicianName}
                             </span>
                           </h6>
+                          <a
+                            href="#"
+                            className="text-primary"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleAppointmentClick(appointment);
+                            }}
+                          >
+                            View Appointment Details
+                          </a>
 
                           {/* IF PENDING */}
                           {appointment.status === "Pending" && (
-                            <>
-                              <div className="row p-2">
-                                <div className="d-flex justify-content-between flex-wrap gap-3">
-                                  <div className="mb-3 text-pending">
-                                    PENDING
+                            <div className="row p-2">
+                              <div className="d-flex justify-content-between flex-wrap gap-3">
+                                <div className="mb-3 text-pending">PENDING</div>
+                                <div className="d-flex gap-3">
+                                  <div className="mb-3 fw-bold text-button border">
+                                    Edit
                                   </div>
-                                  <div className="d-flex gap-3">
-                                    <div className="mb-3 fw-bold text-button border">
-                                      Edit
-                                    </div>
-                                    <div className="mb-3 fw-bold text-button border">
-                                      Cancel
-                                    </div>
+                                  <div className="mb-3 fw-bold text-button border">
+                                    Cancel
                                   </div>
                                 </div>
                               </div>
-                            </>
+                            </div>
                           )}
                           {/* IF ACCEPTED */}
                           {appointment.status === "Accepted" && (
-                            <>
-                              <div className="row p-2 gap-3">
-                                <div
-                                  className="mb-3 fw-bold text-button border"
-                                  onClick={() =>
-                                    joinMeeting(
-                                      appointment._id,
-                                      appointment.roomId
-                                    )
-                                  }
-                                >
-                                  Join
-                                </div>
-                                <div
-                                  className="mb-3 fw-bold text-button border"
-                                  onClick={closeModal}
-                                >
-                                  Cancel
-                                </div>
+                            <div className="row p-2 gap-3">
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() =>
+                                  joinMeeting(
+                                    appointment._id,
+                                    appointment.roomId
+                                  )
+                                }
+                              >
+                                Join
                               </div>
-                            </>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() => setIsConfirm(true)}
+                              >
+                                Cancel
+                              </div>
+                            </div>
                           )}
                         </div>
                       ))}

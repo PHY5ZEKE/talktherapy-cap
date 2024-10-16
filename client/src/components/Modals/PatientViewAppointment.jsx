@@ -39,63 +39,53 @@ export default function PatientViewAppointment({
             </div>
           )}
 
-        <div className="container text-center">
-          <form>
+          <div className="container text-center">
             <div className="row text-center">
-              <label className="fw-bold mt-3 mb-0" htmlFor="patientName">Patient Name</label>
-              <p>
-                {appointment.patientId.firstName}{" "}
-                {appointment.patientId.middleName}{" "}
-                {appointment.patientId.lastName}
-              </p>
-            </div>
-        
-            <div className="row text-center">
-              <label className="fw-bold mt-3 mb-0" htmlFor="appointmentDate">Date</label>
+              <label className="fw-bold mt-3 mb-0" htmlFor="appointmentDate">
+                Date
+              </label>
               <p>
                 {appointment.selectedSchedule?.day || "N/A"}{" "}
                 {appointment.selectedSchedule?.startTime || "N/A"} -{" "}
                 {appointment.selectedSchedule?.endTime || "N/A"}
               </p>
             </div>
-        
+
             <div className="row text-center">
               <div className="col">
-                <label className="fw-bold mb-0" htmlFor="clinician">Clinician</label>
+                <label className="fw-bold mb-0" htmlFor="clinician">
+                  Clinician
+                </label>
                 <div>
                   <p className="">
                     {appointment.selectedSchedule?.clinicianName || "N/A"}
                   </p>
                 </div>
-        
+
                 <div>
-                  <label className="fw-bold mb-0" htmlFor="status">Status</label>
+                  <label className="fw-bold mb-0" htmlFor="status">
+                    Status
+                  </label>
                   <p>{appointment.status || "N/A"}</p>
                 </div>
               </div>
-        
+
               <div className="col">
-                <label className="fw-bold mb-0" htmlFor="chiefComplaint">Chief Complaint</label>
-                <input
-                  type="text"
-                  id="chiefComplaint"
-                  name="chiefComplaint"
-                  defaultValue={appointment.chiefComplaint || "N/A"}
-                  className="form-control"
-                />
-                <label className="fw-bold mb-0" htmlFor="sourceOfReferral">Source of Referral</label>
-                <input
-                  type="text"
-                  id="sourceOfReferral"
-                  name="sourceOfReferral"
-                  defaultValue={appointment.sourceOfReferral || "N/A"}
-                  className="form-control"
-                />
+                <label className="fw-bold mb-0" htmlFor="chiefComplaint">
+                  Chief Complaint
+                </label>
+                <p>{appointment.chiefComplaint || "N/A"}</p>
+                <label className="fw-bold mb-0" htmlFor="sourceOfReferral">
+                  Source of Referral
+                </label>
+                <p>{appointment.sourceOfReferral || "N/A"}</p>
               </div>
             </div>
-        
+
             <div className="col">
-              <label className="fw-bold mb-0" htmlFor="referralUpload">Referral Upload</label>
+              <label className="fw-bold mb-0" htmlFor="referralUpload">
+                Referral Upload
+              </label>
               {appointment.referralUpload ? (
                 <a
                   href={appointment.referralUpload}
@@ -109,13 +99,9 @@ export default function PatientViewAppointment({
                 <p>None</p>
               )}
             </div>
-          </form>
-        </div>
+          </div>
 
           <div className="d-flex justify-content-center mt-3 gap-3">
-            <button className="button-group bg-white">
-              <p className="fw-bold my-0 status">Save</p>
-            </button>
             <button onClick={handleClose} className="button-group bg-white">
               <p className="fw-bold my-0 status">Close</p>
             </button>
