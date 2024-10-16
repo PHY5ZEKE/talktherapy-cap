@@ -59,14 +59,14 @@ export default function AppointmentDetailsClinician({
           <>
             <button
               onClick={() => updateStatus("Accepted")}
-              className="button-group bg-white"
+              className="text-button border"
               disabled={loading}
             >
               <p className="fw-bold my-0 status">Accept</p>
             </button>
             <button
               onClick={() => updateStatus("Rejected")}
-              className="button-group bg-white"
+              className="text-button border"
               disabled={loading}
             >
               <p className="fw-bold my-0 status">Reject</p>
@@ -77,7 +77,7 @@ export default function AppointmentDetailsClinician({
         return (
           <button
             onClick={() => updateStatus("Completed")}
-            className="button-group bg-white"
+            className="text-button border"
             disabled={loading}
           >
             <p className="fw-bold my-0 status">Complete</p>
@@ -168,7 +168,7 @@ export default function AppointmentDetailsClinician({
 
           <div className="d-flex justify-content-center mt-3 gap-3">
             {renderStatusButton()}
-            <button onClick={handleClose} className="button-group bg-white">
+            <button onClick={handleClose} className="text-button border">
               <p className="fw-bold my-0 status">Close</p>
             </button>
           </div>

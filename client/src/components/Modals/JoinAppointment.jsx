@@ -179,13 +179,10 @@ export default function JoinAppointment({
                 </Form.Group>
 
                 <div className="d-flex justify-content-center mt-3 gap-3">
-                  <button type="submit" className="button-group bg-white">
+                  <button type="submit" className="text-button border">
                     <p className="fw-bold my-0 status">BOOK</p>
                   </button>
-                  <button
-                    onClick={handleClose}
-                    className="button-group bg-white"
-                  >
+                  <button onClick={handleClose} className="text-button border">
                     <p className="fw-bold my-0 status">CANCEL</p>
                   </button>
                 </div>

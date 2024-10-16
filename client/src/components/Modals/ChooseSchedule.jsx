@@ -144,31 +144,10 @@ export default function ChooseSchedule({
             </div>
           </div>
 
-          <div className="d-flex justify-content-center">
-            <form className="container" onSubmit={handleSubmit}>
-              <p className="text-center">
-                What is your reason for rescheduling the current session?
-              </p>
-              <textarea
-                className="form-control"
-                aria-label="With textarea"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-                required
-              ></textarea>
-              {error && <p className="text-danger">{error}</p>}
-              {successMessage && (
-                <p className="text-success">{successMessage}</p>
-              )}
-              <div className="d-flex justify-content-center mt-3 gap-3">
-                <button type="submit" className="button-group bg-white">
-                  <p className="fw-bold my-0 status">SUBMIT</p>
-                </button>
-                <button onClick={handleClose} className="button-group bg-white">
-                  <p className="fw-bold my-0 status">CANCEL</p>
-                </button>
-              </div>
-            </form>
+          <div className="d-flex justify-content-center mt-3 gap-3">
+            <button onClick={handleClose} className="button-group bg-white">
+              <p className="fw-bold my-0 status">CANCEL</p>
+            </button>
           </div>
         </div>
       </div>

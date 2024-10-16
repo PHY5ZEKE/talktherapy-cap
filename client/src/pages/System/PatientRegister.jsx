@@ -2,26 +2,32 @@ import { Link } from "react-router-dom";
 import { route } from "../../utils/route.js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRef } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
-export default function AdminRegister() {
+export default function ClinicianRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
-    address: "",
     email: "",
     password: "",
     confPassword: "",
     mobile: "",
+    birthday: "",
+    diagnosis: "",
+    consent: "",
   });
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
-  const appURL = import.meta.env.VITE_APP_URL;
 
-  const navigate = useNavigate();
+  const datePickerRef = useRef(null);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -29,6 +35,12 @@ export default function AdminRegister() {
 
   const toggleConfPasswordVisibility = () => {
     setShowConfPassword(!showConfPassword);
+  };
+
+  const navigate = useNavigate();
+
+  const handleIconClick = () => {
+    datePickerRef.current.setFocus();
   };
 
   const handleChange = (e) => {
@@ -47,10 +59,12 @@ export default function AdminRegister() {
       middleName,
       lastName,
       email,
-      address,
       password,
       confPassword,
       mobile,
+      birthday,
+      diagnosis,
+      consent,
     } = formData;
 
     if (password !== confPassword) {
@@ -64,18 +78,20 @@ export default function AdminRegister() {
       middleName,
       lastName,
       email,
-      address,
       password,
       mobile,
+      birthday,
+      diagnosis,
+      consent: consent === "yes",
     };
 
     try {
-      const response = await fetch(`${appURL}/${route.admin.signup}`, {
+      const response = await fetch(`${appURL}/${route.clinician.signup}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(submissionData),
+        body: JSON.stringify({ submissionData, birthday: selectedDate }),
       });
 
       const result = await response.json();
@@ -101,9 +117,8 @@ export default function AdminRegister() {
         </nav>
       </div>
 
-      <div className="row flex-grow-1">
-        {/* Left section: Hidden on small screens, visible on medium+ */}
-        <div className="col-12 col-md-6 d-none d-md-block p-3">
+      <div className="row h-100">
+        <div className="col d-none d-md-block p-3">
           <div className="w-75 mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
             <h1 className="fw-boldest">TalkTherapy</h1>
             <h3 className="fw-boldest">Rehabilitation in your hands.</h3>
@@ -114,16 +129,15 @@ export default function AdminRegister() {
           </div>
         </div>
 
-        {/* Right section: Form */}
-        <div className="col-12 col-md-6 my-auto p-3">
+        <div className="col my-auto p-3">
           <form
-            className="bg-white form-container rounded-4 mx-auto w-100 w-md-75 p-3 p-md-4"
+            className="bg-white form-container rounded-4 mx-auto w-100 p-3"
             onSubmit={handleSubmit}
           >
-            <h4 className="fw-bold text-center mb-2">Register</h4>
-            <p className="text-center">Please fill out all fields.</p>
+            <h4 className="fw-bold text-center mb-0">Register</h4>
+            <p className="text-center"> Please fill out all fields.</p>
 
-            <h6 className="fw-bold">Basic Information</h6>
+            <h6>Basic Information</h6>
             <div className="input-group mb-3">
               <span className="input-group-text">First Name</span>
               <input
@@ -161,48 +175,80 @@ export default function AdminRegister() {
               />
             </div>
 
-            <div className="input-group mb-3">
-              <span className="input-group-text">Phone Number</span>
-              <input
-                type="text"
-                aria-label="Phone Number"
-                placeholder="Phone Number"
-                className="form-control"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-              />
+            <div className="row">
+              <div className="col">
+                <div className="input-group mb-3">
+                  <span className="input-group-text">Phone Number</span>
+                  <input
+                    type="text"
+                    aria-label="Phone Number"
+                    placeholder="Phone Number"
+                    className="form-control"
+                    name="mobile"
+                    value={formData.mobile}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="input-group mb-3">
-              <span className="input-group-text">Clinic Address</span>
-              <input
-                type="text"
-                aria-label="Clinic Address"
-                placeholder="Clinic Address"
-                className="form-control"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-              />
+            <div className="row">
+              <div className="col">
+                <div className="input-group mb-3">
+                  <span className="input-group-text">Date of Birth</span>
+                  <DatePicker
+                    aria-label="Date"
+                    ref={datePickerRef}
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
+                    dateFormat="yyyy-MM-dd"
+                    showYearDropdown
+                    scrollableYearDropdown
+                    className="form-control"
+                  />
+                </div>
+              </div>
             </div>
 
-            <h6 className="fw-bold">Credentials</h6>
+            <div className="row">
+              <div className="col">
+                <div className="input-group mb-3">
+                  <span className="input-group-text">Medical Diagnosis</span>
+                  <select
+                    className="form-select"
+                    aria-label="Diagnosis"
+                    value={formData.diagnosis}
+                    onChange={handleChange}
+                  >
+                    <option selected>Diagnosis</option>
+                    <option value="1">Diagnosis 1</option>
+                    <option value="2">Diagnosis 2</option>
+                    <option value="3">Diagnosis 3</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <h6>Credentials</h6>
+
             <div className="input-group mb-3">
               <input
                 type="email"
                 className="form-control"
                 placeholder="Valid email address"
                 aria-label="Valid email address"
+                aria-describedby="basic-addon2"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
               />
-              <span className="input-group-text">@gmail.com</span>
+              <span className="input-group-text" id="basic-addon2">
+                @gmail.com
+              </span>
             </div>
 
             <div className="row">
-              <div className="col-12 col-md-6">
+              <div className="col">
                 <div className="input-group mb-3">
                   <span className="input-group-text">Password</span>
                   <input
@@ -222,13 +268,15 @@ export default function AdminRegister() {
                   </i>
                 </div>
               </div>
+            </div>
 
-              <div className="col-12 col-md-6">
+            <div className="row">
+              <div className="col">
                 <div className="input-group mb-3">
                   <span className="input-group-text">Confirm Password</span>
                   <input
                     aria-label="Confirm password"
-                    placeholder="Must Match"
+                    placeholder="Passwords must match"
                     className="form-control"
                     type={showConfPassword ? "text" : "password"}
                     name="confPassword"
@@ -245,14 +293,44 @@ export default function AdminRegister() {
               </div>
             </div>
 
-            <div className="d-flex flex-column align-items-center justify-content-center">
+            <div className="row">
+              <div className="col">
+                <div className="input-group">
+                  <span className="input-group-text">Consent</span>
+                  <div className="form-check form-check-inline mx-3">
+                    <input
+                      type="radio"
+                      label="Yes"
+                      name="consent"
+                      value="yes"
+                      checked={formData.consent === "yes"}
+                      onChange={handleChange}
+                    />
+                    <label className="form-check-label">Yes</label>
+                  </div>
+                  <div className="form-check form-check-inline">
+                    <input
+                      type="radio"
+                      label="No"
+                      name="consent"
+                      value="no"
+                      checked={formData.consent === "no"}
+                      onChange={handleChange}
+                    />
+                    <label className="form-check-label">No</label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="w-75 d-flex flex-column align-items-center justify-content-center">
               <button
-                className="btn btn-primary w-50 rounded-5 my-3"
+                className="text-button border rounded-5 my-3"
                 type="submit"
               >
                 Submit
               </button>
-              <Link to="/login" className="loginLink text-decoration-none">
+              <Link to="/login" className="loginLink">
                 I want to login
               </Link>
             </div>
@@ -261,7 +339,7 @@ export default function AdminRegister() {
       </div>
 
       <div className="row bg-white border border-bottom-0 border-start-0 border-end-0">
-        <div className="col text-center p-3">
+        <div className="col mx-auto text-center p-3">
           <p className="fw-bold mb-0">TalkTherapy</p>
         </div>
       </div>

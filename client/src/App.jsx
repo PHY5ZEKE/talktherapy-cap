@@ -4,10 +4,10 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 // CSS
-import './styles/text.css'
-import './styles/button.css'
-import './styles/containers.css'
-import './styles/images.css'
+import "./styles/text.css";
+import "./styles/button.css";
+import "./styles/containers.css";
+import "./styles/images.css";
 
 // System
 import Login from "./pages/Login/Login";
@@ -57,8 +57,8 @@ import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
 // Test Layout
-import Layout from "./pages/System/Register";
-import Home2 from './pages/Patient/Home'
+import Layout from "./pages/System/PatientRegister";
+import Home2 from "./pages/Patient/Home";
 
 const routes = (
   <Router>

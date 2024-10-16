@@ -2,7 +2,7 @@ import "./modal.css";
 
 import Calendar from "../../assets/icons/Calendar";
 
-export default function Soap({openModal}) {
+export default function Soap({ openModal }) {
   const handleClose = (e) => {
     e.preventDefault();
     openModal();
@@ -42,10 +42,10 @@ export default function Soap({openModal}) {
           </div>
 
           <div className="d-flex justify-content-center mt-3 gap-3">
-            <button className="button-group bg-white">
+            <button className="text-button border">
               <p className="fw-bold my-0 status">SUBMIT</p>
             </button>
-            <button className="button-group bg-white" onClick={handleClose}>
+            <button className="text-button border" onClick={handleClose}>
               <p className="fw-bold my-0 status">CANCEL</p>
             </button>
           </div>

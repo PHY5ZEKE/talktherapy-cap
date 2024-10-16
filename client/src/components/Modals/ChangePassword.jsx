@@ -108,7 +108,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="text-button border"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                 >
                   {showCurrentPassword ? "Hide" : "Show"}
@@ -131,7 +131,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="text-button border"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
                   {showNewPassword ? "Hide" : "Show"}
@@ -154,7 +154,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="btn btn-outline-secondary"
+                  className="text-button border"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? "Hide" : "Show"}

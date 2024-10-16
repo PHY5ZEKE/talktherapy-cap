@@ -77,14 +77,14 @@ export default function RegisterAdmin({ openModal }) {
 
           <div className="d-flex justify-content-center mt-3 gap-3">
             <div
-              className="fw-bold text-button border"
+              className="text-button border"
               style={{ cursor: "pointer" }}
               onClick={handleSubmit}
             >
               Submit
             </div>
             <div
-              className="fw-bold text-button border"
+              className="text-button border"
               style={{ cursor: "pointer" }}
               onClick={handleClose}
             >

@@ -66,7 +66,6 @@ export default function EditProfile({
         }),
       });
 
-
       const data = await response.json();
       console.log("Response:", response);
       console.log("Data:", data);
@@ -146,7 +145,7 @@ export default function EditProfile({
                 />
                 <button
                   type="button"
-                  className="action-btn btn-text-blue btn-primary mt-2"
+                  className="text-button border"
                   onClick={handleProfilePictureUpload}
                 >
                   Upload Picture
@@ -217,10 +216,7 @@ export default function EditProfile({
             </div>
           )}
 
-          <button
-            type="submit"
-            className="action-btn btn-text-blue btn-primary"
-          >
+          <button type="submit" className="text-button border">
             Save
           </button>
         </form>
