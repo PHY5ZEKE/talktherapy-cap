@@ -35,14 +35,27 @@ export default function Home() {
 
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
-  const closeModal = () => {
-    setIsConfirm(!isConfirm);
+  const openConfirmModal = () => {
+    setIsConfirm(true);
+  };
+  const closeConfirmModal = () => {
+    setIsConfirm(false);
   };
 
   // Handle Choose Schedule Modal
   const [isChoose, setIsChoose] = useState(false);
-  const closeSchedule = () => {
-    setIsChoose(!isChoose);
+  const openChooseScheduleModal = () => {
+    setIsChoose(true);
+  };
+  const closeChooseScheduleModal = () => {
+    setIsChoose(false);
+  };
+
+  // Handle Appointment Details Modal
+  const [isViewAppointment, setIsViewAppointment] = useState(false);
+  const closeViewAppointmentModal = () => {
+    setIsViewAppointment(false);
+    setSelectedAppointment(null);
   };
 
   // Modal Information
@@ -59,7 +72,7 @@ export default function Home() {
       );
       console.log("Fetched appointment details:", response.data); // Debugging statement
       setSelectedAppointment(response.data);
-      setIsConfirm(true);
+      setIsViewAppointment(true);
     } catch (error) {
       console.error("Error fetching appointment details:", error);
     }
@@ -172,19 +185,19 @@ export default function Home() {
       {/* CONFIRM RESCHEDULE MODAL */}
       {isConfirm && (
         <ConfirmReschedule
-          onClick={closeModal}
-          closeModal={closeModal}
-          openResched={closeSchedule}
+          onClick={closeConfirmModal}
+          closeModal={closeConfirmModal}
+          openResched={openChooseScheduleModal}
         />
       )}
 
       {/* CHOOSE NEW SCHEDULE MODAL */}
-      {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
+      {isChoose && <ChooseSchedule closeModal={closeChooseScheduleModal} />}
 
       {/* VIEW APPOINTMENT DETAILS MODAL */}
-      {isConfirm && (
+      {isViewAppointment && (
         <AppointmentDetailsClinician
-          openModal={closeModal}
+          openModal={closeViewAppointmentModal}
           appointment={selectedAppointment}
         />
       )}
@@ -238,7 +251,6 @@ export default function Home() {
                         <div
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                          onClick={() => openModal(appointment._id)}
                         >
                           <h5 className="mb-0 fw-bold">
                             {appointment.selectedSchedule.day}
@@ -252,6 +264,16 @@ export default function Home() {
                             {appointment.patientId.firstName}{" "}
                             {appointment.patientId.lastName}
                           </p>
+                          <a
+                            href="#"
+                            className="text-primary"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openModal(appointment._id);
+                            }}
+                          >
+                            View Appointment Details
+                          </a>
 
                           <div className="d-flex justify-content-between gap-1">
                             <div className="mb-3 text-accepted">ACCEPTED</div>
@@ -270,7 +292,7 @@ export default function Home() {
                               </button>
                               <button
                                 className="mb-3 text-button border"
-                                onClick={() => setIsChoose(!isChoose)}
+                                onClick={openConfirmModal}
                               >
                                 Cancel
                               </button>
@@ -286,7 +308,6 @@ export default function Home() {
                         <div
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                          onClick={() => openModal(appointment._id)}
                         >
                           <h5 className="mb-0 fw-bold">
                             {appointment.selectedSchedule.day}
@@ -300,6 +321,16 @@ export default function Home() {
                             {appointment.patientId.firstName}{" "}
                             {appointment.patientId.lastName}
                           </p>
+                          <a
+                            href="#"
+                            className="text-primary"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openModal(appointment._id);
+                            }}
+                          >
+                            View Appointment Details
+                          </a>
 
                           <div className="mb-3 text-accepted">COMPLETED</div>
                         </div>
@@ -324,22 +355,24 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    {
-                      appointments.map((appointment) => (
-                        <div 
+                    {appointments.map((appointment) => (
+                      <div
                         key={appointment._id}
-                        className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                        <h5 className="mb-0 fw-bold">{new Date(appointment.createdAt).toLocaleDateString()}</h5>
-                        <p className="mb-0 fw-bold">{new Date(appointment.createdAt).toLocaleTimeString()}</p>
+                        className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                      >
+                        <h5 className="mb-0 fw-bold">
+                          {new Date(appointment.createdAt).toLocaleDateString()}
+                        </h5>
+                        <p className="mb-0 fw-bold">
+                          {new Date(appointment.createdAt).toLocaleTimeString()}
+                        </p>
                         <p className="mb-3">
-                        Session of Dr. {appointment.selectedClinician} with{" "}
-                        {appointment.patientId.firstName}{" "}
-                        {appointment.patientId.lastName} has started.
+                          Session of Dr. {appointment.selectedClinician} with{" "}
+                          {appointment.patientId.firstName}{" "}
+                          {appointment.patientId.lastName} has started.
                         </p>
                       </div>
-                      ))
-                    }
-
+                    ))}
                   </div>
                 </div>
               </div>
@@ -348,7 +381,6 @@ export default function Home() {
               <div className="col-sm bg-white"></div>
             </div>
           </div>
-
         </div>
       </div>
     </>
