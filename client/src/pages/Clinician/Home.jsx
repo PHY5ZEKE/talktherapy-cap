@@ -1,16 +1,10 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/MenuDropdown";
-
-// Icons
-import Search from "../../assets/icons/Search";
-import Sort from "../../assets/icons/Sort";
 
 // Modal
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
@@ -140,6 +134,7 @@ export default function Home() {
         const data = await response.json();
         setClinicianData(data.clinician);
         localStorage.setItem("userId", data.clinician._id);
+        localStorage.setItem("userName", `${data.clinician.firstName} ${data.clinician.lastName}`)
         setLoading(false);
       } catch (error) {
         setError(error.message);

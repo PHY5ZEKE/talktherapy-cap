@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
-import axios from "axios";
 import { useState, useEffect } from "react";
 
 // UI Components
@@ -50,6 +49,7 @@ export default function Home() {
 
         setPatientData(patientData.patient);
         localStorage.setItem("userId", patientData.patient._id);
+        localStorage.setItem("userName", `${patientData.patient.firstName} ${patientData.patient.lastName}`)
         setAppointments(appointmentsData);
         setLoading(false);
       } catch (error) {

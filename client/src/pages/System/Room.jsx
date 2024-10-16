@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Rnd } from "react-rnd";
 import { route } from "../../utils/route";
 
 import "../../styles/containers.css";
@@ -15,6 +14,7 @@ export default function Room() {
   const [userRole, setUserRole] = useState(null);
   const [messages, setMessages] = useState([]); // State for storing messages
   const [type, setType] = useState("");
+  const [appointment, setAppointment] = useState([]);
   const appURL = import.meta.env.VITE_APP_URL;
 
   // Nav
@@ -37,8 +37,8 @@ export default function Room() {
 
   const [isHidden, setHidden] = useState(true);
 
-  const currentUser = localStorage.getItem("userId");
-  const uuid = currentUser;
+  const currentName = localStorage.getItem("userName");
+  const uuid = currentName;
 
   const peerConnectionConfig = {
     iceServers: [
@@ -52,6 +52,7 @@ export default function Room() {
     const role = localStorage.getItem("userRole");
     const currentUser = localStorage.getItem("userId");
     setUserRole(role);
+
     const fetchAppointment = async () => {
       try {
         const response = await fetch(
@@ -70,6 +71,7 @@ export default function Room() {
         }
 
         const data = await response.json();
+        setAppointment(data)
 
         // Validate user roles after fetching appointment
         if (
@@ -267,7 +269,6 @@ export default function Room() {
     navigate("/");
   }
 
-  // TODO: Change sender name
   function sendMessage(message) {
     if (!message || !serverConnection.current) return;
 
@@ -285,43 +286,36 @@ export default function Room() {
 
   return (
     <>
-      <div className="container-fluid mx-auto room-height">
-        <div className="row text-center py-2 border border-start-0 border-[#B9B9B9] sticky-top">
-          {/* TODO: Change names */}
+      <div className="container-fluid d-flex flex-column justify-content-between vh-100">
+        <div className="row text-center py-2 border border-start-0 border-[#B9B9B9]">
           <p className="mb-0">
-            Currently in session with: Dr. Juan Dela Cruz and Nicole E. Oraya
+            Currently in session with: {appointment.selectedSchedule?.clinicianName}  and {appointment.patientId.firstName}{" "}
+                {appointment.patientId.middleName}{" "}
+                {appointment.patientId.lastName}
           </p>
         </div>
-        <div className="my-3 room-videos">
-          <Rnd
-            default={{
-              x: 0,
-              y: 105,
-              width: "45vw",
-              height: "55vh",
-            }}
-            minWidth={"280px"}
-            minHeight={"200px"}
-            bounds=".room-videos"
-            className={isHidden ? `drag bg-black-subtle` : `drag`}
-          >
+
+        <div className="row-auto d-flex flex-wrap flex-md-row flex-column bg-warning h-100">
+          <div className="col">
             <video
               muted
               ref={localVideoRef}
               className="mx-auto video-local bg-warning-subtle"
               autoPlay
             />
-          </Rnd>
+          </div>
 
-          <video
-            className="bg-black video-remote mx-auto"
-            ref={remoteVideoRef}
-            autoPlay
-            playsInline
-          ></video>
+          <div className="col">
+            <video
+              className="bg-black video-remote mx-auto"
+              ref={remoteVideoRef}
+              autoPlay
+              playsInline
+            />
+          </div>
         </div>
 
-        <div className="row bg-white border border-start-0 border-[#B9B9B9] fixed-bottom">
+        <div className="row bg-white border border-start-0 border-[#B9B9B9]">
           <div className="d-flex align-items-center justify-content-center">
             <div className="p-2">
               <div className="row py-1">
@@ -329,7 +323,7 @@ export default function Room() {
                   <button
                     onClick={handleDisconnect}
                     type="submit"
-                    className="button-group bg-white"
+                    className="text-button border"
                   >
                     <p className="fw-bold my-0 status">Disconnect</p>
                   </button>
@@ -356,7 +350,7 @@ export default function Room() {
                     {/* ACTION BUTTONS */}
                     <div className="col">
                       <button
-                        className="button-group bg-white"
+                        className="text-button border"
                         type="button"
                         data-bs-toggle="dropdown"
                         aria-expanded="false"
@@ -450,7 +444,7 @@ export default function Room() {
                         <div>
                           {messages.map((msg, index) => (
                             <p key={index}>
-                              <span className="fw-bold">{msg.sender} :</span>
+                              <span className="fw-bold">{msg.sender}</span>:{" "}
                               {msg.message}
                             </p>
                           ))}
@@ -458,27 +452,26 @@ export default function Room() {
                       </div>
 
                       {/* INPUT CHAT */}
-                      <div className="input-group position-sticky my-3">
+                      <form
+                        className="input-group my-3"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          sendMessage(type);
+                        }}
+                      >
                         <input
                           type="text"
                           className="form-control"
                           placeholder="Type a message..."
                           onChange={(e) => setType(e.target.value)}
                         />
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => sendMessage(type)}
-                        >
+                        <button type="submit" className="btn btn-primary">
                           Send
                         </button>
-                      </div>
+                      </form>
                     </div>
                   </>
                 ) : null}
-
-                {/* <button type="submit" className="button-group bg-white">
-                  <p className="fw-bold my-0 status">Messages</p>
-                </button> */}
 
                 <div></div>
               </div>

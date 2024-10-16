@@ -123,7 +123,7 @@
 .video-remote {
   /* position: relative; */
   width: 100%;
-  height: inherit;
+  min-height: 100%;
   object-fit: cover;
 }
 
@@ -132,6 +132,7 @@
   /* top: -50vh; */
   width: 100%;
   height: inherit;
+  min-height: 100%;
   overflow: auto;
   object-fit: cover;
   z-index: 101;

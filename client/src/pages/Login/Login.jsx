@@ -41,7 +41,6 @@ const Login = () => {
         setError(response.data.message);
       } else {
         // Save the access token and user role to local storage or state management
-        console.log(response.data);
         localStorage.setItem("accessToken", response.data.accessToken);
         localStorage.setItem("userRole", response.data.userRole);
 
