@@ -1,16 +1,9 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
-
-// Icons
-import Sort from "../../assets/icons/Sort";
-import Search from "../../assets/icons/Search";
-import React, { useState, useEffect } from "react";
-
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 import Soap from "../../components/Modals/Soap";
 
 export default function ManageSchedule() {
@@ -126,172 +119,197 @@ export default function ManageSchedule() {
   };
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* SOAP MODAL */}
+      {showModal && <Soap openModal={handleOpen} />}
 
-        {/* SOAP MODAL */}
-        {showModal && <Soap openModal={handleOpen} />}
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">
-                {clinicianData?.firstName || "Clinician"}
-              </p>
-            </div>
-          </Row>
-
-          {/* TOAL ADMINS */}
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="d-flex justify-content-center align-items-center">
-                  <p className="m-0 fw-bold">Search Patients</p>
-                </div>
-
-                <div className="d-flex align-items-center gap-2 search-bar d-none d-lg-block">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for patient"
-                    className="search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : clinicianData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {clinicianData?.firstName} {clinicianData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
-              <Sort />
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto d-sm-block d-lg-none"
-          >
-            <div className="admin-left d-flex justify-content-center">
-              <div className="d-flex align-items-center gap-2 search-bar">
-                <Search />
-                <input
-                  type="text"
-                  placeholder="Search for content"
-                  className="search-input"
-                />
-              </div>
-            </div>
-          </Row>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">List of Patients</p>
+                    <input
+                      type="text"
+                      placeholder="Search for patient"
+                      className="search-input"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
 
-          <Row lg md>
-            {/* PATIENT LIST */}
-            <Col lg className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="scrollable-div-4 d-flex flex-column gap-3">
-                {filteredPatients.map((patient) => (
+                <div className="row p-3">
                   <div
-                    key={patient._id}
-                    className="card-content-bg-dark p-3"
-                    onClick={() => handleClinicianClick(patient)}
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
                   >
-                    <div className="d-flex flex-column g-1 mb-2">
-                      <p className="fw-bold mb-0">{`${patient.firstName} ${patient.lastName}`}</p>
-                      <p className="mb-0">{patient.email}</p>
-                      <p className="mb-0">{patient.mobile}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Col>
-
-            {/* PREVIEW PATIENT */}
-
-            <Col lg>
-              {isLoading ? (
-                <p>Loading...</p>
-              ) : selectedPatient ? (
-                <div className="card-container p-3 d-flex flex-column flex-row scrollable-div-5 notif-home">
-                  <div className="w-100 mb-3">
-                    <div className="profile-img">
-                      <img
-                        src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg"
-                        alt="Profile"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="d-flex flex-column g-1 mb-2 mx-3">
-                    <h3 className="fw-bold mb-0">
-                      {selectedPatient.firstName} {selectedPatient.middleName}{" "}
-                      {selectedPatient.lastName}
-                    </h3>
-                    <p className="mb-0">Patient</p>
-                    <p className="mb-0">{selectedPatient.diagnosis}</p>
-                    <p className="mb-0">{selectedPatient.mobile}</p>
-                    <p className="mb-0">{selectedPatient.email}</p>
-
-                    {/* Operations */}
-                    <div className="d-flex flex-column gap-3">
-                      <button className="action-btn" onClick={handleOpen}>
-                        Add SOAP
-                      </button>
-                      <button className="action-btn">View Progress</button>
-                      <button className="action-btn">View Records</button>
-                      <button className="action-btn">Request Records</button>
-                      <button className="action-btn">Export Data</button>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <p>Select an patient to view their profile</p>
-              )}
-            </Col>
-
-            {/* PREVIEW FILES */}
-            <Col lg>
-              <div className="card-container d-flex gap-2 flex-wrap align-items-center flex-row scrollable-div-5 notif-home">
-                {/* DIAGNOSIS COMPONENT */}
-                <div className="card-content-bg-dark w-100 p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">Diagnosis</p>
-                    <p className="mb-0">Patient Name: Nicole E. Oraya</p>
-                    <p>Date: July 24, 2024</p>
-                    <p className="mb-0">Diagnosis text here</p>
-                  </div>
-
-                  <div className="d-flex flex-column gap-3">
-                    <button className="action-btn fw-bold">Edit</button>
-                  </div>
-                </div>
-
-                {/* EXERCISE PROGRESS COMPONENT */}
-                <div className="card-content-bg-dark w-100 p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">Exercise Name</p>
-                    <p>Date: July 24, 2024</p>
-                    <p className="mb-0">Performance text here</p>
+                    {filteredPatients && filteredPatients.length > 0 ? (
+                      filteredPatients.map((patient) => (
+                        <div
+                          key={patient._id}
+                          onClick={() => handleClinicianClick(patient)}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          style={{ cursor: "pointer" }}
+                        >
+                          <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.lastName}`}</h5>
+                          <p className="mb-0 fw-bold">{patient.email}</p>
+                          <p className="mb-3">{patient.mobile}</p>
+                        </div>
+                      ))
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        You currently don't have any appointments.
+                      </h5>
+                    )}
                   </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">View Patient</p>
+                    <p className="mb-0">
+                      Get a preview of the patient and other actions.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {isLoading ? (
+                      <h5 className="mb-0 fw-bold text-center">
+                        Loading data.
+                      </h5>
+                    ) : selectedPatient ? (
+                      <div className="card">
+                        <img
+                          src={selectedPatient?.profilePicture}
+                          className="card-img-top"
+                          alt="Profile picture"
+                          style={{ maxHeight: "320px", minHeight: "320px", objectFit: "cover" }}
+                        />
+                        <div className="card-body">
+                          <h5 className="">
+                            {selectedPatient?.firstName}{" "}
+                            {selectedPatient?.middleName}{" "}
+                            {selectedPatient?.lastName}
+                          </h5>
+                          <p className="mb-0">{selectedPatient?.diagnosis}</p>
+                          <p className="mb-0">{selectedPatient?.mobile}</p>
+                          <p className="mb-0">{selectedPatient?.email}</p>
+
+                          <div className="d-flex flex-column gap-3">
+                            <button
+                              className="text-button border w-100"
+                              onClick={handleOpen}
+                            >
+                              Add SOAP
+                            </button>
+                            <button className="text-button border w-100">
+                              View Progress
+                            </button>
+                            <button className="text-button border w-100">
+                              View Records
+                            </button>
+                            <button className="text-button border w-100">
+                              Request Records
+                            </button>
+                            <button className="text-button border w-100">
+                              Export Data
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        Select a patient to view their profile.
+                      </h5>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* THIRD COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">View Selected Option</p>
+                    <p className="mb-0">
+                      Account related information will appear here.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-pending">PENDING</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-accepted">ACCEPTED</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-cancelled">CANCELLED</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

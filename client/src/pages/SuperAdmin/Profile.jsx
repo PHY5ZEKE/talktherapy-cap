@@ -68,13 +68,12 @@ export default function Profile() {
   }
 
   if (!userDetails) {
-    return (
-      <div class="container-fluid d-flex vh-100 align-items-center justify-content-center">
-        <div class="spinner-border" role="status">
-          <span class="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
+    return <div class="container-fluid d-flex vh-100 align-items-center justify-content-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+  ;
   }
 
   return (

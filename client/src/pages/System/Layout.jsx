@@ -45,6 +45,7 @@ export default function Layout() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
                   >
                   <h5 className="mb-0 fw-bold text-center">You currently don't have any appointments.</h5>
                   </div>

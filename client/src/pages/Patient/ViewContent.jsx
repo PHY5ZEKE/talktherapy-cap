@@ -55,8 +55,18 @@ export default function ViewContent() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-                <p className="mb-0 mt-3">Hello,</p>
-                <p className="fw-bold">{patientData?.firstName}</p>
+              {error ? (
+                  <p>{error}</p>
+                ) : patientData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {patientData?.firstName} {patientData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
               <MenuDropdown />

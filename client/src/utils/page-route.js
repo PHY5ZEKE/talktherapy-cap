@@ -19,6 +19,13 @@ export const page = {
         schedule: "/admin/schedule",
         profile: "/admin/profile",
         archival: "/admin/archival"
+    },
+    clinician: {
+      home: "/clinician",
+      patients: "/clinician/patients",
+      content: "/clinician/content",
+      profile: "/clinician/profile",
+      schedule: "/clinician/schedule"
     }
   };
   

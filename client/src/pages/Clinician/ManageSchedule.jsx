@@ -1,19 +1,13 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // DatePicker
 import { useState, useEffect, useCallback, useMemo } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
-// Buttons
-import Edit from "../../assets/icons/Edit";
-import Delete from "../../assets/icons/Delete";
 
 import AddSchedule from "../../components/Modals/AddSchedule";
 
@@ -124,113 +118,134 @@ export default function ManageSchedule() {
   );
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
-        {/* Add Schedule Modal */}
-        {isOpen && (
-          <AddSchedule
-            closeModal={handleAdd}
-            onScheduleAdded={handleScheduleAdded}
-          />
-        )}
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-stretch"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">
-                {clinicianData?.firstName || "Clinician"}
-              </p>
-            </div>
-          </Row>
+    <>
+      {/* Add Schedule Modal */}
+      {isOpen && (
+        <AddSchedule
+          closeModal={handleAdd}
+          onScheduleAdded={handleScheduleAdded}
+        />
+      )}
 
-          {/* TOAL ADMINS */}
-          <Row
-            lg
-            md
-            className="total-admin border border-1 my-3 border-[#B9B9B9] card-content-bg-light p-3 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="admin-left d-flex justify-content-between">
-              <div className="admin-child d-flex gap-3">
-                <div className="d-flex justify-content-center align-items-center">
-                  <h5 className="m-0 fw-bold">Manage Your Schedule</h5>
-                </div>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
+
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : clinicianData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {clinicianData?.firstName} {clinicianData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
+
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row lg md>
-            {/* CALENDAR */}
-            <Col lg className="height-responsive">
-              {/* CONTENT LIST */}
-              <div className="card-container d-flex flex-wrap justify-content-center align-items-center flex-row gap-3 scrollable-div-5 notif-home">
-                <div className="w-100 d-flex justify-content-center">
-                  <DatePicker
-                    selected={startDate}
-                    onChange={handleDateChange}
-                    inline
-                    dayClassName={getDayClassName}
-                  />
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Your Schedule</p>
+                    <p className="mb-0">
+                      Select a date to view available clinician schedules.
+                    </p>
+                  </div>
                 </div>
 
-                <button className="action-btn" onClick={handleAdd}>
-                  Add Schedule
-                </button>
-              </div>
-            </Col>
-
-            {/* PREVIEW SCHEDULE LIST */}
-            <Col lg>
-              <div className="card-container d-flex flex-wrap align-items-center flex-row scrollable-div-5 notif-home">
-                <div className="p-3 w-100">
-                  <h4 className="fw-bold mb-0">
-                    {clinicianData?.firstName || "Clinician"}'s Schedule
-                  </h4>
-                  <p className="mb-0">
-                    {selectedDate
-                      ? selectedDate.toDateString()
-                      : "Select a date"}
-                  </p>
-                </div>
-
-                {getSchedulesForSelectedDay.map((schedule, index) => (
+                <div className="row p-3">
                   <div
-                    key={index}
-                    className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom"
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
                   >
-                    <div className="w-50">
-                      <h5 className="fw-bold mb-0">
-                        {schedule.startTime} - {schedule.endTime}
-                      </h5>
-                      <p className="mb-0">{schedule.day}</p>
-                      <p className="mb-0">Status: {schedule.status}</p>
-                    </div>
-
-                    <div>
-                      <button className="icon-btn">
-                        <Edit />
+                    <div className="mb-3 d-flex flex-column gap-3 flex-nowrap">
+                      <button
+                        className="text-button border w-100"
+                        onClick={handleAdd}
+                      >
+                        Add Schedule
                       </button>
-                      <Delete />
+                      <DatePicker
+                        selected={startDate}
+                        onChange={handleDateChange}
+                        inline
+                        dayClassName={getDayClassName}
+                      />
                     </div>
                   </div>
-                ))}
+                </div>
               </div>
-            </Col>
 
-            <Col lg></Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">
+                      {clinicianData?.firstName}'s Schedule
+                    </p>
+                    <p className="mb-0">
+                      {selectedDate
+                        ? selectedDate.toDateString()
+                        : "Select a date"}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {getSchedulesForSelectedDay.length === 0 ? (
+                      <h5 className="mb-0 fw-bold text-center">
+                        No schedule available for the selected date.
+                      </h5>
+                    ) : (
+                      getSchedulesForSelectedDay.map((schedule, index) => (
+                        <div
+                          key={index}
+                          className="d-flex justify-content-start align-items-center w-100 p-2 border-top-0 border-bottom"
+                        >
+                          <div className="w-100">
+                            <h5 className="fw-bold mb-0">
+                              {schedule.startTime} - {schedule.endTime}
+                            </h5>
+
+                            <p className="mb-0">{schedule.day}</p>
+                            <p className="mb-0 my-2">
+                              Status:{" "}
+                              <span className="fw-bold">{schedule.status}</span>
+                            </p>
+                          </div>
+
+                          <div className="mb-3 fw-bold text-button border">
+                            Edit
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* SECOND COL */}
+              <div className="col-sm bg-white"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

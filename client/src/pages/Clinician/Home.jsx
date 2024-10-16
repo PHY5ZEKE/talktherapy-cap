@@ -6,6 +6,7 @@ import axios from "axios";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // Icons
 import Search from "../../assets/icons/Search";
@@ -167,8 +168,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      {/* MODAL */}
+    <>
+      {/* CONFIRM RESCHEDULE MODAL */}
       {isConfirm && (
         <ConfirmReschedule
           onClick={closeModal}
@@ -177,8 +178,10 @@ export default function Home() {
         />
       )}
 
+      {/* CHOOSE NEW SCHEDULE MODAL */}
       {isChoose && <ChooseSchedule closeModal={closeSchedule} />}
 
+      {/* VIEW APPOINTMENT DETAILS MODAL */}
       {isConfirm && (
         <AppointmentDetailsClinician
           openModal={closeModal}
@@ -186,203 +189,168 @@ export default function Home() {
         />
       )}
 
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-flex"
-        >
-          {/* USER TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">
-                {clinicianData?.firstName || "Clinician"}
-              </p>
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : clinicianData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {clinicianData?.firstName} {clinicianData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
+              </div>
+
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row lg md>
-            {/* APPOINTMENT LIST */}
-            <Col lg className="height-responsive d-none d-lg-block">
-              {/* DATE COMPONENT */}
-              <div className="card-content-bg-light p-3 my-3 date-card">
-                <div className="d-flex flex-row justify-content-between g-1 mb-2">
-                  <div className="calendar-text">
-                    <p className="fw-bold mb-0">July</p>
-                    <p className="mb-0">Today is Friday, July 5, 2024</p>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Today is </p>
+                    <p className="mb-0">Your Appointments</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {appointments
+                      .filter(
+                        (appointment) => appointment.status === "Accepted"
+                      )
+                      .map((appointment) => (
+                        <div
+                          key={appointment._id}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          onClick={() => openModal(appointment._id)}
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.day}
+                          </h5>
+                          <p className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.startTime} -{" "}
+                            {appointment.selectedSchedule.endTime}
+                          </p>
+                          <p className="mb-3">
+                            Scheduled appointment with{" "}
+                            {appointment.patientId.firstName}{" "}
+                            {appointment.patientId.lastName}
+                          </p>
+
+                          <div className="d-flex justify-content-between gap-1">
+                            <div className="mb-3 text-accepted">ACCEPTED</div>
+
+                            <div className="d-flex flex-nowrap gap-1">
+                              <button
+                                className="mb-3 text-button border"
+                                onClick={() =>
+                                  joinMeeting(
+                                    appointment._id,
+                                    appointment.roomId
+                                  )
+                                }
+                              >
+                                Join
+                              </button>
+                              <button
+                                className="mb-3 text-button border"
+                                onClick={() => setIsChoose(!isChoose)}
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    {appointments
+                      .filter(
+                        (appointment) => appointment.status === "Completed"
+                      )
+                      .map((appointment) => (
+                        <div
+                          key={appointment._id}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          onClick={() => openModal(appointment._id)}
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.day}
+                          </h5>
+                          <p className="mb-0 fw-bold">
+                            {appointment.selectedSchedule.startTime} -{" "}
+                            {appointment.selectedSchedule.endTime}
+                          </p>
+                          <p className="mb-3">
+                            Scheduled appointment with{" "}
+                            {appointment.patientId.firstName}{" "}
+                            {appointment.patientId.lastName}
+                          </p>
+
+                          <div className="mb-3 text-accepted">COMPLETED</div>
+                        </div>
+                      ))}
                   </div>
                 </div>
               </div>
 
-              <div className="card-container d-flex flex-column gap-2">
-                <div className="search-bar d-flex align-content-center gap-2">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className="search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Notifications</p>
+                    <p className="mb-0">
+                      Account related notifications will appear here.
+                    </p>
+                  </div>
                 </div>
 
-                <div className="scrollable-div d-flex flex-column">
-                  {appointments
-                    .filter((appointment) => appointment.status === "Accepted")
-                    .map((appointment) => (
-                      <div
-                        key={appointment._id}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
-                      >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} -{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-                        <p className="mb-0">
-                          Scheduled appointment with{" "}
-                          {appointment.patientId.firstName}{" "}
-                          {appointment.patientId.lastName}
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          <p
-                            onClick={() => openModal(appointment._id)}
-                            className="status-accepted status-text status-text-green"
-                          >
-                            ACCEPTED
-                          </p>
-                          <div>
-                            <button
-                              className="button-group bg-white"
-                              onClick={() =>
-                                joinMeeting(appointment._id, appointment.roomId)
-                              }
-                            >
-                              <p className="fw-bold my-0 status">JOIN</p>
-                            </button>
-                            <button
-                              className="button-group bg-white"
-                              onClick={() => setIsChoose(!isChoose)}
-                            >
-                              <p className="fw-bold my-0 status">CANCEL</p>
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-
-                  {appointments
-                    .filter((appointment) => appointment.status === "Completed")
-                    .map((appointment) => (
-                      <div
-                        key={appointment._id}
-                        className="d-flex flex-column g-1 mb-2 card-content-bg-dark p-3 status-accepted-2"
-                      >
-                        <p className="fw-bold mb-0">
-                          {appointment.selectedSchedule.day}
-                        </p>
-                        <p className="mb-0">
-                          {appointment.selectedSchedule.startTime} -{" "}
-                          {appointment.selectedSchedule.endTime}
-                        </p>
-                        <p className="mb-0">
-                          Scheduled appointment with{" "}
-                          {appointment.patientId.firstName}{" "}
-                          {appointment.patientId.lastName}
-                        </p>
-                        <div className="d-flex justify-content-between mt-3">
-                          <p className="status-accepted status-text status-text-green">
-                            onClick={() => openModal(appointment._id)}
-                            Completed
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            </Col>
-
-            {/* PATIENT LIST */}
-            <Col lg className="height-responsive d-none d-lg-block">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Patients</h4>
-                <Sort />
-              </div>
-
-              <div className="d-flex flex-column gap-3 justify-content-between my-3 py-3 px-3 card-content-bg-light">
-                <div className="search-bar d-flex align-content-center gap-2">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for Patient"
-                    className="search-input"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </div>
-
-                <div className="scrollable-div-4 d-flex flex-column gap-3">
-                  {filteredPatients.map((patient) => (
-                    <div key={patient._id} className="card-content-bg-dark p-3">
-                      <div className="d-flex flex-column g-1 mb-2">
-                        <p className="fw-bold mb-0">{`${patient.firstName} ${patient.lastName}`}</p>
-                        <p className="mb-0">{patient.email}</p>
-                        <p className="mb-0">{patient.mobile}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Col>
-
-            {/* NOTIFICATION */}
-            <Col lg className="height-responsive">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Notifications</h4>
-              </div>
-
-              <div className="card-container d-flex flex-column gap-2 scrollable-div-2 notif-home">
-                {appointments.map((appointment) => (
+                <div className="row p-3">
                   <div
-                    key={appointment._id}
-                    className="card-content-bg-dark p-3"
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
                   >
-                    <div className="d-flex flex-column g-1 mb-2">
-                      <p className="fw-bold mb-0">
-                        {new Date(appointment.createdAt).toLocaleDateString()}
-                      </p>
-                      <p className="mb-0">
-                        {new Date(appointment.createdAt).toLocaleTimeString()}
-                      </p>
-                      <p className="mb-0">
+                    {
+                      appointments.map((appointment) => (
+                        <div 
+                        key={appointment._id}
+                        className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                        <h5 className="mb-0 fw-bold">{new Date(appointment.createdAt).toLocaleDateString()}</h5>
+                        <p className="mb-0 fw-bold">{new Date(appointment.createdAt).toLocaleTimeString()}</p>
+                        <p className="mb-3">
                         Session of Dr. {appointment.selectedClinician} with{" "}
                         {appointment.patientId.firstName}{" "}
                         {appointment.patientId.lastName} has started.
-                      </p>
-                    </div>
+                        </p>
+                      </div>
+                      ))
+                    }
 
-                    <div className="button-group bg-white">
-                      <p className="fw-bold my-0 status">ON-GOING</p>
-                    </div>
                   </div>
-                ))}
+                </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+
+              {/* THIRD COL */}
+              <div className="col-sm bg-white"></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </>
   );
 }

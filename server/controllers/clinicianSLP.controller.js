@@ -341,6 +341,7 @@ exports.getAllPatients = [
           active: patient.active,
           createdOn: patient.createdOn,
           addedOn: patient.addedOn,
+          profilePicture: patient.profilePicture,
         })),
       });
     } catch (error) {
@@ -387,6 +388,7 @@ exports.getPatientById = [
           active: patient.active,
           createdOn: patient.createdOn,
           addedOn: patient.addedOn,
+          profilePicture: patient.profilePicture
         },
       });
     } catch (error) {
