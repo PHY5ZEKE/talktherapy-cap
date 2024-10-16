@@ -48,4 +48,10 @@ router.get(
   appointmentController.getClinicianAppointments
 );
 
+router.post(
+  "/request-schedule-change",
+  verifyToken,
+  appointmentController.requestScheduleChange
+);
+
 module.exports = router;

@@ -158,8 +158,11 @@ exports.getAllAppointments = async (req, res) => {
       .populate({
         path: "patientId",
         select: "firstName middleName lastName", // Select the patient details
+      })
+      .populate({
+        path: "newSchedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
-
     // Decrypt patient details
     const decryptedAppointments = appointments.map((appointment) => {
       if (appointment.patientId) {
@@ -188,10 +191,16 @@ exports.getPatientAppointment = async (req, res) => {
     const patientId = req.user.id; // Assuming the patient ID is stored in req.user.id after token verification
 
     // Find appointments for the logged-in user only
-    const appointments = await Appointment.find({ patientId }).populate({
-      path: "selectedSchedule",
-      select: "clinicianName specialization day startTime endTime status", // Select the schedule details
-    });
+    const appointments = await Appointment.find({ patientId }).populate([
+      {
+        path: "selectedSchedule",
+        select: "clinicianName specialization day startTime endTime status", // Select the schedule details
+      },
+      {
+        path: "newSchedule",
+        select: "clinicianName specialization day startTime endTime status", // Select the new schedule details
+      },
+    ]);
 
     res.status(200).json(appointments);
   } catch (error) {
@@ -280,6 +289,10 @@ exports.getAppointmentById = async (req, res) => {
       .populate({
         path: "patientId",
         select: "firstName middleName lastName",
+      })
+      .populate({
+        path: "newSchedule",
+        select: "clinicianName specialization day startTime endTime",
       });
 
     if (!appointment) {
@@ -320,10 +333,11 @@ exports.updateAppointmentStatus = async (req, res) => {
     const { status } = req.body;
     const adminId = req.user.id; // Assuming the token contains the admin ID
 
-    // Find the appointment by appointmentId and populate selectedSchedule
-    const appointment = await Appointment.findById(appointmentId).populate(
-      "selectedSchedule"
-    );
+    // Find the appointment by appointmentId and populate selectedSchedule and newSchedule
+    const appointment = await Appointment.findById(appointmentId).populate([
+      "selectedSchedule",
+      "newSchedule",
+    ]);
 
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
@@ -371,6 +385,29 @@ exports.updateAppointmentStatus = async (req, res) => {
       // Update the selectedSchedule status to "Available"
       appointment.selectedSchedule.status = "Available";
       await appointment.selectedSchedule.save();
+    } else if (appointment.status === "Schedule Change Request") {
+      // If appointment is Schedule Change Request and the status to update is Accepted or Rejected
+      if (status === "Accepted") {
+        appointment.status = "Accepted";
+        // Update status of old schedule to "Available"
+        const oldSchedule = appointment.selectedSchedule;
+        oldSchedule.status = "Available";
+        await oldSchedule.save();
+        // Override the selectedSchedule with the newSchedule
+        appointment.selectedSchedule = appointment.newSchedule;
+        // Empty the newSchedule and changeReason
+        appointment.newSchedule = null;
+        appointment.changeReason = "";
+        // Update the newSchedule status to "Booked"
+        appointment.selectedSchedule.status = "Booked";
+        await appointment.selectedSchedule.save();
+      } else if (status === "Rejected") {
+        appointment.status = "Rejected";
+        // Update status of old schedule to "Available"
+        const oldSchedule = appointment.selectedSchedule;
+        oldSchedule.status = "Available";
+        await oldSchedule.save();
+      }
     } else {
       return res.status(400).json({ message: "Invalid status transition" });
     }
@@ -382,7 +419,7 @@ exports.updateAppointmentStatus = async (req, res) => {
       await createAuditLog(
         "updateAppointmentStatus",
         admin.email, // Pass the admin's email
-        `Admin ${admin.email} ${status}  the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
+        `Admin ${admin.email} ${status} the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
       );
     } catch (auditLogError) {
       console.error("Error creating audit log:", auditLogError);
@@ -436,6 +473,44 @@ exports.getClinicianAppointments = async (req, res) => {
     res.status(200).json(decryptedAppointments);
   } catch (error) {
     console.error("Error fetching clinician appointments:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.requestScheduleChange = async (req, res) => {
+  try {
+    const { appointmentId, newScheduleId, reason } = req.body;
+    const patientId = req.user.id; // Assuming the patient ID is stored in req.user.id after token verification
+
+    // Find the appointment by appointmentId and patientId
+    const appointment = await Appointment.findOne({
+      _id: appointmentId,
+      patientId,
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Validate the new schedule
+    const newSchedule = await Schedule.findById(newScheduleId);
+    if (!newSchedule) {
+      return res.status(400).json({ message: "Invalid new schedule selected" });
+    }
+
+    // Update the appointment with the new schedule and reason
+    appointment.newSchedule = newScheduleId;
+    appointment.changeReason = reason;
+    appointment.status = "Schedule Change Request";
+
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Schedule change request submitted successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error requesting schedule change:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
