@@ -6,6 +6,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // Icons
 import Back from "../../assets/icons/Back";
@@ -47,103 +48,99 @@ export default function Perform() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col xs={{ order: 12 }} lg={{ order: 1 }}>
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">{patientData?.firstName || "Admin"}</p>
-            </div>
-          </Row>
-
-          <Row lg md>
-            {/* YOUR PROFILE */}
-            <Col lg className="height-responsive full-height">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <Back />
-                <h4 className="fw-bold my-0 mx-0 card-text">Exercise Title</h4>
-                <BookmarkHollow />
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">Admin</p>
               </div>
 
-              <div className="card-container d-flex flex-column gap-2 notif-home">
-                {/* IMAGE COMPONENT */}
-                <div className="p-3">
-                  <div className="exercise-vid">
-                    <video src="https://i.pinimg.com/736x/bb/41/fd/bb41fd264ef0b1248387c53048137bb5.jpg" />
-                    <div className="progress-pos">
-                      <progress value="32" max="100">
-                        32%
-                      </progress>
-                    </div>
+              <MenuDropdown />
+            </div>
+
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    {/* TITLE */}
+                    <p className="mb-0 fw-bold">Video Title Here</p>
+                    <p className="mb-0">Category</p>
                   </div>
                 </div>
 
-                {/* VIDEO COMPONENT */}
-                <div className="d-flex flex-column g-1 mb-2 mx-3">
-                  <h4 className="fw-bold mb-0">Exercise Title</h4>
-                  <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    eget fermentum torto r. Nulla facilisi. Maecenas hendrerit
-                    feugiat finibus. Mauris nec diam at risus ullamcorper
-                    pellentesque quis a mauris. Suspendisse id sagittis dolor.
-                    Vivamus tristique tempus leo, sed consectetur ante consequat
-                    eu. Nulla feugiat nisi sed sapien sodales iaculis. Cras
-                    imperdiet turpis massa, id dapibus nulla congue vitae. Morbi
-                    lacus turpis, pellentesque quis velit non, varius luctus
-                    est. Praesent mollis turpis et venenatis placerat. Etiam
-                    tempor faucibus magna, in fringilla metus consectetur eget.
-                    Nam eleifend ex lectus, vel vulputate sem malesuada vel.
-                    Suspendisse vel diam ac nunc sagittis volutpat. Suspendisse
-                    potenti. Aliquam ac molestie sapien. Nam eros tellus,
-                    pulvinar nec nisi eu, luctus tristique ligula.
-                  </p>
-                  <p className="mb-0">Category</p>
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                    {/* TO DO: CHANGE DEPENDING ON INPUT AND TYPE OF EXXERCISE */}
+                    <div className="w-100 bg-warning exercise-vid rounded-2"></div>
+                    <p className="mb-0">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                      Sed eget fermentum torto r. Nulla facilisi. Maecenas
+                      hendrerit feugiat finibus. Mauris nec diam at risus
+                      ullamcorper pellentesque quis a mauris. Suspendisse id
+                      sagittis dolor. Vivamus tristique tempus leo, sed
+                      consectetur ante consequat eu. Nulla feugiat nisi sed
+                      sapien sodales iaculis. Cras imperdiet turpis massa, id
+                      dapibus nulla congue vitae. Morbi lacus turpis,
+                      pellentesque quis velit non, varius luctus est. Praesent
+                      mollis turpis et venenatis placerat. Etiam tempor faucibus
+                      magna, in fringilla metus consectetur eget. Nam eleifend
+                      ex lectus, vel vulputate sem malesuada vel. Suspendisse
+                      vel diam ac nunc sagittis volutpat. Suspendisse potenti.
+                      Aliquam ac molestie sapien. Nam eros tellus, pulvinar nec
+                      nisi eu, luctus tristique ligula.
+                    </p>
+                  </div>
                 </div>
               </div>
-            </Col>
 
-            {/* ACTIONS */}
-            <Col lg className="height-responsive">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">
-                  Perform Exercise
-                </h4>
-              </div>
-
-              <div className="card-container d-flex justify-content-center align-items-center flex-column gap-2 scrollable-div notif-home">
-                <div className="local-video">
-                  <video></video>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Perform</p>
+                    <p className="mb-0">Practice and folllow along.</p>
+                  </div>
                 </div>
-                <button className="button-group bg-white">
-                  <p className="fw-bold my-0 status">PERFORM</p>
-                </button>
 
-                <div className="card-container p-3 w-75">
-                  <p className="mb-0">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed
-                    eget fermentum torto r. Nulla facilisi. Maecenas hendrerit
-                    feugiat finibus. Mauris nec diam at risus ullamcorper
-                    pellentesque quis a mauris. Suspendisse id sagittis dolor.
-                    Vivamus tristique tempus leo, sed consectetur ante consequat
-                    eu.
-                  </p>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3">
+                      <div className="mb-3">
+                        {/* VIDEO CAM */}
+                        <video className="w-100 h-75 bg-warning"></video>
+                      </div>
+
+                      {/* BUTTON */}
+                      <div
+                        className="mb-3 fw-bold text-button border mx-auto"
+                        style={{ cursor: "pointer" }}
+                      >
+                        Perform
+                      </div>
+                      {/* PERFORMANCE */}
+                      <p className="mb-3 w-100 bg-secondary-subtle text-center p-3 rounded-2">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

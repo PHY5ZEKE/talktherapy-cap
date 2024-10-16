@@ -48,6 +48,16 @@
   cursor: pointer;
 }
 
+.text-danger {
+  color:#f44336;
+  background-color: #ffdddd;
+}
+
+.text-success {
+  color:#4caf50;
+  background-color: #e4ffdd;
+}
+
 .text-header {
   display: flex;
   align-items: center;

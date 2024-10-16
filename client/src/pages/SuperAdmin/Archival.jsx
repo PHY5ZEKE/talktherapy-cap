@@ -1,14 +1,15 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
-import Calendar from "../../assets/icons/Calendar";
-import Sort from "../../assets/icons/Sort";
+// Calendar
+import Icon from "../../assets/icons/CalendarIcon";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 export default function Archival() {
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
@@ -56,123 +57,125 @@ export default function Archival() {
   }, []);
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-flex"
-        >
-          {/* TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              {error && <p className="error">{error}</p>}
-              {superAdmin ? (
-                <p className="m-0 fw-bold">
-                  Hello, {superAdmin.firstName} {superAdmin.lastName}
-                </p>
-              ) : (
-                <p>Loading...</p>
-              )}
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : superAdmin ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {superAdmin.firstName} {superAdmin.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
+              </div>
+
+              <MenuDropdown />
             </div>
-          </Row>
 
-          {/* SYSTEM ACTIVITIES */}
-          <Row
-            lg
-            md
-            className="activity-top border border-1 my-2 border-[#B9B9B9] card-content-bg-light p-2 d-flex justify-content-center align-items-center mx-auto"
-          >
-            <div className="container">
-              <div className="row">
-                <div className="col d-flex align-items-center gap-3">
-                  <h4 className="mb-0 fw-bold">Data Archival</h4>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <div className="d-flex flex-wrap gap-3 align-items-center justify-content-start">
+                      <div>
+                        <p className="mb-0 fw-bold">System Activities</p>
+                        <p className="mb-0">Date Here</p>
+                      </div>
+
+                      <DatePicker
+                        className="calendar text-center"
+                        showIcon
+                        icon={Icon}
+                        dateFormat={"yyyy/MM/dd"}
+                      />
+
+                      <div className="d-flex gap-3">
+                        <button
+                          className="fw-bold text-button border"
+                          style={{ cursor: "pointer" }}
+                        >
+                          Import
+                        </button>
+                        <button
+                          className="fw-bold text-button border"
+                          style={{ cursor: "pointer" }}
+                        >
+                          Export
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="col">
-                  <div className="row text-center d-flex align-items-center gap-3">
-                    <div className="col fw-bold">Friday, July 5, 2024</div>
-                    <div className="col">
-                      <Calendar />
-                    </div>
-                    <div className="col">
-                      <Sort />
-                    </div>
-                    <div className="col">
-                      <button className="action-btn2 btn-text-blue fw-bold mb-3">
-                        Import
-                      </button>
-                      <button className="action-btn2 btn-text-blue fw-bold">
-                        Archive Selected
-                      </button>
-                    </div>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <table className="table table-hover">
+                      <thead>
+                        <tr>
+                          <th scope="col">Last Active</th>
+                          <th scope="col">Email Address</th>
+                          <th scope="col">First Name</th>
+                          <th scope="col">Last Name</th>
+                          <th scope="col" style={{ width: "70" }}>
+                            <button className="action-btn btn-text-blue">
+                              Select All
+                            </button>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <th scope="row">July 5, 2024</th>
+                          <td>Mark@gmail.com</td>
+                          <td>Mark</td>
+                          <td>Villar</td>
+                          <td>
+                            <input type="checkbox" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">July 5, 2024</th>
+                          <td>Mark@gmail.com</td>
+                          <td>Mark</td>
+                          <td>Villar</td>
+                          <td>
+                            <input type="checkbox" />
+                          </td>
+                        </tr>
+                        <tr>
+                          <th scope="row">July 5, 2024</th>
+                          <td>Mark@gmail.com</td>
+                          <td>Mark</td>
+                          <td>Villar</td>
+                          <td>
+                            <input type="checkbox" />
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
                 </div>
               </div>
             </div>
-          </Row>
-
-          <Row lg md>
-            {/* YOUR PROFILE */}
-            <Col lg className="height-responsive">
-              <div className="table-responsive card-container d-flex flex-column gap-2 scrollable-div notif-home">
-                {/* TABLE NOTIFICATION*/}
-                <table className="table table-hover">
-                  <thead>
-                    <tr>
-                      <th scope="col">Last Active</th>
-                      <th scope="col">Email Address</th>
-                      <th scope="col">First Name</th>
-                      <th scope="col">Last Name</th>
-                      <th scope="col" style={{ width: "70" }}>
-                        <button className="action-btn btn-text-blue">
-                          Select All
-                        </button>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <th scope="row">July 5, 2024</th>
-                      <td>Mark@gmail.com</td>
-                      <td>Mark</td>
-                      <td>Villar</td>
-                      <td>
-                        <input type="checkbox" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">July 5, 2024</th>
-                      <td>Mark@gmail.com</td>
-                      <td>Mark</td>
-                      <td>Villar</td>
-                      <td>
-                        <input type="checkbox" />
-                      </td>
-                    </tr>
-                    <tr>
-                      <th scope="row">July 5, 2024</th>
-                      <td>Mark@gmail.com</td>
-                      <td>Mark</td>
-                      <td>Villar</td>
-                      <td>
-                        <input type="checkbox" />
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

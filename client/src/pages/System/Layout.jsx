@@ -11,6 +11,7 @@ import {
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 export default function Layout() {
   return (
@@ -28,24 +29,7 @@ export default function Layout() {
                 <p className="fw-bold">Admin</p>
               </div>
 
-              <div className="col d-block d-md-none">
-                <div className="d-flex align-items-center justify-content-end h-100">
-                  <div>
-                    <div data-bs-toggle="dropdown" aria-expanded="false">
-                      <FontAwesomeIcon icon={faBars} size="xl" />
-                    </div>
-                        <ul className="dropdown-menu">
-                            <li><a className="dropdown-item" href="#">Home</a></li>
-                            <li><a className="dropdown-item" href="#">Feedbacks</a></li>
-                            <li><a className="dropdown-item" href="#">Exercises</a></li>
-                            <li><a className="dropdown-item" href="#">Appointments</a></li>
-                            <li><a className="dropdown-item" href="#">Settings</a></li>
-                            <li><hr className="dropdown-divider"/></li>
-                            <li><a className="dropdown-item" href="#">Logout</a></li>
-                        </ul>
-                  </div>
-                </div>
-              </div>
+              <MenuDropdown/>
             </div>
 
             <div className="row h-100">

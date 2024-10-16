@@ -1,24 +1,12 @@
-import React, { useState, useEffect } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { route } from "../../utils/route";
 
-// CSS
-import "./home.css";
-
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
-
-// Icons
-import Delete from "../../assets/icons/Delete";
-import Edit from "../../assets/icons/Edit";
-import Search from "../../assets/icons/Search";
-import Calendar from "../../assets/icons/Calendar";
-// import { set } from "react-datepicker/dist/date_utils";
-
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 import EditProfile from "../../components/Modals/EditProfile";
+import RegisterAdmin from "../../components/Modals/RegisterAdmin";
 
 export default function Home() {
   // Get Super Admin and Admins
@@ -30,8 +18,10 @@ export default function Home() {
   const [userDetails, setUserDetails] = useState(null);
   const [editProfileAPI, setEditProfileAPI] = useState("");
   const [updateProfilePictureAPI, setUpdateProfilePictureAPI] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdd, setIsAdd] = useState(false);
 
   const handleModal = (user) => {
     setIsOpen(!isOpen);
@@ -119,217 +109,220 @@ export default function Home() {
     fetchAdmins();
   }, []);
 
+  // Function to toggle activation status
+  const toggleAdminStatus = async (adminData) => {
+    if (!adminData) return;
+
+    setIsProcessing(true); // Start processing
+
+    try {
+      const url = adminData.active
+        ? `${appURL}/${route.admin.removeAdmin}`
+        : `${appURL}/${route.admin.activateAdmin}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify({ email: adminData.email }), // Automatically pass the selected admin's email
+      });
+
+      const data = await response.json();
+
+      if (!data.error) {
+        // Optionally, update the admins list to reflect the change
+        setAdmins(
+          admins.map((admin) =>
+            admin._id === adminData._id
+              ? { ...admin, active: !adminData.active }
+              : admin
+          )
+        );
+      } else {
+        console.error("Failed to toggle admin status:", data.message);
+      }
+    } catch (error) {
+      console.error("Error toggling admin status:", error);
+    } finally {
+      setIsProcessing(false); // Stop processing
+    }
+  };
+
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* EDIT MODAL */}
+      {isOpen && (
+        <EditProfile
+          editProfileAPI={editProfileAPI}
+          editPictureAPI={updateProfilePictureAPI}
+          userDetails={userDetails}
+          closeModal={handleModal}
+          isOwner={false}
+          whatRole={"superAdmin"}
+          onProfileUpdate={onProfileUpdate}
+        />
+      )}
 
-        {/* EDIT MODAL */}
-        {isOpen && (
-          <EditProfile
-            editProfileAPI={editProfileAPI}
-            editPictureAPI={updateProfilePictureAPI}
-            userDetails={userDetails}
-            closeModal={handleModal}
-            isOwner={false}
-            whatRole={"superAdmin"}
-            onProfileUpdate={onProfileUpdate}
-          />
-        )}
+      {/* REGISTER ADMIN MODAL */}
+      {isAdd && (
+        <>
+          <RegisterAdmin openModal={()=>setIsAdd(!isAdd)} />
+        </>
+      )}
 
-        {/* CONTENT */}
-        <Col
-          xs={{ order: 12 }}
-          lg={{ order: 1 }}
-          className="d-flex flex-column stretch-flex"
-        >
-          {/* USER TOP BAR */}
-          <Row
-            lg
-            md
-            className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center"
-          >
-            <div>
-              {error && <p className="error">{error}</p>}
-              {superAdmin ? (
-                <p className="m-0 fw-bold">
-                  Hello, {superAdmin.firstName} {superAdmin.lastName}
-                </p>
-              ) : (
-                <p>Loading...</p>
-              )}
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
+
+          {/* MAIN CONTENT */}
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                {error ? (
+                  <p>{error}</p>
+                ) : superAdmin ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {superAdmin?.firstName} {superAdmin?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
+              </div>
+
+              <MenuDropdown />
             </div>
-          </Row>
 
-          <Row lg md>
-            {/* CONTENT USER LIST */}
-            <Col lg className="height-responsive d-none d-lg-block">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Admins</h4>
-              </div>
-
-              <div className="card-container d-flex flex-column gap-2">
-                <div className="search-bar d-flex align-content-center gap-2">
-                  <Search />
-                  <input
-                    type="text"
-                    placeholder="Search for Admins"
-                    className="search-input"
-                  />
-                </div>
-
-                {loading && <p>Loading...</p>}
-                {error && <p>{error}</p>}
-
-                <div className="scrollable-div d-flex flex-column gap-3">
-                  {admins.map((admin) => (
-                    <div key={admin._id} className="card-content-bg-dark p-3">
-                      <div className="d-flex flex-column g-1 mb-2">
-                        <p className="fw-bold mb-0">
-                          {admin.firstName} {admin.lastName}
-                        </p>
-                        <p className="mb-0">{admin.email}</p>
-                        <p className="mb-0">{admin.address}</p>
-                        <p className="mb-0">{admin.mobile}</p>
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <div className="d-flex gap-3 justify-content-between">
+                      <div>
+                        <p className="mb-0 fw-bold">Admins</p>
+                        <p className="mb-0">Quick manage admins.</p>
                       </div>
 
-                      <div className="button-group d-flex justify-content-center flex-row gap-2 bg-white">
-                        <button
-                          className="icon-btn"
-                          onClick={() => {
-                            handleModal(admin);
-                          }}
-                        >
-                          <Edit />
-                        </button>
-                        <Delete />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Col>
-
-            {/* NOTIFICATION */}
-            <Col lg className="height-responsive">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Notifications</h4>
-              </div>
-              {/* DATE COMPONENT */}
-              <div className="card-content-bg-light p-3">
-                <div className="container text-center">
-                  <div className="row">
-                    <div className="col">
-                      <div className="row">
-                        <p className="mb-0">July</p>
-                        <p className="mb-0">Today is Friday, July 5, 2024</p>
-                      </div>
-                    </div>
-
-                    <div className="col">
-                      <Calendar />
+                      <button
+                        className="fw-bold text-button border"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setIsAdd(!isAdd)}
+                      >
+                        Add Admin
+                      </button>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="card-container d-flex flex-column gap-2 scrollable-div-2 notif-home">
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {error ? (
+                      <p>{error}</p>
+                    ) : superAdmin ? (
+                      <>
+                        {admins.map((admin) => (
+                          <div
+                            key={admin._id}
+                            className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          >
+                            <h5 className="mb-0 fw-bold">
+                              {admin.firstName} {admin.lastName}
+                            </h5>
+                            <p className="mb-0">{admin.email}</p>
+                            <p className="mb-0">{admin.address}</p>
+                            <p className="mb-3">{admin.mobile}</p>
 
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
-                  </div>
-                </div>
-
-                {/* NOTIFICATION COMPONENT */}
-                <div className="card-content-bg-dark p-3">
-                  <div className="d-flex flex-column g-1 mb-2">
-                    <p className="fw-bold mb-0">July 5, 2024</p>
-                    <p className="mb-0">7:31 PM</p>
-                    <p className="mb-0">
-                      Session of Dr. Reyes with Nicole Oraya has started.
-                    </p>
-                  </div>
-
-                  <div className="button-group bg-white">
-                    <p className="fw-bold my-0 status">ON-GOING</p>
+                            <div className="d-flex gap-3">
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => handleModal(admin)}
+                              >
+                                Edit
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                style={{ cursor: "pointer" }}
+                              >
+                                Delete
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => toggleAdminStatus(admin)}
+                                disabled={isProcessing}
+                              >
+                                {admin.active ? "Deactivate" : "Activate"}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    ) : (
+                      <p>Fetching data.</p>
+                    )}
                   </div>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Notifications</p>
+                    <p className="mb-0">
+                      Account and system related activities will be shown here.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-pending">PENDING</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-accepted">ACCEPTED</div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
+                      <p className="mb-3">
+                        Session of Rico Noapl Nieto with Ako.
+                      </p>
+                      <div className="mb-3 text-cancelled">CANCELLED</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

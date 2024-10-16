@@ -21,6 +21,11 @@
   white-space: nowrap;
 }
 
+.exercise-vid {
+  height: 320px;
+}
+
+/* OLD CSS */
 .full-height {
   max-height: 100%;
 }

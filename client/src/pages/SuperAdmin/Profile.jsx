@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
+
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
+import MenuDropdown from "../../components/Layout/MenuDropdown";
 
 // utils
 import { route } from "../../utils/route";
+import { page } from "../../utils/page-route";
+import { Link } from "react-router-dom";
 
 export default function Profile() {
   const [userDetails, setUserDetails] = useState(null);
@@ -67,106 +68,135 @@ export default function Profile() {
   }
 
   if (!userDetails) {
-    return <div>Loading...</div>;
+    return (
+      <div class="container-fluid d-flex vh-100 align-items-center justify-content-center">
+        <div class="spinner-border" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="container-fluid m-0">
-      <Row className="min-vh-100 vw-100">
-        <Sidebar />
+    <>
+      {/* EDIT MODAL */}
+      {isOpen && (
+        <EditProfile
+          editProfileAPI={route.sudo.edit}
+          editPictureAPI={route.sudo.picture}
+          userDetails={userDetails}
+          closeModal={handleModal}
+          isOwner={true}
+          onProfileUpdate={fetchUserDetails}
+        />
+      )}
 
-        {/* EDIT MODAL */}
-        {isOpen && (
-          <EditProfile
-            editProfileAPI={route.sudo.edit}
-            editPictureAPI={route.sudo.picture}
-            userDetails={userDetails}
-            closeModal={handleModal}
-            isOwner={true}
-            onProfileUpdate={fetchUserDetails}
-          />
-        )}
+      {/* CHANGE PASS MODAL */}
+      {isPasswordModalOpen && (
+        <ChangePassword
+          editPasswordAPI={route.sudo.password}
+          closeModal={handlePasswordModal}
+        />
+      )}
 
-        {/* CHANGE PASS MODAL */}
-        {isPasswordModalOpen && (
-          <ChangePassword
-            editPasswordAPI={route.sudo.password}
-            closeModal={handlePasswordModal}
-          />
-        )}
+      <div className="container-fluid p-0 vh-100">
+        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+          {/* SIDEBAR */}
+          <Sidebar />
 
-        <Col xs={{ order: 12 }} lg={{ order: 1 }}>
-          <Row className="border border-start-0 border-[#B9B9B9] p-2 d-flex justify-content-center align-items-center">
-            <div>
-              <p className="m-0">Hello,</p>
-              <p className="m-0 fw-bold">
-                {userDetails.firstName} {userDetails.middleName}{" "}
-                {userDetails.lastName}
-              </p>
-            </div>
-          </Row>
           {/* MAIN CONTENT */}
-          <Row>
-            {/* YOUR PROFILE */}
-            <Col lg className="height-responsive full-height">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Your Profile</h4>
+          <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
+            <div className="row bg-white border-bottom">
+              <div className="col">
+                <p className="mb-0 mt-3">Hello,</p>
+                <p className="fw-bold">Admin</p>
               </div>
 
-              <div className="card-container d-flex flex-column gap-2 notif-home">
-                {/* IMAGE COMPONENT */}
-                <div className="p-3">
-                  <div className="profile-img">
-                    <img src={userDetails.profilePicture} alt="Profile" />
+              <MenuDropdown />
+            </div>
+
+            <div className="row h-100">
+              {/* FIRST COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Your Profile</p>
+                    <p className="mb-0">Make changes to your profile.</p>
                   </div>
                 </div>
 
-                {/* PROFILE DETAILS */}
-                <div className="d-flex flex-column g-1 mb-2 mx-3">
-                  <h3 className="fw-bold mb-0">
-                    {" "}
-                    {userDetails.firstName} {userDetails.lastName}
-                  </h3>
-                  <p className="mb-0">{userDetails.address} </p>
-                  <p className="mb-0">{userDetails.mobile}</p>
-                  <p className="mb-0">{userDetails.email}</p>
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                    <div className="card">
+                      <img
+                        src={userDetails?.profilePicture}
+                        className="card-img-top"
+                        alt="Profile picture"
+                        style={{ maxHeight: "320px", objectFit: "cover" }}
+                      />
+                      <div className="card-body">
+                        <h5 className="">
+                          {userDetails?.firstName} {userDetails?.middleName}{" "}
+                          {userDetails?.lastName}
+                        </h5>
+                        <p className="mb-0">{userDetails?.address}</p>
+                        <p className="mb-0">{userDetails?.mobile}</p>
+                        <p className="mb-0">{userDetails?.email}</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </Col>
 
-            {/* ACTIONS */}
-            <Col lg className="height-responsive">
-              {/* HEADING */}
-              <div className="d-flex justify-content-between my-3 py-3 px-3 card-content-bg-light text-header">
-                <h4 className="fw-bold my-0 mx-0 card-text">Actions</h4>
+              {/* SECOND COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">Actions</p>
+                    <p className="mb-0">Perform account changes.</p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    <Link to={page.sudo.audit}>
+                      <div className="mb-3 fw-bold text-button border w-100">
+                        Audit Logs
+                      </div>
+                    </Link>
+
+                    <Link to={page.sudo.archival}>
+                      <div className="mb-3 fw-bold text-button border w-100">
+                        Archival
+                      </div>
+                    </Link>
+
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handleModal}
+                    >
+                      Edit Profile
+                    </div>
+
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handlePasswordModal}
+                    >
+                      Change Password
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="card-container d-flex justify-content-center align-items-center flex-column gap-2 scrollable-div notif-home">
-                {/* BUTTONS */}
-                <a href="/sudo/users">
-                  <button className="action-btn">Manage Admins</button>
-                </a>
-
-                <a href="/sudo/audit">
-                  <button className="action-btn">Audit Logs</button>
-                </a>
-                <a href="/sudo/archival">
-                  <button className="action-btn">Archival</button>
-                </a>
-                <button className="action-btn" onClick={handleModal}>
-                  Edit Profile
-                </button>
-                <button className="action-btn" onClick={handlePasswordModal}>
-                  Change Password
-                </button>
-              </div>
-            </Col>
-
-            <Col lg></Col>
-          </Row>
-        </Col>
-      </Row>
-    </div>
+              {/* THIRD COL */}
+              <div className="col-sm bg-white"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }

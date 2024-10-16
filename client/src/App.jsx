@@ -19,8 +19,6 @@ import ForgotPassword from "./pages/Forgot-Password/ForgotPassword";
 // Super Admin TalkTherapy
 import SuperAdminHome from "./pages/SuperAdmin/Home";
 import SuperAdminProfile from "./pages/SuperAdmin/Profile";
-import SuperAdminRegister from "./pages/SuperAdmin/RegisterAdmin";
-import SuperAdminManage from "./pages/SuperAdmin/ManageAdmin";
 import SuperAdminArchival from "./pages/SuperAdmin/Archival";
 import SuperAdminAudit from "./pages/SuperAdmin/AuditLogs";
 
@@ -122,22 +120,6 @@ const routes = (
         element={
           <PrivateRoute allowedRoles={["superAdmin"]}>
             <SuperAdminProfile />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/sudo/register"
-        element={
-          <PrivateRoute allowedRoles={["superAdmin"]}>
-            <SuperAdminRegister />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/sudo/users"
-        element={
-          <PrivateRoute allowedRoles={["superAdmin"]}>
-            <SuperAdminManage />
           </PrivateRoute>
         }
       />
