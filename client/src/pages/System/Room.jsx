@@ -289,9 +289,11 @@ export default function Room() {
       <div className="container-fluid d-flex flex-column justify-content-between vh-100">
         <div className="row text-center py-2 border border-start-0 border-[#B9B9B9]">
           <p className="mb-0">
-            Currently in session with: {appointment.selectedSchedule?.clinicianName}  and {appointment.patientId.firstName}{" "}
-                {appointment.patientId.middleName}{" "}
-                {appointment.patientId.lastName}
+            Currently in session with:{" "}  
+              {appointment?.selectedSchedule?.clinicianName || "Clinician not available"} and{" "} 
+              {appointment?.patientId?.firstName || ""}{" "}
+              {appointment?.patientId?.middleName || ""}{" "}
+              {appointment?.patientId?.lastName || ""}
           </p>
         </div>
 
