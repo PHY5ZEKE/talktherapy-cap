@@ -2,6 +2,9 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStethoscope } from "@fortawesome/free-solid-svg-icons";
+
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
@@ -168,13 +171,13 @@ export default function ManageSchedule() {
                               {clinician.firstName} {clinician.middleName}{" "}
                               {clinician.lastName}
                             </h5>
-                            <h6 className="fw-bold mb-0">
-                              Clinic Address: {clinician.address}
+                            <h6 className="mb-2">
+                              <FontAwesomeIcon icon={faStethoscope} size="sm" /> {" "}
+                              {clinician.specialization}
                             </h6>
-                            <h6 className="fw-bold mb-0">
-                              Specialization: {clinician.specialization}
-                            </h6>
+
                             <p className="mb-0">{clinician.email}</p>
+                            <p className="mb-0">{clinician.address}</p>
                             <p className="mb-0">{clinician.mobile}</p>
                           </div>
                         </div>

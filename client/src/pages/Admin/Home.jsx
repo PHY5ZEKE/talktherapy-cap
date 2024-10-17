@@ -13,7 +13,10 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
+const appURL = import.meta.env.VITE_APP_URL;
+
 export default function Home() {
+
   const [patients, setPatients] = useState(null);
   const [clinicians, setClinicians] = useState(null);
   const [adminData, setAdminData] = useState(null);
@@ -23,7 +26,6 @@ export default function Home() {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const appURL = import.meta.env.VITE_APP_URL;
 
   const notify = (message) =>
     toast.success(message, {
@@ -72,8 +74,8 @@ export default function Home() {
       setSelectedAppointment(response.data);
       setIsConfirm(true);
     } catch (error) {
-      failNotify(toastMessage.fail.fetch)
-      failNotify(toastMessage.fail.error)
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     }
   };
 
@@ -83,7 +85,6 @@ export default function Home() {
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
     const fetchAppointments = async () => {
       try {
         const response = await fetch(`${appURL}/${route.appointment.getAll}`, {
@@ -97,12 +98,12 @@ export default function Home() {
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
         }
-
         const data = await response.json();
         setAppointments(data);
       } catch (error) {
         failNotify(toastMessage.fail.fetch);
         setError(error.message);
+        console.log("Error fetch appointments :", error)
       } finally {
         setLoading(false);
       }
@@ -114,7 +115,6 @@ export default function Home() {
   useEffect(() => {
     const fetchAdminData = async () => {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
       try {
         const response = await fetch(`${appURL}/${route.admin.fetch}`, {
           method: "GET",
@@ -183,11 +183,11 @@ export default function Home() {
         if (!data.error) {
           setPatients(data.patients);
         } else {
-          failNotify(toastMessage.fail.fetch)
+          failNotify(toastMessage.fail.fetch);
         }
       } catch (error) {
-        failNotify(toastMessage.fail.fetch)
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -546,6 +546,15 @@ export default function Home() {
                       >
                         Clinicians
                       </button>
+
+                      {selectedUserType === "clinicians" && (
+                        <button
+                          onClick={closeAddClinician}
+                          className="text-button border"
+                        >
+                          Add Clinician
+                        </button>
+                      )}
                     </div>
 
                     {selectedUserType === "patients" && patients ? (
@@ -589,13 +598,6 @@ export default function Home() {
                       ))
                     ) : selectedUserType === "clinicians" && clinicians ? (
                       <>
-                        <button
-                          onClick={closeAddClinician}
-                          className="text-button border mb-3 mx-auto d-flex"
-                        >
-                          Add Clinician
-                        </button>
-                        <hr />
                         {clinicians.map((clinician) => (
                           <div
                             key={clinician._id}

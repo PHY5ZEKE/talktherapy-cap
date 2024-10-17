@@ -12,7 +12,6 @@ export default function FeedbackDiagnosis() {
   const [error, setError] = useState(null);
   const [diagnosisData, setDiagnosisData] = useState([]);
   const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
-  const appURL = import.meta.env.VITE_APP_URL;
 
   useEffect(() => {
     const fetchPatientData = async () => {

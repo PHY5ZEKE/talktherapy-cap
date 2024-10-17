@@ -17,15 +17,14 @@ import AppointmentDetailsClinician from "../../components/Modals/AppointmentDeta
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 
+const appURL = import.meta.env.VITE_APP_URL;
+
 export default function Home() {
-  const [patients, setPatients] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const appURL = import.meta.env.VITE_APP_URL;
 
   const navigate = useNavigate();
 
@@ -85,44 +84,6 @@ export default function Home() {
       failNotify(toastMessage.fail.error);
     }
   };
-
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.patient.getAllPatients}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!data.error) {
-          setPatients(data.patients);
-        } else {
-          failNotify(toastMessage.fail.fetch);
-        }
-      } catch (error) {
-        failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
-      }
-    };
-
-    fetchPatients();
-  }, []);
-
-  const filteredPatients = patients.filter(
-    (patient) =>
-      patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.mobile.includes(searchTerm)
-  );
 
   const joinMeeting = (app, id) => {
     navigate(`/room/${app}/${id}`);
