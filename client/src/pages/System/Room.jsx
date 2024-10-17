@@ -10,19 +10,15 @@ import Mic from "../../assets/buttons/Mic";
 import Camera from "../../assets/buttons/Camera";
 
 // Import the voice recognition functionalities
-import { runSpeechRecognition, segmentPhonemes } from "../../machinelearning/my_model/voice2text.js"; 
+import { runSpeechRecognition} from "../../machinelearning/my_model/voice2text.js"; 
 import { init } from "../../machinelearning/script.js"; 
 
 export default function Room() {
-  // Error
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [messages, setMessages] = useState([]); // State for storing messages
   const [type, setType] = useState("");
   const [appointment, setAppointment] = useState([]);
-
-  const [diagnosticOutput, setDiagnosticOutput] = useState(""); 
-  const [phonemeSegments, setPhonemeSegments] = useState([]);
   const [speechScore, setSpeechScore] = useState({ pronunciationScore: 0, fluencyScore: 0 });
 
   const appURL = import.meta.env.VITE_APP_URL;
@@ -302,9 +298,8 @@ export default function Room() {
     ]);
   }
 
-  // Function to start voice recognition
   function startVoiceRecognitionHandler() {
-    runSpeechRecognition(setDiagnosticOutput, setPhonemeSegments, setSpeechScore); 
+    runSpeechRecognition(setSpeechScore); 
   }
 
   return (
@@ -547,7 +542,7 @@ export default function Room() {
                         <div id="score-container">
                             <h6>Speech Assessment Scores:</h6>
                             <div id="score-output">
-                                Pronunciation: {speechScore.pronunciationScore}%, Fluency: {speechScore.fluencyScore}%
+                                Pronunciation: {speechScore.pronunciationScore.toFixed(2)}%, Fluency: {speechScore.fluencyScore.toFixed(2)}%
                             </div>
                         </div>
                         

@@ -1,5 +1,5 @@
 const URL = "http://localhost:5173/src/machinelearning/my_model/";
-import * as tf from '@tensorflow/tfjs'; // Import TensorFlow
+import * as tf from '@tensorflow/tfjs'; 
 import Chart from 'chart.js/auto';
 
 export async function createModel() {

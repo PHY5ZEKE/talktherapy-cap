@@ -1,4 +1,4 @@
-export function runSpeechRecognition(setDiagnosticOutput, setPhonemeSegments, setScore) {
+export function runSpeechRecognition(setScore) {
     var output = document.getElementById("output");
     var action = document.getElementById("action");
     var phonemeContainer = document.getElementById("phoneme-output"); // Updated to phoneme-output
@@ -38,7 +38,7 @@ export function runSpeechRecognition(setDiagnosticOutput, setPhonemeSegments, se
         // Assess pronunciation for the first word
         var words = finalText.split(' ');
         var firstWord = words.length > 0 ? cleanWord(words[0]) : '';
-        var phonemeSequence = pronouncing.phonesForWord(firstWord);
+        var phonemeSequence = window.pronouncing.phonesForWord(firstWord);
 
         if (phonemeSequence.length > 0) {
             var phonemeArray = phonemeSequence[0].split(" ");
@@ -58,10 +58,10 @@ export function runSpeechRecognition(setDiagnosticOutput, setPhonemeSegments, se
     recognition.start();
 }
 
-export function assessPronunciation(transcript, phonemeArray, pronouncing) {
+export function assessPronunciation(transcript, phonemeArray) {
     const words = transcript.split(' ');
     const firstWord = words.length > 0 ? cleanWord(words[0]) : '';
-    const referencePhonemes = pronouncing.phonesForWord(firstWord);
+    const referencePhonemes = window.pronouncing.phonesForWord(firstWord);
 
     if (referencePhonemes.length === 0) {
         return { pronunciationScore: 0, fluencyScore: 0 }; // No reference phonemes found
@@ -89,7 +89,7 @@ export function calculateFluency() {
 
 export function displayScore(score) {
     var scoreOutput = document.getElementById("score-output"); // Ensure this element exists in your HTML
-    scoreOutput.innerHTML = `Pronunciation: ${score.pronunciationScore}%, Fluency: ${score.fluencyScore}%`;
+    scoreOutput.innerHTML = `Pronunciation: ${score.pronunciationScore.toFixed(2)}%, Fluency: ${score.fluencyScore.toFixed(2)}%`;
 }
 
 // Original phoneme segmentation and display functions remain unchanged
@@ -102,7 +102,7 @@ export function segmentPhonemes(text) {
         console.error("Pronouncing.js library not loaded.");
         return;
     }
-    
+  
     var words = text.split(' ');
     var phonemeContainer = document.getElementById("phoneme-output");
     phonemeContainer.innerHTML = ''; 
@@ -123,7 +123,6 @@ export function segmentPhonemes(text) {
 
 export function displayPhonemes(word, phonemeArray) {
     var phonemeContainer = document.getElementById("phoneme-output");
-
     var phonemeElement = document.createElement("div");
     phonemeElement.innerText = word + ": " + phonemeArray.join(", ");
     phonemeContainer.appendChild(phonemeElement);
