@@ -92,15 +92,18 @@ export default function ClinicianRegister() {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Registration Successful");
-        navigate("/login"); // Redirect to login or another page
+        setMessage("Registration Successful");
+        setError(false);
+        navigate("/login");
       } else {
-        setMessage(result.message);
-        alert(result.message || "Registration Failed");
+        setMessage(result.message || "Registration Failed");
+        setError(true);
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+      console.error("Error during registration:", error); // Log error
+      // Display error message in the form itself
+      setMessage("An error occurred. Please try again.");
+      setError(true);
     }
   };
 
@@ -297,24 +300,24 @@ export default function ClinicianRegister() {
               <div className="col-sm d-flex flex-column mb-3">
                 <p className="fw-bold mb-0">Consent</p>
                 <div className="d-flex">
-                    <input
-                      type="radio"
-                      label="Yes"
-                      name="consent"
-                      value="yes"
-                      checked={formData.consent === "yes"}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label mx-2">Yes</label>
-                    <input
-                      type="radio"
-                      label="No"
-                      name="consent"
-                      value="no"
-                      checked={formData.consent === "no"}
-                      onChange={handleChange}
-                    />
-                    <label className="form-check-label mx-2">No</label>
+                  <input
+                    type="radio"
+                    label="Yes"
+                    name="consent"
+                    value="yes"
+                    checked={formData.consent === "yes"}
+                    onChange={handleChange}
+                  />
+                  <label className="form-check-label mx-2">Yes</label>
+                  <input
+                    type="radio"
+                    label="No"
+                    name="consent"
+                    value="no"
+                    checked={formData.consent === "no"}
+                    onChange={handleChange}
+                  />
+                  <label className="form-check-label mx-2">No</label>
                 </div>
               </div>
             </div>
