@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 // Utils
 import { route } from "../../utils/route";

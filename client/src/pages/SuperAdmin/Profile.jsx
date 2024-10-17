@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/SudoMenu";
 
 // utils
 import { route } from "../../utils/route";

@@ -4,7 +4,7 @@ import axios from "axios";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 // Modal
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";

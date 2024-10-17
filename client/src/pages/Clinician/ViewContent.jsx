@@ -3,7 +3,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 export default function ViewContent() {
   const [clinicianData, setClinicianData] = useState(null);

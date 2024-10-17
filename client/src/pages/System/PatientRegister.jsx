@@ -3,8 +3,6 @@ import { route } from "../../utils/route.js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 
 export default function ClinicianRegister() {
   const [showPassword, setShowPassword] = useState(false);
@@ -39,16 +37,13 @@ export default function ClinicianRegister() {
 
   const navigate = useNavigate();
 
-  const handleIconClick = () => {
-    datePickerRef.current.setFocus();
-  };
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
@@ -100,6 +95,7 @@ export default function ClinicianRegister() {
         alert("Registration Successful");
         navigate("/login"); // Redirect to login or another page
       } else {
+        setMessage(result.message);
         alert(result.message || "Registration Failed");
       }
     } catch (error) {
@@ -118,8 +114,8 @@ export default function ClinicianRegister() {
       </div>
 
       <div className="row h-100">
-        <div className="col d-none d-md-block p-3">
-          <div className="w-75 mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
+        <div className="col-sm d-none d-lg-block p-3">
+          <div className="mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
             <h1 className="fw-boldest">TalkTherapy</h1>
             <h3 className="fw-boldest">Rehabilitation in your hands.</h3>
             <p>
@@ -129,175 +125,179 @@ export default function ClinicianRegister() {
           </div>
         </div>
 
-        <div className="col my-auto p-3">
+        <div className="col-sm my-auto p-3 overflow-hidden">
+          {message && (
+            <div
+              className="d-flex mx-auto text-danger text-center mb-2 p-2 rounded-3 border"
+              style={{ minWidth: "300px", maxWidth: "70%" }}
+            >
+              {message}
+            </div>
+          )}
           <form
-            className="bg-white form-container rounded-4 mx-auto w-100 p-3"
+            className="bg-white container-fluid form-container rounded-4 mx-auto p-3 overflow-auto"
+            style={{ maxHeight: "75vh", minWidth: "300px", maxWidth: "70%" }}
             onSubmit={handleSubmit}
           >
-            <h4 className="fw-bold text-center mb-0">Register</h4>
+            <h2 className="fw-bold text-center mb-0">Register</h2>
             <p className="text-center"> Please fill out all fields.</p>
 
-            <h6>Basic Information</h6>
-            <div className="input-group mb-3">
-              <span className="input-group-text">First Name</span>
-              <input
-                type="text"
-                aria-label="First name"
-                placeholder="First Name"
-                className="form-control"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="input-group mb-3">
-              <span className="input-group-text">Middle Name</span>
-              <input
-                type="text"
-                aria-label="Middle name"
-                placeholder="Middle Name"
-                className="form-control"
-                name="middleName"
-                value={formData.middleName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="input-group mb-3">
-              <span className="input-group-text">Last Name</span>
-              <input
-                type="text"
-                aria-label="Last name"
-                placeholder="Last Name"
-                className="form-control"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </div>
+            <h5>Basic Information</h5>
 
             <div className="row">
-              <div className="col">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Phone Number</span>
-                  <input
-                    type="text"
-                    aria-label="Phone Number"
-                    placeholder="Phone Number"
-                    className="form-control"
-                    name="mobile"
-                    value={formData.mobile}
-                    onChange={handleChange}
-                  />
-                </div>
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">First Name</p>
+                <input
+                  type="text"
+                  className="form-input rounded-2"
+                  aria-label="First name"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Middle Name</p>
+                <input
+                  type="text"
+                  aria-label="Middle name"
+                  placeholder="Middle Name"
+                  className="form-input rounded-2"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Last Name</p>
+                <input
+                  type="text"
+                  aria-label="Last name"
+                  placeholder="Last Name"
+                  className="form-input rounded-2"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                />
               </div>
             </div>
 
             <div className="row">
-              <div className="col">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Date of Birth</span>
-                  <DatePicker
-                    aria-label="Date"
-                    ref={datePickerRef}
-                    selected={selectedDate}
-                    onChange={(date) => setSelectedDate(date)}
-                    dateFormat="yyyy-MM-dd"
-                    showYearDropdown
-                    scrollableYearDropdown
-                    className="form-control"
-                  />
-                </div>
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Phone Number</p>
+                <input
+                  type="text"
+                  aria-label="Phone Number"
+                  placeholder="Phone Number"
+                  className="form-input rounded-2"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Birthday</p>
+                <input
+                  type="date"
+                  aria-label="Date"
+                  ref={datePickerRef}
+                  selected={selectedDate}
+                  onChange={(date) => setSelectedDate(date)}
+                  className="form-input rounded"
+                />
               </div>
             </div>
 
             <div className="row">
-              <div className="col">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Medical Diagnosis</span>
-                  <select
-                    className="form-select"
-                    aria-label="Diagnosis"
-                    value={formData.diagnosis}
-                    onChange={handleChange}
-                  >
-                    <option selected>Diagnosis</option>
-                    <option value="1">Diagnosis 1</option>
-                    <option value="2">Diagnosis 2</option>
-                    <option value="3">Diagnosis 3</option>
-                  </select>
-                </div>
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="fw-bold mb-0">Medical Diagnosis</p>
+                <select
+                  className="form-input rounded-2"
+                  aria-label="Diagnosis"
+                  name="diagnosis"
+                  value={formData.diagnosis}
+                  onChange={handleChange}
+                >
+                  <option value="1">Diagnosis 1</option>
+                  <option value="2">Diagnosis 2</option>
+                  <option value="3">Diagnosis 3</option>
+                </select>
               </div>
             </div>
 
-            <h6>Credentials</h6>
+            <h5>Credentials</h5>
 
-            <div className="input-group mb-3">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Valid email address"
-                aria-label="Valid email address"
-                aria-describedby="basic-addon2"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              <span className="input-group-text" id="basic-addon2">
-                @gmail.com
-              </span>
+            <div className="row">
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Valid Email</p>
+                <input
+                  type="email"
+                  className="form-input rounded-2"
+                  placeholder="Valid email address"
+                  aria-label="Valid email address"
+                  aria-describedby="basic-addon2"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div className="row">
-              <div className="col">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Password</span>
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="fw-bold mb-0">Password</p>
+                <div className="d-flex">
                   <input
                     aria-label="Password"
                     placeholder="Password"
-                    className="form-control"
+                    className="form-input rounded-2 w-100"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                   />
-                  <i
+                  <button
                     onClick={togglePasswordVisibility}
-                    className="input-group-text"
+                    className="text-button form-show rounded-2"
                   >
                     Show
-                  </i>
+                  </button>
                 </div>
               </div>
             </div>
 
             <div className="row">
-              <div className="col">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Confirm Password</span>
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="fw-bold mb-0">Confirm Password</p>
+
+                <div className="d-flex">
                   <input
                     aria-label="Confirm password"
                     placeholder="Passwords must match"
-                    className="form-control"
+                    className="form-input rounded-2 w-100"
                     type={showConfPassword ? "text" : "password"}
                     name="confPassword"
                     value={formData.confPassword}
                     onChange={handleChange}
                   />
-                  <i
+                  <button
                     onClick={toggleConfPasswordVisibility}
-                    className="input-group-text"
+                    className="text-button form-show rounded-2"
                   >
                     Show
-                  </i>
+                  </button>
                 </div>
               </div>
             </div>
 
             <div className="row">
-              <div className="col">
-                <div className="input-group">
-                  <span className="input-group-text">Consent</span>
-                  <div className="form-check form-check-inline mx-3">
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="fw-bold mb-0">Consent</p>
+                <div className="d-flex">
                     <input
                       type="radio"
                       label="Yes"
@@ -306,9 +306,7 @@ export default function ClinicianRegister() {
                       checked={formData.consent === "yes"}
                       onChange={handleChange}
                     />
-                    <label className="form-check-label">Yes</label>
-                  </div>
-                  <div className="form-check form-check-inline">
+                    <label className="form-check-label mx-2">Yes</label>
                     <input
                       type="radio"
                       label="No"
@@ -317,22 +315,23 @@ export default function ClinicianRegister() {
                       checked={formData.consent === "no"}
                       onChange={handleChange}
                     />
-                    <label className="form-check-label">No</label>
-                  </div>
+                    <label className="form-check-label mx-2">No</label>
                 </div>
               </div>
             </div>
 
-            <div className="w-75 d-flex flex-column align-items-center justify-content-center">
-              <button
-                className="text-button border rounded-5 my-3"
-                type="submit"
-              >
-                Submit
-              </button>
-              <Link to="/login" className="loginLink">
-                I want to login
-              </Link>
+            <div className="row">
+              <div className="col-sm d-flex flex-column align-items-center justify-content-center">
+                <button
+                  className="text-button fw-bold border rounded-5 my-3"
+                  type="submit"
+                >
+                  Submit
+                </button>
+                <Link to="/login" className="loginLink">
+                  I want to login
+                </Link>
+              </div>
             </div>
           </form>
         </div>

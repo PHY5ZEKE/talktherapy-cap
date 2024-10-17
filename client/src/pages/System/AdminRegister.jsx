@@ -84,6 +84,7 @@ export default function AdminRegister() {
         alert("Registration Successful");
         navigate("/login"); // Redirect to login or another page
       } else {
+        setMessage(result.message)
         alert(result.message || "Registration Failed");
       }
     } catch (error) {
@@ -102,9 +103,8 @@ export default function AdminRegister() {
       </div>
 
       <div className="row flex-grow-1">
-        {/* Left section: Hidden on small screens, visible on medium+ */}
-        <div className="col-12 col-md-6 d-none d-md-block p-3">
-          <div className="w-75 mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
+        <div className="col-sm d-none d-lg-block p-3">
+          <div className="mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
             <h1 className="fw-boldest">TalkTherapy</h1>
             <h3 className="fw-boldest">Rehabilitation in your hands.</h3>
             <p>
@@ -115,146 +115,168 @@ export default function AdminRegister() {
         </div>
 
         {/* Right section: Form */}
-        <div className="col-12 col-md-6 my-auto p-3">
+        <div className="col-sm my-auto p-3">
+          {message && (
+            <div
+              className="d-flex mx-auto text-danger text-center mb-2 p-2 rounded-3 border"
+              style={{ minWidth: "300px", maxWidth: "70%" }}
+            >
+              {message}
+            </div>
+          )}
+
           <form
-            className="bg-white form-container rounded-4 mx-auto w-100 w-md-75 p-3 p-md-4"
+            className="bg-white container-fluid form-container rounded-4 mx-auto p-3 overflow-auto"
+            style={{ maxHeight: "75vh", minWidth: "300px", maxWidth: "70%" }}
             onSubmit={handleSubmit}
           >
             <h4 className="fw-bold text-center mb-2">Register</h4>
             <p className="text-center">Please fill out all fields.</p>
+            <h5>Basic Information</h5>
 
-            <h6 className="fw-bold">Basic Information</h6>
-            <div className="input-group mb-3">
-              <span className="input-group-text">First Name</span>
-              <input
-                type="text"
-                aria-label="First name"
-                placeholder="First Name"
-                className="form-control"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="input-group mb-3">
-              <span className="input-group-text">Middle Name</span>
-              <input
-                type="text"
-                aria-label="Middle name"
-                placeholder="Middle Name"
-                className="form-control"
-                name="middleName"
-                value={formData.middleName}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="input-group mb-3">
-              <span className="input-group-text">Last Name</span>
-              <input
-                type="text"
-                aria-label="Last name"
-                placeholder="Last Name"
-                className="form-control"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
+            <div className="row">
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">First Name</p>
+                <input
+                  type="text"
+                  className="form-input rounded-2"
+                  aria-label="First name"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Middle Name</p>
+                <input
+                  type="text"
+                  aria-label="Middle name"
+                  placeholder="Middle Name"
+                  className="form-input rounded-2"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Last Name</p>
+                <input
+                  type="text"
+                  aria-label="Last name"
+                  placeholder="Last Name"
+                  className="form-input rounded-2"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
-            <div className="input-group mb-3">
-              <span className="input-group-text">Phone Number</span>
+            <div className="col-sm d-flex flex-column mb-3">
+              <p className="mb-0 fw-bold">Phone Number</p>
               <input
                 type="text"
                 aria-label="Phone Number"
                 placeholder="Phone Number"
-                className="form-control"
+                className="form-input rounded-2"
                 name="mobile"
                 value={formData.mobile}
                 onChange={handleChange}
               />
             </div>
 
-            <div className="input-group mb-3">
-              <span className="input-group-text">Clinic Address</span>
+            <div className="col-sm d-flex flex-column mb-3">
+              <p className="mb-0 fw-bold">Clinic Address</p>
               <input
                 type="text"
-                aria-label="Clinic Address"
+                aria-label="Clinic address"
                 placeholder="Clinic Address"
-                className="form-control"
+                className="form-input rounded-2"
                 name="address"
                 value={formData.address}
                 onChange={handleChange}
               />
             </div>
 
-            <h6 className="fw-bold">Credentials</h6>
-            <div className="input-group mb-3">
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Valid email address"
-                aria-label="Valid email address"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-              <span className="input-group-text">@gmail.com</span>
+            <h5>Credentials</h5>
+            <div className="row">
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="mb-0 fw-bold">Valid Email</p>
+                <input
+                  type="email"
+                  className="form-input rounded-2"
+                  placeholder="Valid email address"
+                  aria-label="Valid email address"
+                  aria-describedby="basic-addon2"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                />
+              </div>
             </div>
 
             <div className="row">
-              <div className="col-12 col-md-6">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Password</span>
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="fw-bold mb-0">Password</p>
+                <div className="d-flex">
                   <input
                     aria-label="Password"
                     placeholder="Password"
-                    className="form-control"
+                    className="form-input rounded-2 w-100"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     value={formData.password}
                     onChange={handleChange}
                   />
-                  <i
+                  <button
                     onClick={togglePasswordVisibility}
-                    className="input-group-text"
+                    className="text-button form-show rounded-2"
                   >
                     Show
-                  </i>
+                  </button>
                 </div>
               </div>
+            </div>
 
-              <div className="col-12 col-md-6">
-                <div className="input-group mb-3">
-                  <span className="input-group-text">Confirm Password</span>
+            <div className="row">
+              <div className="col-sm d-flex flex-column mb-3">
+                <p className="fw-bold mb-0">Confirm Password</p>
+
+                <div className="d-flex">
                   <input
                     aria-label="Confirm password"
-                    placeholder="Must Match"
-                    className="form-control"
+                    placeholder="Passwords must match"
+                    className="form-input rounded-2 w-100"
                     type={showConfPassword ? "text" : "password"}
                     name="confPassword"
                     value={formData.confPassword}
                     onChange={handleChange}
                   />
-                  <i
+                  <button
                     onClick={toggleConfPasswordVisibility}
-                    className="input-group-text"
+                    className="text-button form-show rounded-2"
                   >
                     Show
-                  </i>
+                  </button>
                 </div>
               </div>
             </div>
 
-            <div className="d-flex flex-column align-items-center justify-content-center">
-              <button
-                className="btn btn-primary w-50 rounded-5 my-3"
-                type="submit"
-              >
-                Submit
-              </button>
-              <Link to="/login" className="loginLink text-decoration-none">
-                I want to login
-              </Link>
+            <div className="row">
+              <div className="col-sm d-flex flex-column align-items-center justify-content-center">
+                <button
+                  className="text-button fw-bold border rounded-5 my-3"
+                  type="submit"
+                >
+                  Submit
+                </button>
+                <Link to="/login" className="loginLink">
+                  I want to login
+                </Link>
+              </div>
             </div>
           </form>
         </div>

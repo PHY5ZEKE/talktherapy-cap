@@ -3,7 +3,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/SudoMenu";
 
 // Calendar
 import Icon from "../../assets/icons/CalendarIcon";

@@ -1,7 +1,6 @@
 export const page = {
     sudo: {
       home: "/sudo",
-      users: "/sudo/users",
       audit: "/sudo/audit",
       profile: "/sudo/profile",
       archival: "/sudo/archival",

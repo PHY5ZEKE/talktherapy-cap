@@ -3,7 +3,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/PatientMenu";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
@@ -55,7 +55,7 @@ export default function ViewContent() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-              {error ? (
+                {error ? (
                   <p>{error}</p>
                 ) : patientData ? (
                   <>
@@ -87,43 +87,58 @@ export default function ViewContent() {
                     className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
                     style={{ minHeight: "85vh" }}
                   >
-                    <div className="card exercise-container" style={{ width: "18rem" }}>
+                    <div
+                      className="card exercise-container"
+                      style={{ width: "18rem" }}
+                    >
                       <img
                         src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
                         className="card-img-top"
                         alt="..."
-                        style={{height: "16rem", objectFit:"cover"}}
+                        style={{ height: "16rem", objectFit: "cover" }}
                       />
                       <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
+                        <h5 className="card-title fw-bold mb-0 text-truncate">
+                          Example Long Title Here For Test
+                        </h5>
                         <p className="">Category</p>
                         <FontAwesomeIcon icon={faBookmark} />
                       </div>
                     </div>
 
-                    <div className="card exercise-container" style={{ width: "18rem" }}>
+                    <div
+                      className="card exercise-container"
+                      style={{ width: "18rem" }}
+                    >
                       <img
                         src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
                         className="card-img-top"
                         alt="..."
-                        style={{height: "16rem", objectFit:"cover"}}
+                        style={{ height: "16rem", objectFit: "cover" }}
                       />
                       <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
+                        <h5 className="card-title fw-bold mb-0 text-truncate">
+                          Example Long Title Here For Test
+                        </h5>
                         <p className="">Category</p>
                         <FontAwesomeIcon icon={faBookmark} />
                       </div>
                     </div>
 
-                    <div className="card exercise-container" style={{ width: "18rem" }}>
+                    <div
+                      className="card exercise-container"
+                      style={{ width: "18rem" }}
+                    >
                       <img
                         src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
                         className="card-img-top"
                         alt="..."
-                        style={{height: "16rem", objectFit:"cover"}}
+                        style={{ height: "16rem", objectFit: "cover" }}
                       />
                       <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
+                        <h5 className="card-title fw-bold mb-0 text-truncate">
+                          Example Long Title Here For Test
+                        </h5>
                         <p className="">Category</p>
                         <FontAwesomeIcon icon={faBookmark} />
                       </div>

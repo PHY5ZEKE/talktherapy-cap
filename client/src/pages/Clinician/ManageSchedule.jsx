@@ -2,7 +2,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 // DatePicker
 import { useState, useEffect, useCallback, useMemo } from "react";

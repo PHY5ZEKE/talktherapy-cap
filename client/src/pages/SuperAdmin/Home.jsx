@@ -4,7 +4,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/SudoMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterAdmin from "../../components/Modals/RegisterAdmin";
 

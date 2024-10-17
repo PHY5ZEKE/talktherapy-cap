@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/PatientMenu";
 
 // Utils
 import { route } from "../../utils/route";
@@ -86,8 +86,18 @@ export default function Profile() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-                <p className="mb-0 mt-3">Hello,</p>
-                <p className="fw-bold">Admin</p>
+                {error ? (
+                  <p>{error}</p>
+                ) : patientData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {patientData?.firstName} {patientData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
               <MenuDropdown />
@@ -110,7 +120,7 @@ export default function Profile() {
                         src={patientData?.profilePicture}
                         className="card-img-top"
                         alt="Profile picture"
-                        style={{maxHeight:"320px", objectFit:"cover"}}
+                        style={{ maxHeight: "320px", objectFit: "cover" }}
                       />
                       <div className="card-body">
                         <h5 className="">

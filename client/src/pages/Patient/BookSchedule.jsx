@@ -1,12 +1,10 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
+
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import JoinAppointment from "../../components/Modals/JoinAppointment";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/PatientMenu";
 import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
 import ChooseSchedule from "../../components/Modals/ChooseSchedule";
@@ -279,8 +277,18 @@ export default function BookSchedule() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-                <p className="mb-0 mt-3">Hello,</p>
-                <p className="fw-bold">{patientData?.firstName}</p>
+                {error ? (
+                  <p>{error}</p>
+                ) : patientData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {patientData?.firstName} {patientData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
               <MenuDropdown />
@@ -306,11 +314,11 @@ export default function BookSchedule() {
                     <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
                       <select
                         className="form-select form-select-lg mb-3"
-                        aria-label=".form-select-lg example"
+                        aria-label="form-select-lg example"
                         value={selectedSpecialization}
                         onChange={handleSpecializationChange}
                       >
-                        <option value="" disabled selected>
+                        <option value="default" disabled>
                           Specialization
                         </option>
                         <option value="Aphasia">Aphasia</option>

@@ -4,8 +4,9 @@ import axios from "axios";
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import AppointmentDetails from "../../components/Modals/AppointmentDetails";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
+import RegisterClinician from "../../components/Modals/RegisterClinician";
 import { route } from "../../utils/route";
 
 export default function Home() {
@@ -59,6 +60,10 @@ export default function Home() {
       console.error("Error fetching appointment details:", error);
     }
   };
+
+  // Handle Add Clinician Modal
+  const [isAddClinician, setIsAddClinician] = useState(false)
+  const closeAddClinician = () => setIsAddClinician(!isAddClinician)
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
@@ -284,6 +289,13 @@ export default function Home() {
           whatRole={role}
         />
       )}
+
+      {/* ADD CLINICIAN MODAL */}
+      {
+        isAddClinician && (
+          <RegisterClinician openModal={closeAddClinician}/>
+        )
+      }
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -525,16 +537,15 @@ export default function Home() {
                       patients.map((patient) => (
                         <div
                           key={patient._id}
-                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          className="mb-3 border border-top-0 border-start-0 border-end-0"
                         >
                           <p className="mb-0 fw-bold">
-                            {patient.firstName} {patient.middleName}{" "}
-                            {patient.lastName}
+                            {patient.firstName} {patient.middleName} {patient.lastName}
                           </p>
                           <p className="mb-0">{patient.email}</p>
                           <p className="mb-0">{patient.address}</p>
                           <p className="mb-3">{patient.mobile}</p>
-
+                    
                           <div className="d-flex gap-3">
                             <div
                               className="mb-3 fw-bold text-button border"
@@ -561,50 +572,51 @@ export default function Home() {
                         </div>
                       ))
                     ) : selectedUserType === "clinicians" && clinicians ? (
-                      clinicians.map((clinician) => (
-                        <div
-                          key={clinician._id}
-                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                        >
-                          <p className="mb-0 fw-bold">
-                            {clinician.firstName} {clinician.middleName}{" "}
-                            {clinician.lastName}
-                          </p>
-                          <p className="mb-0">{clinician.email}</p>
-                          <p className="mb-0">{clinician.address}</p>
-                          <p className="mb-3">{clinician.mobile}</p>
-
-                          <div className="d-flex gap-3">
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={() =>
-                                handleModal(clinician, "clinician")
-                              }
-                            >
-                              Edit
-                            </div>
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                            >
-                              Delete
-                            </div>
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => toggleClinicianStatus(clinician)}
-                              disabled={isProcessing}
-                            >
-                              {clinician.active ? "Deactivate" : "Activate"}
+                      <>
+                        <button
+                        onClick={closeAddClinician}
+                        className="text-button border mb-3 mx-auto d-flex">Add Clinician</button>
+                        <hr/>
+                        {clinicians.map((clinician) => (
+                          <div
+                            key={clinician._id}
+                            className="mb-3 border border-top-0 border-start-0 border-end-0"
+                          >
+                            <p className="mb-0 fw-bold">
+                              {clinician.firstName} {clinician.middleName} {clinician.lastName}
+                            </p>
+                            <p className="mb-0">{clinician.email}</p>
+                            <p className="mb-0">{clinician.address}</p>
+                            <p className="mb-3">{clinician.mobile}</p>
+                    
+                            <div className="d-flex gap-3">
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => handleModal(clinician, "clinician")}
+                              >
+                                Edit
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                style={{ cursor: "pointer" }}
+                              >
+                                Delete
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => toggleClinicianStatus(clinician)}
+                                disabled={isProcessing}
+                              >
+                                {clinician.active ? "Deactivate" : "Activate"}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))
+                        ))}
+                      </>
                     ) : (
-                      <h5 className="mb-0 fw-bold text-center">
-                        Loading users.
-                      </h5>
+                      <h5 className="mb-0 fw-bold text-center">Loading users.</h5>
                     )}
                   </div>
                 </div>

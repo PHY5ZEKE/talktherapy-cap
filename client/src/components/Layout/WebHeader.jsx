@@ -1,7 +1,7 @@
 import Logout from "../../assets/buttons/Logout"
 import { Row } from "react-bootstrap"
 
-export default function PatientNav({data}) {
+export default function WebHeader({data}) {
   return (
     <Row
     lg

@@ -6,7 +6,7 @@ import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/PatientMenu";
 
 // Icons
 import Back from "../../assets/icons/Back";
@@ -58,8 +58,18 @@ export default function Perform() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-                <p className="mb-0 mt-3">Hello,</p>
-                <p className="fw-bold">Admin</p>
+                {error ? (
+                  <p>{error}</p>
+                ) : patientData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {patientData?.firstName} {patientData?.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <p>Fetching data.</p>
+                )}
               </div>
 
               <MenuDropdown />
@@ -132,7 +142,6 @@ export default function Perform() {
                       <p className="mb-3 w-100 bg-secondary-subtle text-center p-3 rounded-2">
                         Session of Rico Noapl Nieto with Ako.
                       </p>
-                      
                     </div>
                   </div>
                 </div>

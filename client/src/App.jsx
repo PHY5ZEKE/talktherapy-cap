@@ -11,9 +11,9 @@ import "./styles/images.css";
 
 // System
 import Login from "./pages/Login/Login";
-import RegisterAdmin from "./pages/Register/RegisterAdmin";
-import RegisterClinician from "./pages/Register/RegisterClinician";
-import RegisterPatientSlp from "./pages/Register/RegisterPatientSlp";
+import RegisterAdmin from "./pages/System/AdminRegister";
+import RegisterClinician from "./pages/System/ClinicianRegister";
+import RegisterPatientSlp from "./pages/System/PatientRegister";
 import ForgotPassword from "./pages/Forgot-Password/ForgotPassword";
 
 // Super Admin TalkTherapy
@@ -30,7 +30,6 @@ import AdminArchival from "./pages/Admin/Archival";
 import AdminProfile from "./pages/Admin/Profile";
 
 // Clinician TalkTherapy
-import ClinicianRegister from "./pages/Admin/RegisterClinician";
 import ClinicianHome from "./pages/Clinician/Home";
 import ClinicianPatient from "./pages/Clinician/SearchPatients";
 import ClinicianContent from "./pages/Clinician/ViewContent";
@@ -57,7 +56,7 @@ import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
 // Test Layout
-import Layout from "./pages/System/PatientRegister";
+import Layout from "./pages/System/ClinicianRegister";
 import Home2 from "./pages/Patient/Home";
 
 const routes = (
@@ -140,14 +139,6 @@ const routes = (
       />
 
       {/*Admin */}
-      <Route
-        path="/admin/register"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <ClinicianRegister />
-          </PrivateRoute>
-        }
-      />
       <Route
         path="/admin"
         element={

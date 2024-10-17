@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
-import MenuDropdown from "../../components/Layout/MenuDropdown";
+import MenuDropdown from "../../components/Layout/AdminMenu";
 
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";

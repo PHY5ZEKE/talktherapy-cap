@@ -6,7 +6,7 @@
   height: fit-content;
 }
 
-.exercise-container:hover{
+.exercise-container:hover {
   transform: scale(1);
 }
 
@@ -28,13 +28,30 @@
 .react-datepicker__view-calendar-icon input {
   background-color: #fff;
   border: rgb(222, 226, 230) 1px solid;
-  border-radius: 0.30rem;
+  border-radius: 0.3rem;
   color: #000;
 }
 
 .form-container {
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+  padding: 2rem !important;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+    rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
 }
+
+.form-input {
+  all: unset;
+  border: 1px solid rgb(222, 226, 230);
+  background-color: #fff;
+  padding: 0.5rem;
+}
+
+.form-show {
+  border: 1px solid rgb(222, 226, 230);
+  padding: 0.5rem;
+  width: 100px;
+  text-align: center;
+}
+
 /* OLD CSS */
 .full-height {
   max-height: 100%;

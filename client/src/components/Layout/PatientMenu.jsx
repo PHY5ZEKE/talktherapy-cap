@@ -2,16 +2,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 
-export default function MenuDropdown() {
-
+export default function PatientMenu() {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-      // Clear the authentication token and user information from local storage
       localStorage.removeItem("accessToken");
       localStorage.removeItem("userRole");
-  
-      // Redirect to the login page
       navigate("/login");
     };
 
