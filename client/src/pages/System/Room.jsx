@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
 
 import "../../styles/containers.css";
+import "../../styles/diagnostic.css";
 
 // Icons
 import Mic from "../../assets/buttons/Mic";
@@ -509,7 +510,7 @@ export default function Room() {
                           className="offcanvas-title"
                           id="offcanvasDiagnosticToolLabel"
                         >
-                          Diagnostic Tool
+                          Assistive Diagnostic Tool
                         </h5>
                         <button
                           type="button"
@@ -520,11 +521,12 @@ export default function Room() {
                       </div>
                       <div className="offcanvas-body">
                         {/* Diagnostic Tool Content */}
-                        <div>
-                        <button className="btn btn-primary" onClick={startVoiceRecognitionHandler}>
-                          Start Voice Recognition
-                        </button>
+                        <div className="button-container">
+                          <button className="text-button border" onClick={startVoiceRecognitionHandler}>
+                            Start Voice Recognition
+                          </button>
                         </div>
+                        
                         <div className="chart-container">
                           <div id="chartContainer">
                             <canvas id="outputChart"></canvas>
@@ -538,17 +540,16 @@ export default function Room() {
                           </div>
                         </div>
 
+                        <div id="phoneme-container">
+                          <div id="phoneme-output"></div>
+                        </div>
+
                         <div id="score-container">
-                          <br></br>
                             <h6>Speech Assessment Scores:</h6>
                             <div id="score-output">
                                 Pronunciation: {speechScore.pronunciationScore}%, Fluency: {speechScore.fluencyScore}%
                             </div>
                         </div>
-                        
-                          <div id="phoneme-container">
-                            <div id="phoneme-output"></div>
-                          </div>
                         
                           <div id="label-container"></div>
                           

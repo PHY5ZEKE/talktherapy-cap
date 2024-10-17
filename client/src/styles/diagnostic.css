@@ -1,0 +1,83 @@
+#chartContainer {
+  width: 100%;
+  max-width: 800px;
+  margin: auto;
+}
+
+.controls-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center; /* Center horizontally */
+  align-items: center; /* Center vertically */
+  margin-bottom: 10px; /* Optional: Adjust spacing above the button */
+}
+
+.cardbox {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+#output {
+  font-size: 16px;
+  margin: 10px 0;
+}
+
+#score-container {
+  margin: 20px 0;
+  background-color: #f1f1f1;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+#score-output {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+#phoneme-container {
+  margin: 20px 0;
+  background-color: #e9ecef;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+#phoneme-output {
+  font-size: 16px;
+}
+
+#label-container {
+  margin: 20px 0;
+  font-size: 16px;
+  padding: 5px;
+  background-color: #ecf0f1;
+  border-radius: 5px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  color: #2c3e50;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+  .controls-container {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .cardbox {
+      width: 90%;
+  }
+}

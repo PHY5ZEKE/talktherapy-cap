@@ -72,7 +72,7 @@ export default function Layout() {
                       <h5 className="mb-0 fw-bold">Tuesday</h5>
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
+                        Session of Rico Nopal Nieto with Ako.
                       </p>
                       <div className="mb-3 text-pending">PENDING</div>
                     </div>
@@ -81,7 +81,7 @@ export default function Layout() {
                       <h5 className="mb-0 fw-bold">Tuesday</h5>
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
+                        Session of Rico Nopal Nieto with Ako.
                       </p>
                       <div className="mb-3 text-accepted">ACCEPTED</div>
                     </div>
@@ -90,7 +90,7 @@ export default function Layout() {
                       <h5 className="mb-0 fw-bold">Tuesday</h5>
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
+                        Session of Rico Nopal Nieto with Ako.
                       </p>
                       <div className="mb-3 text-cancelled">CANCELLED</div>
                     </div>
@@ -118,7 +118,7 @@ export default function Layout() {
                       <h5 className="mb-0 fw-bold">Tuesday</h5>
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
+                        Session of Rico Nopal Nieto with Ako.
                       </p>
                       <div className="mb-3 text-pending">PENDING</div>
                     </div>
@@ -127,7 +127,7 @@ export default function Layout() {
                       <h5 className="mb-0 fw-bold">Tuesday</h5>
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
+                        Session of Rico Nopal Nieto with Ako.
                       </p>
                       <div className="mb-3 text-accepted">ACCEPTED</div>
                     </div>
@@ -136,7 +136,7 @@ export default function Layout() {
                       <h5 className="mb-0 fw-bold">Tuesday</h5>
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
+                        Session of Rico Nopal Nieto with Ako.
                       </p>
                       <div className="mb-3 text-cancelled">CANCELLED</div>
                     </div>
