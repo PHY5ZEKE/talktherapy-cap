@@ -42,7 +42,10 @@ export function runSpeechRecognition(setScore) {
 
         if (phonemeSequence.length > 0) {
             var phonemeArray = phonemeSequence[0].split(" ");
-            displayPhonemes(firstWord, phonemeArray);
+            //displayPhonemes(firstWord, phonemeArray);
+            var phonemeContainer = document.getElementById("phoneme-output");
+            var phonemeElement = document.createElement("div");
+            phonemeElement.innerText = words + ": " + phonemeArray.join(", ");
 
             // Process the phoneme sequence with ML model for assessment
             const score = await assessPronunciation(finalText, phonemeArray);
@@ -112,7 +115,11 @@ export function segmentPhonemes(text) {
         var phones = window.pronouncing.phonesForWord(cleanedWord); 
         if (phones.length > 0) {
             var phonemeArray = phones[0].split(" ");
-            displayPhonemes(cleanedWord, phonemeArray);
+            //displayPhonemes(cleanedWord, phonemeArray);
+            var phonemeContainer = document.getElementById("phoneme-output");
+            phonemeElement = document.createElement("div");
+            phonemeElement.innerText = word + ": " + phonemeArray.join(", ");
+            phonemeContainer.appendChild(phonemeElement);
         } else {
             var phonemeElement = document.createElement("div");
             phonemeElement.innerText = cleanedWord + ": No phonemes found";
@@ -121,9 +128,9 @@ export function segmentPhonemes(text) {
     });
 }
 
-export function displayPhonemes(word, phonemeArray) {
-    var phonemeContainer = document.getElementById("phoneme-output");
-    var phonemeElement = document.createElement("div");
-    phonemeElement.innerText = word + ": " + phonemeArray.join(", ");
-    phonemeContainer.appendChild(phonemeElement);
-}
+// export function displayPhonemes(word, phonemeArray) {
+//     var phonemeContainer = document.getElementById("phoneme-output");
+//     var phonemeElement = document.createElement("div");
+//     phonemeElement.innerText = word + ": " + phonemeArray.join(", ");
+//     phonemeContainer.appendChild(phonemeElement);
+// }
