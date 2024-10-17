@@ -16,6 +16,9 @@ export default function ManageSchedule() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [clinicians, setClinicians] = useState(null);
+  const [selectedClinicianSchedule, setSelectedClinicianSchedule] = useState(
+    []
+  );
   const appURL = import.meta.env.VITE_APP_URL;
 
   // Fetch admin data from the backend
@@ -62,7 +65,7 @@ export default function ManageSchedule() {
         const data = await response.json();
 
         if (!data.error) {
-          console.log(data.clinicians)
+          console.log(data.clinicians);
           setClinicians(data.clinicians);
         } else {
           console.error("Failed to fetch clinicians:", data.message);
@@ -74,6 +77,28 @@ export default function ManageSchedule() {
 
     fetchClinicians();
   }, []);
+
+  const fetchClinicianSchedule = async (clinicianId) => {
+    try {
+      const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      const data = await response.json();
+
+      if (!data.error) {
+        const clinicianSchedule = data.filter(
+          (schedule) => schedule.clinicianId === clinicianId
+        );
+        setSelectedClinicianSchedule(clinicianSchedule);
+      } else {
+        console.error("Failed to fetch schedule:", data.message);
+      }
+    } catch (error) {
+      console.error("Error fetching schedule:", error);
+    }
+  };
 
   return (
     <>
@@ -108,43 +133,9 @@ export default function ManageSchedule() {
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Pick a Date</p>
-                    <p className="mb-0">
-                      Select a date to view available clinician schedules.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="row p-3">
-                  <div
-                    className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "75vh" }}
-                  >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <select
-                        className="form-select form-select-lg mb-3"
-                        aria-label=".form-select-lg example"
-                      >
-                        <option value="" disabled selected>
-                          Specialization
-                        </option>
-                        <option value="Aphasia">Aphasia</option>
-                        <option value="Stroke">Stroke</option>
-                      </select>
-
-                      <DatePicker selected={startDate} inline />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* SECOND COL */}
-              <div className="col-sm bg-white">
-                <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">List of Clinicians</p>
                     <p className="mb-0">
-                      Click a clinician to view their schedule.
+                      Click a clinician to view their schedule block.
                     </p>
                   </div>
                 </div>
@@ -160,6 +151,7 @@ export default function ManageSchedule() {
                           key={clinician._id}
                           className="d-flex justify-content-start align-items-center w-100 p-2 border-top-0 border-bottom"
                           style={{ cursor: "pointer" }}
+                          onClick={() => fetchClinicianSchedule(clinician._id)}
                         >
                           <div className="w-100">
                             <h5 className="fw-bold mb-0">
@@ -167,7 +159,10 @@ export default function ManageSchedule() {
                               {clinician.lastName}
                             </h5>
                             <h6 className="fw-bold mb-0">
-                              {clinician.address}
+                              Clinic Address: {clinician.address}
+                            </h6>
+                            <h6 className="fw-bold mb-0">
+                              Specialization: {clinician.specialization}
                             </h6>
                             <p className="mb-0">{clinician.email}</p>
                             <p className="mb-0">{clinician.mobile}</p>
@@ -182,13 +177,10 @@ export default function ManageSchedule() {
                   </div>
                 </div>
               </div>
-
-              {/* THIRD COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Your Appointments</p>
-                    <p className="mb-0">View the status of your appointment.</p>
+                    <p className="mb-0 fw-bold">Clinician Schedule</p>
                   </div>
                 </div>
 
@@ -197,15 +189,23 @@ export default function ManageSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">DAY</h5>
-                      <p className="fw-bold mb-0">TIME</p>
-                      <p className=" mb-0">
-                        Session with{" "}
-                        <span className="fw-bold">clinician name</span>
-                      </p>
-                      <p>Status: </p>
-                    </div>
+                    {selectedClinicianSchedule.length > 0 ? (
+                      selectedClinicianSchedule.map((schedule) => (
+                        <div
+                          key={schedule._id}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                        >
+                          <h5 className="fw-bold mb-0">{schedule.day}</h5>
+                          <p className="mb-0">
+                            {schedule.startTime} - {schedule.endTime}
+                          </p>
+                        </div>
+                      ))
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        No schedule available.
+                      </h5>
+                    )}
                   </div>
                 </div>
               </div>

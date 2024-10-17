@@ -68,12 +68,13 @@ export default function Profile() {
   }
 
   if (!userDetails) {
-    return <div class="container-fluid d-flex vh-100 align-items-center justify-content-center">
-    <div class="spinner-border" role="status">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-  </div>
-  ;
+    return (
+      <div className="container-fluid d-flex vh-100 align-items-center justify-content-center">
+        <div className="spinner-border" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -108,7 +109,11 @@ export default function Profile() {
             <div className="row bg-white border-bottom">
               <div className="col">
                 <p className="mb-0 mt-3">Hello,</p>
-                <p className="fw-bold">Admin</p>
+                <p className="fw-bold">
+                  {" "}
+                  {userDetails?.firstName} {userDetails?.middleName}{" "}
+                  {userDetails?.lastName}
+                </p>
               </div>
 
               <MenuDropdown />

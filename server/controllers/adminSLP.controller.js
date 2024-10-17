@@ -272,6 +272,7 @@ exports.getAllClinicians = [
           address: clinician.address,
           mobile: clinician.mobile,
           active: clinician.active,
+          specialization: clinician.specialization,
           createdOn: clinician.createdOn,
           addedOn: clinician.addedOn,
         })),
