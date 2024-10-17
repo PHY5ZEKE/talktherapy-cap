@@ -5,7 +5,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 // CSS
 import "./styles/text.css";
-import "./styles/button.css";
 import "./styles/containers.css";
 import "./styles/images.css";
 
@@ -57,7 +56,6 @@ import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
 // Test Layout
 import Layout from "./pages/System/ClinicianRegister";
-import Home2 from "./pages/Patient/Home";
 
 const routes = (
   <Router>
@@ -66,7 +64,6 @@ const routes = (
       <Route path="*" element={<NotFound />} />
 
       <Route path="/layout" element={<Layout />} />
-      <Route path="/home2" element={<Home2 />} />
 
       {/* Unauthorized Access Page */}
       <Route path="/unauthorized" element={<UnauthorizedAccess />} />

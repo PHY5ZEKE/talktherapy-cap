@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
 const WebSocket = require("ws");
+const WebSocketServer = WebSocket.Server;
 
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
@@ -74,7 +75,10 @@ app.get("/", (req, res) => {
 const server = http.createServer(app);
 
 // WSS Initialize
-const wss = new WebSocket.Server({ server });
+const WSS_PORT = 8080;
+const wss = new WebSocketServer({
+  port: Number(process.env.PORT) || WSS_PORT,
+});
 
 // Rooms
 const rooms = {};
@@ -172,7 +176,7 @@ try {
   console.error(error);
 }
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 8000;
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}`);
 });
