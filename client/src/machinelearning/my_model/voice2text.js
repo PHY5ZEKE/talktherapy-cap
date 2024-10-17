@@ -1,4 +1,4 @@
-function runSpeechRecognition() {
+export function runSpeechRecognition(setDiagnosticOutput, setPhonemeSegments, setScore) {
     var output = document.getElementById("output");
     var action = document.getElementById("action");
     var phonemeContainer = document.getElementById("phoneme-output"); // Updated to phoneme-output
@@ -21,6 +21,8 @@ function runSpeechRecognition() {
     };
 
     recognition.onresult = async function (event) {
+        const pronouncingModule = await import('../../machinelearning/my_model/pronouncing.js');
+        const pronouncing = pronouncingModule.default || pronouncingModule; 
         var fullTranscript = '';
         for (var i = 0; i < event.results.length; i++) {
             var transcript = event.results[i][0].transcript;
@@ -44,9 +46,11 @@ function runSpeechRecognition() {
 
             // Process the phoneme sequence with ML model for assessment
             const score = await assessPronunciation(finalText, phonemeArray);
-            displayScore(score);
+            setScore(score);
+            console.log("Updated score:", score);
         } else {
             phonemeContainer.innerText = "No phonemes found for the word: " + firstWord;
+            setScore({ pronunciationScore: 0, fluencyScore: 0 });
             scoreOutput.innerText = "Unable to assess pronunciation due to lack of phoneme data.";
         }
     };
@@ -54,7 +58,7 @@ function runSpeechRecognition() {
     recognition.start();
 }
 
-function assessPronunciation(transcript, phonemeArray) {
+export function assessPronunciation(transcript, phonemeArray, pronouncing) {
     const words = transcript.split(' ');
     const firstWord = words.length > 0 ? cleanWord(words[0]) : '';
     const referencePhonemes = pronouncing.phonesForWord(firstWord);
@@ -78,23 +82,23 @@ function assessPronunciation(transcript, phonemeArray) {
     };
 }
 
-function calculateFluency() {
+export function calculateFluency() {
     // Implement logic to assess speed, pauses, etc.
     return Math.random() * 100; // Dummy fluency score for now
 }
 
-function displayScore(score) {
+export function displayScore(score) {
     var scoreOutput = document.getElementById("score-output"); // Ensure this element exists in your HTML
     scoreOutput.innerHTML = `Pronunciation: ${score.pronunciationScore}%, Fluency: ${score.fluencyScore}%`;
 }
 
 // Original phoneme segmentation and display functions remain unchanged
-function cleanWord(word) {
+export function cleanWord(word) {
     return word.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").toLowerCase();
 }
 
-function segmentPhonemes(text) {
-    if (typeof pronouncing === 'undefined') {
+export function segmentPhonemes(text) {
+    if (typeof window.pronouncing === 'undefined') {
         console.error("Pronouncing.js library not loaded.");
         return;
     }
@@ -105,7 +109,7 @@ function segmentPhonemes(text) {
 
     words.forEach(word => {
         var cleanedWord = cleanWord(word);
-        var phones = pronouncing.phonesForWord(cleanedWord); 
+        var phones = window.pronouncing.phonesForWord(cleanedWord); 
         if (phones.length > 0) {
             var phonemeArray = phones[0].split(" ");
             displayPhonemes(cleanedWord, phonemeArray);
@@ -117,7 +121,7 @@ function segmentPhonemes(text) {
     });
 }
 
-function displayPhonemes(word, phonemeArray) {
+export function displayPhonemes(word, phonemeArray) {
     var phonemeContainer = document.getElementById("phoneme-output");
 
     var phonemeElement = document.createElement("div");

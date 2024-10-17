@@ -1,10 +1,12 @@
-const URL = "http://127.0.0.1:5500/Audio Training v2.3/my_model/";
+const URL = "http://localhost:5173/src/machinelearning/my_model/";
+import * as tf from '@tensorflow/tfjs'; // Import TensorFlow
+import Chart from 'chart.js/auto';
 
-async function createModel() {
+export async function createModel() {
     const checkpointURL = URL + "model.json";
     const metadataURL = URL + "metadata.json";
 
-    const recognizer = speechCommands.create(
+    const recognizer = await window.speechCommands.create(
         "BROWSER_FFT", 
         undefined, 
         checkpointURL, 
@@ -16,7 +18,7 @@ async function createModel() {
     return recognizer;
 }
 
-async function init() {
+export async function init() {
     const recognizer = await createModel();
     const classLabels = recognizer.wordLabels();
     const labelContainer = document.getElementById("label-container");

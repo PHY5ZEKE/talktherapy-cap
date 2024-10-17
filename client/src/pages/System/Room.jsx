@@ -8,6 +8,10 @@ import "../../styles/containers.css";
 import Mic from "../../assets/buttons/Mic";
 import Camera from "../../assets/buttons/Camera";
 
+// Import the voice recognition functionalities
+import { runSpeechRecognition, segmentPhonemes } from "../../machinelearning/my_model/voice2text.js"; 
+import { init } from "../../machinelearning/script.js"; 
+
 export default function Room() {
   // Error
   const [error, setError] = useState(null);
@@ -15,6 +19,11 @@ export default function Room() {
   const [messages, setMessages] = useState([]); // State for storing messages
   const [type, setType] = useState("");
   const [appointment, setAppointment] = useState([]);
+
+  const [diagnosticOutput, setDiagnosticOutput] = useState(""); 
+  const [phonemeSegments, setPhonemeSegments] = useState([]);
+  const [speechScore, setSpeechScore] = useState({ pronunciationScore: 0, fluencyScore: 0 });
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   // Nav
@@ -46,6 +55,16 @@ export default function Room() {
       { urls: "stun:stun.l.google.com:19302" },
     ],
   };
+
+  useEffect(() => {
+    const initializeModel = async () => {
+        await init(); // Call the init function to set up the model and chart
+    };
+
+    initializeModel(); // Initialize the model on component mount
+
+    // Optionally, you can return a cleanup function here if needed
+}, []);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -276,11 +295,15 @@ export default function Room() {
     );
 
     // Get JSON data from websocket broadcast
-
     setMessages((prevMessages) => [
       ...prevMessages,
       { message, sender: uuid, isSent: true }, // Mark as sent
     ]);
+  }
+
+  // Function to start voice recognition
+  function startVoiceRecognitionHandler() {
+    runSpeechRecognition(setDiagnosticOutput, setPhonemeSegments, setSpeechScore); 
   }
 
   return (
@@ -385,7 +408,9 @@ export default function Room() {
                               <a
                                 role="button"
                                 className="dropdown-item"
-                                href="#"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasDiagnosticTool"
+                                aria-controls="offcanvasDiagnosticTool"
                               >
                                 Diagnostic Tool
                               </a>
@@ -418,7 +443,7 @@ export default function Room() {
                       </ul>
                     </div>
 
-                    {/* CANVAS */}
+                    {/* CANVAS FOR MESSAGES */}
                     <div
                       className="offcanvas offcanvas-start"
                       data-bs-scroll="true"
@@ -471,10 +496,66 @@ export default function Room() {
                         </button>
                       </form>
                     </div>
+
+                    {/* CANVAS FOR DIAGNOSTIC TOOL */}
+                    <div
+                      className="offcanvas offcanvas-end"
+                      tabIndex="-1"
+                      id="offcanvasDiagnosticTool"
+                      aria-labelledby="offcanvasDiagnosticToolLabel"
+                    >
+                      <div className="offcanvas-header">
+                        <h5
+                          className="offcanvas-title"
+                          id="offcanvasDiagnosticToolLabel"
+                        >
+                          Diagnostic Tool
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="offcanvas"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div className="offcanvas-body">
+                        {/* Diagnostic Tool Content */}
+                        <div>
+                        <button className="btn btn-primary" onClick={startVoiceRecognitionHandler}>
+                          Start Voice Recognition
+                        </button>
+                        </div>
+                        <div className="chart-container">
+                          <div id="chartContainer">
+                            <canvas id="outputChart"></canvas>
+                          </div>
+                        </div>
+
+                        <div className="controls-container">
+                          <div className="cardbox">
+                            <div id="output"></div>
+                            <span id="action"></span>
+                          </div>
+                        </div>
+
+                        <div id="score-container">
+                          <br></br>
+                            <h6>Speech Assessment Scores:</h6>
+                            <div id="score-output">
+                                Pronunciation: {speechScore.pronunciationScore}%, Fluency: {speechScore.fluencyScore}%
+                            </div>
+                        </div>
+                        
+                          <div id="phoneme-container">
+                            <div id="phoneme-output"></div>
+                          </div>
+                        
+                          <div id="label-container"></div>
+                          
+                      </div>
+                    </div>
                   </>
                 ) : null}
-
-                <div></div>
               </div>
             </div>
           </div>
