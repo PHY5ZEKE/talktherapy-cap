@@ -3,6 +3,9 @@ import { useState } from "react";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
+
 export default function ChangePassword({ editPasswordAPI, closeModal }) {
   const [showPasswordModal, setShowPasswordModal] = useState(true);
 
@@ -15,6 +18,18 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Close Modal
   const handleCloseModal = () => {
@@ -39,7 +54,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
 
     // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
-      alert("New password and confirm password do not match.");
+      notify("Password do not match.")
       return;
     }
 
@@ -63,27 +78,27 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
       }
 
       if (response.ok) {
-        alert("Password changed successfully.");
+        notify(toastMessage.success.edit);
         handleCloseModal();
       } else {
-        alert(data.message || "Error changing password.");
+        failNotify(toastMessage.fail.edit);
       }
     } catch (error) {
-      console.error("Error changing password:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
 
       if (error.message === "Unexpected response format") {
-        alert("Server returned an unexpected response format.");
+        failNotify(toastMessage.fail.server)
       } else if (error.response) {
         // Server responded with a status other than 200 range
-        alert(
-          `Server Error: ${error.response.status} - ${error.response.data.message}`
-        );
+        failNotify(toastMessage.fail.server)
       } else if (error.request) {
         // Request was made but no response received
-        alert("Network Error: No response received from server.");
+        failNotify(toastMessage.fail.server)
+ 
       } else {
         // Something else happened while setting up the request
-        alert(`Error: ${error.message}`);
+        failNotify(toastMessage.fail.error)
       }
     }
   };
@@ -99,7 +114,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
             <div className="input-group">
               <input
                 type={showCurrentPassword ? "text" : "password"}
-                className="form-control"
+                className="form-control rounded-3 me-3"
                 placeholder="Enter current password"
                 value={currentPassword}
                 name="currentPassword"
@@ -122,7 +137,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
             <div className="input-group">
               <input
                 type={showNewPassword ? "text" : "password"}
-                className="form-control"
+                className="form-control rounded-3 me-3"
                 placeholder="Enter new password"
                 value={newPassword}
                 name="newPassword"
@@ -145,7 +160,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
             <div className="input-group">
               <input
                 type={showConfirmPassword ? "text" : "password"}
-                className="form-control"
+                className="form-control rounded-3 me-3"
                 placeholder="Confirm new password"
                 value={confirmPassword}
                 name="confirmPassword"
@@ -163,16 +178,13 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="action-btn btn-text-blue btn-primary mt-3"
-          >
+          <button type="submit" className="text-button w-100 mt-3">
             Save
           </button>
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseModal}>
+        <Button className="text-button fw-bold" onClick={handleCloseModal}>
           Close
         </Button>
       </Modal.Footer>

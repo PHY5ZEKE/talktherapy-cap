@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
+
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -15,11 +18,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function BookSchedule() {
-  const [showModal, setShowModal] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertVariant, setAlertVariant] = useState("success");
-
   // DatePicker Instance
   const [startDate, setStartDate] = useState(new Date());
 
@@ -62,16 +60,23 @@ export default function BookSchedule() {
     setIsOpen(true);
   };
 
-  const handleSuccess = (message) => {
-    setAlertMessage(message);
-    setAlertVariant("success");
-    setAlertVisible(true);
-    setShowModal(false);
+  const notify = (message) =>
+  {
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
     window.location.reload(); // Reload the page on success
-  };
+  }
+    
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleDateChange = useCallback((date) => {
-    console.log("Date selected:", date);
     setStartDate(date);
     setSelectedDate(date);
   }, []);
@@ -81,7 +86,6 @@ export default function BookSchedule() {
   };
 
   const joinMeeting = (app, id) => {
-    console.log("Joining meeting with ID:", id);
     navigate(`/room/${app}/${id}`);
   };
 
@@ -150,10 +154,9 @@ export default function BookSchedule() {
         }
 
         const data = await response.json();
-        console.log("All Schedules fetched:", data);
         setAllSchedule(data);
       } catch (error) {
-        console.error("Error fetching schedules:", error.message);
+        failNotify(toastMessage.fail.error)
         setError(error.message);
       }
     };
@@ -173,11 +176,10 @@ export default function BookSchedule() {
         }
 
         const data = await response.json();
-        console.log("Appointments fetched:", data);
         setHasBooked(isBooked(data));
         setAppointments(data);
       } catch (error) {
-        console.error("Error fetching appointments:", error.message);
+        failNotify(toastMessage.fail.error)
         setError(error.message);
       }
     };
@@ -205,7 +207,6 @@ export default function BookSchedule() {
         (!selectedSpecialization ||
           schedule.specialization === selectedSpecialization)
     );
-    console.log(`Schedules for ${dayOfWeek}:`, filteredSchedules);
     return filteredSchedules;
   }, [selectedDate, allSched, selectedSpecialization]);
 
@@ -223,8 +224,15 @@ export default function BookSchedule() {
   const onScheduleSelect = (appointment) => {
     setSelectedAppointment(appointment);
     setIsChoose(false);
-    handleSuccess("Schedule change request submitted successfully");
+    notify()
   };
+
+  const filteredAppointments = appointments.filter(
+    (appointment) =>
+      appointment.status === "Pending" ||
+      appointment.status === "Accepted" ||
+      appointment.status === "Schedule Change Request"
+  );
 
   return (
     <>
@@ -235,7 +243,7 @@ export default function BookSchedule() {
           selectedClinician={selectedClinician}
           selectedSchedule={selectedSchedule}
           patientId={patientData?._id}
-          onSuccess={handleSuccess}
+          onSuccess={notify}
           closeModal={() => setIsOpen(false)}
         />
       )}
@@ -406,17 +414,15 @@ export default function BookSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    {appointments
-                      .filter(
-                        (appointment) =>
-                          appointment.status === "Pending" ||
-                          appointment.status === "Accepted" ||
-                          appointment.status === "Schedule Change Request"
-                      )
-                      .map((appointment, index) => (
+                    {filteredAppointments.length === 0 ? (
+                      <h5 className="mb-0 fw-bold text-center">
+                        You do not have any appointments available.
+                      </h5>
+                    ) : (
+                      filteredAppointments.map((appointment, index) => (
                         <div
                           key={index}
-                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          className="mb-3 border border-top-0 border-start-0 border-end-0"
                         >
                           <h5 className="mb-0 fw-bold">
                             {appointment.status === "Schedule Change Request"
@@ -446,7 +452,6 @@ export default function BookSchedule() {
                           >
                             View Appointment Details
                           </a>
-
                           {/* IF PENDING */}
                           {appointment.status === "Pending" && (
                             <div className="row p-2">
@@ -485,6 +490,14 @@ export default function BookSchedule() {
                               >
                                 Change
                               </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() =>
+                                  openConfirmRescheduleModal(appointment)
+                                }
+                              >
+                                Reschedule
+                              </div>
                             </div>
                           )}
                           {/* IF SCHEDULE CHANGE REQUEST */}
@@ -515,7 +528,8 @@ export default function BookSchedule() {
                             </div>
                           )}
                         </div>
-                      ))}
+                      ))
+                    )}
                   </div>
                 </div>
               </div>

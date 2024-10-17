@@ -1,6 +1,8 @@
-
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -15,17 +17,28 @@ import AppointmentDetailsClinician from "../../components/Modals/AppointmentDeta
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 
+const appURL = import.meta.env.VITE_APP_URL;
+
 export default function Home() {
-  const [patients, setPatients] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [appointments, setAppointments] = useState([]);
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const appURL = import.meta.env.VITE_APP_URL;
 
   const navigate = useNavigate();
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
@@ -64,53 +77,15 @@ export default function Home() {
           },
         }
       );
-      console.log("Fetched appointment details:", response.data); // Debugging statement
       setSelectedAppointment(response.data);
       setIsViewAppointment(true);
     } catch (error) {
-      console.error("Error fetching appointment details:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     }
   };
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.patient.getAllPatients}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!data.error) {
-          setPatients(data.patients);
-        } else {
-          console.error("Failed to fetch patients:", data.message);
-        }
-      } catch (error) {
-        console.error("Error fetching patients:", error);
-      }
-    };
-
-    fetchPatients();
-  }, []);
-
-  const filteredPatients = patients.filter(
-    (patient) =>
-      patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      patient.mobile.includes(searchTerm)
-  );
-
   const joinMeeting = (app, id) => {
-    console.log("Joining meeting with ID:", id);
     navigate(`/room/${app}/${id}`);
   };
 
@@ -134,7 +109,10 @@ export default function Home() {
         const data = await response.json();
         setClinicianData(data.clinician);
         localStorage.setItem("userId", data.clinician._id);
-        localStorage.setItem("userName", `${data.clinician.firstName} ${data.clinician.lastName}`)
+        localStorage.setItem(
+          "userName",
+          `${data.clinician.firstName} ${data.clinician.lastName}`
+        );
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -168,8 +146,8 @@ export default function Home() {
         const data = await response.json();
         setAppointments(data);
       } catch (error) {
-        console.error("Error fetching appointments:", error);
-      }
+        failNotify(toastMessage.fail.fetch)
+        failNotify(toastMessage.fail.error)      }
     };
 
     fetchAppointments();

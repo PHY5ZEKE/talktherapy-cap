@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -11,9 +14,22 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function Archival() {
+  const nav = useNavigate();
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   //Super Admin
   useEffect(() => {
@@ -42,14 +58,19 @@ export default function Archival() {
           setSuperAdmin(data.superAdmin);
         } else if (response.status === 401) {
           setError("Unauthorized. Please log in again.");
+          localStorage.removeItem("accessToken")
+          localStorage.removeItem("userRole")
+          failNotify(toastMessage.fail.unauthorized)
+          nav("/unauthorized")
         } else {
           const errorText = await response.text();
-          console.error("Failed to fetch super admin data:", errorText);
-          setError("Failed to fetch super admin data");
+          failNotify(toastMessage.fail.error)
+          failNotify(toastMessage.fail.fetch)
+          setError("Failed to fetch data.")
         }
       } catch (error) {
-        console.error("Error fetching super admin data:", error);
-        setError("Error fetching super admin data");
+        failNotify(toastMessage.fail.error)
+        setError("Error in fetching data.");
       }
     };
 

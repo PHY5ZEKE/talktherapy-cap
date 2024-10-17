@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -16,6 +18,12 @@ export default function ManageSchedule() {
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
 
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
   // Modal
   const [showModal, setShowModal] = useState(false);
   const handleOpen = () => {
@@ -24,14 +32,14 @@ export default function ManageSchedule() {
 
   useEffect(() => {
     const fetchClinicianData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+      const token = localStorage.getItem("accessToken");
 
       try {
         const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -70,10 +78,11 @@ export default function ManageSchedule() {
         if (!data.error) {
           setPatients(data.patients);
         } else {
-          console.error("Failed to fetch patients:", data.message);
+          failNotify(toastMessage.fail.fetch);
         }
       } catch (error) {
-        console.error("Error fetching patients:", error);
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -89,7 +98,7 @@ export default function ManageSchedule() {
   );
 
   const fetchPatientDetails = async (patientId) => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
       const response = await fetch(
@@ -105,10 +114,11 @@ export default function ManageSchedule() {
       if (!data.error) {
         setSelectedPatient(data.patient);
       } else {
-        console.error("Failed to fetch patient details:", data.message);
+        failNotify(toastMessage.fail.fetch);
       }
     } catch (error) {
-      console.error("Error fetching patient details:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     } finally {
       setIsLoading(false);
     }
@@ -120,15 +130,18 @@ export default function ManageSchedule() {
 
   return (
     <>
-      {/* SOAP MODAL */}
-      {showModal && <Soap openModal={handleOpen} />}
+      {showModal && (
+        <Soap
+          openModal={handleOpen}
+          clinicianId={clinicianData?._id}
+          patientId={selectedPatient?._id}
+        />
+      )}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
-          {/* SIDEBAR */}
           <Sidebar />
 
-          {/* MAIN CONTENT */}
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
@@ -150,7 +163,6 @@ export default function ManageSchedule() {
             </div>
 
             <div className="row h-100">
-              {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -158,7 +170,7 @@ export default function ManageSchedule() {
                     <input
                       type="text"
                       placeholder="Search for patient"
-                      className="search-input"
+                      className="search-input rounded-3"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -192,7 +204,6 @@ export default function ManageSchedule() {
                 </div>
               </div>
 
-              {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -218,7 +229,11 @@ export default function ManageSchedule() {
                           src={selectedPatient?.profilePicture}
                           className="card-img-top"
                           alt="Profile picture"
-                          style={{ maxHeight: "320px", minHeight: "320px", objectFit: "cover" }}
+                          style={{
+                            maxHeight: "320px",
+                            minHeight: "320px",
+                            objectFit: "cover",
+                          }}
                         />
                         <div className="card-body">
                           <h5 className="">
@@ -228,7 +243,7 @@ export default function ManageSchedule() {
                           </h5>
                           <p className="mb-0">{selectedPatient?.diagnosis}</p>
                           <p className="mb-0">{selectedPatient?.mobile}</p>
-                          <p className="mb-0">{selectedPatient?.email}</p>
+                          <p className="mb-3">{selectedPatient?.email}</p>
 
                           <div className="d-flex flex-column gap-3">
                             <button
@@ -261,7 +276,6 @@ export default function ManageSchedule() {
                 </div>
               </div>
 
-              {/* THIRD COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">

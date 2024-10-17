@@ -7,9 +7,16 @@ import AppointmentDetails from "../../components/Modals/AppointmentDetails";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterClinician from "../../components/Modals/RegisterClinician";
+
+// Utils
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
+
+const appURL = import.meta.env.VITE_APP_URL;
 
 export default function Home() {
+
   const [patients, setPatients] = useState(null);
   const [clinicians, setClinicians] = useState(null);
   const [adminData, setAdminData] = useState(null);
@@ -19,7 +26,18 @@ export default function Home() {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Handle Edit Profile Modal
   const [isOpen, setIsOpen] = useState(false);
@@ -53,21 +71,20 @@ export default function Home() {
           },
         }
       );
-      console.log("Fetched appointment details:", response.data); // Debugging statement
       setSelectedAppointment(response.data);
       setIsConfirm(true);
     } catch (error) {
-      console.error("Error fetching appointment details:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     }
   };
 
   // Handle Add Clinician Modal
-  const [isAddClinician, setIsAddClinician] = useState(false)
-  const closeAddClinician = () => setIsAddClinician(!isAddClinician)
+  const [isAddClinician, setIsAddClinician] = useState(false);
+  const closeAddClinician = () => setIsAddClinician(!isAddClinician);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
     const fetchAppointments = async () => {
       try {
         const response = await fetch(`${appURL}/${route.appointment.getAll}`, {
@@ -81,13 +98,12 @@ export default function Home() {
         if (!response.ok) {
           throw new Error("Failed to fetch appointments");
         }
-
         const data = await response.json();
-        console.log("Appointments fetched:", data);
         setAppointments(data);
       } catch (error) {
-        console.error("Error fetching appointments:", error.message);
+        failNotify(toastMessage.fail.fetch);
         setError(error.message);
+        console.log("Error fetch appointments :", error)
       } finally {
         setLoading(false);
       }
@@ -99,7 +115,6 @@ export default function Home() {
   useEffect(() => {
     const fetchAdminData = async () => {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
       try {
         const response = await fetch(`${appURL}/${route.admin.fetch}`, {
           method: "GET",
@@ -141,10 +156,11 @@ export default function Home() {
         if (!data.error) {
           setClinicians(data.clinicians);
         } else {
-          console.error("Failed to fetch admins:", data.message);
+          failNotify(toastMessage.fail.fetch);
         }
       } catch (error) {
-        console.error("Error fetching admins:", error);
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -167,10 +183,11 @@ export default function Home() {
         if (!data.error) {
           setPatients(data.patients);
         } else {
-          console.error("Failed to fetch admins:", data.message);
+          failNotify(toastMessage.fail.fetch);
         }
       } catch (error) {
-        console.error("Error fetching admins:", error);
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -214,6 +231,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.error) {
+        notify(toastMessage.success.status);
         // Optionally, update the clinicians list to reflect the change
         setClinicians(
           clinicians.map((clinician) =>
@@ -223,7 +241,7 @@ export default function Home() {
           )
         );
       } else {
-        console.error("Failed to toggle clinician status:", data.message);
+        failNotify(toastMessage.fail.status);
       }
     } finally {
       setIsProcessing(false); // Stop processing
@@ -252,6 +270,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.error) {
+        notify(toastMessage.success.status);
         // Optionally, update the patients list to reflect the change
         setPatients(
           patients.map((patient) =>
@@ -261,7 +280,7 @@ export default function Home() {
           )
         );
       } else {
-        console.error("Failed to toggle patient status:", data.message);
+        failNotify(toastMessage.fail.status);
       }
     } finally {
       setIsProcessing(false); // Stop processing
@@ -291,11 +310,7 @@ export default function Home() {
       )}
 
       {/* ADD CLINICIAN MODAL */}
-      {
-        isAddClinician && (
-          <RegisterClinician openModal={closeAddClinician}/>
-        )
-      }
+      {isAddClinician && <RegisterClinician openModal={closeAddClinician} />}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -531,6 +546,15 @@ export default function Home() {
                       >
                         Clinicians
                       </button>
+
+                      {selectedUserType === "clinicians" && (
+                        <button
+                          onClick={closeAddClinician}
+                          className="text-button border"
+                        >
+                          Add Clinician
+                        </button>
+                      )}
                     </div>
 
                     {selectedUserType === "patients" && patients ? (
@@ -540,12 +564,13 @@ export default function Home() {
                           className="mb-3 border border-top-0 border-start-0 border-end-0"
                         >
                           <p className="mb-0 fw-bold">
-                            {patient.firstName} {patient.middleName} {patient.lastName}
+                            {patient.firstName} {patient.middleName}{" "}
+                            {patient.lastName}
                           </p>
                           <p className="mb-0">{patient.email}</p>
                           <p className="mb-0">{patient.address}</p>
                           <p className="mb-3">{patient.mobile}</p>
-                    
+
                           <div className="d-flex gap-3">
                             <div
                               className="mb-3 fw-bold text-button border"
@@ -573,27 +598,26 @@ export default function Home() {
                       ))
                     ) : selectedUserType === "clinicians" && clinicians ? (
                       <>
-                        <button
-                        onClick={closeAddClinician}
-                        className="text-button border mb-3 mx-auto d-flex">Add Clinician</button>
-                        <hr/>
                         {clinicians.map((clinician) => (
                           <div
                             key={clinician._id}
                             className="mb-3 border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">
-                              {clinician.firstName} {clinician.middleName} {clinician.lastName}
+                              {clinician.firstName} {clinician.middleName}{" "}
+                              {clinician.lastName}
                             </p>
                             <p className="mb-0">{clinician.email}</p>
                             <p className="mb-0">{clinician.address}</p>
                             <p className="mb-3">{clinician.mobile}</p>
-                    
+
                             <div className="d-flex gap-3">
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 style={{ cursor: "pointer" }}
-                                onClick={() => handleModal(clinician, "clinician")}
+                                onClick={() =>
+                                  handleModal(clinician, "clinician")
+                                }
                               >
                                 Edit
                               </div>
@@ -616,7 +640,9 @@ export default function Home() {
                         ))}
                       </>
                     ) : (
-                      <h5 className="mb-0 fw-bold text-center">Loading users.</h5>
+                      <h5 className="mb-0 fw-bold text-center">
+                        Loading users.
+                      </h5>
                     )}
                   </div>
                 </div>

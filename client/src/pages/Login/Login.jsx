@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./login.css";
 import Navbar from "../../components/Navbar/NavigationBar.jsx";
 import Footer from "../../components/Footer/Footer.jsx";
@@ -6,6 +6,8 @@ import { Form, Container, Row, Col, Button, Alert } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 import axios from "axios";
+import { Slide, toast } from "react-toastify";
+import { toastMessage } from "../../utils/toastHandler.js";
 
 // Modal
 import ChooseRegister from "../../components/Modals/ChooseRegister.jsx";
@@ -25,6 +27,12 @@ const Login = () => {
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
   };
+
+  const notify = () =>
+    toast.success(toastMessage.success.login, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -46,15 +54,19 @@ const Login = () => {
         // Redirect based on user role
         switch (response.data.userRole) {
           case "superAdmin":
+            notify();
             navigate("/sudo");
             break;
           case "admin":
+            notify();
             navigate("/admin");
             break;
           case "clinician":
+            notify();
             navigate("/clinician");
             break;
           case "patientslp":
+            notify();
             navigate("/patient");
             break;
           default:
@@ -88,7 +100,7 @@ const Login = () => {
             </p>
           </div>
           <Container fluid className="loginContainer">
-            <Form className="loginForm" onSubmit={(e)=>handleLogin(e)}>
+            <Form className="loginForm" onSubmit={(e) => handleLogin(e)}>
               <Row className="form-row">
                 <Col>
                   <Form.Group>
@@ -162,13 +174,14 @@ const Login = () => {
                   <Col className="text-center">
                     {isOpen && <ChooseRegister openModal={openModal} />}
 
-                    <button
+                    <p
                       type="button"
-                      className="fw-bold no-bg-text"
+                      className="fw-bold mb-0"
+                      style={{ cursor: "pointer" }}
                       onClick={openModal}
                     >
                       Register
-                    </button>
+                    </p>
                   </Col>
                 </Row>
                 <Row>

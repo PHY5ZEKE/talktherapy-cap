@@ -2,30 +2,41 @@ import { Link } from "react-router-dom";
 import { route } from "../../utils/route.js";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { toast, Slide } from "react-toastify";
 
-export default function ClinicianRegister() {
+import { toastMessage } from "../../utils/toastHandler";
+
+export default function AdminRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
+    address: "",
     email: "",
     password: "",
     confPassword: "",
     mobile: "",
-    birthday: "",
-    diagnosis: "",
-    consent: "",
   });
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
-
-  const datePickerRef = useRef(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -35,15 +46,12 @@ export default function ClinicianRegister() {
     setShowConfPassword(!showConfPassword);
   };
 
-  const navigate = useNavigate();
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
-    console.log(formData);
   };
 
   const handleSubmit = async (e) => {
@@ -54,12 +62,10 @@ export default function ClinicianRegister() {
       middleName,
       lastName,
       email,
+      address,
       password,
       confPassword,
       mobile,
-      birthday,
-      diagnosis,
-      consent,
     } = formData;
 
     if (password !== confPassword) {
@@ -73,36 +79,34 @@ export default function ClinicianRegister() {
       middleName,
       lastName,
       email,
+      address,
       password,
       mobile,
-      birthday,
-      diagnosis,
-      consent: consent === "yes",
     };
 
     try {
-      const response = await fetch(`${appURL}/${route.clinician.signup}`, {
+      const response = await fetch(`${appURL}/${route.admin.signup}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ submissionData, birthday: selectedDate }),
+        body: JSON.stringify(submissionData),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        setMessage("Registration Successful");
         setError(false);
+        notify(toastMessage.success.register)
         navigate("/login");
       } else {
         setMessage(result.message || "Registration Failed");
         setError(true);
       }
     } catch (error) {
-      console.error("Error during registration:", error); // Log error
       // Display error message in the form itself
-      setMessage("An error occurred. Please try again.");
+      failNotify(toastMessage.fail.error)
+      failNotify(error)
       setError(true);
     }
   };
@@ -116,7 +120,7 @@ export default function ClinicianRegister() {
         </nav>
       </div>
 
-      <div className="row h-100">
+      <div className="row flex-grow-1">
         <div className="col-sm d-none d-lg-block p-3">
           <div className="mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
             <h1 className="fw-boldest">TalkTherapy</h1>
@@ -128,7 +132,8 @@ export default function ClinicianRegister() {
           </div>
         </div>
 
-        <div className="col-sm my-auto p-3 overflow-hidden">
+        {/* Right section: Form */}
+        <div className="col-sm my-auto p-3">
           {message && (
             <div
               className="d-flex mx-auto text-danger text-center mb-2 p-2 rounded-3 border"
@@ -137,14 +142,14 @@ export default function ClinicianRegister() {
               {message}
             </div>
           )}
+
           <form
             className="bg-white container-fluid form-container rounded-4 mx-auto p-3 overflow-auto"
             style={{ maxHeight: "75vh", minWidth: "300px", maxWidth: "70%" }}
             onSubmit={handleSubmit}
           >
-            <h2 className="fw-bold text-center mb-0">Register</h2>
-            <p className="text-center"> Please fill out all fields.</p>
-
+            <h4 className="fw-bold text-center mb-2">Register</h4>
+            <p className="text-center">Please fill out all fields.</p>
             <h5>Basic Information</h5>
 
             <div className="row">
@@ -188,51 +193,33 @@ export default function ClinicianRegister() {
               </div>
             </div>
 
-            <div className="row">
-              <div className="col-sm d-flex flex-column mb-3">
-                <p className="mb-0 fw-bold">Phone Number</p>
-                <input
-                  type="text"
-                  aria-label="Phone Number"
-                  placeholder="Phone Number"
-                  className="form-input rounded-2"
-                  name="mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                />
-              </div>
-
-              <div className="col-sm d-flex flex-column mb-3">
-                <p className="mb-0 fw-bold">Birthday</p>
-                <input
-                  type="date"
-                  aria-label="Date"
-                  ref={datePickerRef}
-                  selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
-                  className="form-input rounded"
-                />
-              </div>
+            <div className="col-sm d-flex flex-column mb-3">
+              <p className="mb-0 fw-bold">Phone Number</p>
+              <input
+                type="text"
+                aria-label="Phone Number"
+                placeholder="Phone Number"
+                className="form-input rounded-2"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+              />
             </div>
 
-            <div className="row">
-              <div className="col-sm d-flex flex-column mb-3">
-                <p className="fw-bold mb-0">Medical Diagnosis</p>
-                <select
-                  className="form-input rounded-2"
-                  aria-label="Diagnosis"
-                  name="diagnosis"
-                  value={formData.diagnosis}
-                  onChange={handleChange}
-                >
-                  <option value="Aphasia">Aphasia</option>
-                  <option value="Stroke">Stroke</option>
-                </select>
-              </div>
+            <div className="col-sm d-flex flex-column mb-3">
+              <p className="mb-0 fw-bold">Clinic Address</p>
+              <input
+                type="text"
+                aria-label="Clinic address"
+                placeholder="Clinic Address"
+                className="form-input rounded-2"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
             </div>
 
             <h5>Credentials</h5>
-
             <div className="row">
               <div className="col-sm d-flex flex-column mb-3">
                 <p className="mb-0 fw-bold">Valid Email</p>
@@ -265,6 +252,7 @@ export default function ClinicianRegister() {
                   <button
                     onClick={togglePasswordVisibility}
                     className="text-button form-show rounded-2"
+                    type="button"
                   >
                     Show
                   </button>
@@ -289,35 +277,10 @@ export default function ClinicianRegister() {
                   <button
                     onClick={toggleConfPasswordVisibility}
                     className="text-button form-show rounded-2"
+                    type="button"
                   >
                     Show
                   </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="row">
-              <div className="col-sm d-flex flex-column mb-3">
-                <p className="fw-bold mb-0">Consent</p>
-                <div className="d-flex">
-                  <input
-                    type="radio"
-                    label="Yes"
-                    name="consent"
-                    value="yes"
-                    checked={formData.consent === "yes"}
-                    onChange={handleChange}
-                  />
-                  <label className="form-check-label mx-2">Yes</label>
-                  <input
-                    type="radio"
-                    label="No"
-                    name="consent"
-                    value="no"
-                    checked={formData.consent === "no"}
-                    onChange={handleChange}
-                  />
-                  <label className="form-check-label mx-2">No</label>
                 </div>
               </div>
             </div>
@@ -340,7 +303,7 @@ export default function ClinicianRegister() {
       </div>
 
       <div className="row bg-white border border-bottom-0 border-start-0 border-end-0">
-        <div className="col mx-auto text-center p-3">
+        <div className="col text-center p-3">
           <p className="fw-bold mb-0">TalkTherapy</p>
         </div>
       </div>

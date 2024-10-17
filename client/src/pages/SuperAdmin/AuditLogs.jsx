@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Calendar
 import Icon from "../../assets/icons/CalendarIcon";
@@ -6,17 +7,32 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 
 export default function AuditLogs() {
+  const nav = useNavigate();
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
   const [auditLogs, setAuditLogs] = useState([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Fetch Super Admin
   useEffect(() => {
@@ -24,6 +40,10 @@ export default function AuditLogs() {
       const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
 
       if (!token) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("userRole");
+        failNotify(toastMessage.fail.unauthorized);
+        nav("/unauthorized");
         setError("No token found. Please log in.");
         return;
       }
@@ -45,14 +65,19 @@ export default function AuditLogs() {
           setSuperAdmin(data.superAdmin);
         } else if (response.status === 401) {
           setError("Unauthorized. Please log in again.");
+          localStorage.removeItem("accessToken")
+          localStorage.removeItem("userRole")
+          failNotify(toastMessage.fail.unauthorized)
+          nav("/unauthorized")
         } else {
           const errorText = await response.text();
-          console.error("Failed to fetch super admin data:", errorText);
-          setError("Failed to fetch super admin data");
+          failNotify(toastMessage.fail.error)
+          failNotify(toastMessage.fail.fetch)
+          setError("Failed to fetch data.")
         }
       } catch (error) {
-        console.error("Error fetching super admin data:", error);
-        setError("Error fetching super admin data");
+        failNotify(toastMessage.fail.error)
+        setError("Error in fetching data.");
       }
     };
 
@@ -85,11 +110,12 @@ export default function AuditLogs() {
         setAuditLogs(data.auditLogs);
       } else {
         const errorText = await response.text();
-        console.error("Failed to fetch audit logs:", errorText);
+        failNotify(toastMessage.fail.fetch)
         setError("Failed to fetch audit logs");
       }
     } catch (error) {
-      console.error("Error fetching audit logs:", error);
+      failNotify(toastMessage.fail.fetch)
+      failNotify(toastMessage.fail.error)
       setError("Error fetching audit logs");
     }
   };

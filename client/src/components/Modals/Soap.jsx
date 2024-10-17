@@ -1,11 +1,53 @@
+import { useState } from "react";
 import "./modal.css";
-
 import Calendar from "../../assets/icons/Calendar";
+import { route } from "../../utils/route";
 
-export default function Soap({ openModal }) {
+export default function Soap({ openModal, clinicianId, patientId }) {
+  const [date, setDate] = useState("");
+  const [diagnosis, setDiagnosis] = useState("");
+  const appURL = import.meta.env.VITE_APP_URL;
+
   const handleClose = (e) => {
     e.preventDefault();
     openModal();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const soapData = {
+      patientId,
+      clinicianId,
+      date,
+      diagnosis,
+    };
+
+    console.log("Submitting SOAP data:", soapData); // Log the request payload
+
+    try {
+      const token = localStorage.getItem("accessToken");
+      const response = await fetch(`${appURL}/${route.soap.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(soapData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Server response:", errorData); // Log the server response
+        throw new Error("Failed to create SOAP diagnosis");
+      }
+
+      const data = await response.json();
+      console.log("SOAP diagnosis created successfully:", data);
+      openModal(); // Close the modal after successful submission
+    } catch (error) {
+      console.error("Error creating SOAP diagnosis:", error);
+    }
   };
 
   return (
@@ -21,7 +63,12 @@ export default function Soap({ openModal }) {
             <div className="row">
               <div className="col mb-3">
                 <p className="fw-bold mb-0">Date</p>
-                <Calendar />
+                <input
+                  type="date"
+                  className="form-control"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                />
               </div>
 
               <div className="col">
@@ -32,22 +79,23 @@ export default function Soap({ openModal }) {
           </div>
 
           <div className="container d-flex justify-content-center">
-            <form className="container">
+            <form className="container" onSubmit={handleSubmit}>
               <p className="text-center">Diagnosis</p>
               <textarea
                 className="form-control"
                 aria-label="With textarea"
+                value={diagnosis}
+                onChange={(e) => setDiagnosis(e.target.value)}
               ></textarea>
+              <div className="d-flex justify-content-center mt-3 gap-3">
+                <button type="submit" className="text-button border">
+                  <p className="fw-bold my-0 status">SUBMIT</p>
+                </button>
+                <button className="text-button border" onClick={handleClose}>
+                  <p className="fw-bold my-0 status">CANCEL</p>
+                </button>
+              </div>
             </form>
-          </div>
-
-          <div className="d-flex justify-content-center mt-3 gap-3">
-            <button className="text-button border">
-              <p className="fw-bold my-0 status">SUBMIT</p>
-            </button>
-            <button className="text-button border" onClick={handleClose}>
-              <p className="fw-bold my-0 status">CANCEL</p>
-            </button>
           </div>
         </div>
       </div>

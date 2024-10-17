@@ -71,4 +71,10 @@ export const route = {
     delete: "api/schedule-slp/delete-schedule",
     clinician: "api/schedule-slp/clinician-schedules",
   },
+  soap: {
+    create: "api/soap-slp/add-soap",
+    edit: "api/soap-slp/edit-soap",
+    delete: "api/soap-slp/delete-soap",
+    getPatientSoap: "api/soap-slp/get-soap/",
+  },
 };

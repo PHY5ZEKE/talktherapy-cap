@@ -49,6 +49,11 @@
   cursor: pointer;
 }
 
+.text-button:hover {
+  background-color: #1c9dff;
+  color: #fff;
+}
+
 .text-danger {
   color: #f44336;
   background-color: #ffdddd;

@@ -1,4 +1,6 @@
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -21,6 +23,18 @@ export default function ManageSchedule() {
   const [selectedDate, setSelectedDate] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
 
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
   // Handle Add Schedule Modal Open
   const [isOpen, setIsOpen] = useState(false);
   const handleAdd = useCallback(() => {
@@ -28,12 +42,11 @@ export default function ManageSchedule() {
   }, []);
 
   const handleScheduleAdded = useCallback((newSchedule) => {
-    console.log("New schedule added:", newSchedule);
+    notify(toastMessage.success.addSchedule)
     setSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
   }, []);
 
   const handleDateChange = useCallback((date) => {
-    console.log("Date selected:", date);
     setStartDate(date);
     setSelectedDate(date);
   }, []);
@@ -56,11 +69,10 @@ export default function ManageSchedule() {
         }
 
         const data = await response.json();
-        console.log("Clinician data fetched:", data);
         setClinicianData(data.clinician);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching clinician data:", error.message);
+        failNotify(toastMessage.fail.error)
         setError(error.message);
         setLoading(false);
       }
@@ -81,10 +93,9 @@ export default function ManageSchedule() {
         }
 
         const data = await response.json();
-        console.log("Schedules fetched:", data);
         setSchedules(data);
       } catch (error) {
-        console.error("Error fetching schedules:", error.message);
+        failNotify(toastMessage.fail.error)
         setError(error.message);
       }
     };
@@ -101,7 +112,6 @@ export default function ManageSchedule() {
     const filteredSchedules = schedules.filter(
       (schedule) => schedule.day === dayOfWeek
     );
-    console.log(`Schedules for ${dayOfWeek}:`, filteredSchedules);
     return filteredSchedules;
   }, [selectedDate, schedules]);
 
@@ -111,7 +121,6 @@ export default function ManageSchedule() {
       const hasSchedule = schedules.some(
         (schedule) => schedule.day === dayOfWeek
       );
-      console.log(`Checking day: ${dayOfWeek}, hasSchedule: ${hasSchedule}`);
       return hasSchedule ? { backgroundColor: "green", color: "white" } : {};
     },
     [schedules]
@@ -170,7 +179,7 @@ export default function ManageSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <div className="mb-3 d-flex flex-column gap-3 flex-nowrap">
+                    <div className="mb-3 d-flex flex-column justify-content-center gap-3 flex-nowrap">
                       <button
                         className="text-button border w-100"
                         onClick={handleAdd}
