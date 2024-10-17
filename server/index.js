@@ -8,8 +8,6 @@ const WebSocket = require("ws");
 const express = require("express");
 const cors = require("cors");
 
-
-
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 mongoose
@@ -82,7 +80,7 @@ const server = http.createServer(app);
 
 // WebSocket Server
 const WebSocketServer = WebSocket.Server;
-const wss = new WebSocket.Server({ server, port: HTTPS_PORT });
+const wss = new WebSocket.Server({ server });
 
 // Rooms
 const rooms = {};
