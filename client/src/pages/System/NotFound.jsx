@@ -16,7 +16,7 @@ export default function NotFound() {
           `}
         </p>
         <button onClick={handleClose} className="button-group bg-white">
-          <p className="fw-bold my-0 text-button border">BACK</p>
+          <p className="fw-bold my-0 text-button">BACK</p>
         </button>
       </div>
     </div>
