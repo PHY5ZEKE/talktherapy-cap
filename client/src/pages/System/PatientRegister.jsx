@@ -222,9 +222,8 @@ export default function ClinicianRegister() {
                   value={formData.diagnosis}
                   onChange={handleChange}
                 >
-                  <option value="1">Diagnosis 1</option>
-                  <option value="2">Diagnosis 2</option>
-                  <option value="3">Diagnosis 3</option>
+                  <option value="Aphasia">Aphasia</option>
+                  <option value="Stroke">Stroke</option>
                 </select>
               </div>
             </div>

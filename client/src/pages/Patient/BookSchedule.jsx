@@ -311,7 +311,7 @@ export default function BookSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                    <div className="mb-3 d-flex flex-column gap-3 flex-nowrap">
                       <select
                         className="form-select form-select-lg mb-3"
                         aria-label="form-select-lg example"
