@@ -73,17 +73,31 @@ const RegisterClinician = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const formData = {
+      firstName: formData.firstName,
+      middleName: formData.middleName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password,
+      mobile: formData.mobile,
+      birthday: selectedDate,
+      gender: selectedGender,
+      address: formData.address,
+      specialization: selectedSpecialization,
+    };
+
+    console.log("Form Data:", formData); // Add this line to debug the form data
+
     try {
       const response = await fetch(`${appURL}/${route.clinician.signup}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...formData,
-          birthday: selectedDate,
-        }),
+        body: JSON.stringify(formData),
       });
 
       const data = await response.json();

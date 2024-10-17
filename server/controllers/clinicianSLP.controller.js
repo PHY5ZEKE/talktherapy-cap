@@ -191,6 +191,8 @@ exports.activateClinician = async (req, res) => {
 };
 
 exports.clinicianSignup = async (req, res) => {
+  console.log("Request Body:", req.body); // Add this line to debug the request body
+
   const {
     firstName,
     middleName,
@@ -202,7 +204,7 @@ exports.clinicianSignup = async (req, res) => {
     specialization,
     email,
     password,
-  } = req.body;
+  } = req.body.submissionData; // Adjusted to handle nested structure
 
   const requiredFields = {
     firstName: "First name is required.",
@@ -218,7 +220,8 @@ exports.clinicianSignup = async (req, res) => {
   };
 
   for (const [field, message] of Object.entries(requiredFields)) {
-    if (!req.body[field]) {
+    if (!req.body.submissionData[field]) {
+      // Adjusted to handle nested structure
       return res.status(400).json({ error: true, message });
     }
   }
@@ -388,7 +391,7 @@ exports.getPatientById = [
           active: patient.active,
           createdOn: patient.createdOn,
           addedOn: patient.addedOn,
-          profilePicture: patient.profilePicture
+          profilePicture: patient.profilePicture,
         },
       });
     } catch (error) {
