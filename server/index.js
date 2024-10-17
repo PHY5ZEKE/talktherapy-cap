@@ -2,11 +2,9 @@ const path = require("path");
 const http = require("http");
 const config = require("./config.json");
 const mongoose = require("mongoose");
-
-const WebSocket = require("ws");
-
 const express = require("express");
 const cors = require("cors");
+const WebSocket = require("ws");
 
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
@@ -19,6 +17,7 @@ mongoose
     console.error("Failed to connect to MongoDB", err);
   });
 
+// Express App
 const app = express();
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
@@ -53,7 +52,6 @@ app.use((req, res, next) => {
 });
 
 // Use the routes
-
 app.use("/api/patient-slp", patientSlpRoutes);
 app.use("/api/clinician-slp", clinicianSLPRoutes);
 app.use("/api/admin-slp", adminSLPRoutes);
@@ -72,19 +70,21 @@ app.get("/", (req, res) => {
   res.json({ data: "hello" });
 });
 
-// PORT
-const HTTPS_PORT = process.env.PORT || 8080;
-
-// HTTP Server for Express and WS Port
+// Start of HTTP Server for Express and WebSocket
 const server = http.createServer(app);
 
-// WebSocket Server
-const WebSocketServer = WebSocket.Server;
+// WSS Initialize
 const wss = new WebSocket.Server({ server });
 
 // Rooms
 const rooms = {};
 const MAX = 2;
+
+const roomFullMessage = JSON.stringify({
+  type: "room-full",
+  message: "Room is full, redirecting to home page.",
+  redirectURL: "/",
+});
 
 try {
   // ws connection start
@@ -102,13 +102,7 @@ try {
         }
         if (rooms[currentRoom].length >= MAX) {
           // Room is full, redirect user
-          ws.send(
-            JSON.stringify({
-              type: "room-full",
-              message: "Room is full, redirecting to home page.",
-              redirectURL: "/"
-            })
-          );
+          ws.send(roomFullMessage);
           ws.close();
         } else {
           // Add client to the room
@@ -117,23 +111,25 @@ try {
       }
 
       if (data.type === "message") {
-        // Broadcast message to all clients in the same room, including the sender
         if (currentRoom) {
+          const broadcastMessage = JSON.stringify({
+            type: "message",
+            message: data.message,
+            sender: data.sender,
+          });
+
           rooms[currentRoom].forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
-              client.send(
-                JSON.stringify({
-                  type: "message",
-                  message: data.message,
-                  sender: data.sender, // Include sender's UUID for all clients
-                })
-              );
+              client.send(broadcastMessage);
             }
           });
         }
       }
 
-      if (data.type === 'offer' || data.type === 'answer' || data.type === 'ice-candidate') {
+      if (
+        ["offer", "answer", "ice-candidate"].includes(data.type) &&
+        currentRoom
+      ) {
         // Relay WebRTC signaling messages only to other clients in the same room
         if (currentRoom) {
           rooms[currentRoom].forEach((client) => {
@@ -148,7 +144,9 @@ try {
     ws.on("close", () => {
       // Remove the client from the room when they disconnect
       if (currentRoom) {
-        rooms[currentRoom] = rooms[currentRoom].filter((client) => client !== ws);
+        rooms[currentRoom] = rooms[currentRoom].filter(
+          (client) => client !== ws
+        );
 
         // Notify other clients in the room that this client has left
         rooms[currentRoom].forEach((client) => {
@@ -174,7 +172,7 @@ try {
   console.error(error);
 }
 
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8080;
 server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server is running on port ${PORT}`);
 });
