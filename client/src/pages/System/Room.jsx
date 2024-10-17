@@ -105,14 +105,13 @@ export default function Room() {
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      const domain = "server-production-2381.up.railway.app";
       localStream.current = stream;
 
       if (localVideoRef.current) {
         localVideoRef.current.srcObject = stream;
       }
 
-      serverConnection.current = new WebSocket(`wss://${domain}`);
+      serverConnection.current = new WebSocket(`wss://${import.meta.env.VITE_WSS}`);
 
       serverConnection.current.onopen = () => {
         // Join the room by sending the room ID to the server
