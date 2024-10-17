@@ -32,14 +32,14 @@ export default function ManageSchedule() {
 
   useEffect(() => {
     const fetchClinicianData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+      const token = localStorage.getItem("accessToken");
 
       try {
         const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${token}`,
           },
         });
 
@@ -98,7 +98,7 @@ export default function ManageSchedule() {
   );
 
   const fetchPatientDetails = async (patientId) => {
-    setIsLoading(true); // Start loading
+    setIsLoading(true);
 
     try {
       const response = await fetch(
@@ -130,15 +130,18 @@ export default function ManageSchedule() {
 
   return (
     <>
-      {/* SOAP MODAL */}
-      {showModal && <Soap openModal={handleOpen} />}
+      {showModal && (
+        <Soap
+          openModal={handleOpen}
+          clinicianId={clinicianData?._id}
+          patientId={selectedPatient?._id}
+        />
+      )}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
-          {/* SIDEBAR */}
           <Sidebar />
 
-          {/* MAIN CONTENT */}
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
@@ -160,7 +163,6 @@ export default function ManageSchedule() {
             </div>
 
             <div className="row h-100">
-              {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -202,7 +204,6 @@ export default function ManageSchedule() {
                 </div>
               </div>
 
-              {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -275,7 +276,6 @@ export default function ManageSchedule() {
                 </div>
               </div>
 
-              {/* THIRD COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">

@@ -28,6 +28,7 @@ const superAdminSLPRoutes = require("./routes/superAdminSLP.route.js");
 const scheduleRoutes = require("./routes/schedule.route.js");
 const contentRoute = require("./routes/content.route.js");
 const appointmentRoute = require("./routes/appointment.route.js");
+const soapSLPRoute = require("./routes/soapSLP.route.js");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -60,6 +61,7 @@ app.use("/api/super-admin-slp", superAdminSLPRoutes);
 app.use("/api/schedule-slp", scheduleRoutes);
 app.use("/api/contents", contentRoute);
 app.use("/api/appointments-slp", appointmentRoute);
+app.use("/api/soap-slp", soapSLPRoute);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

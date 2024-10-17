@@ -17,7 +17,7 @@ const appointmentSchema = new mongoose.Schema(
     },
     selectedClinician: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "ClinicianSP",
+      ref: "ClinicianSLP",
       required: true,
     },
     selectedSchedule: {
