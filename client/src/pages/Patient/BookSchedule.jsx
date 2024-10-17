@@ -485,6 +485,14 @@ export default function BookSchedule() {
                               >
                                 Change
                               </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() =>
+                                  openConfirmRescheduleModal(appointment)
+                                }
+                              >
+                                Reschedule
+                              </div>
                             </div>
                           )}
                           {/* IF SCHEDULE CHANGE REQUEST */}
