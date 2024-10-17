@@ -1,18 +1,29 @@
 import "./modal.css";
-import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
+
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 export default function AppointmentDetailsClinician({
   openModal,
   appointment,
 }) {
   const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState(""); // "success" or "danger"
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -31,22 +42,16 @@ export default function AppointmentDetailsClinician({
           },
         }
       );
-      setAlertMessage("Appointment status updated successfully.");
-      setAlertType("success");
+      notify(toastMessage.success.statusBook)
       setTimeout(() => {
         window.location.reload();
       }, 2000); // Reload after 2 seconds
     } catch (error) {
-      setAlertMessage("Error updating appointment status.");
-      setAlertType("danger");
+      failNotify(toastMessage.fail.statusBook)
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log("Appointment details in modal:", appointment); // Debugging statement
-  }, [appointment]);
 
   if (!appointment) {
     return null; // Return null if no appointment details are available
@@ -100,12 +105,6 @@ export default function AppointmentDetailsClinician({
             <h3 className="fw-bold">Appointment Details</h3>
             <p className="mb-0">Verify if the following details are correct.</p>
           </div>
-
-          {alertMessage && (
-            <div className={`alert alert-${alertType} mt-3`} role="alert">
-              {alertMessage}
-            </div>
-          )}
 
           <div className="container text-center">
             <div className="row text-center">

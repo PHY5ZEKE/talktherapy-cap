@@ -2,8 +2,11 @@ import "./modal.css";
 import Form from "react-bootstrap/Form";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
 import { useState } from "react";
-import Alert from "react-bootstrap/Alert";
+
+// Utils
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 export default function JoinAppointment({
   openModal,
@@ -18,9 +21,17 @@ export default function JoinAppointment({
   const [referralUpload, setReferralUpload] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
 
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertVariant, setAlertVariant] = useState("success");
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -31,9 +42,7 @@ export default function JoinAppointment({
     e.preventDefault();
 
     if (!medicalDiagnosis || !sourceOfReferral || !chiefComplaint) {
-      setAlertMessage("All fields are required.");
-      setAlertVariant("danger");
-      setAlertVisible(true);
+      failNotify("All fields are required.")
       return;
     }
 
@@ -53,7 +62,6 @@ export default function JoinAppointment({
       selectedSchedule: selectedSchedule,
     };
 
-    console.log("Form data:", JSON.stringify(formData));
     try {
       const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
 
@@ -71,10 +79,8 @@ export default function JoinAppointment({
       );
 
       const data = await response.json();
-      console.log("Response data:", data);
 
       formData.append("appointmentId", data.appointmentId);
-      console.log("appointmentId:", data.appointmentId);
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to create appointment");
@@ -97,16 +103,11 @@ export default function JoinAppointment({
         throw new Error(fileData.message || "Failed to create appointment");
       }
 
-      console.log("Appointment created successfully:", data);
+      notify(toastMessage.success.book)
       onSuccess("Appointment created successfully."); // Call the success handler
       window.location.reload(); // Reload the page on success
     } catch (error) {
-      console.error("Error creating appointment:", error.message);
-      setAlertMessage(
-        error.message || "Error creating appointment. Please try again."
-      );
-      setAlertVariant("danger");
-      setAlertVisible(true);
+      failNotify(toastMessage.fail.error)
     }
   };
 
@@ -119,17 +120,6 @@ export default function JoinAppointment({
         </div>
 
         <div className="container">
-          {/* Alert Component */}
-          {alertVisible && (
-            <Alert
-              variant={alertVariant}
-              onClose={() => setAlertVisible(false)}
-              dismissible
-            >
-              {alertMessage}
-            </Alert>
-          )}
-
           {/* Join Appointment Form */}
           <div className="row">
             <div className="col">

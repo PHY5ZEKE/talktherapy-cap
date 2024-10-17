@@ -1,16 +1,11 @@
-import Container from "react-bootstrap/Container";
-import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
-// Icons
-import Back from "../../assets/icons/Back";
-import BookmarkHollow from "../../assets/icons/BookmarkHollow";
+
 export default function Perform() {
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);

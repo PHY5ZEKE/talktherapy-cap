@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
+import { ToastContainer } from "react-toastify";
 // Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -7,12 +7,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./styles/text.css";
 import "./styles/containers.css";
 import "./styles/images.css";
+import "react-toastify/dist/ReactToastify.css";
 
 // System
 import Login from "./pages/Login/Login";
-import RegisterAdmin from "./pages/System/AdminRegister";
-import RegisterClinician from "./pages/System/ClinicianRegister";
-import RegisterPatientSlp from "./pages/System/PatientRegister";
+import RegisterAdmin from "./pages/Register/AdminRegister";
+import RegisterClinician from "./pages/Register/ClinicianRegister";
+import RegisterPatientSlp from "./pages/Register/PatientRegister";
 import ForgotPassword from "./pages/Forgot-Password/ForgotPassword";
 
 // Super Admin TalkTherapy
@@ -54,16 +55,11 @@ import Room from "./pages/System/Room";
 import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
-// Test Layout
-import Layout from "./pages/System/ClinicianRegister";
-
 const routes = (
   <Router>
     <Routes>
       {/* Error Page for No-Match Paths */}
       <Route path="*" element={<NotFound />} />
-
-      <Route path="/layout" element={<Layout />} />
 
       {/* Unauthorized Access Page */}
       <Route path="/unauthorized" element={<UnauthorizedAccess />} />
@@ -272,7 +268,12 @@ const routes = (
 );
 
 const App = () => {
-  return <div>{routes}</div>;
+  return (
+    <div>
+      {routes}
+      <ToastContainer />
+    </div>
+  );
 };
 
 export default App;

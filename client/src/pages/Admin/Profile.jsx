@@ -12,12 +12,20 @@ import ChangePassword from "../../components/Modals/ChangePassword";
 // Utils
 import { route } from "../../utils/route";
 import { page } from "../../utils/page-route"
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 export default function Profile() {
   const [adminData, setAdminData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
@@ -48,9 +56,10 @@ export default function Profile() {
 
       const data = await response.json();
       setAdminData(data.admin);
-      console.log(data);
       setLoading(false);
     } catch (error) {
+      failNotify(toastMessage.fail.fetch)
+      failNotify(toastMessage.fail.error)
       setError(error.message);
       setLoading(false);
     }

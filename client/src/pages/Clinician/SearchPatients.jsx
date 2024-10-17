@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -15,6 +17,12 @@ export default function ManageSchedule() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Modal
   const [showModal, setShowModal] = useState(false);
@@ -70,10 +78,11 @@ export default function ManageSchedule() {
         if (!data.error) {
           setPatients(data.patients);
         } else {
-          console.error("Failed to fetch patients:", data.message);
+          failNotify(toastMessage.fail.fetch);
         }
       } catch (error) {
-        console.error("Error fetching patients:", error);
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -105,10 +114,11 @@ export default function ManageSchedule() {
       if (!data.error) {
         setSelectedPatient(data.patient);
       } else {
-        console.error("Failed to fetch patient details:", data.message);
+        failNotify(toastMessage.fail.fetch);
       }
     } catch (error) {
-      console.error("Error fetching patient details:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +168,7 @@ export default function ManageSchedule() {
                     <input
                       type="text"
                       placeholder="Search for patient"
-                      className="search-input"
+                      className="search-input rounded-3"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -218,7 +228,11 @@ export default function ManageSchedule() {
                           src={selectedPatient?.profilePicture}
                           className="card-img-top"
                           alt="Profile picture"
-                          style={{ maxHeight: "320px", minHeight: "320px", objectFit: "cover" }}
+                          style={{
+                            maxHeight: "320px",
+                            minHeight: "320px",
+                            objectFit: "cover",
+                          }}
                         />
                         <div className="card-body">
                           <h5 className="">
@@ -228,7 +242,7 @@ export default function ManageSchedule() {
                           </h5>
                           <p className="mb-0">{selectedPatient?.diagnosis}</p>
                           <p className="mb-0">{selectedPatient?.mobile}</p>
-                          <p className="mb-0">{selectedPatient?.email}</p>
+                          <p className="mb-3">{selectedPatient?.email}</p>
 
                           <div className="d-flex flex-column gap-3">
                             <button

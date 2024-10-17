@@ -1,6 +1,8 @@
-
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -26,6 +28,18 @@ export default function Home() {
   const appURL = import.meta.env.VITE_APP_URL;
 
   const navigate = useNavigate();
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
@@ -64,11 +78,11 @@ export default function Home() {
           },
         }
       );
-      console.log("Fetched appointment details:", response.data); // Debugging statement
       setSelectedAppointment(response.data);
       setIsViewAppointment(true);
     } catch (error) {
-      console.error("Error fetching appointment details:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     }
   };
 
@@ -91,10 +105,11 @@ export default function Home() {
         if (!data.error) {
           setPatients(data.patients);
         } else {
-          console.error("Failed to fetch patients:", data.message);
+          failNotify(toastMessage.fail.fetch);
         }
       } catch (error) {
-        console.error("Error fetching patients:", error);
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -110,7 +125,6 @@ export default function Home() {
   );
 
   const joinMeeting = (app, id) => {
-    console.log("Joining meeting with ID:", id);
     navigate(`/room/${app}/${id}`);
   };
 
@@ -134,7 +148,10 @@ export default function Home() {
         const data = await response.json();
         setClinicianData(data.clinician);
         localStorage.setItem("userId", data.clinician._id);
-        localStorage.setItem("userName", `${data.clinician.firstName} ${data.clinician.lastName}`)
+        localStorage.setItem(
+          "userName",
+          `${data.clinician.firstName} ${data.clinician.lastName}`
+        );
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -168,8 +185,8 @@ export default function Home() {
         const data = await response.json();
         setAppointments(data);
       } catch (error) {
-        console.error("Error fetching appointments:", error);
-      }
+        failNotify(toastMessage.fail.fetch)
+        failNotify(toastMessage.fail.error)      }
     };
 
     fetchAppointments();

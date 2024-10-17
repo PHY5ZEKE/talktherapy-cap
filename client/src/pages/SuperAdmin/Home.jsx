@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -20,13 +22,25 @@ export default function Home() {
   const [updateProfilePictureAPI, setUpdateProfilePictureAPI] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
 
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
   const [isOpen, setIsOpen] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
 
   const handleModal = (user) => {
     setIsOpen(!isOpen);
     setUserDetails(user);
-    setEditProfileAPI("super-admin-slp/edit-admin");
+    setEditProfileAPI(route.sudo.editAdmin);
   };
 
   const onProfileUpdate = async (updatedDetails) => {
@@ -42,9 +56,9 @@ export default function Home() {
         }
       );
       // Handle the response as needed
-      console.log("Profile updated successfully:", response.data);
+      notify(toastMessage.success.edit)
     } catch (error) {
-      console.error("Error updating profile:", error);
+      failNotify(toastMessage.fail.error)
     }
   };
 
@@ -74,11 +88,13 @@ export default function Home() {
           setError("Unauthorized. Please log in again.");
         } else {
           const errorText = await response.text();
-          console.error("Failed to fetch super admin data:", errorText);
+          failNotify(toastMessage.fail.fetch)
+
           setError("Failed to fetch super admin data");
         }
       } catch (error) {
-        console.error("Error fetching super admin data:", error);
+        failNotify(toastMessage.fail.fetch)
+        failNotify(toastMessage.fail.error)
         setError("Error fetching super admin data");
       }
     };
@@ -140,11 +156,12 @@ export default function Home() {
               : admin
           )
         );
+        notify(toastMessage.success.status);
       } else {
-        console.error("Failed to toggle admin status:", data.message);
+        failNotify(toastMessage.fail.status);
       }
     } catch (error) {
-      console.error("Error toggling admin status:", error);
+      failNotify(toastMessage.fail.error);
     } finally {
       setIsProcessing(false); // Stop processing
     }
@@ -168,7 +185,7 @@ export default function Home() {
       {/* REGISTER ADMIN MODAL */}
       {isAdd && (
         <>
-          <RegisterAdmin openModal={()=>setIsAdd(!isAdd)} />
+          <RegisterAdmin openModal={() => setIsAdd(!isAdd)} />
         </>
       )}
 

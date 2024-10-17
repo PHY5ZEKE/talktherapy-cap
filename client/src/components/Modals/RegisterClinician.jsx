@@ -1,5 +1,8 @@
 import { useState } from "react";
+
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
 
 export default function RegisterClinician({ openModal }) {
   const appURL = import.meta.env.VITE_APP_URL;
@@ -7,6 +10,18 @@ export default function RegisterClinician({ openModal }) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -37,11 +52,13 @@ export default function RegisterClinician({ openModal }) {
         setError(true);
         setMessage(data.message);
       } else {
+        notify(toastMessage.success.register)
         setError(false);
         setMessage(data.message);
         setEmail(""); // Clear the input field on success
       }
     } catch (err) {
+      failNotify(toastMessage.fail.error)
       setError(true);
       setMessage("An error occurred. Please try again.");
     }
@@ -83,14 +100,14 @@ export default function RegisterClinician({ openModal }) {
 
           <div className="d-flex justify-content-center mt-3 gap-3">
             <div
-              className="text-button border"
+              className="text-button border fw-bold"
               style={{ cursor: "pointer" }}
               onClick={handleSubmit}
             >
               Submit
             </div>
             <div
-              className="text-button border"
+              className="text-button border fw-bold"
               style={{ cursor: "pointer" }}
               onClick={handleClose}
             >

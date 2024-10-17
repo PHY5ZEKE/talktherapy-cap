@@ -1,12 +1,14 @@
 import { Link } from "react-router-dom";
 import { route } from "../../utils/route.js";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, Slide } from "react-toastify";
+
+import { toastMessage } from "../../utils/toastHandler";
 
 export default function ClinicianRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -22,7 +24,17 @@ export default function ClinicianRegister() {
     specialization: "",
   });
 
-  const datePickerRef = useRef(null);
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
@@ -89,21 +101,20 @@ export default function ClinicianRegister() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ submissionData, birthday: selectedDate }),
+        body: JSON.stringify({ submissionData }),
       });
 
       const result = await response.json();
 
       if (response.ok) {
-        alert("Registration Successful");
+        notify(toastMessage.success.register)
         navigate("/login"); // Redirect to login or another page
       } else {
         setMessage(result.message);
-        alert(result.message || "Registration Failed");
       }
     } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+      failNotify(toastMessage.fail.error)
+      failNotify(error)
     }
   };
 
@@ -208,9 +219,9 @@ export default function ClinicianRegister() {
                 <input
                   type="date"
                   aria-label="Date"
-                  ref={datePickerRef}
-                  selected={selectedDate}
-                  onChange={(date) => setSelectedDate(date)}
+                  name="birthday"
+                  value={formData.birthday}
+                  onChange={handleChange}
                   className="form-input rounded"
                 />
               </div>
@@ -226,6 +237,7 @@ export default function ClinicianRegister() {
                   value={formData.gender}
                   onChange={handleChange}
                 >
+                  <option value="">Select gender</option>
                   <option value="Male">Male</option>
                   <option value="Female">Female</option>
                   <option value="Others">Others</option>
@@ -256,6 +268,7 @@ export default function ClinicianRegister() {
                   value={formData.diagnosis}
                   onChange={handleChange}
                 >
+                  <option value="">Select diagnosis</option>
                   <option value="Aphasia">Aphasia</option>
                   <option value="Stroke">Stroke</option>
                 </select>
@@ -294,6 +307,7 @@ export default function ClinicianRegister() {
                     onChange={handleChange}
                   />
                   <button
+                    type="button"
                     onClick={togglePasswordVisibility}
                     className="text-button form-show rounded-2"
                   >
@@ -318,6 +332,7 @@ export default function ClinicianRegister() {
                     onChange={handleChange}
                   />
                   <button
+                    type="button"
                     onClick={toggleConfPasswordVisibility}
                     className="text-button form-show rounded-2"
                   >

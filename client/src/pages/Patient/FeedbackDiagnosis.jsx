@@ -5,18 +5,12 @@ import { route } from "../../utils/route";
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
-// DatePicker
-
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
 export default function FeedbackDiagnosis() {
+  const appURL = import.meta.env.VITE_APP_URL;
+
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // DatePicker Instance
-  const [startDate, setStartDate] = useState(new Date());
-  const appURL = import.meta.env.VITE_APP_URL;
 
   useEffect(() => {
     const fetchPatientData = async () => {

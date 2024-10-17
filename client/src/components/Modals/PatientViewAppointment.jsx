@@ -1,8 +1,6 @@
 import "./modal.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { route } from "../../utils/route";
 
 export default function PatientViewAppointment({
   openModal,
@@ -10,10 +8,6 @@ export default function PatientViewAppointment({
   closeModal,
 }) {
   const appURL = import.meta.env.VITE_APP_URL;
-
-  const [loading, setLoading] = useState(false);
-  const [alertMessage, setAlertMessage] = useState("");
-  const [alertType, setAlertType] = useState(""); // "success" or "danger"
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -33,11 +27,6 @@ export default function PatientViewAppointment({
             <p className="mb-0">Verify if the following details are correct.</p>
           </div>
 
-          {alertMessage && (
-            <div className={`alert alert-${alertType} mt-3`} role="alert">
-              {alertMessage}
-            </div>
-          )}
 
           <div className="container text-center">
             <div className="row text-center">

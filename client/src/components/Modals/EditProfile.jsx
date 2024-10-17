@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-
+import { toast, Slide } from "react-toastify";
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
+import { toastMessage } from "../../utils/toastHandler";
 
 // FOR SUDO, ADMIN, AND PATIENT
 export default function EditProfile({
@@ -21,6 +22,18 @@ export default function EditProfile({
   const [showModal, setShowModal] = useState(true);
 
   const [profilePicture, setProfilePicture] = useState(null);
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Form Inputs
   const [firstName, setFirstName] = useState("");
@@ -67,19 +80,16 @@ export default function EditProfile({
       });
 
       const data = await response.json();
-      console.log("Response:", response);
-      console.log("Data:", data);
 
       if (response.ok) {
-        alert("Profile updated successfully.");
+        notify(toastMessage.success.edit);
         setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
       } else {
-        alert(data.message || "Error updating profile.");
+        failNotify(toastMessage.fail.edit);
       }
     } catch (error) {
-      console.error("Error updating profile", error);
-      alert("Error updating profile.");
+      failNotify(toastMessage.fail.error);
     }
   };
   // Change Profile Picture Listener
@@ -92,7 +102,7 @@ export default function EditProfile({
     const token = localStorage.getItem("accessToken");
 
     if (!profilePicture) {
-      alert("Please select a profile picture to upload.");
+      failNotify("Select an image for profile picture upload.")
       return;
     }
 
@@ -111,18 +121,17 @@ export default function EditProfile({
       const data = await response.json();
 
       if (response.ok) {
-        alert("Profile picture updated successfully.");
+        notify(toastMessage.success.edit);
         setUpdatedUser((prevData) => ({
           ...prevData,
           profilePicture: data.profilePicture,
         }));
         onProfileUpdate();
       } else {
-        alert(data.message || "Error updating profile picture.");
+        failNotify(toastMessage.fail.edit);
       }
     } catch (error) {
-      console.error("Error updating profile picture", error);
-      alert("Error updating profile picture.");
+      failNotify(toastMessage.fail.error);
     }
   };
 
@@ -135,8 +144,8 @@ export default function EditProfile({
         <form onSubmit={handleEditProfileSubmit}>
           {isOwner && (
             <>
-              <h3 className="mt-4">Profile Picture</h3>
-              <div className="form-group mb-3">
+              <h3 className="">Profile Picture</h3>
+              <div className="form-group d-flex flex-column mb-3">
                 <p className="mb-0">Upload Profile Picture</p>
                 <input
                   type="file"
@@ -145,7 +154,7 @@ export default function EditProfile({
                 />
                 <button
                   type="button"
-                  className="text-button border"
+                  className="text-button border w-100 mt-3"
                   onClick={handleProfilePictureUpload}
                 >
                   Upload Picture
@@ -203,7 +212,7 @@ export default function EditProfile({
             </>
           )}
 
-          {whatRole !== "patientslp" && (
+          {whatRole !== "patient" && (
             <div className="form-group">
               <p className="mb-0">Clinic Address</p>
               <input
@@ -216,13 +225,13 @@ export default function EditProfile({
             </div>
           )}
 
-          <button type="submit" className="text-button border">
+          <button type="submit" className="text-button border mt-3 w-100">
             Save
           </button>
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button variant="secondary" onClick={handleCloseModal}>
+        <Button className="text-button fw-bold" onClick={handleCloseModal}>
           Close
         </Button>
       </Modal.Footer>

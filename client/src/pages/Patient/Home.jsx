@@ -71,7 +71,6 @@ export default function Home() {
   );
 
   const joinMeeting = (app, id) => {
-    console.log("Joining meeting with ID:", id);
     navigate(`/room/${app}/${id}`);
   };
 

@@ -1,4 +1,6 @@
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
@@ -20,6 +22,12 @@ export default function ManageSchedule() {
     []
   );
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   // Fetch admin data from the backend
   useEffect(() => {
@@ -65,13 +73,14 @@ export default function ManageSchedule() {
         const data = await response.json();
 
         if (!data.error) {
-          console.log(data.clinicians);
           setClinicians(data.clinicians);
         } else {
-          console.error("Failed to fetch clinicians:", data.message);
+          failNotify(toastMessage.fail.fetch);
+          failNotify(toastMessage.fail.error);
         }
       } catch (error) {
-        console.error("Error fetching clinicians:", error);
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
       }
     };
 
@@ -93,10 +102,11 @@ export default function ManageSchedule() {
         );
         setSelectedClinicianSchedule(clinicianSchedule);
       } else {
-        console.error("Failed to fetch schedule:", data.message);
+        failNotify(toastMessage.fail.fetch);
       }
     } catch (error) {
-      console.error("Error fetching schedule:", error);
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
     }
   };
 
@@ -181,6 +191,7 @@ export default function ManageSchedule() {
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Clinician Schedule</p>
+                    <p className="mb-0">Schedule of selected clinician.</p>
                   </div>
                 </div>
 

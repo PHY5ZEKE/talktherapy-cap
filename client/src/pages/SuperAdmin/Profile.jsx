@@ -5,6 +5,9 @@ import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
+
 // utils
 import { route } from "../../utils/route";
 import { page } from "../../utils/page-route";
@@ -14,6 +17,18 @@ export default function Profile() {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
@@ -50,11 +65,12 @@ export default function Profile() {
         setError("Unauthorized. Please log in again.");
       } else {
         const errorText = await response.text();
-        console.error("Failed to fetch super admin data:", errorText);
+        failNotify(toastMessage.fail.fetch)
         setError("Failed to fetch super admin data");
       }
     } catch (error) {
-      console.error("Error fetching super admin data:", error);
+      failNotify(toastMessage.fail.fetch)
+      failNotify(toastMessage.fail.error)
       setError("Error fetching super admin data");
     }
   };

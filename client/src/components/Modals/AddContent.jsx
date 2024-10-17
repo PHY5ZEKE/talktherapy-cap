@@ -1,5 +1,9 @@
-import "./modal.css";
 import { useState } from "react";
+
+import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide} from "react-toastify";
+
 export default function AddContent({ closeModal }) {
   // Callback Function
   const handleClose = (e) => {
