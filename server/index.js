@@ -1,7 +1,14 @@
 const path = require("path");
-
+const http = require("http");
 const config = require("./config.json");
 const mongoose = require("mongoose");
+
+const WebSocket = require("ws");
+
+const express = require("express");
+const cors = require("cors");
+
+
 
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
@@ -14,8 +21,6 @@ mongoose
     console.error("Failed to connect to MongoDB", err);
   });
 
-const express = require("express");
-const cors = require("cors");
 const app = express();
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
@@ -69,6 +74,109 @@ app.get("/", (req, res) => {
   res.json({ data: "hello" });
 });
 
-app.listen(8000, "0.0.0.0", () => {
-  console.log("Server is running on port 8000");
+// PORT
+const HTTPS_PORT = process.env.PORT || 8080;
+
+// HTTP Server for Express and WS Port
+const server = http.createServer(app);
+
+// WebSocket Server
+const WebSocketServer = WebSocket.Server;
+const wss = new WebSocket.Server({ server, port: HTTPS_PORT });
+
+// Rooms
+const rooms = {};
+const MAX = 2;
+
+try {
+  // ws connection start
+  wss.on("connection", (ws) => {
+    let currentRoom = null;
+
+    ws.on("message", (message) => {
+      const data = JSON.parse(message);
+
+      if (data.type === "join-room") {
+        // Add client to the room
+        currentRoom = data.roomID;
+        if (!rooms[currentRoom]) {
+          rooms[currentRoom] = [];
+        }
+        if (rooms[currentRoom].length >= MAX) {
+          // Room is full, redirect user
+          ws.send(
+            JSON.stringify({
+              type: "room-full",
+              message: "Room is full, redirecting to home page.",
+              redirectURL: "/"
+            })
+          );
+          ws.close();
+        } else {
+          // Add client to the room
+          rooms[currentRoom].push(ws);
+        }
+      }
+
+      if (data.type === "message") {
+        // Broadcast message to all clients in the same room, including the sender
+        if (currentRoom) {
+          rooms[currentRoom].forEach((client) => {
+            if (client.readyState === WebSocket.OPEN) {
+              client.send(
+                JSON.stringify({
+                  type: "message",
+                  message: data.message,
+                  sender: data.sender, // Include sender's UUID for all clients
+                })
+              );
+            }
+          });
+        }
+      }
+
+      if (data.type === 'offer' || data.type === 'answer' || data.type === 'ice-candidate') {
+        // Relay WebRTC signaling messages only to other clients in the same room
+        if (currentRoom) {
+          rooms[currentRoom].forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+              client.send(JSON.stringify(data));
+            }
+          });
+        }
+      }
+    });
+
+    ws.on("close", () => {
+      // Remove the client from the room when they disconnect
+      if (currentRoom) {
+        rooms[currentRoom] = rooms[currentRoom].filter((client) => client !== ws);
+
+        // Notify other clients in the room that this client has left
+        rooms[currentRoom].forEach((client) => {
+          if (client.readyState === WebSocket.OPEN) {
+            client.send(
+              JSON.stringify({
+                type: "user-left",
+                userId: data.uuid, // Or use any other unique identifier
+              })
+            );
+          }
+        });
+
+        // Clean up the room if it's empty
+        if (rooms[currentRoom].length === 0) {
+          delete rooms[currentRoom];
+          console.log(`Room ${currentRoom} is empty and deleted`);
+        }
+      }
+    });
+  });
+} catch (error) {
+  console.error(error);
+}
+
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
 });
