@@ -37,9 +37,9 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://chefsdaughter.online",
-      "http://www.chefsdaughter.online",
-      "https://www.chefsdaughter.online",
+      "https://talktherapy.site",
+      "http://www.talktherapy.site",
+      "https://www.talktherapy.site",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
