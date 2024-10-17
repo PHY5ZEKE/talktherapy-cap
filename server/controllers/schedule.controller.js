@@ -81,8 +81,6 @@ exports.getSchedules = async (req, res) => {
 
 // Get All Clinicain User Schedules
 exports.getClinicianSched = async (req, res) => {
-  // it does not need to get the clicnian id
-  // it only needs to get all instances of clinician schedules regardless of clinician id
   try {
     const schedules = await Schedule.find();
     res.status(200).json(schedules);
