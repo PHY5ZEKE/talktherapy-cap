@@ -81,15 +81,18 @@ export default function AdminRegister() {
       const result = await response.json();
 
       if (response.ok) {
-        alert("Registration Successful");
-        navigate("/login"); // Redirect to login or another page
+        setMessage("Registration Successful");
+        setError(false);
+        navigate("/login");
       } else {
-        setMessage(result.message)
-        alert(result.message || "Registration Failed");
+        setMessage(result.message || "Registration Failed");
+        setError(true);
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("An error occurred. Please try again.");
+      // Display error message in the form itself
+      setMessage("An error occurred. Please try again.");
+      setError(true);
     }
   };
 
@@ -234,6 +237,7 @@ export default function AdminRegister() {
                   <button
                     onClick={togglePasswordVisibility}
                     className="text-button form-show rounded-2"
+                    type="button"
                   >
                     Show
                   </button>
@@ -258,6 +262,7 @@ export default function AdminRegister() {
                   <button
                     onClick={toggleConfPasswordVisibility}
                     className="text-button form-show rounded-2"
+                    type="button"
                   >
                     Show
                   </button>
