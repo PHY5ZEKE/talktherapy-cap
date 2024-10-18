@@ -22,7 +22,7 @@ export function runSpeechRecognition(setScore) {
 
     recognition.onresult = async function (event) {
         const pronouncingModule = await import('/src/machinelearning/my_model/pronouncing.js');
-        const pronouncing = pronouncingModule.default || pronouncingModule; 
+        console.log("pronouncing.js loaded:", pronouncingModule);
         var fullTranscript = '';
         for (var i = 0; i < event.results.length; i++) {
             var transcript = event.results[i][0].transcript;
