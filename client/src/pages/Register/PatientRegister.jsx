@@ -92,7 +92,7 @@ export default function ClinicianRegister() {
     };
 
     try {
-      const response = await fetch(`${appURL}/${route.clinician.signup}`, {
+      const response = await fetch(`${appURL}/${route.patient.signup}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export default function ClinicianRegister() {
 
       if (response.ok) {
         setError(false);
-        notify(toastMessage.success.register)
+        notify(toastMessage.success.register);
         navigate("/login");
       } else {
         setMessage(result.message || "Registration Failed");
@@ -112,8 +112,8 @@ export default function ClinicianRegister() {
       }
     } catch (error) {
       // Display error message in the form itself
-      failNotify(toastMessage.fail.error)
-      failNotify(error)
+      failNotify(toastMessage.fail.error);
+      failNotify(error);
       setError(true);
     }
   };

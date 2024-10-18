@@ -127,7 +127,7 @@ const signupPatient = async (req, res) => {
     consent,
     email,
     password,
-  } = req.body;
+  } = req.body.submissionData;
 
   const requiredFields = {
     firstName: "First name is required.",
@@ -141,7 +141,7 @@ const signupPatient = async (req, res) => {
   };
 
   for (const [field, message] of Object.entries(requiredFields)) {
-    if (!req.body[field]) {
+    if (!req.body.submissionData[field]) {
       return res.status(400).json({ error: true, message });
     }
   }
