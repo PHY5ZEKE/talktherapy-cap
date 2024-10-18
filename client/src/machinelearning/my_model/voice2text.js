@@ -1,8 +1,15 @@
-export function runSpeechRecognition(setScore) {
+export async function runSpeechRecognition(setScore) {
     var output = document.getElementById("output");
     var action = document.getElementById("action");
     var phonemeContainer = document.getElementById("phoneme-output"); 
     var scoreOutput = document.getElementById("score-output"); 
+
+    try {
+        await import('/src/machinelearning/my_model/pronouncing.js');
+    } catch (error) {
+        console.error("Error loading pronouncing.js:", error);
+        return;
+    }
     
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
