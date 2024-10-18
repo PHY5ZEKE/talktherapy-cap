@@ -37,6 +37,7 @@ app.use("/src", express.static(path.join(__dirname, "../src")));
 app.use(
   cors({
     origin: [
+      '*',
       "http://localhost:5173",
       "https://talktherapy.site",
       "http://www.talktherapy.site",
