@@ -6,14 +6,15 @@ import { useState } from "react";
 // Utils
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 export default function JoinAppointment({
   openModal,
   selectedClinician,
   selectedSchedule,
   patientId,
-  onSuccess, // Receive the success handler
+  onSuccess,
+  closeModal,
 }) {
   const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
   const [sourceOfReferral, setSourceOfReferral] = useState("");
@@ -35,14 +36,14 @@ export default function JoinAppointment({
 
   const handleClose = (e) => {
     e.preventDefault();
-    openModal();
+    closeModal();
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!medicalDiagnosis || !sourceOfReferral || !chiefComplaint) {
-      failNotify("All fields are required.")
+      failNotify("All fields are required.");
       return;
     }
 
@@ -103,11 +104,11 @@ export default function JoinAppointment({
         throw new Error(fileData.message || "Failed to create appointment");
       }
 
-      notify(toastMessage.success.book)
+      notify(toastMessage.success.book);
       onSuccess("Appointment created successfully."); // Call the success handler
       window.location.reload(); // Reload the page on success
     } catch (error) {
-      failNotify(toastMessage.fail.error)
+      failNotify(toastMessage.fail.error);
     }
   };
 
@@ -180,7 +181,7 @@ export default function JoinAppointment({
             </div>
           </div>
 
-          <div className="row text-center">
+          <div className="row text-center" hidden>
             <div className="col">
               <p className="fw-bold">Selected Clinician</p>
               <p>{selectedClinician}</p>

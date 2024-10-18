@@ -3,7 +3,6 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
-
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import JoinAppointment from "../../components/Modals/JoinAppointment";
@@ -60,15 +59,17 @@ export default function BookSchedule() {
     setIsOpen(true);
   };
 
-  const notify = (message) =>
-  {
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const notify = (message) => {
     toast.success(message, {
       transition: Slide,
       autoClose: 2000,
     });
     window.location.reload(); // Reload the page on success
-  }
-    
+  };
 
   const failNotify = (message) =>
     toast.error(message, {
@@ -156,7 +157,7 @@ export default function BookSchedule() {
         const data = await response.json();
         setAllSchedule(data);
       } catch (error) {
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.error);
         setError(error.message);
       }
     };
@@ -179,7 +180,7 @@ export default function BookSchedule() {
         setHasBooked(isBooked(data));
         setAppointments(data);
       } catch (error) {
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.error);
         setError(error.message);
       }
     };
@@ -224,7 +225,7 @@ export default function BookSchedule() {
   const onScheduleSelect = (appointment) => {
     setSelectedAppointment(appointment);
     setIsChoose(false);
-    notify()
+    notify();
   };
 
   const filteredAppointments = appointments.filter(
@@ -244,7 +245,7 @@ export default function BookSchedule() {
           selectedSchedule={selectedSchedule}
           patientId={patientData?._id}
           onSuccess={notify}
-          closeModal={() => setIsOpen(false)}
+          closeModal={closeModal} // Pass the closeModal function
         />
       )}
 
@@ -458,10 +459,16 @@ export default function BookSchedule() {
                               <div className="d-flex justify-content-between flex-wrap gap-3">
                                 <div className="mb-3 text-pending">PENDING</div>
                                 <div className="d-flex gap-3">
-                                  <div className="mb-3 fw-bold text-button border">
+                                  <div
+                                    className="mb-3 fw-bold text-button border"
+                                    hidden
+                                  >
                                     Edit
                                   </div>
-                                  <div className="mb-3 fw-bold text-button border">
+                                  <div
+                                    className="mb-3 fw-bold text-button border"
+                                    hidden
+                                  >
                                     Cancel
                                   </div>
                                 </div>

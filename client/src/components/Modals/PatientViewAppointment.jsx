@@ -27,7 +27,6 @@ export default function PatientViewAppointment({
             <p className="mb-0">Verify if the following details are correct.</p>
           </div>
 
-
           <div className="container text-center">
             <div className="row text-center">
               <label className="fw-bold mt-3 mb-0" htmlFor="appointmentDate">
