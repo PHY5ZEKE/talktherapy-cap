@@ -23,6 +23,7 @@ export function runSpeechRecognition(setScore) {
     recognition.onresult = async function (event) {
         const pronouncingModule = await import('/src/machinelearning/my_model/pronouncing.js');
         console.log("pronouncing.js loaded:", pronouncingModule);
+        const pronouncing = pronouncingModule.default || pronouncingModule; 
         var fullTranscript = '';
         for (var i = 0; i < event.results.length; i++) {
             var transcript = event.results[i][0].transcript;
@@ -38,7 +39,7 @@ export function runSpeechRecognition(setScore) {
         // Assess pronunciation for the first word
         var words = finalText.split(' ');
         var firstWord = words.length > 0 ? cleanWord(words[0]) : '';
-        var phonemeSequence = window.pronouncing.phonesForWord(firstWord);
+        var phonemeSequence = pronouncing.phonesForWord(firstWord);
 
         if (phonemeSequence.length > 0) {
             var phonemeArray = phonemeSequence[0].split(" ");
