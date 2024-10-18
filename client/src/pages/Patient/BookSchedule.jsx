@@ -244,7 +244,6 @@ export default function BookSchedule() {
           selectedClinician={selectedClinician}
           selectedSchedule={selectedSchedule}
           patientId={patientData?._id}
-          onSuccess={notify}
           closeModal={closeModal} // Pass the closeModal function
         />
       )}

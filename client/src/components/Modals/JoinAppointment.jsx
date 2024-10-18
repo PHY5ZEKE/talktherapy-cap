@@ -13,7 +13,6 @@ export default function JoinAppointment({
   selectedClinician,
   selectedSchedule,
   patientId,
-  onSuccess,
   closeModal,
 }) {
   const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
@@ -105,7 +104,6 @@ export default function JoinAppointment({
       }
 
       notify(toastMessage.success.book);
-      onSuccess("Appointment created successfully."); // Call the success handler
       window.location.reload(); // Reload the page on success
     } catch (error) {
       failNotify(toastMessage.fail.error);
