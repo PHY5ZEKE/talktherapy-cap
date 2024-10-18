@@ -21,7 +21,7 @@ export function runSpeechRecognition(setScore) {
     };
 
     recognition.onresult = async function (event) {
-        const pronouncingModule = await import('../../machinelearning/my_model/pronouncing.js');
+        const pronouncingModule = await import('/src/machinelearning/my_model/pronouncing.js');
         const pronouncing = pronouncingModule.default || pronouncingModule; 
         var fullTranscript = '';
         for (var i = 0; i < event.results.length; i++) {
