@@ -107,14 +107,14 @@ export default function ClinicianRegister() {
       const result = await response.json();
 
       if (response.ok) {
-        notify(toastMessage.success.register)
+        notify(toastMessage.success.register);
         navigate("/login"); // Redirect to login or another page
       } else {
         setMessage(result.message);
       }
     } catch (error) {
-      failNotify(toastMessage.fail.error)
-      failNotify(error)
+      failNotify(toastMessage.fail.error);
+      failNotify(error);
     }
   };
 
@@ -249,7 +249,7 @@ export default function ClinicianRegister() {
                 <input
                   type="text"
                   aria-label="Address"
-                  placeholder="Adress"
+                  placeholder="Address"
                   className="form-input rounded-2"
                   name="address"
                   value={formData.address}
@@ -260,15 +260,15 @@ export default function ClinicianRegister() {
 
             <div className="row">
               <div className="col-sm d-flex flex-column mb-3">
-                <p className="fw-bold mb-0">Medical Diagnosis</p>
+                <p className="fw-bold mb-0">Specialization</p>
                 <select
                   className="form-input rounded-2"
-                  aria-label="Diagnosis"
-                  name="diagnosis"
-                  value={formData.diagnosis}
+                  aria-label="Specialization"
+                  name="specialization"
+                  value={formData.specialization}
                   onChange={handleChange}
                 >
-                  <option value="">Select diagnosis</option>
+                  <option value="">Select Specialization</option>
                   <option value="Aphasia">Aphasia</option>
                   <option value="Stroke">Stroke</option>
                 </select>
