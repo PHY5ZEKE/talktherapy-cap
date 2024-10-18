@@ -1,9 +1,9 @@
 export function runSpeechRecognition(setScore) {
     var output = document.getElementById("output");
     var action = document.getElementById("action");
-    var phonemeContainer = document.getElementById("phoneme-output"); // Updated to phoneme-output
-    var scoreOutput = document.getElementById("score-output"); // New element for showing score (add this in HTML if missing)
-
+    var phonemeContainer = document.getElementById("phoneme-output"); 
+    var scoreOutput = document.getElementById("score-output"); 
+    
     var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
         alert("Speech recognition not supported in this browser. Please use Chrome, Firefox, or Edge.");
@@ -21,9 +21,6 @@ export function runSpeechRecognition(setScore) {
     };
 
     recognition.onresult = async function (event) {
-        const pronouncingModule = await import('/src/machinelearning/my_model/pronouncing.js');
-        console.log("pronouncing.js loaded:", pronouncingModule);
-        const pronouncing = pronouncingModule.default || pronouncingModule; 
         var fullTranscript = '';
         for (var i = 0; i < event.results.length; i++) {
             var transcript = event.results[i][0].transcript;
@@ -39,7 +36,7 @@ export function runSpeechRecognition(setScore) {
         // Assess pronunciation for the first word
         var words = finalText.split(' ');
         var firstWord = words.length > 0 ? cleanWord(words[0]) : '';
-        var phonemeSequence = pronouncing.phonesForWord(firstWord);
+        var phonemeSequence = window.pronouncing.phonesForWord(firstWord);
 
         if (phonemeSequence.length > 0) {
             var phonemeArray = phonemeSequence[0].split(" ");
