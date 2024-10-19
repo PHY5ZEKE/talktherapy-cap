@@ -274,6 +274,7 @@ export default function ClinicianRegister() {
                     onChange={handleChange}
                   />
                   <button
+                    type="button"
                     onClick={togglePasswordVisibility}
                     className="text-button form-show rounded-2"
                   >
@@ -298,6 +299,7 @@ export default function ClinicianRegister() {
                     onChange={handleChange}
                   />
                   <button
+                    type="button"
                     onClick={toggleConfPasswordVisibility}
                     className="text-button form-show rounded-2"
                   >
