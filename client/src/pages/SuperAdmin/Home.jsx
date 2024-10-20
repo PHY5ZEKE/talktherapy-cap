@@ -336,6 +336,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
+
+              {/* THIRD COL */}
+              <div className="col-sm bg-white"></div>
             </div>
           </div>
         </div>

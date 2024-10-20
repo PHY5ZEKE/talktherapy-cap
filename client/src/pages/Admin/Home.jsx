@@ -8,6 +8,9 @@ import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterClinician from "../../components/Modals/RegisterClinician";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
+
 // Utils
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
@@ -16,7 +19,6 @@ import { toast, Slide } from "react-toastify";
 const appURL = import.meta.env.VITE_APP_URL;
 
 export default function Home() {
-
   const [patients, setPatients] = useState(null);
   const [clinicians, setClinicians] = useState(null);
   const [adminData, setAdminData] = useState(null);
@@ -103,7 +105,7 @@ export default function Home() {
       } catch (error) {
         failNotify(toastMessage.fail.fetch);
         setError(error.message);
-        console.log("Error fetch appointments :", error)
+        console.log("Error fetch appointments :", error);
       } finally {
         setLoading(false);
       }
@@ -394,10 +396,10 @@ export default function Home() {
                               onClick={() => openModal(appointment._id)}
                             >
                               <h5 className="mb-0 fw-bold">
-                                {appointment.status ===
+                                {appointment?.status ===
                                 "Schedule Change Request"
-                                  ? appointment.newSchedule.day
-                                  : appointment.selectedSchedule.day}
+                                  ? appointment?.newSchedule.day
+                                  : appointment?.selectedSchedule.day}
                               </h5>
                               <p className="mb-0">
                                 {appointment.status ===
@@ -564,6 +566,9 @@ export default function Home() {
                           className="mb-3 border border-top-0 border-start-0 border-end-0"
                         >
                           <p className="mb-0 fw-bold">
+                            <span className="me-2">
+                            <FontAwesomeIcon icon={faUser} />
+                            </span>
                             {patient.firstName} {patient.middleName}{" "}
                             {patient.lastName}
                           </p>
@@ -604,6 +609,9 @@ export default function Home() {
                             className="mb-3 border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">
+                              <span className="me-2">
+                                <FontAwesomeIcon icon={faUserDoctor} />
+                              </span>
                               {clinician.firstName} {clinician.middleName}{" "}
                               {clinician.lastName}
                             </p>

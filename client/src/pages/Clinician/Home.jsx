@@ -239,7 +239,7 @@ export default function Home() {
                           </p>
                           <a
                             href="#"
-                            className="text-primary"
+                            className="text-primary "
                             onClick={(e) => {
                               e.preventDefault();
                               openModal(appointment._id);
@@ -248,7 +248,7 @@ export default function Home() {
                             View Appointment Details
                           </a>
 
-                          <div className="d-flex justify-content-between gap-1">
+                          <div className="d-flex justify-content-between gap-1 mt-3">
                             <div className="mb-3 text-accepted">ACCEPTED</div>
 
                             <div className="d-flex flex-nowrap gap-1">
@@ -305,7 +305,7 @@ export default function Home() {
                             View Appointment Details
                           </a>
 
-                          <div className="mb-3 text-accepted">COMPLETED</div>
+                          <div className="my-3 text-accepted">COMPLETED</div>
                         </div>
                       ))}
                   </div>

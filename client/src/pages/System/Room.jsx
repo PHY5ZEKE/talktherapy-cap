@@ -10,8 +10,8 @@ import Mic from "../../assets/buttons/Mic";
 import Camera from "../../assets/buttons/Camera";
 
 // Import the voice recognition functionalities
-import { runSpeechRecognition} from "../../machinelearning/my_model/voice2text.js"; 
-import { init } from "../../machinelearning/script.js"; 
+import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
+import { init } from "../../machinelearning/script.js";
 
 export default function Room() {
   const [error, setError] = useState(null);
@@ -19,7 +19,10 @@ export default function Room() {
   const [messages, setMessages] = useState([]); // State for storing messages
   const [type, setType] = useState("");
   const [appointment, setAppointment] = useState([]);
-  const [speechScore, setSpeechScore] = useState({ pronunciationScore: 0, fluencyScore: 0 });
+  const [speechScore, setSpeechScore] = useState({
+    pronunciationScore: 0,
+    fluencyScore: 0,
+  });
 
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -55,13 +58,13 @@ export default function Room() {
 
   useEffect(() => {
     const initializeModel = async () => {
-        await init(); // Call the init function to set up the model and chart
+      await init(); // Call the init function to set up the model and chart
     };
 
     initializeModel(); // Initialize the model on component mount
 
     // Optionally, you can return a cleanup function here if needed
-}, []);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
@@ -87,7 +90,7 @@ export default function Room() {
         }
 
         const data = await response.json();
-        setAppointment(data)
+        setAppointment(data);
 
         // Validate user roles after fetching appointment
         if (
@@ -127,7 +130,9 @@ export default function Room() {
         localVideoRef.current.srcObject = stream;
       }
 
-      serverConnection.current = new WebSocket(`wss://${import.meta.env.VITE_WSS}`);
+      serverConnection.current = new WebSocket(
+        `wss://${import.meta.env.VITE_WSS}`
+      );
 
       serverConnection.current.onopen = () => {
         // Join the room by sending the room ID to the server
@@ -299,24 +304,25 @@ export default function Room() {
   }
 
   function startVoiceRecognitionHandler() {
-    runSpeechRecognition(setSpeechScore); 
+    runSpeechRecognition(setSpeechScore);
   }
 
   return (
     <>
       <div className="container-fluid d-flex flex-column justify-content-between vh-100">
-        <div className="row text-center py-2 border border-start-0 border-[#B9B9B9]">
+        <div className="row text-center py-2 border border-start-0 border-[#B9B9B9] stick-top">
           <p className="mb-0">
-            Currently in session with:{" "}  
-              {appointment?.selectedSchedule?.clinicianName || "Clinician not available"} and{" "} 
-              {appointment?.patientId?.firstName || ""}{" "}
-              {appointment?.patientId?.middleName || ""}{" "}
-              {appointment?.patientId?.lastName || ""}
+            Currently in session with:{" "}
+            {appointment?.selectedSchedule?.clinicianName ||
+              "Clinician not available"}{" "}
+            and {appointment?.patientId?.firstName || ""}{" "}
+            {appointment?.patientId?.middleName || ""}{" "}
+            {appointment?.patientId?.lastName || ""}
           </p>
         </div>
 
-        <div className="row-auto d-flex flex-wrap flex-md-row flex-column bg-warning h-100">
-          <div className="col">
+        <div className="row justify-content-center-md mx-auto w-100 vh-100">
+          <div className="col-sm">
             <video
               muted
               ref={localVideoRef}
@@ -325,7 +331,7 @@ export default function Room() {
             />
           </div>
 
-          <div className="col">
+          <div className="col-sm">
             <video
               className="bg-black video-remote mx-auto"
               ref={remoteVideoRef}
@@ -335,225 +341,210 @@ export default function Room() {
           </div>
         </div>
 
-        <div className="row bg-white border border-start-0 border-[#B9B9B9]">
-          <div className="d-flex align-items-center justify-content-center">
-            <div className="p-2">
-              <div className="row py-1">
-                <div className="col">
-                  <button
-                    onClick={handleDisconnect}
-                    type="submit"
-                    className="text-button border"
-                  >
-                    <p className="fw-bold my-0 status">Disconnect</p>
-                  </button>
-                </div>
+        <div className="row bg-white border border-start-0 border-[#B9B9B9] sticky-bottom">
+          <div className="d-flex align-items-center justify-content-center p-3">
+            <button
+              onClick={handleDisconnect}
+              type="submit"
+              className="text-button border"
+            >
+              <p className="fw-bold my-0 status">Disconnect</p>
+            </button>
 
-                <div
-                  className="col"
-                  onClick={muteCam}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Camera />
-                </div>
+            {/* CAMERA AND MUTE */}
+            <div className="d-flex align-items-center mx-1">
+              <div onClick={muteCam} style={{ cursor: "pointer" }}>
+                <Camera />
+              </div>
 
-                <div
-                  className="col d-flex align-items-center justify-content-center"
-                  onClick={muteMic}
-                  style={{ cursor: "pointer" }}
-                >
-                  <Mic />
-                </div>
-
-                {userRole === "clinician" || userRole === "patientslp" ? (
-                  <>
-                    {/* ACTION BUTTONS */}
-                    <div className="col">
-                      <button
-                        className="text-button border"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
-                      >
-                        <p className="fw-bold my-0 status">Actions</p>
-                      </button>
-                      <ul className="dropdown-menu">
-                        {userRole === "clinician" ? (
-                          <>
-                            <li>
-                              <a
-                                role="button"
-                                className="dropdown-item"
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvasWithBothOptions"
-                                aria-controls="offcanvasWithBothOptions"
-                              >
-                                Message
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                role="button"
-                                className="dropdown-item"
-                                href="#"
-                              >
-                                Add Diagnostic
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                role="button"
-                                className="dropdown-item"
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvasDiagnosticTool"
-                                aria-controls="offcanvasDiagnosticTool"
-                              >
-                                Diagnostic Tool
-                              </a>
-                            </li>
-                            <li>
-                              <a
-                                role="button"
-                                className="dropdown-item"
-                                href="#"
-                              >
-                                End Session
-                              </a>
-                            </li>
-                          </>
-                        ) : (
-                          <>
-                            <li>
-                              <a
-                                role="button"
-                                className="dropdown-item"
-                                data-bs-toggle="offcanvas"
-                                data-bs-target="#offcanvasWithBothOptions"
-                                aria-controls="offcanvasWithBothOptions"
-                              >
-                                Message
-                              </a>
-                            </li>
-                          </>
-                        )}
-                      </ul>
-                    </div>
-
-                    {/* CANVAS FOR MESSAGES */}
-                    <div
-                      className="offcanvas offcanvas-start"
-                      data-bs-scroll="true"
-                      tabIndex="-1"
-                      id="offcanvasWithBothOptions"
-                      aria-labelledby="offcanvasWithBothOptionsLabel"
-                    >
-                      <div className="offcanvas-header">
-                        <h5
-                          className="offcanvas-title"
-                          id="offcanvasWithBothOptionsLabel"
-                        >
-                          Messages
-                        </h5>
-                        <button
-                          type="button"
-                          className="btn-close"
-                          data-bs-dismiss="offcanvas"
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                      <div className="offcanvas-body d-flex flex-column justify-content-between overflow-y-auto">
-                        {/* CHAT AREA */}
-                        <div>
-                          {messages.map((msg, index) => (
-                            <p key={index}>
-                              <span className="fw-bold">{msg.sender}</span>:{" "}
-                              {msg.message}
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* INPUT CHAT */}
-                      <form
-                        className="input-group my-3"
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          sendMessage(type);
-                        }}
-                      >
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Type a message..."
-                          onChange={(e) => setType(e.target.value)}
-                        />
-                        <button type="submit" className="btn btn-primary">
-                          Send
-                        </button>
-                      </form>
-                    </div>
-
-                    {/* CANVAS FOR DIAGNOSTIC TOOL */}
-                    <div
-                      className="offcanvas offcanvas-end"
-                      tabIndex="-1"
-                      id="offcanvasDiagnosticTool"
-                      aria-labelledby="offcanvasDiagnosticToolLabel"
-                    >
-                      <div className="offcanvas-header">
-                        <h5
-                          className="offcanvas-title"
-                          id="offcanvasDiagnosticToolLabel"
-                        >
-                          Assistive Diagnostic Tool
-                        </h5>
-                        <button
-                          type="button"
-                          className="btn-close"
-                          data-bs-dismiss="offcanvas"
-                          aria-label="Close"
-                        ></button>
-                      </div>
-                      <div className="offcanvas-body">
-                        {/* Diagnostic Tool Content */}
-                        <div className="button-container">
-                          <button className="text-button border" onClick={startVoiceRecognitionHandler}>
-                            Start Voice Recognition
-                          </button>
-                        </div>
-                        
-                        <div className="chart-container">
-                          <div id="chartContainer">
-                            <canvas id="outputChart"></canvas>
-                          </div>
-                        </div>
-
-                        <div className="controls-container">
-                          <div className="cardbox">
-                            <div id="output"></div>
-                            <span id="action"></span>
-                          </div>
-                        </div>
-
-                        <div id="phoneme-container">
-                          <div id="phoneme-output"></div>
-                        </div>
-
-                        <div id="score-container">
-                            <h6>Speech Assessment Scores:</h6>
-                            <div id="score-output">
-                                Pronunciation: {speechScore.pronunciationScore.toFixed(2)}%, Fluency: {speechScore.fluencyScore.toFixed(2)}%
-                            </div>
-                        </div>
-                        
-                          <div id="label-container"></div>
-                          
-                      </div>
-                    </div>
-                  </>
-                ) : null}
+              <div onClick={muteMic} style={{ cursor: "pointer" }}>
+                <Mic />
               </div>
             </div>
+
+            {userRole === "clinician" || userRole === "patientslp" ? (
+              <>
+                {/* ACTION BUTTONS */}
+                <div className="">
+                  <button
+                    className="text-button border"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <p className="fw-bold my-0 status">Actions</p>
+                  </button>
+                  <ul className="dropdown-menu">
+                    {userRole === "clinician" ? (
+                      <>
+                        <li>
+                          <a
+                            role="button"
+                            className="dropdown-item"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasWithBothOptions"
+                            aria-controls="offcanvasWithBothOptions"
+                          >
+                            Message
+                          </a>
+                        </li>
+                        <li>
+                          <a role="button" className="dropdown-item" href="#">
+                            Add Diagnostic
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            role="button"
+                            className="dropdown-item"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasDiagnosticTool"
+                            aria-controls="offcanvasDiagnosticTool"
+                          >
+                            Diagnostic Tool
+                          </a>
+                        </li>
+                        <li>
+                          <a role="button" className="dropdown-item" href="#">
+                            End Session
+                          </a>
+                        </li>
+                      </>
+                    ) : (
+                      <>
+                        <li>
+                          <a
+                            role="button"
+                            className="dropdown-item"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasWithBothOptions"
+                            aria-controls="offcanvasWithBothOptions"
+                          >
+                            Message
+                          </a>
+                        </li>
+                      </>
+                    )}
+                  </ul>
+                </div>
+
+                {/* CANVAS FOR MESSAGES */}
+                <div
+                  className="offcanvas offcanvas-start"
+                  data-bs-scroll="true"
+                  tabIndex="-1"
+                  id="offcanvasWithBothOptions"
+                  aria-labelledby="offcanvasWithBothOptionsLabel"
+                >
+                  <div className="offcanvas-header">
+                    <h5
+                      className="offcanvas-title"
+                      id="offcanvasWithBothOptionsLabel"
+                    >
+                      Messages
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="offcanvas"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div className="offcanvas-body d-flex flex-column justify-content-between overflow-y-auto">
+                    {/* CHAT AREA */}
+                    <div>
+                      {messages.map((msg, index) => (
+                        <p key={index}>
+                          <span className="fw-bold">{msg.sender}</span>:{" "}
+                          {msg.message}
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* INPUT CHAT */}
+                  <form
+                    className="input-group my-3"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      sendMessage(type);
+                    }}
+                  >
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Type a message..."
+                      onChange={(e) => setType(e.target.value)}
+                    />
+                    <button type="submit" className="btn btn-primary">
+                      Send
+                    </button>
+                  </form>
+                </div>
+
+                {/* CANVAS FOR DIAGNOSTIC TOOL */}
+                <div
+                  className="offcanvas offcanvas-end"
+                  tabIndex="-1"
+                  id="offcanvasDiagnosticTool"
+                  aria-labelledby="offcanvasDiagnosticToolLabel"
+                >
+                  <div className="offcanvas-header">
+                    <h5
+                      className="offcanvas-title"
+                      id="offcanvasDiagnosticToolLabel"
+                    >
+                      Assistive Diagnostic Tool
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="offcanvas"
+                      aria-label="Close"
+                    ></button>
+                  </div>
+                  <div className="offcanvas-body">
+                    {/* Diagnostic Tool Content */}
+                    <div className="button-container">
+                      <button
+                        className="text-button border"
+                        onClick={startVoiceRecognitionHandler}
+                      >
+                        Start Voice Recognition
+                      </button>
+                    </div>
+
+                    <div className="chart-container">
+                      <div id="chartContainer">
+                        <canvas id="outputChart"></canvas>
+                      </div>
+                    </div>
+
+                    <div className="controls-container">
+                      <div className="cardbox">
+                        <div id="output"></div>
+                        <span id="action"></span>
+                      </div>
+                    </div>
+
+                    <div id="phoneme-container">
+                      <div id="phoneme-output"></div>
+                    </div>
+
+                    <div id="score-container">
+                      <h6>Speech Assessment Scores:</h6>
+                      <div id="score-output">
+                        Pronunciation:{" "}
+                        {speechScore.pronunciationScore.toFixed(2)}%, Fluency:{" "}
+                        {speechScore.fluencyScore.toFixed(2)}%
+                      </div>
+                    </div>
+
+                    <div id="label-container"></div>
+                  </div>
+                </div>
+              </>
+            ) : null}
           </div>
         </div>
       </div>

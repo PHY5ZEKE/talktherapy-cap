@@ -125,15 +125,10 @@ export default function ChooseSchedule({
                           </td>
                           <td>
                             <button
-                              className={
-                                selectedSchedule &&
-                                selectedSchedule._id === schedule._id
-                                  ? "button-group bg-primary text-white" // Highlight the selected button
-                                  : "button-group bg-white"
-                              }
+                              className="text-button-table border"
                               onClick={() => setSelectedSchedule(schedule)} // Set selected schedule
                             >
-                              <p className="fw-bold my-0 status">SELECT</p>
+                              <p className="fw-bold my-0 status">Select</p>
                             </button>
                           </td>
                         </tr>
@@ -161,11 +156,11 @@ export default function ChooseSchedule({
                 <p className="text-success">{successMessage}</p>
               )}
               <div className="d-flex justify-content-center mt-3 gap-3">
-                <button type="submit" className="button-group bg-white">
-                  <p className="fw-bold my-0 status">SUBMIT</p>
+                <button type="submit" className="text-button border">
+                  <p className="fw-bold my-0 status">Submit</p>
                 </button>
-                <button onClick={handleClose} className="button-group bg-white">
-                  <p className="fw-bold my-0 status">CANCEL</p>
+                <button onClick={handleClose} className="text-button border">
+                  <p className="fw-bold my-0 status">Cancel</p>
                 </button>
               </div>
             </form>

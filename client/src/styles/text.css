@@ -1,5 +1,5 @@
 .text-pending {
-  width: 120px;
+  width: max-content;
   padding: 0.5em;
   text-align: center;
   border: #ffa500 1px solid;
@@ -9,7 +9,7 @@
 }
 
 .text-accepted {
-  width: 120px;
+  width: max-content;
   padding: 0.5em;
   text-align: center;
   border: #4caf50 1px solid;
@@ -19,7 +19,7 @@
 }
 
 .text-cancelled {
-  width: 120px;
+  width: max-content;
   padding: 0.5em;
   text-align: center;
   border: #f44336 1px solid;
@@ -67,6 +67,15 @@
 .text-warning {
   color: #ffa500;
   background-color: #fcf0db;
+}
+
+.text-button-table {
+  text-align: center;
+  border-radius: 25px;
+  color: #1c9dff;
+  background-color: #fff;
+  border-color: #c1c1c1!important;
+  cursor: pointer;
 }
 
 .text-header {

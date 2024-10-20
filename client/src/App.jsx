@@ -269,7 +269,7 @@ const routes = (
 
 const App = () => {
   return (
-    <div>
+    <div className="vw-100">
       {routes}
       <ToastContainer />
     </div>

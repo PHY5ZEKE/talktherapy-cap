@@ -48,10 +48,10 @@ export default function ConfirmReschedule({
 
           <div className="d-flex justify-content-center mt-3 gap-3">
             <button onClick={handleResched} className="text-button border">
-              <p className="fw-bold my-0 status">RESCHEDULE</p>
+              <p className="fw-bold my-0">Reschedule</p>
             </button>
             <button onClick={closeModal} className="text-button border">
-              <p className="fw-bold my-0 status">CANCEL</p>
+              <p className="fw-bold my-0">Cancel</p>
             </button>
           </div>
         </div>
