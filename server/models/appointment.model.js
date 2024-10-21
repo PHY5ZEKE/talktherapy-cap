@@ -44,6 +44,7 @@ const appointmentSchema = new mongoose.Schema(
         "Completed",
         "Schedule Change Request",
         "Temporary Reschedule Request",
+        "Temporarily Rescheduled",
       ],
       default: "Pending",
     },

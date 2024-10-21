@@ -16,7 +16,8 @@ export default function TemporaryRescheduleConfirmation({
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
             <h3 className="fw-bold">
-              Are you sure you want to temporarily reschedule?
+              Are you sure you want to temporarily reschedule this week's
+              meeting?
             </h3>
             <p className="mb-0">
               The requested reschedule will be subject for approval

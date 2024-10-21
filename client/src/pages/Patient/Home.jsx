@@ -67,7 +67,9 @@ export default function Home() {
   // Filter accepted appointments
   const acceptedAppointments = appointments.filter(
     (appointment) =>
-      appointment.status === "Accepted" || appointment.status === "Pending"
+      appointment.status === "Accepted" ||
+      appointment.status === "Pending" ||
+      appointment.status === "Temporarily Rescheduled"
   );
 
   const joinMeeting = (app, id) => {
@@ -157,9 +159,12 @@ export default function Home() {
                             {patientData?.firstName}.
                           </p>
 
-                          {appointment.status === "Accepted" ? (
+                          {appointment.status === "Accepted" ||
+                          appointment.status === "Temporarily Rescheduled" ? (
                             <div className="d-flex justify-content-between flex-wrap gap-3">
-                              <div className="mb-3 text-accepted">ACCEPTED</div>
+                              <div className="mb-3 text-accepted">
+                                {appointment.status}
+                              </div>
 
                               <div className="d-flex gap-3">
                                 <div
@@ -184,7 +189,8 @@ export default function Home() {
                   ) : (
                     <div className="col bg-white border rounded-4 p-3 overflow-auto">
                       <h5 className="mb-0 fw-bold text-center">
-                        You currently don't have any appointments.
+                        You currently don't have an accepted appointment. Check
+                        the Scheduling Page to book an appointment.
                       </h5>
                     </div>
                   )}

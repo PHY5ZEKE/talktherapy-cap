@@ -201,7 +201,10 @@ export default function Home() {
   };
 
   const pendingAppointments = appointments.filter(
-    (appointment) => appointment.status === "Pending"
+    (appointment) =>
+      appointment.status === "Pending" ||
+      appointment.status === "Temporary Reschedule Request" ||
+      appointment.status === "Schedule Change Request"
   ).length;
   const rejectedAppointments = appointments.filter(
     (appointment) => appointment.status === "Rejected"
@@ -386,7 +389,10 @@ export default function Home() {
                           .filter(
                             (appointment) =>
                               appointment.status === "Pending" ||
-                              appointment.status === "Schedule Change Request"
+                              appointment.status ===
+                                "Schedule Change Request" ||
+                              appointment.status ===
+                                "Temporary Reschedule Request" // Include Temporary Reschedule Request
                           )
                           .map((appointment, index) => (
                             <div
@@ -396,33 +402,49 @@ export default function Home() {
                               onClick={() => openModal(appointment._id)}
                             >
                               <h5 className="mb-0 fw-bold">
-                                {appointment?.status ===
+                                {appointment.status ===
                                 "Schedule Change Request"
-                                  ? appointment?.newSchedule.day
-                                  : appointment?.selectedSchedule.day}
+                                  ? appointment.newSchedule.day
+                                  : appointment.status ===
+                                    "Temporary Reschedule Request" // Include Temporary Reschedule Request
+                                  ? appointment.temporaryReschedule.day
+                                  : appointment.selectedSchedule.day}
                               </h5>
                               <p className="mb-0">
                                 {appointment.status ===
                                 "Schedule Change Request"
                                   ? `${appointment.newSchedule.startTime} to ${appointment.newSchedule.endTime}`
-                                  : `${appointment.selectedSchedule.startTime} to ${appointment.selectedSchedule.endTime}`}
+                                  : appointment.status ===
+                                    "Temporary Reschedule Request" // Include Temporary Reschedule Request
+                                  ? `${appointment.temporaryReschedule.startTime} to ${appointment.temporaryReschedule.endTime}`
+                                  : `${appointment.newSchedule.startTime} to ${appointment.newSchedule.endTime}`}
                               </p>
                               <p className="mb-0">
                                 {appointment.status ===
                                 "Schedule Change Request"
-                                  ? "Ako na to has requested for a change in her schedule"
+                                  ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested for a change in her schedule`
+                                  : appointment.status ===
+                                    "Temporary Reschedule Request" // Include Temporary Reschedule Request
+                                  ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a temporary reschedule`
                                   : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule.clinicianName}`}
                               </p>
                               <div className="mb-3 text-pending">
                                 {appointment.status === "Pending"
                                   ? "PENDING"
-                                  : "SCHEDULE CHANGE REQUEST"}
+                                  : appointment.status ===
+                                    "Schedule Change Request"
+                                  ? "SCHEDULE CHANGE REQUEST"
+                                  : "TEMPORARY SCHEDULE REQUEST"}{" "}
+                                {/* Include Temporary Schedule Request */}
                               </div>
                             </div>
                           ))}
+
                         {appointments
                           .filter(
-                            (appointment) => appointment.status === "Accepted"
+                            (appointment) =>
+                              appointment.status === "Accepted" ||
+                              appointment.status === "Temporarily Rescheduled"
                           )
                           .map((appointment, index) => (
                             <div
@@ -432,20 +454,36 @@ export default function Home() {
                               onClick={() => openModal(appointment._id)}
                             >
                               <h5 className="mb-0 fw-bold">
-                                {appointment.selectedSchedule.day}
+                                {appointment.status ===
+                                "Temporarily Rescheduled"
+                                  ? appointment.temporaryReschedule.day
+                                  : appointment.selectedSchedule.day}
                               </h5>
                               <p className="mb-0">
-                                {appointment.selectedSchedule.startTime} to{" "}
-                                {appointment.selectedSchedule.endTime}
+                                {appointment.status ===
+                                "Temporarily Rescheduled"
+                                  ? appointment.temporaryReschedule.startTime
+                                  : appointment.selectedSchedule.startTime}{" "}
+                                to{" "}
+                                {appointment.status ===
+                                "Temporarily Rescheduled"
+                                  ? appointment.temporaryReschedule.endTime
+                                  : appointment.selectedSchedule.endTime}
                               </p>
                               <p className="mb-0">
                                 {appointment.patientId.firstName}{" "}
                                 {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName} has requested a
-                                session with{" "}
-                                {appointment.selectedSchedule.clinicianName}
+                                {appointment.patientId.lastName} has a session
+                                with{" "}
+                                {appointment.status ===
+                                "Temporarily Rescheduled"
+                                  ? appointment.temporaryReschedule
+                                      .clinicianName
+                                  : appointment.selectedSchedule.clinicianName}
                               </p>
-                              <div className="mb-3 text-accepted">ACCEPTED</div>
+                              <div className="mb-3 text-accepted">
+                                {appointment.status}
+                              </div>
                             </div>
                           ))}
                         {appointments
@@ -504,7 +542,9 @@ export default function Home() {
                                 session with{" "}
                                 {appointment.selectedSchedule.clinicianName}
                               </p>
-                              <div className="mb-3 text-accepted">ACCEPTED</div>
+                              <div className="mb-3 text-accepted">
+                                {appointment.status}
+                              </div>
                             </div>
                           ))}
                       </>
@@ -567,7 +607,7 @@ export default function Home() {
                         >
                           <p className="mb-0 fw-bold">
                             <span className="me-2">
-                            <FontAwesomeIcon icon={faUser} />
+                              <FontAwesomeIcon icon={faUser} />
                             </span>
                             {patient.firstName} {patient.middleName}{" "}
                             {patient.lastName}

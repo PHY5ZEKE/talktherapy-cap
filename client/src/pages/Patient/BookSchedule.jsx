@@ -250,7 +250,10 @@ export default function BookSchedule() {
     (appointment) =>
       appointment.status === "Pending" ||
       appointment.status === "Accepted" ||
-      appointment.status === "Schedule Change Request"
+      appointment.status === "Schedule Change Request" ||
+      appointment.status === "Temporary Reschedule Request" ||
+      appointment.status === "Rejected" ||
+      appointment.status === "Temporarily Rescheduled"
   );
 
   return (
@@ -462,11 +465,17 @@ export default function BookSchedule() {
                           <h5 className="mb-0 fw-bold">
                             {appointment.status === "Schedule Change Request"
                               ? appointment.newSchedule.day
+                              : appointment.status ===
+                                "Temporary Reschedule Request"
+                              ? appointment.temporaryReschedule.day
                               : appointment.selectedSchedule.day}
                           </h5>
                           <p className="fw-bold mb-0">
                             {appointment.status === "Schedule Change Request"
                               ? `${appointment.newSchedule.startTime} - ${appointment.newSchedule.endTime}`
+                              : appointment.status ===
+                                "Temporary Reschedule Request"
+                              ? `${appointment.temporaryReschedule.startTime} - ${appointment.temporaryReschedule.endTime}`
                               : `${appointment.selectedSchedule.startTime} - ${appointment.selectedSchedule.endTime}`}
                           </p>
                           <h6 className=" mb-0">
@@ -474,6 +483,9 @@ export default function BookSchedule() {
                             <span className="fw-bold">
                               {appointment.status === "Schedule Change Request"
                                 ? appointment.newSchedule.clinicianName
+                                : appointment.status ===
+                                  "Temporary Reschedule Request"
+                                ? appointment.temporaryReschedule.clinicianName
                                 : appointment.selectedSchedule.clinicianName}
                             </span>
                           </h6>
@@ -547,14 +559,20 @@ export default function BookSchedule() {
                               <div className="mb-3 text-pending">
                                 FOR APPROVAL
                               </div>
-                              <div
-                                className="mb-3 fw-bold text-button border"
-                                onClick={() =>
-                                  openConfirmRescheduleModal(appointment)
-                                }
-                              >
-                                Change
+                            </div>
+                          )}
+                          {/* IF TEMPORARY RESCHEDULE REQUEST */}
+                          {appointment.status ===
+                            "Temporary Reschedule Request" && (
+                            <div className="row p-2 gap-3">
+                              <div className="mb-3 text-pending">
+                                FOR APPROVAL
                               </div>
+                            </div>
+                          )}
+                          {/* IF TEMPORARILY RESCHEDULED */}
+                          {appointment.status === "Temporarily Rescheduled" && (
+                            <div className="row p-2 gap-3">
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 onClick={() =>
@@ -564,7 +582,15 @@ export default function BookSchedule() {
                                   )
                                 }
                               >
-                                Join Old Schedule
+                                Join
+                              </div>
+                            </div>
+                          )}
+                          {/* IF REJECTED */}
+                          {appointment.status === "Rejected" && (
+                            <div className="row p-2 gap-3">
+                              <div className="mb-3 text-cancelled">
+                                Rejected
                               </div>
                             </div>
                           )}

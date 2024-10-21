@@ -25,6 +25,81 @@ const upload = multer({
   }),
 }).single("file");
 
+const findAppointmentDetails = async (appointmentId) => {
+  return await Appointment.findById(appointmentId).populate([
+    "selectedSchedule",
+    "newSchedule",
+    "temporaryReschedule",
+  ]);
+};
+
+const findAdminDetails = async (adminId) => {
+  return await Admin.findById(adminId);
+};
+
+const findPatientDetails = async (patientId) => {
+  return await Patient.findById(patientId);
+};
+
+const findClinicianDetails = async (clinicianId) => {
+  return await ClinicianSLP.findById(clinicianId);
+};
+
+const handlePendingStatus = async (appointment, status) => {
+  appointment.status = status;
+  if (status === "Accepted") {
+    appointment.roomId = generateRoomId();
+    appointment.selectedSchedule.status = "Booked";
+    await appointment.selectedSchedule.save();
+  } else {
+    appointment.roomId = "errorRoomId";
+  }
+};
+
+const handleAcceptedStatus = async (appointment) => {
+  appointment.status = "Completed";
+  appointment.roomId = "errorRoomId";
+  appointment.selectedSchedule.status = "Available";
+  await appointment.selectedSchedule.save();
+};
+
+const handleScheduleChangeRequest = async (appointment, status) => {
+  if (status === "Accepted") {
+    appointment.status = "Accepted";
+    const oldSchedule = appointment.selectedSchedule;
+    oldSchedule.status = "Available";
+    await oldSchedule.save();
+    appointment.selectedSchedule = appointment.newSchedule;
+    appointment.newSchedule = null;
+    appointment.changeReason = "";
+    appointment.selectedSchedule.status = "Booked";
+    await appointment.selectedSchedule.save();
+  } else if (status === "Rejected") {
+    appointment.status = "Rejected";
+    const oldSchedule = appointment.selectedSchedule;
+    oldSchedule.status = "Available";
+    await oldSchedule.save();
+  }
+};
+
+const handleTemporaryRescheduleRequest = async (appointment, status) => {
+  if (status === "Accepted") {
+    appointment.status = "Temporarily Rescheduled";
+    const temporaryReschedule = appointment.temporaryReschedule;
+    temporaryReschedule.status = "Booked";
+    await temporaryReschedule.save();
+  } else if (status === "Rejected") {
+    appointment.status = "Accepted";
+  }
+};
+
+const handleTemporarilyRescheduled = async (appointment) => {
+  appointment.status = "Accepted";
+  const temporaryReschedule = appointment.temporaryReschedule;
+  temporaryReschedule.status = "Available";
+  await temporaryReschedule.save();
+};
+
 // Create a new appointment JSON first
 exports.createAppointmentJSON = async (req, res) => {
   try {
@@ -162,6 +237,10 @@ exports.getAllAppointments = async (req, res) => {
       .populate({
         path: "newSchedule",
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
+      })
+      .populate({
+        path: "temporaryReschedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
     // Decrypt patient details
     const decryptedAppointments = appointments.map((appointment) => {
@@ -198,6 +277,10 @@ exports.getPatientAppointment = async (req, res) => {
       },
       {
         path: "newSchedule",
+        select: "clinicianName specialization day startTime endTime status", // Select the new schedule details
+      },
+      {
+        path: "temporaryReschedule",
         select: "clinicianName specialization day startTime endTime status", // Select the new schedule details
       },
     ]);
@@ -293,6 +376,10 @@ exports.getAppointmentById = async (req, res) => {
       .populate({
         path: "newSchedule",
         select: "clinicianName specialization day startTime endTime",
+      })
+      .populate({
+        path: "temporaryReschedule",
+        select: "clinicianName specialization day startTime endTime",
       });
 
     if (!appointment) {
@@ -333,97 +420,60 @@ exports.updateAppointmentStatus = async (req, res) => {
     const { status } = req.body;
     const adminId = req.user.id; // Assuming the token contains the admin ID
 
-    // Find the appointment by appointmentId and populate selectedSchedule and newSchedule
-    const appointment = await Appointment.findById(appointmentId).populate([
-      "selectedSchedule",
-      "newSchedule",
-    ]);
-
+    const appointment = await findAppointmentDetails(appointmentId);
     if (!appointment) {
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    // Fetch admin details
-    const admin = await Admin.findById(adminId);
+    const admin = await findAdminDetails(adminId);
     if (!admin) {
       return res.status(404).json({ message: "Admin not found" });
     }
 
-    // Fetch patient details
-    const patient = await Patient.findById(appointment.patientId);
+    const patient = await findPatientDetails(appointment.patientId);
     if (!patient) {
       return res.status(404).json({ message: "Patient not found" });
     }
 
-    // Fetch clinician details
-    const clinician = await ClinicianSLP.findById(
-      appointment.selectedClinician
-    );
+    const clinician = await findClinicianDetails(appointment.selectedClinician);
     if (!clinician) {
       return res.status(404).json({ message: "Clinician not found" });
     }
 
-    // Check the current status and update accordingly
-    if (
-      appointment.status === "Pending" &&
-      (status === "Accepted" || status === "Rejected")
-    ) {
-      // If appointment is Pending and the status to update is Accepted or Rejected
-      appointment.status = status;
-      if (status === "Accepted") {
-        appointment.roomId = generateRoomId();
-        // Update the selectedSchedule status to "Booked"
-        appointment.selectedSchedule.status = "Booked";
-        await appointment.selectedSchedule.save();
-      } else {
-        appointment.roomId = "errorRoomId";
-      }
-    } else if (appointment.status === "Accepted" && status === "Completed") {
-      // If appointment is Accepted and the status to update is Completed
-      appointment.status = status;
-      appointment.roomId = "errorRoomId";
-      // Update the selectedSchedule status to "Available"
-      appointment.selectedSchedule.status = "Available";
-      await appointment.selectedSchedule.save();
-    } else if (appointment.status === "Schedule Change Request") {
-      // If appointment is Schedule Change Request and the status to update is Accepted or Rejected
-      if (status === "Accepted") {
-        appointment.status = "Accepted";
-        // Update status of old schedule to "Available"
-        const oldSchedule = appointment.selectedSchedule;
-        oldSchedule.status = "Available";
-        await oldSchedule.save();
-        // Override the selectedSchedule with the newSchedule
-        appointment.selectedSchedule = appointment.newSchedule;
-        // Empty the newSchedule and changeReason
-        appointment.newSchedule = null;
-        appointment.changeReason = "";
-        // Update the newSchedule status to "Booked"
-        appointment.selectedSchedule.status = "Booked";
-        await appointment.selectedSchedule.save();
-      } else if (status === "Rejected") {
-        appointment.status = "Rejected";
-        // Update status of old schedule to "Available"
-        const oldSchedule = appointment.selectedSchedule;
-        oldSchedule.status = "Available";
-        await oldSchedule.save();
-      }
-    } else {
-      return res.status(400).json({ message: "Invalid status transition" });
+    switch (appointment.status) {
+      case "Pending":
+        await handlePendingStatus(appointment, status);
+        break;
+      case "Accepted":
+        if (status === "Completed") {
+          await handleAcceptedStatus(appointment);
+        }
+        break;
+      case "Schedule Change Request":
+        await handleScheduleChangeRequest(appointment, status);
+        break;
+      case "Temporary Reschedule Request":
+        await handleTemporaryRescheduleRequest(appointment, status);
+        break;
+      case "Temporarily Rescheduled":
+        if (status === "Revert") {
+          await handleTemporarilyRescheduled(appointment);
+        }
+        break;
+      default:
+        return res.status(400).json({ message: "Invalid status transition" });
     }
 
     await appointment.save();
 
     try {
-      // Create audit log with the admin's email, patient's email, and clinician's email
       await createAuditLog(
         "updateAppointmentStatus",
-        admin.email, // Pass the admin's email
+        admin.email,
         `Admin ${admin.email} ${status} the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
       );
     } catch (auditLogError) {
       console.error("Error creating audit log:", auditLogError);
-      // Continue without failing the request
     }
 
     res.status(200).json({

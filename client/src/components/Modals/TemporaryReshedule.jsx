@@ -91,7 +91,10 @@ export default function TemporaryReschedule({
       <div className="modal-background">
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
-            <h3 className="fw-bold">Choose a schedule</h3>
+            <h3 className="fw-bold">
+              Choose an available schedule for your next session. This is only
+              temporary and will revert to your original schedule
+            </h3>
             <p className="mb-0">The following are available schedules.</p>
             <p>This will notify the admin</p>
           </div>

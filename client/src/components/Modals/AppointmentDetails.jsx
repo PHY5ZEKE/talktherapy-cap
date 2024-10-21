@@ -6,7 +6,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { route } from "../../utils/route";
 
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 export default function AppointmentDetails({ openModal, appointment }) {
   const [loading, setLoading] = useState(false);
@@ -41,12 +41,12 @@ export default function AppointmentDetails({ openModal, appointment }) {
           },
         }
       );
-      notify(toastMessage.success.statusBook)
+      notify(toastMessage.success.statusBook);
       setTimeout(() => {
         window.location.reload();
       }, 2000); // Reload after 2 seconds
     } catch (error) {
-      failNotify(toastMessage.fail.status)
+      failNotify(toastMessage.fail.status);
     } finally {
       setLoading(false);
     }
@@ -60,6 +60,7 @@ export default function AppointmentDetails({ openModal, appointment }) {
     switch (appointment.status) {
       case "Pending":
       case "Schedule Change Request":
+      case "Temporary Reschedule Request":
         return (
           <>
             <button
@@ -75,6 +76,30 @@ export default function AppointmentDetails({ openModal, appointment }) {
               disabled={loading}
             >
               <p className="fw-bold my-0 status">Reject</p>
+            </button>
+          </>
+        );
+      case "Temporarily Rescheduled":
+        return (
+          <>
+            <button
+              onClick={() => updateStatus("Revert")}
+              className="text-button border"
+              disabled={loading}
+            >
+              <p className="fw-bold my-0 status">Revert</p>
+            </button>
+          </>
+        );
+      case "Accepted":
+        return (
+          <>
+            <button
+              onClick={() => updateStatus("Completed")}
+              className="text-button border"
+              disabled={loading}
+            >
+              <p className="fw-bold my-0 status">Complete</p>
             </button>
           </>
         );
@@ -146,6 +171,22 @@ export default function AppointmentDetails({ openModal, appointment }) {
                     {appointment.newSchedule?.day || "N/A"}{" "}
                     {appointment.newSchedule?.startTime || "N/A"} -{" "}
                     {appointment.newSchedule?.endTime || "N/A"}
+                  </p>
+
+                  <p className="fw-bold mb-0">Reason for Reschedule</p>
+                  <p>{appointment.changeReason || "N/A"}</p>
+                </div>
+              </div>
+            )}
+
+            {appointment.status === "Temporary Reschedule Request" && (
+              <div className="row text-center">
+                <div className="col">
+                  <p className="fw-bold mb-0">Temporary Schedule</p>
+                  <p>
+                    {appointment.temporaryReschedule?.day || "N/A"}{" "}
+                    {appointment.temporaryReschedule?.startTime || "N/A"} -{" "}
+                    {appointment.temporaryReschedule?.endTime || "N/A"}
                   </p>
 
                   <p className="fw-bold mb-0">Reason for Reschedule</p>
