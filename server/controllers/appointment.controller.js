@@ -514,3 +514,41 @@ exports.requestScheduleChange = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.requestTemporaryReschedule = async (req, res) => {
+  try {
+    const { appointmentId, newScheduleId, reason } = req.body;
+    const patientId = req.user.id; // Assuming the patient ID is stored in req.user.id after token verification
+
+    // Find the appointment by appointmentId and patientId
+    const appointment = await Appointment.findOne({
+      _id: appointmentId,
+      patientId,
+    });
+
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Validate the new schedule
+    const newSchedule = await Schedule.findById(newScheduleId);
+    if (!newSchedule) {
+      return res.status(400).json({ message: "Invalid new schedule selected" });
+    }
+
+    // Update the appointment with the new schedule and reason
+    appointment.temporaryReschedule = newScheduleId;
+    appointment.changeReason = reason;
+    appointment.status = "Temporary Reschedule Request";
+
+    await appointment.save();
+
+    res.status(200).json({
+      message: "Temporary reschedule request submitted successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error requesting temporary reschedule:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

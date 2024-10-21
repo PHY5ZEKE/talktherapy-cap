@@ -54,4 +54,10 @@ router.post(
   appointmentController.requestScheduleChange
 );
 
+router.post(
+  "/request-temporary-reschedule",
+  verifyToken,
+  appointmentController.requestTemporaryReschedule
+);
+
 module.exports = router;

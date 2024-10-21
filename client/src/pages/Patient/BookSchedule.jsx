@@ -10,6 +10,8 @@ import MenuDropdown from "../../components/Layout/PatientMenu";
 import PatientViewAppointment from "../../components/Modals/PatientViewAppointment";
 import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
 import ChooseSchedule from "../../components/Modals/ChooseSchedule";
+import TemporaryRescheduleConfirmation from "../../components/Modals/TemporaryRescheduleConfirmation";
+import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
 
 // DatePicker
 import { useState, useEffect, useCallback, useMemo } from "react";
@@ -46,10 +48,12 @@ export default function BookSchedule() {
 
   // Handle Confirm Reschedule Modal
   const [isConfirm, setIsConfirm] = useState(false);
+  const [isTemporarySchedule, setIsTemporarySchedule] = useState(false);
   const [isChoose, setIsChoose] = useState(false);
   const [isViewAppointment, setIsViewAppointment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [appointmentToReschedule, setAppointmentToReschedule] = useState(null); // New state
+  const [appointmentToReschedule, setAppointmentToReschedule] = useState(null);
+  const [isTemporaryReschedule, setIsTemporaryReschedule] = useState(false);
   const [clinicianIdForReschedule, setClinicianIdForReschedule] =
     useState(null); // New state
 
@@ -108,10 +112,24 @@ export default function BookSchedule() {
     setIsChoose(false);
   };
 
+  const openTemporaryScheduleModal = () => {
+    setIsTemporarySchedule(true);
+  };
+
+  const closeTemporaryScheduleModal = () => {
+    setIsTemporarySchedule(false);
+  };
+
   const openConfirmRescheduleModal = (appointment) => {
     setAppointmentToReschedule(appointment);
-    setClinicianIdForReschedule(appointment.selectedClinician); // Set the clinician ID for rescheduling
+    setClinicianIdForReschedule(appointment.selectedClinician);
     setIsConfirm(true);
+  };
+
+  const openTemporaryRescheduleModal = (appointment) => {
+    setAppointmentToReschedule(appointment);
+    setClinicianIdForReschedule(appointment.selectedClinician);
+    setIsTemporaryReschedule(true);
   };
 
   useEffect(() => {
@@ -265,6 +283,23 @@ export default function BookSchedule() {
           clinicianId={clinicianIdForReschedule}
           onScheduleSelect={onScheduleSelect}
           appointment={appointmentToReschedule} // Pass the appointment details
+        />
+      )}
+
+      {isTemporaryReschedule && (
+        <TemporaryRescheduleConfirmation
+          closeModal={() => setIsTemporaryReschedule(false)}
+          openTemporarySchedule={openTemporaryScheduleModal} // Pass the new function
+          appointment={appointmentToReschedule}
+        />
+      )}
+
+      {isTemporarySchedule && (
+        <TemporarySchedule
+          closeModal={closeTemporaryScheduleModal}
+          clinicianId={clinicianIdForReschedule}
+          onScheduleSelect={onScheduleSelect}
+          appointment={appointmentToReschedule}
         />
       )}
 
@@ -499,7 +534,7 @@ export default function BookSchedule() {
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 onClick={() =>
-                                  openConfirmRescheduleModal(appointment)
+                                  openTemporaryRescheduleModal(appointment)
                                 }
                               >
                                 Reschedule

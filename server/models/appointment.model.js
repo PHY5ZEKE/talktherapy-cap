@@ -26,6 +26,10 @@ const appointmentSchema = new mongoose.Schema(
       required: true,
     },
     newSchedule: { type: mongoose.Schema.Types.ObjectId, ref: "Schedule" },
+    temporaryReschedule: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Schedule",
+    },
     changeReason: { type: String },
     referralUpload: {
       type: String,
@@ -39,6 +43,7 @@ const appointmentSchema = new mongoose.Schema(
         "Rejected",
         "Completed",
         "Schedule Change Request",
+        "Temporary Reschedule Request",
       ],
       default: "Pending",
     },
