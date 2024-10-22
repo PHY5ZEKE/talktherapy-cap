@@ -466,7 +466,8 @@ export default function BookSchedule() {
                             {appointment.status === "Schedule Change Request"
                               ? appointment.newSchedule.day
                               : appointment.status ===
-                                "Temporary Reschedule Request"
+                                  "Temporary Reschedule Request" ||
+                                appointment.status === "Temporarily Rescheduled"
                               ? appointment.temporaryReschedule.day
                               : appointment.selectedSchedule.day}
                           </h5>
@@ -474,7 +475,8 @@ export default function BookSchedule() {
                             {appointment.status === "Schedule Change Request"
                               ? `${appointment.newSchedule.startTime} - ${appointment.newSchedule.endTime}`
                               : appointment.status ===
-                                "Temporary Reschedule Request"
+                                  "Temporary Reschedule Request" ||
+                                appointment.status === "Temporarily Rescheduled"
                               ? `${appointment.temporaryReschedule.startTime} - ${appointment.temporaryReschedule.endTime}`
                               : `${appointment.selectedSchedule.startTime} - ${appointment.selectedSchedule.endTime}`}
                           </p>
@@ -484,7 +486,9 @@ export default function BookSchedule() {
                               {appointment.status === "Schedule Change Request"
                                 ? appointment.newSchedule.clinicianName
                                 : appointment.status ===
-                                  "Temporary Reschedule Request"
+                                    "Temporary Reschedule Request" ||
+                                  appointment.status ===
+                                    "Temporarily Rescheduled"
                                 ? appointment.temporaryReschedule.clinicianName
                                 : appointment.selectedSchedule.clinicianName}
                             </span>

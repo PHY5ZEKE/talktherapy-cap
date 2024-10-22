@@ -4,7 +4,7 @@ import axios from "axios";
 
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 export default function AppointmentDetailsClinician({
   openModal,
@@ -42,12 +42,12 @@ export default function AppointmentDetailsClinician({
           },
         }
       );
-      notify(toastMessage.success.statusBook)
+      notify(toastMessage.success.statusBook);
       setTimeout(() => {
         window.location.reload();
       }, 2000); // Reload after 2 seconds
     } catch (error) {
-      failNotify(toastMessage.fail.statusBook)
+      failNotify(toastMessage.fail.statusBook);
     } finally {
       setLoading(false);
     }
@@ -147,6 +147,54 @@ export default function AppointmentDetailsClinician({
                 <p>{appointment.sourceOfReferral || "N/A"}</p>
               </div>
             </div>
+
+            {appointment.status === "Schedule Change Request" && (
+              <div className="row text-center">
+                <div className="col">
+                  <p className="fw-bold mb-0">New Schedule</p>
+                  <p>
+                    {appointment.newSchedule?.day || "N/A"}{" "}
+                    {appointment.newSchedule?.startTime || "N/A"} -{" "}
+                    {appointment.newSchedule?.endTime || "N/A"}
+                  </p>
+
+                  <p className="fw-bold mb-0">Reason for Reschedule</p>
+                  <p>{appointment.changeReason || "N/A"}</p>
+                </div>
+              </div>
+            )}
+
+            {appointment.status === "Temporary Reschedule Request" && (
+              <div className="row text-center">
+                <div className="col">
+                  <p className="fw-bold mb-0">Temporary Schedule</p>
+                  <p>
+                    {appointment.temporaryReschedule?.day || "N/A"}{" "}
+                    {appointment.temporaryReschedule?.startTime || "N/A"} -{" "}
+                    {appointment.temporaryReschedule?.endTime || "N/A"}
+                  </p>
+
+                  <p className="fw-bold mb-0">Reason for Reschedule</p>
+                  <p>{appointment.changeReason || "N/A"}</p>
+                </div>
+              </div>
+            )}
+
+            {appointment.status === "Temporarily Rescheduled" && (
+              <div className="row text-center">
+                <div className="col">
+                  <p className="fw-bold mb-0">Temporary Schedule</p>
+                  <p>
+                    {appointment.temporaryReschedule?.day || "N/A"}{" "}
+                    {appointment.temporaryReschedule?.startTime || "N/A"} -{" "}
+                    {appointment.temporaryReschedule?.endTime || "N/A"}
+                  </p>
+
+                  <p className="fw-bold mb-0">Reason for Reschedule</p>
+                  <p>{appointment.changeReason || "N/A"}</p>
+                </div>
+              </div>
+            )}
 
             <div className="col">
               <p className="fw-bold mb-0">Referral Upload</p>

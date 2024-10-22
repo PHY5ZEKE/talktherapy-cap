@@ -242,18 +242,29 @@ exports.getAllAppointments = async (req, res) => {
         path: "temporaryReschedule",
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
+
     // Decrypt patient details
     const decryptedAppointments = appointments.map((appointment) => {
       if (appointment.patientId) {
-        appointment.patientId.firstName = decrypt(
-          appointment.patientId.firstName
-        );
-        appointment.patientId.middleName = decrypt(
-          appointment.patientId.middleName
-        );
-        appointment.patientId.lastName = decrypt(
-          appointment.patientId.lastName
-        );
+        try {
+          if (appointment.patientId.firstName) {
+            appointment.patientId.firstName = decrypt(
+              appointment.patientId.firstName
+            );
+          }
+          if (appointment.patientId.middleName) {
+            appointment.patientId.middleName = decrypt(
+              appointment.patientId.middleName
+            );
+          }
+          if (appointment.patientId.lastName) {
+            appointment.patientId.lastName = decrypt(
+              appointment.patientId.lastName
+            );
+          }
+        } catch (decryptError) {
+          console.error("Error decrypting patient details:", decryptError);
+        }
       }
       return appointment;
     });
@@ -493,7 +504,15 @@ exports.getClinicianAppointments = async (req, res) => {
     // Find appointments for the logged-in clinician with status "Accepted" or "Completed"
     const appointments = await Appointment.find({
       selectedClinician: clinicianId,
-      status: { $in: ["Accepted", "Completed"] },
+      status: {
+        $in: [
+          "Accepted",
+          "Completed",
+          "Temporarily Rescheduled",
+          "Temporary Reschedule Request",
+          "Schedule Change Request",
+        ],
+      },
     })
       .populate({
         path: "selectedSchedule",
@@ -502,6 +521,14 @@ exports.getClinicianAppointments = async (req, res) => {
       .populate({
         path: "patientId",
         select: "firstName middleName lastName", // Select the patient details
+      })
+      .populate({
+        path: "temporaryReschedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
+      })
+      .populate({
+        path: "newSchedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
 
     // Decrypt patient details
