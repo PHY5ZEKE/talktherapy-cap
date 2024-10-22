@@ -508,8 +508,8 @@ export default function Home() {
                               <p className="mb-0">
                                 {appointment.patientId.firstName}{" "}
                                 {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName}
-                                session request with{" "}
+                                {appointment.patientId.lastName} session request
+                                with{" "}
                                 {appointment.selectedSchedule.clinicianName} was
                                 rejected
                               </p>
