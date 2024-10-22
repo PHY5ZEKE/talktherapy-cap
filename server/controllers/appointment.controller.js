@@ -46,12 +46,11 @@ const findClinicianDetails = async (clinicianId) => {
 };
 
 const handlePendingStatus = async (appointment, status) => {
-  if (appointment.selectedSchedule.status === "Booked") {
-    throw new Error("The selected schedule is no longer available.");
-  }
-
   appointment.status = status;
   if (status === "Accepted") {
+    if (appointment.selectedSchedule.status === "Booked") {
+      throw new Error("The selected schedule is no longer available.");
+    }
     appointment.roomId = generateRoomId();
     appointment.selectedSchedule.status = "Booked";
     await appointment.selectedSchedule.save();
@@ -92,6 +91,10 @@ const handleScheduleChangeRequest = async (appointment, status) => {
 
 const handleTemporaryRescheduleRequest = async (appointment, status) => {
   if (status === "Accepted") {
+    if (appointment.temporaryReschedule.status === "Booked") {
+      throw new Error("The temporary reschedule is no longer available.");
+    }
+
     appointment.status = "Temporarily Rescheduled";
     const temporaryReschedule = appointment.temporaryReschedule;
     temporaryReschedule.status = "Booked";
@@ -100,7 +103,6 @@ const handleTemporaryRescheduleRequest = async (appointment, status) => {
     appointment.status = "Accepted";
   }
 };
-
 const handleTemporarilyRescheduled = async (appointment) => {
   appointment.status = "Accepted";
   const temporaryReschedule = appointment.temporaryReschedule;
