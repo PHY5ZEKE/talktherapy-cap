@@ -283,7 +283,26 @@ exports.getPatientAppointment = async (req, res) => {
         path: "temporaryReschedule",
         select: "clinicianName specialization day startTime endTime status", // Select the new schedule details
       },
+      {
+        path: "patientId",
+        select: "firstName middleName lastName",
+      },
     ]);
+
+    // Decrpyt patient name
+    appointments.forEach((appointment) => {
+      if (appointment.patientId) {
+        appointment.patientId.firstName = decrypt(
+          appointment.patientId.firstName
+        );
+        appointment.patientId.middleName = decrypt(
+          appointment.patientId.middleName
+        );
+        appointment.patientId.lastName = decrypt(
+          appointment.patientId.lastName
+        );
+      }
+    });
 
     res.status(200).json(appointments);
   } catch (error) {

@@ -1,39 +1,43 @@
 import { useState, useEffect, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { route } from "../../utils/route";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import "../../styles/containers.css";
 import "../../styles/diagnostic.css";
 
-// Icons
-import Mic from "../../assets/buttons/Mic";
-import Camera from "../../assets/buttons/Camera";
+// UI Components
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faVideo,
+  faVideoSlash,
+  faMicrophone,
+  faMicrophoneSlash,
+} from "@fortawesome/free-solid-svg-icons";
 
 // Import the voice recognition functionalities
 import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
 import { init } from "../../machinelearning/script.js";
 
 export default function Room() {
-  const [error, setError] = useState(null);
+  const location = useLocation();
+  const { appointmentDetails } = location.state || {};
+
   const [userRole, setUserRole] = useState(null);
   const [messages, setMessages] = useState([]); // State for storing messages
   const [type, setType] = useState("");
-  const [appointment, setAppointment] = useState([]);
+  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [isMicEnabled, setIsMicEnabled] = useState(true);
   const [speechScore, setSpeechScore] = useState({
     pronunciationScore: 0,
     fluencyScore: 0,
   });
 
-  const appURL = import.meta.env.VITE_APP_URL;
+  const currentUser = localStorage.getItem("userId");
 
   // Nav
   const navigate = useNavigate();
 
   // Get Room ID
   const { roomid } = useParams();
-
-  // Get Appointment ID
-  const { appid } = useParams();
 
   // Get video stream
   const localVideoRef = useRef();
@@ -44,17 +48,16 @@ export default function Room() {
   const peerConnection = useRef();
   const serverConnection = useRef();
 
-  const [isHidden, setHidden] = useState(true);
-
-  const currentName = localStorage.getItem("userName");
-  const uuid = currentName;
-
   const peerConnectionConfig = {
     iceServers: [
       { urls: "stun:stun.stunprotocol.org:3478" },
       { urls: "stun:stun.l.google.com:19302" },
     ],
   };
+
+  // SDP and ICE Candidates Queue
+  const sdpQueue = useRef([]);
+  const iceQueue = useRef([]);
 
   useEffect(() => {
     const initializeModel = async () => {
@@ -67,53 +70,25 @@ export default function Room() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
     const role = localStorage.getItem("userRole");
-    const currentUser = localStorage.getItem("userId");
-    setUserRole(role);
+    setUserRole(role);``
 
-    const fetchAppointment = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.appointment.getById}/${appid}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch appointments");
-        }
-
-        const data = await response.json();
-        setAppointment(data);
-
-        // Validate user roles after fetching appointment
-        if (
-          (role === "patientslp" && data.patientId._id !== currentUser) ||
-          (role === "clinician" && data.selectedClinician !== currentUser) ||
-          roomid === "errorRoomId"
-        ) {
-          navigate("/unauthorized");
-        } else {
-          pageReady();
-          return () => {
-            peerConnection.current?.close();
-            serverConnection.current?.close();
-          };
-        }
-      } catch (error) {
-        console.error("Error fetching appointments:", error.message);
-        setError(error.message);
-      }
-    };
-
-    // Fetch appointment data on component mount
-    fetchAppointment();
+    // Validate user roles after fetching appointment
+    if (
+      (role === "patientslp" &&
+        appointmentDetails?.patientId._id !== currentUser) ||
+      (role === "clinician" &&
+        appointmentDetails?.selectedClinician !== currentUser) ||
+      roomid === "errorRoomId"
+    ) {
+      handleCloseConnection();
+      navigate("/unauthorized");
+    } else {
+      pageReady();
+      return () => {
+        handleCloseConnection();
+      };
+    }
   }, []);
 
   async function pageReady() {
@@ -135,16 +110,20 @@ export default function Room() {
       );
 
       serverConnection.current.onopen = () => {
-        // Join the room by sending the room ID to the server
         serverConnection.current.send(
-          JSON.stringify({ type: "join-room", roomID: roomid })
+          JSON.stringify({
+            type: "join-room",
+            user:
+              userRole === "patientslp"
+                ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
+                : appointmentDetails?.selectedSchedule.clinicianName,
+            roomID: roomid,
+          })
         );
-        console.log("Connection open");
 
         start(true);
-        console.log("Start WebRTC signaling");
+        // TO DO: Notify for waiting
       };
-
       serverConnection.current.onmessage = gotMessageFromServer;
     } catch (error) {
       errorHandler(error);
@@ -157,7 +136,7 @@ export default function Room() {
       !serverConnection.current ||
       serverConnection.current.readyState !== WebSocket.OPEN
     ) {
-      console.log("WebSocket connection is not open");
+      // TO DO: Notify connection error.
       return;
     }
 
@@ -165,6 +144,7 @@ export default function Room() {
     peerConnection.current.onicecandidate = gotIceCandidate;
     peerConnection.current.ontrack = gotRemoteStream;
 
+    console.log("Okay na!");
     localStream.current.getTracks().forEach((track) => {
       peerConnection.current.addTrack(track, localStream.current);
     });
@@ -175,6 +155,8 @@ export default function Room() {
         .then(createdDescription)
         .catch(errorHandler);
     }
+
+    processQueues();
   }
 
   function gotMessageFromServer(message) {
@@ -182,26 +164,18 @@ export default function Room() {
 
     // Handle WebRTC messages (SDP, ICE candidates)
     if (signal.sdp) {
-      peerConnection.current
-        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
-        .then(() => {
-          if (signal.sdp.type === "offer") {
-            peerConnection.current
-              .createAnswer()
-              .then(createdDescription)
-              .catch(errorHandler);
-          }
-        })
-        .catch(errorHandler);
+      sdpQueue.currrent.push(signal.sdp);
+      processQueues();
     } else if (signal.ice) {
-      peerConnection.current
-        .addIceCandidate(new RTCIceCandidate(signal.ice))
-        .catch(errorHandler);
+      iceQueue.current.push(signal.ice);
+      processQueues();
     }
 
     // Handle Room Maximum Capacity
     if (signal.type === "room-full") {
+      handleCloseConnection();
       navigate("/unauthorized");
+      console.log("Room is full LN 187");
     }
 
     // Handle text messages
@@ -211,6 +185,44 @@ export default function Room() {
         { message: signal.message, sender: signal.sender, isSent: false }, // Mark it as received
       ]);
     }
+
+    if (signal.type === "leave-room") {
+      // TO DO: Notify leave room.
+      handleCloseConnection();
+      navigate("/");
+    }
+  }
+
+  function processQueues() {
+    // Process SDP queue
+    while (
+      sdpQueue.current.length > 0 &&
+      peerConnection.current.signalingState === "stable"
+    ) {
+      const sdp = sdpQueue.current.shift();
+      peerConnection.current
+        .setRemoteDescription(new RTCSessionDescription(sdp))
+        .then(() => {
+          if (sdp.type === "offer") {
+            peerConnection.current
+              .createAnswer()
+              .then(createdDescription)
+              .catch(errorHandler);
+          }
+        })
+        .catch(errorHandler);
+    }
+
+    // Process ICE queue
+    while (
+      iceQueue.current.length > 0 &&
+      peerConnection.current.signalingState !== "closed"
+    ) {
+      const iceCandidate = iceQueue.current.shift();
+      peerConnection.current
+        .addIceCandidate(new RTCIceCandidate(iceCandidate))
+        .catch(errorHandler);
+    }
   }
 
   function gotIceCandidate(event) {
@@ -218,7 +230,10 @@ export default function Room() {
       serverConnection.current.send(
         JSON.stringify({
           ice: event.candidate,
-          uuid: uuid,
+          uuid:
+            userRole === "patientslp"
+              ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
+              : appointmentDetails?.selectedSchedule.clinicianName,
           type: "ice-candidate",
         })
       );
@@ -226,15 +241,16 @@ export default function Room() {
   }
 
   function createdDescription(description) {
-    console.log("got description");
-
     peerConnection.current
       .setLocalDescription(description)
       .then(() => {
         serverConnection.current.send(
           JSON.stringify({
             sdp: peerConnection.current.localDescription,
-            uuid: uuid,
+            uuid:
+              userRole === "patientslp"
+                ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
+                : appointmentDetails?.selectedSchedule.clinicianName,
             type: description.type,
           })
         );
@@ -243,14 +259,9 @@ export default function Room() {
   }
 
   function gotRemoteStream(event) {
-    console.log("got remote stream");
     if (remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = event.streams[0];
     }
-    console.log(
-      "Peer Connection State:",
-      peerConnection.current.connectionState
-    );
   }
 
   function errorHandler(error) {
@@ -258,49 +269,90 @@ export default function Room() {
   }
 
   function muteMic() {
-    const audioTrack = localStream.current.getAudioTracks()[0];
+    const audioTrack = localStream.current?.getAudioTracks()[0];
+
     if (audioTrack) {
       audioTrack.enabled = !audioTrack.enabled;
+      setIsMicEnabled(audioTrack.enabled);
     }
   }
 
-  function muteCam() {
-    setHidden(!isHidden);
-    const videoTrack = localStream.current.getVideoTracks()[0];
-    if (videoTrack) {
-      videoTrack.enabled = !videoTrack.enabled;
+  const handleVideoStream = async () => {
+    if (isCameraEnabled) {
+      if (localStream.current) {
+        localStream.current.getTracks().forEach((track) => {
+          track.stop();
+          track.enabled = false;
+          localStream.current.removeTrack(track);
+        });
+        localVideoRef.current.srcObject = null;
+        localStream.current = null;
+      }
+      setIsCameraEnabled(false);
+    } else {
+      try {
+        const constraints = { video: true };
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        localStream.current = stream;
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = stream;
+        }
+        setIsCameraEnabled(true);
+      } catch (err) {
+        console.error("Error accessing the camera: ", err);
+      }
     }
-  }
+  };
 
-  function handleDisconnect() {
-    localStream.current.getTracks().forEach((track) => track.stop());
+  const handleCloseConnection = () => {
+    // Stop all tracks in the local stream
+    if (localStream.current) {
+      localStream.current.getTracks().forEach((track) => {
+        track.stop();
+        track.enabled = false;
+        localStream?.current.removeTrack(track);
+      });
+      localVideoRef.current.srcObject = null;
+      localStream.current = null;
+    }
 
-    // Close peer and socket connection
+    if (
+      serverConnection.current &&
+      serverConnection.current.readyState === WebSocket.OPEN
+    ) {
+      serverConnection.current.send(
+        JSON.stringify({
+          type: "leave-room",
+          roomID: roomid,
+        })
+      );
+
+      // Close the WebSocket connection
+      serverConnection.current.close();
+    }
+
+    // Close the peer connection
     if (peerConnection.current) {
-      peerConnection.current.close();
+      peerConnection.current?.close();
+      peerConnection.current.onicecandidate = null;
       peerConnection.current = null;
     }
-
-    if (serverConnection.current) {
-      serverConnection.current.close();
-      serverConnection.current = null;
-    }
-
-    navigate("/");
-  }
+  };
 
   function sendMessage(message) {
     if (!message || !serverConnection.current) return;
 
     serverConnection.current.send(
-      JSON.stringify({ type: "message", message, roomID: roomid, sender: uuid })
+      JSON.stringify({
+        type: "message",
+        message,
+        roomID: roomid,
+        sender:
+          userRole === "patientslp"
+            ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
+            : appointmentDetails?.selectedSchedule.clinicianName,
+      })
     );
-
-    // Get JSON data from websocket broadcast
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      { message, sender: uuid, isSent: true }, // Mark as sent
-    ]);
   }
 
   function startVoiceRecognitionHandler() {
@@ -313,11 +365,10 @@ export default function Room() {
         <div className="row text-center py-2 border border-start-0 border-[#B9B9B9] stick-top">
           <p className="mb-0">
             Currently in session with:{" "}
-            {appointment?.selectedSchedule?.clinicianName ||
+            {appointmentDetails?.selectedSchedule?.clinicianName ||
               "Clinician not available"}{" "}
-            and {appointment?.patientId?.firstName || ""}{" "}
-            {appointment?.patientId?.middleName || ""}{" "}
-            {appointment?.patientId?.lastName || ""}
+            and {appointmentDetails?.patientId?.firstName || ""}{" "}
+            {appointmentDetails?.patientId?.lastName || ""}
           </p>
         </div>
 
@@ -326,7 +377,7 @@ export default function Room() {
             <video
               muted
               ref={localVideoRef}
-              className="mx-auto video-local bg-warning-subtle"
+              className="mx-auto video-local bg-black"
               autoPlay
             />
           </div>
@@ -344,7 +395,10 @@ export default function Room() {
         <div className="row bg-white border border-start-0 border-[#B9B9B9] sticky-bottom">
           <div className="d-flex align-items-center justify-content-center p-3">
             <button
-              onClick={handleDisconnect}
+              onClick={() => {
+                handleCloseConnection();
+                navigate("/");
+              }}
               type="submit"
               className="text-button border"
             >
@@ -352,13 +406,21 @@ export default function Room() {
             </button>
 
             {/* CAMERA AND MUTE */}
-            <div className="d-flex align-items-center mx-1">
-              <div onClick={muteCam} style={{ cursor: "pointer" }}>
-                <Camera />
+            <div className="d-flex align-items-center gap-2 mx-1">
+              <div onClick={handleVideoStream} style={{ cursor: "pointer" }}>
+                {isCameraEnabled ? (
+                  <FontAwesomeIcon size="lg" icon={faVideo} />
+                ) : (
+                  <FontAwesomeIcon size="lg" icon={faVideoSlash} />
+                )}
               </div>
 
               <div onClick={muteMic} style={{ cursor: "pointer" }}>
-                <Mic />
+                {isMicEnabled ? (
+                  <FontAwesomeIcon size="lg" icon={faMicrophone} />
+                ) : (
+                  <FontAwesomeIcon size="lg" icon={faMicrophoneSlash} />
+                )}
               </div>
             </div>
 

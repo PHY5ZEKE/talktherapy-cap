@@ -49,10 +49,6 @@ export default function Home() {
 
         setPatientData(patientData.patient);
         localStorage.setItem("userId", patientData.patient._id);
-        localStorage.setItem(
-          "userName",
-          `${patientData.patient.firstName} ${patientData.patient.lastName}`
-        );
         setAppointments(appointmentsData);
         setLoading(false);
       } catch (error) {
@@ -72,8 +68,12 @@ export default function Home() {
       appointment.status === "Temporarily Rescheduled"
   );
 
-  const joinMeeting = (app, id) => {
-    navigate(`/room/${app}/${id}`);
+  const joinMeeting = (id, details) => {
+    navigate(`/room/${id}`, {
+      state: {
+        appointmentDetails: details,
+      },
+    });
   };
 
   const getCurrentDate = () => {
@@ -89,6 +89,7 @@ export default function Home() {
 
   // Handle Appointment Details Modal
 
+  console.log(appointments)
   return (
     <>
       <div className="container-fluid p-0 vh-100">
@@ -170,10 +171,7 @@ export default function Home() {
                                 <div
                                   className="mb-3 fw-bold text-button border"
                                   onClick={() =>
-                                    joinMeeting(
-                                      appointment._id,
-                                      appointment.roomId
-                                    )
+                                    joinMeeting(appointment.roomId, appointment)
                                   }
                                 >
                                   Join

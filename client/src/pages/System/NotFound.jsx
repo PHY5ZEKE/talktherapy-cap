@@ -15,9 +15,9 @@ export default function NotFound() {
           refreshing the page or return to the homepage.
           `}
         </p>
-        <button onClick={handleClose} className="button-group bg-white">
-          <p className="fw-bold my-0 text-button border">BACK</p>
-        </button>
+        <p onClick={handleClose} className="fw-bold my-0 text-button border">
+          BACK
+        </p>
       </div>
     </div>
   );

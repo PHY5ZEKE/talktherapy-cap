@@ -72,7 +72,7 @@ const routes = (
 
       {/* Teleconference */}
       <Route
-        path="/room/:appid/:roomid"
+        path="/room/:roomid"
         element={
           <PrivateRoute allowedRoles={["patientslp", "clinician"]}>
             <Room />

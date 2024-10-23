@@ -20,6 +20,13 @@ mongoose
 
 // Express App
 const app = express();
+const server = http.createServer(app);
+
+// WSS Initialize
+const WSS_PORT = 8080;
+const wss = new WebSocketServer({
+  port: Number(process.env.PORT) || WSS_PORT,
+});
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
 const clinicianSLPRoutes = require("./routes/clinicianSLP.route.js");
@@ -69,22 +76,9 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-app.get("/", (req, res) => {
-  res.json({ data: "hello" });
-});
-
-// Start of HTTP Server for Express and WebSocket
-const server = http.createServer(app);
-
-// WSS Initialize
-const WSS_PORT = 8080;
-const wss = new WebSocketServer({
-  port: Number(process.env.PORT) || WSS_PORT,
-});
-
 // Rooms
 const rooms = {};
-const MAX = 2;
+const MAX = 1;
 
 const roomFullMessage = JSON.stringify({
   type: "room-full",
@@ -99,12 +93,13 @@ try {
 
     ws.on("message", (message) => {
       const data = JSON.parse(message);
-
       if (data.type === "join-room") {
+        console.log(`Initializing ${data.user} to join room ${data.roomID}`);
         // Add client to the room
         currentRoom = data.roomID;
         if (!rooms[currentRoom]) {
           rooms[currentRoom] = [];
+          console.log(`${data.user} successfully joined room ${data.roomID}.`);
         }
         if (rooms[currentRoom].length >= MAX) {
           // Room is full, redirect user

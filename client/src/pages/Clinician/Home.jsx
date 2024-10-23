@@ -85,8 +85,12 @@ export default function Home() {
     }
   };
 
-  const joinMeeting = (app, id) => {
-    navigate(`/room/${app}/${id}`);
+  const joinMeeting = (id, details) => {
+    navigate(`/room/${id}`, {
+      state: {
+        appointmentDetails: details,
+      },
+    });
   };
 
   useEffect(() => {
@@ -256,8 +260,8 @@ export default function Home() {
                                 className="mb-3 text-button border"
                                 onClick={() =>
                                   joinMeeting(
-                                    appointment._id,
-                                    appointment.roomId
+                                    appointment.roomId,
+                                    appointment
                                   )
                                 }
                               >
