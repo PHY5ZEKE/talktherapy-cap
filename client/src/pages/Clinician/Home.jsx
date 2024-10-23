@@ -150,8 +150,9 @@ export default function Home() {
         const data = await response.json();
         setAppointments(data);
       } catch (error) {
-        failNotify(toastMessage.fail.fetch)
-        failNotify(toastMessage.fail.error)      }
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
+      }
     };
 
     fetchAppointments();
@@ -253,7 +254,9 @@ export default function Home() {
                           </a>
 
                           <div className="d-flex justify-content-between gap-1 mt-3">
-                            <div className="mb-3 text-accepted">ACCEPTED</div>
+                            <div className="mb-3 text-accepted">
+                              {appointment.status}
+                            </div>
 
                             <div className="d-flex flex-nowrap gap-1">
                               <button
@@ -309,7 +312,124 @@ export default function Home() {
                             View Appointment Details
                           </a>
 
-                          <div className="my-3 text-accepted">COMPLETED</div>
+                          <div className="my-3 text-accepted">
+                            {appointment.status}
+                          </div>
+                        </div>
+                      ))}
+                    {appointments
+                      .filter(
+                        (appointment) =>
+                          appointment.status === "Temporarily Rescheduled"
+                      )
+                      .map((appointment) => (
+                        <div
+                          key={appointment._id}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.temporaryReschedule.day}
+                          </h5>
+                          <p className="mb-0 fw-bold">
+                            {appointment.temporaryReschedule.startTime} -{" "}
+                            {appointment.temporaryReschedule.endTime}
+                          </p>
+                          <p className="mb-3">
+                            Scheduled appointment with{" "}
+                            {appointment.patientId.firstName}{" "}
+                            {appointment.patientId.lastName}
+                          </p>
+                          <a
+                            href="#"
+                            className="text-primary"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openModal(appointment._id);
+                            }}
+                          >
+                            View Appointment Details
+                          </a>
+
+                          <div className="my-3 text-accepted">
+                            {appointment.status}
+                          </div>
+                        </div>
+                      ))}
+                    {appointments
+                      .filter(
+                        (appointment) =>
+                          appointment.status === "Temporary Reschedule Request"
+                      )
+                      .map((appointment) => (
+                        <div
+                          key={appointment._id}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.temporaryReschedule.day}
+                          </h5>
+                          <p className="mb-0 fw-bold">
+                            {appointment.temporaryReschedule.startTime} -{" "}
+                            {appointment.temporaryReschedule.endTime}
+                          </p>
+                          <p className="mb-3">
+                            {appointment.patientId.firstName}{" "}
+                            {appointment.patientId.lastName} requested a
+                            Temporary Schedule Change. This is subject for
+                            approval.
+                          </p>
+                          <a
+                            href="#"
+                            className="text-primary"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openModal(appointment._id);
+                            }}
+                          >
+                            View Appointment Details
+                          </a>
+
+                          <div className="my-3 text-pending">
+                            {appointment.status}
+                          </div>
+                        </div>
+                      ))}
+                    {appointments
+                      .filter(
+                        (appointment) =>
+                          appointment.status === "Schedule Change Request"
+                      )
+                      .map((appointment) => (
+                        <div
+                          key={appointment._id}
+                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            {appointment.newSchedule.day}
+                          </h5>
+                          <p className="mb-0 fw-bold">
+                            {appointment.newSchedule.startTime} -{" "}
+                            {appointment.newSchedule.endTime}
+                          </p>
+                          <p className="mb-3">
+                            {appointment.patientId.firstName}{" "}
+                            {appointment.patientId.lastName} requested a
+                            Schedule Change. This is subject for approval.
+                          </p>
+                          <a
+                            href="#"
+                            className="text-primary"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              openModal(appointment._id);
+                            }}
+                          >
+                            View Appointment Details
+                          </a>
+
+                          <div className="my-3 text-pending">
+                            {appointment.status}
+                          </div>
                         </div>
                       ))}
                   </div>

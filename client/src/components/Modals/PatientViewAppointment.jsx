@@ -102,6 +102,22 @@ export default function PatientViewAppointment({
               </div>
             )}
 
+            {appointment.status === "Temporarily Rescheduled" && (
+              <div className="row text-center">
+                <div className="col">
+                  <p className="fw-bold mb-0">Temporary Schedule</p>
+                  <p>
+                    {appointment.temporaryReschedule?.day || "N/A"}{" "}
+                    {appointment.temporaryReschedule?.startTime || "N/A"} -{" "}
+                    {appointment.temporaryReschedule?.endTime || "N/A"}
+                  </p>
+
+                  <p className="fw-bold mb-0">Reason for Reschedule</p>
+                  <p>{appointment.changeReason || "N/A"}</p>
+                </div>
+              </div>
+            )}
+
             <div className="col">
               <label className="fw-bold mb-0" htmlFor="referralUpload">
                 Referral Upload

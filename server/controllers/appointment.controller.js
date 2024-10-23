@@ -48,6 +48,9 @@ const findClinicianDetails = async (clinicianId) => {
 const handlePendingStatus = async (appointment, status) => {
   appointment.status = status;
   if (status === "Accepted") {
+    if (appointment.selectedSchedule.status === "Booked") {
+      throw new Error("The selected schedule is no longer available.");
+    }
     appointment.roomId = generateRoomId();
     appointment.selectedSchedule.status = "Booked";
     await appointment.selectedSchedule.save();
@@ -65,6 +68,10 @@ const handleAcceptedStatus = async (appointment) => {
 
 const handleScheduleChangeRequest = async (appointment, status) => {
   if (status === "Accepted") {
+    if (appointment.newSchedule.status === "Booked") {
+      throw new Error("The new schedule is no longer available.");
+    }
+
     appointment.status = "Accepted";
     const oldSchedule = appointment.selectedSchedule;
     oldSchedule.status = "Available";
@@ -84,6 +91,10 @@ const handleScheduleChangeRequest = async (appointment, status) => {
 
 const handleTemporaryRescheduleRequest = async (appointment, status) => {
   if (status === "Accepted") {
+    if (appointment.temporaryReschedule.status === "Booked") {
+      throw new Error("The temporary reschedule is no longer available.");
+    }
+
     appointment.status = "Temporarily Rescheduled";
     const temporaryReschedule = appointment.temporaryReschedule;
     temporaryReschedule.status = "Booked";
@@ -92,7 +103,6 @@ const handleTemporaryRescheduleRequest = async (appointment, status) => {
     appointment.status = "Accepted";
   }
 };
-
 const handleTemporarilyRescheduled = async (appointment) => {
   appointment.status = "Accepted";
   const temporaryReschedule = appointment.temporaryReschedule;
@@ -242,18 +252,29 @@ exports.getAllAppointments = async (req, res) => {
         path: "temporaryReschedule",
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
+
     // Decrypt patient details
     const decryptedAppointments = appointments.map((appointment) => {
       if (appointment.patientId) {
-        appointment.patientId.firstName = decrypt(
-          appointment.patientId.firstName
-        );
-        appointment.patientId.middleName = decrypt(
-          appointment.patientId.middleName
-        );
-        appointment.patientId.lastName = decrypt(
-          appointment.patientId.lastName
-        );
+        try {
+          if (appointment.patientId.firstName) {
+            appointment.patientId.firstName = decrypt(
+              appointment.patientId.firstName
+            );
+          }
+          if (appointment.patientId.middleName) {
+            appointment.patientId.middleName = decrypt(
+              appointment.patientId.middleName
+            );
+          }
+          if (appointment.patientId.lastName) {
+            appointment.patientId.lastName = decrypt(
+              appointment.patientId.lastName
+            );
+          }
+        } catch (decryptError) {
+          console.error("Error decrypting patient details:", decryptError);
+        }
       }
       return appointment;
     });
@@ -432,7 +453,6 @@ function generateRoomId() {
   }
   return result;
 }
-
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
@@ -459,52 +479,62 @@ exports.updateAppointmentStatus = async (req, res) => {
       return res.status(404).json({ message: "Clinician not found" });
     }
 
-    switch (appointment.status) {
-      case "Pending":
-        await handlePendingStatus(appointment, status);
-        break;
-      case "Accepted":
-        if (status === "Completed") {
-          await handleAcceptedStatus(appointment);
-        }
-        break;
-      case "Schedule Change Request":
-        await handleScheduleChangeRequest(appointment, status);
-        break;
-      case "Temporary Reschedule Request":
-        await handleTemporaryRescheduleRequest(appointment, status);
-        break;
-      case "Temporarily Rescheduled":
-        if (status === "Revert") {
-          await handleTemporarilyRescheduled(appointment);
-        }
-        break;
-      default:
-        return res.status(400).json({ message: "Invalid status transition" });
-    }
-
-    await appointment.save();
-
     try {
-      await createAuditLog(
-        "updateAppointmentStatus",
-        admin.email,
-        `Admin ${admin.email} ${status} the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
-      );
-    } catch (auditLogError) {
-      console.error("Error creating audit log:", auditLogError);
-    }
+      switch (appointment.status) {
+        case "Pending":
+          await handlePendingStatus(appointment, status);
+          break;
+        case "Accepted":
+          if (status === "Completed") {
+            await handleAcceptedStatus(appointment);
+          }
+          break;
+        case "Schedule Change Request":
+          await handleScheduleChangeRequest(appointment, status);
+          break;
+        case "Temporary Reschedule Request":
+          await handleTemporaryRescheduleRequest(appointment, status);
+          break;
+        case "Temporarily Rescheduled":
+          if (status === "Revert") {
+            await handleTemporarilyRescheduled(appointment);
+          }
+          break;
+        default:
+          return res.status(400).json({ message: "Invalid status transition" });
+      }
 
-    res.status(200).json({
-      message: "Appointment status updated successfully",
-      appointment,
-    });
+      await appointment.save();
+
+      try {
+        await createAuditLog(
+          "updateAppointmentStatus",
+          admin.email,
+          `Admin ${admin.email} ${status} the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
+        );
+      } catch (auditLogError) {
+        console.error("Error creating audit log:", auditLogError);
+      }
+
+      res.status(200).json({
+        message: "Appointment status updated successfully",
+        appointment,
+      });
+    } catch (error) {
+      if (
+        error.message === "The selected schedule is no longer available." ||
+        error.message === "The new schedule is no longer available." ||
+        error.message === "The temporary reschedule is no longer available."
+      ) {
+        return res.status(400).json({ message: error.message });
+      }
+      throw error;
+    }
   } catch (error) {
     console.error("Error updating appointment status:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
-
 exports.getClinicianAppointments = async (req, res) => {
   try {
     const clinicianId = req.user.id; // Assuming the clinician ID is stored in req.user.id after token verification
@@ -512,7 +542,15 @@ exports.getClinicianAppointments = async (req, res) => {
     // Find appointments for the logged-in clinician with status "Accepted" or "Completed"
     const appointments = await Appointment.find({
       selectedClinician: clinicianId,
-      status: { $in: ["Accepted", "Completed"] },
+      status: {
+        $in: [
+          "Accepted",
+          "Completed",
+          "Temporarily Rescheduled",
+          "Temporary Reschedule Request",
+          "Schedule Change Request",
+        ],
+      },
     })
       .populate({
         path: "selectedSchedule",
@@ -521,6 +559,14 @@ exports.getClinicianAppointments = async (req, res) => {
       .populate({
         path: "patientId",
         select: "firstName middleName lastName", // Select the patient details
+      })
+      .populate({
+        path: "temporaryReschedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
+      })
+      .populate({
+        path: "newSchedule",
+        select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
 
     // Decrypt patient details

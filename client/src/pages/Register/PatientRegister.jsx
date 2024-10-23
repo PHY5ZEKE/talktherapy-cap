@@ -236,6 +236,9 @@ export default function ClinicianRegister() {
                   value={formData.diagnosis}
                   onChange={handleChange}
                 >
+                  <option value="Aphasia" selected disabled>
+                    Select Your Diagnosis
+                  </option>
                   <option value="Aphasia">Aphasia</option>
                   <option value="Stroke">Stroke</option>
                 </select>

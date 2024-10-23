@@ -148,20 +148,49 @@ export default function Home() {
                       >
                         <div className="mb-3 border border-top-0 border-start-0 border-end-0">
                           <h5 className="mb-0 fw-bold">
-                            {appointment.selectedSchedule.day}
+                            {appointment.status === "Temporarily Rescheduled"
+                              ? appointment.temporaryReschedule.day
+                              : appointment.selectedSchedule.day}
                           </h5>
                           <p className="mb-0 fw-bold">
-                            {appointment.selectedSchedule.startTime} -{" "}
-                            {appointment.selectedSchedule.endTime}
+                            {appointment.status === "Temporarily Rescheduled"
+                              ? appointment.temporaryReschedule.startTime
+                              : appointment.selectedSchedule.startTime}{" "}
+                            -{" "}
+                            {appointment.status === "Temporarily Rescheduled"
+                              ? appointment.temporaryReschedule.endTime
+                              : appointment.selectedSchedule.endTime}
                           </p>
                           <p className="mb-3">
                             Session of{" "}
-                            {appointment.selectedSchedule.clinicianName} with{" "}
-                            {patientData?.firstName}.
+                            {appointment.status === "Temporarily Rescheduled"
+                              ? appointment.temporaryReschedule.clinicianName
+                              : appointment.selectedSchedule.clinicianName}{" "}
+                            with {patientData?.firstName}.
                           </p>
 
-                          {appointment.status === "Accepted" ||
-                          appointment.status === "Temporarily Rescheduled" ? (
+                          {appointment.status === "Accepted" ? (
+                            <div className="d-flex justify-content-between flex-wrap gap-3">
+                              <div className="mb-3 text-accepted">
+                                {appointment.status}
+                              </div>
+
+                              <div className="d-flex gap-3">
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  onClick={() =>
+                                    joinMeeting(
+                                      appointment._id,
+                                      appointment.roomId
+                                    )
+                                  }
+                                >
+                                  Join
+                                </div>
+                              </div>
+                            </div>
+                          ) : appointment.status ===
+                            "Temporarily Rescheduled" ? (
                             <div className="d-flex justify-content-between flex-wrap gap-3">
                               <div className="mb-3 text-accepted">
                                 {appointment.status}

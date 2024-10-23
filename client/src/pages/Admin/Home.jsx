@@ -404,20 +404,20 @@ export default function Home() {
                               <h5 className="mb-0 fw-bold">
                                 {appointment.status ===
                                 "Schedule Change Request"
-                                  ? appointment.newSchedule.day
+                                  ? appointment.newSchedule?.day
                                   : appointment.status ===
                                     "Temporary Reschedule Request" // Include Temporary Reschedule Request
-                                  ? appointment.temporaryReschedule.day
-                                  : appointment.selectedSchedule.day}
+                                  ? appointment.temporaryReschedule?.day
+                                  : appointment.selectedSchedule?.day}
                               </h5>
                               <p className="mb-0">
                                 {appointment.status ===
                                 "Schedule Change Request"
-                                  ? `${appointment.newSchedule.startTime} to ${appointment.newSchedule.endTime}`
+                                  ? `${appointment.newSchedule?.startTime} to ${appointment.newSchedule?.endTime}`
                                   : appointment.status ===
                                     "Temporary Reschedule Request" // Include Temporary Reschedule Request
-                                  ? `${appointment.temporaryReschedule.startTime} to ${appointment.temporaryReschedule.endTime}`
-                                  : `${appointment.newSchedule.startTime} to ${appointment.newSchedule.endTime}`}
+                                  ? `${appointment.temporaryReschedule?.startTime} to ${appointment.temporaryReschedule?.endTime}`
+                                  : `${appointment.selectedSchedule?.startTime} to ${appointment.selectedSchedule?.endTime}`}
                               </p>
                               <p className="mb-0">
                                 {appointment.status ===
@@ -426,15 +426,15 @@ export default function Home() {
                                   : appointment.status ===
                                     "Temporary Reschedule Request" // Include Temporary Reschedule Request
                                   ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a temporary reschedule`
-                                  : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule.clinicianName}`}
+                                  : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule?.clinicianName}`}
                               </p>
                               <div className="mb-3 text-pending">
                                 {appointment.status === "Pending"
-                                  ? "PENDING"
+                                  ? "Pending"
                                   : appointment.status ===
                                     "Schedule Change Request"
-                                  ? "SCHEDULE CHANGE REQUEST"
-                                  : "TEMPORARY SCHEDULE REQUEST"}{" "}
+                                  ? "Schedule Change Request"
+                                  : "Temporary Schedule Request"}{" "}
                                 {/* Include Temporary Schedule Request */}
                               </div>
                             </div>
@@ -456,19 +456,20 @@ export default function Home() {
                               <h5 className="mb-0 fw-bold">
                                 {appointment.status ===
                                 "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule.day
-                                  : appointment.selectedSchedule.day}
+                                  ? appointment.temporaryReschedule?.day
+                                  : appointment.selectedSchedule?.day}
                               </h5>
                               <p className="mb-0">
                                 {appointment.status ===
                                 "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule.startTime
-                                  : appointment.selectedSchedule.startTime}{" "}
+                                  ? appointment.temporaryReschedule?.startTime
+                                  : appointment.selectedSchedule
+                                      ?.startTime}{" "}
                                 to{" "}
                                 {appointment.status ===
                                 "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule.endTime
-                                  : appointment.selectedSchedule.endTime}
+                                  ? appointment.temporaryReschedule?.endTime
+                                  : appointment.selectedSchedule?.endTime}
                               </p>
                               <p className="mb-0">
                                 {appointment.patientId.firstName}{" "}
@@ -478,8 +479,8 @@ export default function Home() {
                                 {appointment.status ===
                                 "Temporarily Rescheduled"
                                   ? appointment.temporaryReschedule
-                                      .clinicianName
-                                  : appointment.selectedSchedule.clinicianName}
+                                      ?.clinicianName
+                                  : appointment.selectedSchedule?.clinicianName}
                               </p>
                               <div className="mb-3 text-accepted">
                                 {appointment.status}
@@ -507,8 +508,8 @@ export default function Home() {
                               <p className="mb-0">
                                 {appointment.patientId.firstName}{" "}
                                 {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName}
-                                session request with{" "}
+                                {appointment.patientId.lastName} session request
+                                with{" "}
                                 {appointment.selectedSchedule.clinicianName} was
                                 rejected
                               </p>
