@@ -20,12 +20,15 @@ mongoose
 
 // Express App
 const app = express();
-const server = http.createServer(app);
 
 // WSS Initialize
-const WSS_PORT = 8080;
+const PORT = 8000;
+const server = app.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
 const wss = new WebSocketServer({
-  port: Number(process.env.PORT) || WSS_PORT,
+  server: server,
 });
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
@@ -77,12 +80,18 @@ app.use((err, req, res, next) => {
 });
 
 // Rooms
-const rooms = {};
-const MAX = 1;
+let rooms = {};
+const MAX = 2;
 
 const roomFullMessage = JSON.stringify({
   type: "room-full",
   message: "Room is full, redirecting to home page.",
+  redirectURL: "/",
+});
+
+const userAlreadyInRoomMessage = JSON.stringify({
+  type: "user-already-in-room",
+  message: "User is already in the room.",
   redirectURL: "/",
 });
 
@@ -96,18 +105,45 @@ try {
       if (data.type === "join-room") {
         console.log(`Initializing ${data.user} to join room ${data.roomID}`);
         // Add client to the room
+
         currentRoom = data.roomID;
+
+        // Create room if not array rooms
         if (!rooms[currentRoom]) {
-          rooms[currentRoom] = [];
-          console.log(`${data.user} successfully joined room ${data.roomID}.`);
+          rooms[currentRoom] = {};
+          rooms[currentRoom].clients = [];
         }
-        if (rooms[currentRoom].length >= MAX) {
+        if (rooms[currentRoom].clients.length >= MAX) {
           // Room is full, redirect user
+          console.log(
+            `Room full! Capacity: ${rooms[currentRoom].clients.length}`
+          );
           ws.send(roomFullMessage);
           ws.close();
         } else {
-          // Add client to the room
-          rooms[currentRoom].push(ws);
+          // Check if the user is already in the room
+          const userAlreadyInRoom = rooms[currentRoom].clients.some(
+            (client) => client.user === data.user
+          );
+
+          if (userAlreadyInRoom) {
+            ws.send(userAlreadyInRoomMessage);
+            ws.close();
+          } else {
+            // Add client to the room
+            ws.user = data.user; // Assign user to WebSocket instance
+            rooms[currentRoom].clients.push(ws);
+            console.log(
+              `Joining... Capacity: ${rooms[currentRoom].clients.length}`
+            );
+            console.log(
+              `${data.user} successfully joined room ${data.roomID}.`
+            );
+            console.log(
+              `Current clients in room ${currentRoom}:`,
+              rooms[currentRoom].clients.map((client) => client.user)
+            );
+          }
         }
       }
 
@@ -133,7 +169,7 @@ try {
       ) {
         // Relay WebRTC signaling messages only to other clients in the same room
         if (currentRoom) {
-          rooms[currentRoom].forEach((client) => {
+          rooms[currentRoom].clients.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
               client.send(JSON.stringify(data));
             }
@@ -145,24 +181,22 @@ try {
     ws.on("close", () => {
       // Remove the client from the room when they disconnect
       if (currentRoom) {
-        rooms[currentRoom] = rooms[currentRoom].filter(
-          (client) => client !== ws
+        console.log(
+          `Current clients in room ${currentRoom}:`,
+          rooms[currentRoom].clients.map((client) => client.user)
         );
 
-        // Notify other clients in the room that this client has left
-        rooms[currentRoom].forEach((client) => {
-          if (client.readyState === WebSocket.OPEN) {
-            client.send(
-              JSON.stringify({
-                type: "user-left",
-                userId: data.uuid, // Or use any other unique identifier
-              })
-            );
-          }
-        });
+        rooms[currentRoom].clients = rooms[currentRoom].clients.filter(
+          (client) => client !== ws
+        );
+        console.log(`User ${ws} has left the room: ${currentRoom}`);
+        console.log(
+          `Updated clients in room ${currentRoom}:`,
+          rooms[currentRoom].clients.map((client) => client.user)
+        );
 
         // Clean up the room if it's empty
-        if (rooms[currentRoom].length === 0) {
+        if (rooms[currentRoom].clients.length === 0) {
           delete rooms[currentRoom];
           console.log(`Room ${currentRoom} is empty and deleted`);
         }
@@ -172,8 +206,3 @@ try {
 } catch (error) {
   console.error(error);
 }
-
-const PORT = process.env.PORT || 8000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running on port ${PORT}`);
-});
