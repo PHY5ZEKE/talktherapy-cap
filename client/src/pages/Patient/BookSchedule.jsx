@@ -90,8 +90,12 @@ export default function BookSchedule() {
     setSelectedSpecialization(event.target.value);
   };
 
-  const joinMeeting = (app, id) => {
-    navigate(`/room/${app}/${id}`);
+  const joinMeeting = (id, details) => {
+    navigate(`/room/${id}`, {
+      state: {
+        appointmentDetails: details,
+      },
+    });
   };
 
   const handleAppointmentClick = (appointment) => {
@@ -211,7 +215,12 @@ export default function BookSchedule() {
   function isBooked(appointments) {
     // Check if the patient has any appointments that are Accepted if so, return true
     return appointments.some(
-      (appointment) => appointment.status === "Accepted"
+      (appointment) =>
+        appointment.status === "Pending" ||
+        appointment.status === "Schedule Change Request" ||
+        appointment.status === "Temporary Schedule Request" ||
+        appointment.status === "Temporarily Scheduled" ||
+        appointment.status === "Accepted"
     );
   }
 
@@ -531,10 +540,7 @@ export default function BookSchedule() {
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 onClick={() =>
-                                  joinMeeting(
-                                    appointment._id,
-                                    appointment.roomId
-                                  )
+                                  joinMeeting(appointment.roomId, appointment)
                                 }
                               >
                                 Join
@@ -580,10 +586,7 @@ export default function BookSchedule() {
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 onClick={() =>
-                                  joinMeeting(
-                                    appointment._id,
-                                    appointment.roomId
-                                  )
+                                  joinMeeting(appointment.roomId, appointment)
                                 }
                               >
                                 Join
