@@ -22,13 +22,16 @@ mongoose
 const app = express();
 
 // WSS Initialize
-const PORT = 8000;
-const server = app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
-});
+const WSS_PORT = 8080;
+const server = http.createServer(app);
 
 const wss = new WebSocketServer({
-  server: server,
+  port: Number(process.env.PORT) || WSS_PORT,
+});
+
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
 });
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
@@ -103,9 +106,6 @@ try {
     ws.on("message", (message) => {
       const data = JSON.parse(message);
       if (data.type === "join-room") {
-        console.log(`Initializing ${data.user} to join room ${data.roomID}`);
-        // Add client to the room
-
         currentRoom = data.roomID;
 
         // Create room if not array rooms
@@ -113,25 +113,15 @@ try {
           rooms[currentRoom] = {};
           rooms[currentRoom].clients = [];
         }
+
+        // Check room capacity
         if (rooms[currentRoom].clients.length >= MAX) {
-          // Room is full, redirect user
           console.log(
             `Room full! Capacity: ${rooms[currentRoom].clients.length}`
           );
           ws.send(roomFullMessage);
           ws.close();
         } else {
-          // Check if the user is already in the room
-          const userAlreadyInRoom = rooms[currentRoom].clients.some(
-            (client) => client.user === data.user
-          );
-
-          if (userAlreadyInRoom) {
-            ws.send(userAlreadyInRoomMessage);
-            ws.close();
-          } else {
-            // Add client to the room
-            ws.user = data.user; // Assign user to WebSocket instance
             rooms[currentRoom].clients.push(ws);
             console.log(
               `Joining... Capacity: ${rooms[currentRoom].clients.length}`
@@ -143,7 +133,7 @@ try {
               `Current clients in room ${currentRoom}:`,
               rooms[currentRoom].clients.map((client) => client.user)
             );
-          }
+          
         }
       }
 
@@ -155,11 +145,24 @@ try {
             sender: data.sender,
           });
 
-          rooms[currentRoom].forEach((client) => {
+          rooms[currentRoom].clients.forEach((client) => {
             if (client.readyState === WebSocket.OPEN) {
               client.send(broadcastMessage);
             }
           });
+        }
+      }
+
+      if (data.type === "leave-room") {
+        if (currentRoom) {
+          console.log(`User ${data.user} has left the room: ${currentRoom}`);
+          rooms[currentRoom].clients = rooms[currentRoom].clients.filter(
+            (client) => client !== ws
+          );
+          console.log(
+            `Updated clients in room ${currentRoom}:`,
+            rooms[currentRoom].clients.map((client) => client.user)
+          );
         }
       }
 
@@ -181,18 +184,8 @@ try {
     ws.on("close", () => {
       // Remove the client from the room when they disconnect
       if (currentRoom) {
-        console.log(
-          `Current clients in room ${currentRoom}:`,
-          rooms[currentRoom].clients.map((client) => client.user)
-        );
-
         rooms[currentRoom].clients = rooms[currentRoom].clients.filter(
           (client) => client !== ws
-        );
-        console.log(`User ${ws} has left the room: ${currentRoom}`);
-        console.log(
-          `Updated clients in room ${currentRoom}:`,
-          rooms[currentRoom].clients.map((client) => client.user)
         );
 
         // Clean up the room if it's empty

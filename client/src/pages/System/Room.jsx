@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import "../../styles/containers.css";
@@ -17,13 +17,40 @@ import {
 import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
 import { init } from "../../machinelearning/script.js";
 
+const useMediaStream = (localVideoRef) => {
+  const localStream = useRef(null);
+  const getMediaStream = useCallback(
+    async (constraints) => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        localStream.current = stream;
+        if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+      } catch (error) {
+        console.error("Error accessing media devices.", error);
+      }
+    },
+    [localVideoRef]
+  );
+
+  const stopMediaStream = useCallback(() => {
+    localStream.current?.getTracks().forEach((track) => track.stop());
+    if (localVideoRef.current) localVideoRef.current.srcObject = null;
+    localStream.current = null;
+  }, [localVideoRef]);
+
+  return { getMediaStream, stopMediaStream, localStream };
+};
+
 export default function Room() {
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
+  const { roomid } = useParams();
+  const navigate = useNavigate();
 
   const [userRole, setUserRole] = useState(null);
-  const [messages, setMessages] = useState([]); // State for storing messages
+  const [messages, setMessages] = useState([]);
   const [type, setType] = useState("");
+
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const [isMicEnabled, setIsMicEnabled] = useState(true);
   const [speechScore, setSpeechScore] = useState({
@@ -31,22 +58,16 @@ export default function Room() {
     fluencyScore: 0,
   });
 
-  const currentUser = localStorage.getItem("userId");
-
-  // Nav
-  const navigate = useNavigate();
-
-  // Get Room ID
-  const { roomid } = useParams();
-
-  // Get video stream
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
-  const localStream = useRef();
+  const peerConnection = useRef(null);
 
-  // Connections
-  const peerConnection = useRef();
-  const serverConnection = useRef();
+  const socket = useRef(null);
+  const isSocketOpen = useRef(false);
+  const hasJoinedRoom = useRef(false);
+
+  const sdpQueue = useRef([]);
+  const iceQueue = useRef([]);
 
   const peerConnectionConfig = {
     iceServers: [
@@ -55,25 +76,21 @@ export default function Room() {
     ],
   };
 
-  // SDP and ICE Candidates Queue
-  const sdpQueue = useRef([]);
-  const iceQueue = useRef([]);
+  const role = localStorage.getItem("userRole");
+  const currentUser = localStorage.getItem("userId");
+
+  const { getMediaStream, stopMediaStream, localStream } =
+    useMediaStream(localVideoRef);
 
   useEffect(() => {
     const initializeModel = async () => {
-      await init(); // Call the init function to set up the model and chart
+      await init();
     };
-
-    initializeModel(); // Initialize the model on component mount
-
-    // Optionally, you can return a cleanup function here if needed
+    initializeModel();
   }, []);
 
   useEffect(() => {
-    const role = localStorage.getItem("userRole");
-    setUserRole(role);``
-
-    // Validate user roles after fetching appointment
+    setUserRole(role);
     if (
       (role === "patientslp" &&
         appointmentDetails?.patientId._id !== currentUser) ||
@@ -85,32 +102,29 @@ export default function Room() {
       navigate("/unauthorized");
     } else {
       pageReady();
-      return () => {
-        handleCloseConnection();
-      };
     }
+
+    return () => {
+      if (socket.current) {
+        handleCloseConnection();
+        navigate("/")
+      }
+    };
   }, []);
 
-  async function pageReady() {
-    const constraints = {
-      video: true,
-      audio: true,
-    };
+  const pageReady = async () => {
+    await getMediaStream({ video: true, audio: true });
+    InitializeWebSocket();
+  };
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      localStream.current = stream;
+  const InitializeWebSocket = () => {
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
 
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-      }
-
-      serverConnection.current = new WebSocket(
-        `wss://${import.meta.env.VITE_WSS}`
-      );
-
-      serverConnection.current.onopen = () => {
-        serverConnection.current.send(
+    socket.current.onopen = () => {
+      isSocketOpen.current = true;
+      console.log("Connection open");
+      if (!hasJoinedRoom.current) {
+        socket.current.send(
           JSON.stringify({
             type: "join-room",
             user:
@@ -120,23 +134,29 @@ export default function Room() {
             roomID: roomid,
           })
         );
+        hasJoinedRoom.current = true;
+        console.log("Joined the room");
+        startConnection(true);
+      }
+    };
 
-        start(true);
-        // TO DO: Notify for waiting
-      };
-      serverConnection.current.onmessage = gotMessageFromServer;
-    } catch (error) {
-      errorHandler(error);
-    }
-  }
+    socket.current.onmessage = gotMessageFromServer;
 
-  function start(isCaller) {
-    // check server connection
-    if (
-      !serverConnection.current ||
-      serverConnection.current.readyState !== WebSocket.OPEN
-    ) {
-      // TO DO: Notify connection error.
+    socket.current.onerror = (error) =>
+      console.error("WebSocket error:", error);
+
+    socket.current.onclose = () => {
+      console.warn("WebSocket connection closed");
+      isSocketOpen.current = false;
+      hasJoinedRoom.current = false;
+    };
+  };
+
+  const startConnection = (isCaller) => {
+    if (!socket.current || socket.current.readyState !== WebSocket.OPEN) {
+      console.warn(
+        `WebSocket is not open (current state: ${socket.current.readyState}). Cannot initiate peer connection.`
+      );
       return;
     }
 
@@ -145,56 +165,54 @@ export default function Room() {
     peerConnection.current.ontrack = gotRemoteStream;
 
     console.log("Okay na!");
-    localStream.current.getTracks().forEach((track) => {
-      peerConnection.current.addTrack(track, localStream.current);
-    });
+    localStream.current
+      ?.getTracks()
+      .forEach((track) =>
+        peerConnection.current.addTrack(track, localStream.current)
+      );
 
     if (isCaller) {
       peerConnection.current
         .createOffer()
-        .then(createdDescription)
-        .catch(errorHandler);
+        .then(createDescription)
+        .catch(console.error);
     }
 
     processQueues();
-  }
+  };
 
-  function gotMessageFromServer(message) {
+  const gotMessageFromServer = (message) => {
     const signal = JSON.parse(message.data);
 
-    // Handle WebRTC messages (SDP, ICE candidates)
     if (signal.sdp) {
-      sdpQueue.currrent.push(signal.sdp);
+      sdpQueue.current.push(signal.sdp);
       processQueues();
     } else if (signal.ice) {
       iceQueue.current.push(signal.ice);
       processQueues();
-    }
-
-    // Handle Room Maximum Capacity
-    if (signal.type === "room-full") {
+    } else if (signal.type === "room-full") {
       handleCloseConnection();
       navigate("/unauthorized");
-      console.log("Room is full LN 187");
-    }
-
-    // Handle text messages
-    if (signal.type === "message") {
-      setMessages((prevMessages) => [
-        ...prevMessages,
-        { message: signal.message, sender: signal.sender, isSent: false }, // Mark it as received
-      ]);
-    }
-
-    if (signal.type === "leave-room") {
-      // TO DO: Notify leave room.
+    } else if (signal.type === "message") {
+      setMessages((prevMessages) => {
+        const messageExists = prevMessages.some(
+          (msg) =>
+            msg.message === signal.message && msg.sender === signal.sender
+        );
+        if (!messageExists) {
+          return [
+            ...prevMessages,
+            { message: signal.message, sender: signal.sender, isSent: false },
+          ];
+        }
+        return prevMessages;
+      });
+    } else if (signal.type === "leave-room") {
       handleCloseConnection();
-      navigate("/");
     }
-  }
+  };
 
   function processQueues() {
-    // Process SDP queue
     while (
       sdpQueue.current.length > 0 &&
       peerConnection.current.signalingState === "stable"
@@ -206,11 +224,9 @@ export default function Room() {
           if (sdp.type === "offer") {
             peerConnection.current
               .createAnswer()
-              .then(createdDescription)
-              .catch(errorHandler);
+              .then(createDescription)
           }
         })
-        .catch(errorHandler);
     }
 
     // Process ICE queue
@@ -221,143 +237,101 @@ export default function Room() {
       const iceCandidate = iceQueue.current.shift();
       peerConnection.current
         .addIceCandidate(new RTCIceCandidate(iceCandidate))
-        .catch(errorHandler);
     }
   }
 
-  function gotIceCandidate(event) {
-    if (event.candidate != null) {
-      serverConnection.current.send(
-        JSON.stringify({
-          ice: event.candidate,
-          uuid:
-            userRole === "patientslp"
-              ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
-              : appointmentDetails?.selectedSchedule.clinicianName,
-          type: "ice-candidate",
-        })
-      );
+  const gotIceCandidate = (event) => {
+    if (event.candidate) {
+      if (socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(
+          JSON.stringify({
+            ice: event.candidate,
+            uuid: getUserName(),
+            type: "ice-candidate",
+          })
+        );
+      } else {
+        console.warn(
+          `WebSocket is not open (current state: ${socket.current.readyState}). Cannot send ICE candidate.`
+        );
+      }
     }
-  }
+  };
 
-  function createdDescription(description) {
+  const createDescription = (description) => {
     peerConnection.current
       .setLocalDescription(description)
       .then(() => {
-        serverConnection.current.send(
-          JSON.stringify({
-            sdp: peerConnection.current.localDescription,
-            uuid:
-              userRole === "patientslp"
-                ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
-                : appointmentDetails?.selectedSchedule.clinicianName,
-            type: description.type,
-          })
-        );
+        if (socket.current.readyState === WebSocket.OPEN) {
+          socket.current.send(
+            JSON.stringify({
+              sdp: peerConnection.current.localDescription,
+              uuid: getUserName(),
+              type: description.type,
+            })
+          );
+        } else {
+          console.warn(
+            `WebSocket is not open (current state: ${socket.current.readyState}). Cannot send SDP.`
+          );
+        }
       })
-      .catch(errorHandler);
-  }
+  };
 
-  function gotRemoteStream(event) {
-    if (remoteVideoRef.current) {
+  const gotRemoteStream = (event) => {
+    if (remoteVideoRef.current)
       remoteVideoRef.current.srcObject = event.streams[0];
-    }
-  }
+  };
 
-  function errorHandler(error) {
-    console.log(error);
-  }
-
-  function muteMic() {
+  const toggleMic = () => {
     const audioTrack = localStream.current?.getAudioTracks()[0];
-
     if (audioTrack) {
       audioTrack.enabled = !audioTrack.enabled;
       setIsMicEnabled(audioTrack.enabled);
     }
-  }
-
-  const handleVideoStream = async () => {
-    if (isCameraEnabled) {
-      if (localStream.current) {
-        localStream.current.getTracks().forEach((track) => {
-          track.stop();
-          track.enabled = false;
-          localStream.current.removeTrack(track);
-        });
-        localVideoRef.current.srcObject = null;
-        localStream.current = null;
-      }
-      setIsCameraEnabled(false);
-    } else {
-      try {
-        const constraints = { video: true };
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        localStream.current = stream;
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = stream;
-        }
-        setIsCameraEnabled(true);
-      } catch (err) {
-        console.error("Error accessing the camera: ", err);
-      }
-    }
   };
 
-  const handleCloseConnection = () => {
-    // Stop all tracks in the local stream
-    if (localStream.current) {
-      localStream.current.getTracks().forEach((track) => {
-        track.stop();
-        track.enabled = false;
-        localStream?.current.removeTrack(track);
-      });
-      localVideoRef.current.srcObject = null;
-      localStream.current = null;
-    }
+  const toggleCamera = async () => {
+    isCameraEnabled ? stopMediaStream() : await getMediaStream({ video: true });
+    setIsCameraEnabled((prev) => !prev);
+  };
 
-    if (
-      serverConnection.current &&
-      serverConnection.current.readyState === WebSocket.OPEN
-    ) {
-      serverConnection.current.send(
+  const handleCloseConnection = async () => {
+    if(socket.current) {
+      socket.current?.send(
         JSON.stringify({
           type: "leave-room",
-          roomID: roomid,
+          user: getUserName(),
         })
       );
-
-      // Close the WebSocket connection
-      serverConnection.current.close();
-    }
-
-    // Close the peer connection
-    if (peerConnection.current) {
+      stopMediaStream();
+      socket.current?.close();
       peerConnection.current?.close();
-      peerConnection.current.onicecandidate = null;
-      peerConnection.current = null;
     }
   };
 
-  function sendMessage(message) {
-    if (!message || !serverConnection.current) return;
+  const handleSendMessage = (message) => {
+    if (message) {
+      socket.current.send(
+        JSON.stringify({
+          type: "message",
+          message,
+          roomID: roomid,
+          sender: getUserName(),
+        })
+      );
+    }
+  };
 
-    serverConnection.current.send(
-      JSON.stringify({
-        type: "message",
-        message,
-        roomID: roomid,
-        sender:
-          userRole === "patientslp"
-            ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
-            : appointmentDetails?.selectedSchedule.clinicianName,
-      })
-    );
-  }
+  const getUserName = () => {
+    return userRole === "patientslp"
+      ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
+      : appointmentDetails?.selectedSchedule.clinicianName;
+  };
 
-  function startVoiceRecognitionHandler() {
+  const startVoiceRecognitionHandler = () => {
     runSpeechRecognition(setSpeechScore);
-  }
+  };
 
   return (
     <>
@@ -407,7 +381,7 @@ export default function Room() {
 
             {/* CAMERA AND MUTE */}
             <div className="d-flex align-items-center gap-2 mx-1">
-              <div onClick={handleVideoStream} style={{ cursor: "pointer" }}>
+              <div onClick={toggleCamera} style={{ cursor: "pointer" }}>
                 {isCameraEnabled ? (
                   <FontAwesomeIcon size="lg" icon={faVideo} />
                 ) : (
@@ -415,7 +389,7 @@ export default function Room() {
                 )}
               </div>
 
-              <div onClick={muteMic} style={{ cursor: "pointer" }}>
+              <div onClick={toggleMic} style={{ cursor: "pointer" }}>
                 {isMicEnabled ? (
                   <FontAwesomeIcon size="lg" icon={faMicrophone} />
                 ) : (
@@ -529,13 +503,15 @@ export default function Room() {
                     className="input-group my-3"
                     onSubmit={(e) => {
                       e.preventDefault();
-                      sendMessage(type);
+                      handleSendMessage(type);
+                      setType("");
                     }}
                   >
                     <input
                       type="text"
                       className="form-control"
                       placeholder="Type a message..."
+                      value={type}
                       onChange={(e) => setType(e.target.value)}
                     />
                     <button type="submit" className="btn btn-primary">
