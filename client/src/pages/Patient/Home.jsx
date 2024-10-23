@@ -180,8 +180,8 @@ export default function Home() {
                                   className="mb-3 fw-bold text-button border"
                                   onClick={() =>
                                     joinMeeting(
-                                      appointment._id,
-                                      appointment.roomId
+                                      appointment.roomId,
+                                      appointment
                                     )
                                   }
                                 >
