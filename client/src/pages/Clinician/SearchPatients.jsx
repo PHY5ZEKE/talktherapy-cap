@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -11,6 +11,7 @@ import Soap from "../../components/Modals/Soap";
 export default function ManageSchedule() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
+  const [assignedPatients, setAssignedPatients] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [clinicianData, setClinicianData] = useState(null);
@@ -89,6 +90,36 @@ export default function ManageSchedule() {
     fetchPatients();
   }, []);
 
+  useEffect(() => {
+    const fetchAssignedPatients = async () => {
+      try {
+        const response = await fetch(
+          `${appURL}/${route.clinician.getAssignedPatients}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!data.error) {
+          setAssignedPatients(data.assignedPatients);
+        } else {
+          failNotify(toastMessage.fail.fetch);
+        }
+      } catch (error) {
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
+      }
+    };
+
+    fetchAssignedPatients();
+  }, []);
+
   const filteredPatients = patients.filter(
     (patient) =>
       patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -126,6 +157,10 @@ export default function ManageSchedule() {
 
   const handleClinicianClick = (patient) => {
     fetchPatientDetails(patient._id);
+  };
+
+  const isPatientAssigned = (patientId) => {
+    return assignedPatients.some((patient) => patient._id === patientId);
   };
 
   return (
@@ -246,24 +281,29 @@ export default function ManageSchedule() {
                           <p className="mb-3">{selectedPatient?.email}</p>
 
                           <div className="d-flex flex-column gap-3">
-                            <button
-                              className="text-button border w-100"
-                              onClick={handleOpen}
-                            >
-                              Add SOAP
-                            </button>
-                            <button className="text-button border w-100">
-                              View Progress
-                            </button>
-                            <button className="text-button border w-100">
-                              View Records
-                            </button>
-                            <button className="text-button border w-100">
-                              Request Records
-                            </button>
-                            <button className="text-button border w-100">
-                              Export Data
-                            </button>
+                            {isPatientAssigned(selectedPatient._id) ? (
+                              <>
+                                <button
+                                  className="text-button border w-100"
+                                  onClick={handleOpen}
+                                >
+                                  Add SOAP
+                                </button>
+                                <button className="text-button border w-100">
+                                  View Progress
+                                </button>
+                                <button className="text-button border w-100">
+                                  View Records
+                                </button>
+                                <button className="text-button border w-100">
+                                  Export Data
+                                </button>
+                              </>
+                            ) : (
+                              <button className="text-button border w-100">
+                                Request Records
+                              </button>
+                            )}
                           </div>
                         </div>
                       </div>

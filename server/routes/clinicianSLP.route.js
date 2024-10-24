@@ -44,4 +44,10 @@ router.put(
   clinicianController.updateProfilePicture
 );
 
+router.get(
+  "/get-assigned-patients",
+  verifyToken,
+  clinicianController.getAssignedPatients
+);
+
 module.exports = router;

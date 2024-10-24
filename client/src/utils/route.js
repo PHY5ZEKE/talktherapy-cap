@@ -36,6 +36,7 @@ export const route = {
     getAllPatients: "api/clinician-slp/getAllPatients",
     getPatientById: "api/clinician-slp/getPatientById/",
     picture: "api/clinician-slp/update-profile-picture",
+    getAssignedPatients: "api/clinician-slp/get-assigned-patients",
   },
   patient: {
     deactivate: "api/patient-SLP/remove-slp-patient",

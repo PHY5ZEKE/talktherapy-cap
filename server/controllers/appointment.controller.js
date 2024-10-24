@@ -1,6 +1,7 @@
 const Appointment = require("../models/appointment.model");
 const Admin = require("../models/adminSLP.model"); // Import the Admin model
 const ClinicianSLP = require("../models/clinicianSLP.model");
+const AssignmentSLP = require("../models/assignmentSLP.model");
 const Patient = require("../models/patientSlp.model");
 const Schedule = require("../models/schedule.model");
 const multer = require("multer");
@@ -54,6 +55,20 @@ const handlePendingStatus = async (appointment, status) => {
     appointment.roomId = generateRoomId();
     appointment.selectedSchedule.status = "Booked";
     await appointment.selectedSchedule.save();
+
+    // Assign patient to clinician
+    const existingAssignment = await AssignmentSLP.findOne({
+      clinicianId: appointment.selectedClinician,
+      patientId: appointment.patientId,
+    });
+
+    if (!existingAssignment) {
+      const clinicianPatient = new AssignmentSLP({
+        clinicianId: appointment.selectedClinician,
+        patientId: appointment.patientId,
+      });
+      await clinicianPatient.save();
+    }
   } else {
     appointment.roomId = "errorRoomId";
   }
@@ -482,6 +497,7 @@ function generateRoomId() {
   }
   return result;
 }
+
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;

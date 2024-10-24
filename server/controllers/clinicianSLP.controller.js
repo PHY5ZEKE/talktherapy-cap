@@ -1,4 +1,5 @@
 const Clinician = require("../models/clinicianSLP.model");
+const AssignmentSLP = require("../models/assignmentSLP.model.js");
 const Admin = require("../models/adminSLP.model");
 const Patient = require("../models/patientSlp.model");
 const crypto = require("crypto");
@@ -625,3 +626,20 @@ exports.updateProfilePicture = [
     }
   },
 ];
+
+exports.getAssignedPatients = async (req, res) => {
+  try {
+    const clinicianId = req.user.id; // Assuming the token contains the clinician ID
+
+    const assignedPatients = await AssignmentSLP.find({
+      clinicianId,
+    }).populate("patientId");
+
+    const patients = assignedPatients.map((assignment) => assignment.patientId);
+
+    res.status(200).json({ assignedPatients: patients });
+  } catch (error) {
+    console.error("Error fetching assigned patients:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
