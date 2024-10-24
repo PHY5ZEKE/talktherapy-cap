@@ -301,7 +301,7 @@ export default function ManageSchedule() {
                               </>
                             ) : (
                               <button className="text-button border w-100">
-                                Request Records
+                                Request Access
                               </button>
                             )}
                           </div>
