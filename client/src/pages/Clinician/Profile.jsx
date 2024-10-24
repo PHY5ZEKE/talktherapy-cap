@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { Link } from "react-router-dom";
 
 // Components
@@ -12,6 +14,9 @@ import { route } from "../../utils/route";
 import { page } from "../../utils/page-route";
 
 export default function Profile() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,14 +33,12 @@ export default function Profile() {
   };
 
   const fetchClinicianData = async () => {
-    const token = localStorage.getItem("accessToken");
-
     try {
       const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 

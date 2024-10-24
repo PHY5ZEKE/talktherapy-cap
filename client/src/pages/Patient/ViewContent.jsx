@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +13,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 
 export default function ViewContent() {
+  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,14 +25,12 @@ export default function ViewContent() {
   // Fetch admin data from the backend
   useEffect(() => {
     const fetchPatientData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
       try {
         const response = await fetch(`${appURL}/${route.patient.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 

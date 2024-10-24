@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import "./login.css";
 import Navbar from "../../components/Navbar/NavigationBar.jsx";
 import Footer from "../../components/Footer/Footer.jsx";
@@ -9,6 +9,8 @@ import axios from "axios";
 import { Slide, toast } from "react-toastify";
 import { toastMessage } from "../../utils/toastHandler.js";
 
+import { AuthContext } from "../../utils/AuthContext.jsx";
+
 // Modal
 import ChooseRegister from "../../components/Modals/ChooseRegister.jsx";
 
@@ -18,6 +20,8 @@ import { route } from "../../utils/route.js";
 const appURL = import.meta.env.VITE_APP_URL;
 
 const Login = () => {
+  const { setAuthInfo } = useContext(AuthContext);
+
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -47,9 +51,7 @@ const Login = () => {
       if (response.data.error) {
         setError(response.data.message);
       } else {
-        // Save the access token and user role to local storage or state management
-        localStorage.setItem("accessToken", response.data.accessToken);
-        localStorage.setItem("userRole", response.data.userRole);
+        setAuthInfo(response.data.accessToken, response.data.userRole);
 
         // Redirect based on user role
         switch (response.data.userRole) {

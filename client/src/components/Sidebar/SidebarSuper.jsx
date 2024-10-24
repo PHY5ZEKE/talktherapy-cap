@@ -5,20 +5,22 @@ import {
   faCalendar,
   faGear,
   faRightFromBracket,
-  faUsers
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Link, useNavigate } from "react-router-dom";
 
 import { page } from "../../utils/page-route";
 
+import { useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 export default function Sidebar() {
+  const { clearOnLogout } = useContext(AuthContext);
+  
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear the authentication token and user information from local storage
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userRole");
+    clearOnLogout();
 
     // Redirect to the login page
     navigate("/login");

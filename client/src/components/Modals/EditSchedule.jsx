@@ -1,5 +1,7 @@
 import "./modal.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
 
 export default function EditSchedule({
@@ -7,6 +9,9 @@ export default function EditSchedule({
   onScheduleUpdated,
   scheduleId,
 }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   // Callback Function
   const handleClose = (e) => {
     e.preventDefault();
@@ -38,8 +43,6 @@ export default function EditSchedule({
   // Fetch existing schedule details
   useEffect(() => {
     const fetchSchedule = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
-
       try {
         const response = await fetch(
           `${appURL}/${route.schedule.getScheduleById}/${scheduleId}`,
@@ -47,7 +50,7 @@ export default function EditSchedule({
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -61,7 +64,7 @@ export default function EditSchedule({
           setErrorMessage(data.message); // Set error message
         }
       } catch (error) {
-        setErrorMessage("An error occurred. Please try again."); // Set generic error message
+        setErrorMessage("An error occurred. Please try again.", error); // Set generic error message
       }
     };
 
@@ -88,8 +91,6 @@ export default function EditSchedule({
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
-
     const formattedStartTime = formatTime(startTime);
     const formattedEndTime = formatTime(endTime);
     const schedule = {
@@ -105,7 +106,7 @@ export default function EditSchedule({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify(schedule),
         }
@@ -119,7 +120,7 @@ export default function EditSchedule({
         setErrorMessage(data.message); // Set error message
       }
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again."); // Set generic error message
+      setErrorMessage("An error occurred. Please try again.", error); // Set generic error message
     }
   };
 

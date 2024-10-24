@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 
+import { useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 export default function Logout() {
+  const { clearOnLogOut } = useContext(AuthContext);
+
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // Clear the authentication token and user information from local storage
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("userRole");
+    clearOnLogOut();
 
     // Redirect to the login page
     navigate("/login");

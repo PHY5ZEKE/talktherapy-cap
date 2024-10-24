@@ -14,11 +14,16 @@ import TemporaryRescheduleConfirmation from "../../components/Modals/TemporaryRe
 import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
 
 // DatePicker
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function BookSchedule() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   // DatePicker Instance
   const [startDate, setStartDate] = useState(new Date());
 
@@ -137,15 +142,13 @@ export default function BookSchedule() {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
     const fetchPatientData = async () => {
       try {
         const response = await fetch(`${appURL}/${route.patient.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 
@@ -168,7 +171,7 @@ export default function BookSchedule() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -190,7 +193,7 @@ export default function BookSchedule() {
           method: "GET",
           headers: {
             "Content-Type": "application",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 

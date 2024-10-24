@@ -1,5 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+
+// Context
+import { AuthProvider } from "./utils/AuthContext";
+
 // Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -269,10 +273,12 @@ const routes = (
 
 const App = () => {
   return (
-    <div className="vw-100">
-      {routes}
-      <ToastContainer />
-    </div>
+    <AuthProvider>
+      <div className="vw-100">
+        {routes}
+        <ToastContainer />
+      </div>
+    </AuthProvider>
   );
 };
 

@@ -1,5 +1,7 @@
 import "./modal.css";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import axios from "axios";
 
 import { route } from "../../utils/route";
@@ -10,6 +12,9 @@ export default function AppointmentDetailsClinician({
   openModal,
   appointment,
 }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [loading, setLoading] = useState(false);
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -38,7 +43,7 @@ export default function AppointmentDetailsClinician({
         { status: newStatus },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );

@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { toast, Slide } from "react-toastify";
+
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
 import { toastMessage } from "../../utils/toastHandler";
@@ -14,6 +17,9 @@ export default function EditProfile({
   whatRole,
   onProfileUpdate,
 }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [userData, setUserData] = useState(userDetails);
   const [updatedUser, setUpdatedUser] = useState(null);
 
@@ -61,13 +67,12 @@ export default function EditProfile({
   // Edit Profile Submit Listener
   const handleEditProfileSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("accessToken");
     try {
       const response = await fetch(`${appURL}/${editProfileAPI}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
           firstName,
@@ -99,8 +104,6 @@ export default function EditProfile({
 
   // Upload Profile Picture Listener
   const handleProfilePictureUpload = async () => {
-    const token = localStorage.getItem("accessToken");
-
     if (!profilePicture) {
       failNotify("Select an image for profile picture upload.")
       return;
@@ -113,7 +116,7 @@ export default function EditProfile({
       const response = await fetch(`${appURL}/${editPictureAPI}`, {
         method: "PUT",
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: formData,
       });

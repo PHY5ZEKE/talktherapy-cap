@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 import axios from "axios";
 
 // Components
@@ -28,6 +29,10 @@ export default function Home() {
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const { authState } = useContext(AuthContext);
+
+  const accessToken = authState.accessToken;
 
   const notify = (message) =>
     toast.success(message, {
@@ -64,12 +69,11 @@ export default function Home() {
 
   const openModal = async (appointmentId) => {
     try {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
       const response = await axios.get(
         `${appURL}/${route.appointment.getById}/${appointmentId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -86,14 +90,13 @@ export default function Home() {
   const closeAddClinician = () => setIsAddClinician(!isAddClinician);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
     const fetchAppointments = async () => {
       try {
         const response = await fetch(`${appURL}/${route.appointment.getAll}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -116,13 +119,12 @@ export default function Home() {
 
   useEffect(() => {
     const fetchAdminData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
       try {
         const response = await fetch(`${appURL}/${route.admin.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 
@@ -149,7 +151,7 @@ export default function Home() {
           `${appURL}/${route.admin.getAllClinicians}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -176,7 +178,7 @@ export default function Home() {
           `${appURL}/${route.admin.getAllPatients}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -228,7 +230,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ email: userData.email }), // Automatically pass the selected clinician's email
       });
@@ -267,7 +269,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ email: userData.email }), // Automatically pass the selected patient's email
       });

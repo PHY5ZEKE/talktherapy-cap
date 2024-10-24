@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { useNavigate } from "react-router-dom";
 
 // Calendar
@@ -15,6 +17,9 @@ import Sidebar from "../../components/Sidebar/SidebarSuper";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 
 export default function AuditLogs() {
+  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const nav = useNavigate();
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
@@ -37,11 +42,8 @@ export default function AuditLogs() {
   // Fetch Super Admin
   useEffect(() => {
     const fetchSuperAdmin = async () => {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
-
-      if (!token) {
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("userRole");
+      if (!accessToken) {
+        clearOnLogOut();
         failNotify(toastMessage.fail.unauthorized);
         nav("/unauthorized");
         setError("No token found. Please log in.");
@@ -55,7 +57,7 @@ export default function AuditLogs() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -65,19 +67,18 @@ export default function AuditLogs() {
           setSuperAdmin(data.superAdmin);
         } else if (response.status === 401) {
           setError("Unauthorized. Please log in again.");
-          localStorage.removeItem("accessToken")
-          localStorage.removeItem("userRole")
+          clearOnLogOut();
           failNotify(toastMessage.fail.unauthorized)
           nav("/unauthorized")
         } else {
           const errorText = await response.text();
           failNotify(toastMessage.fail.error)
           failNotify(toastMessage.fail.fetch)
-          setError("Failed to fetch data.")
+          setError("Failed to fetch data.", errorText);
         }
       } catch (error) {
         failNotify(toastMessage.fail.error)
-        setError("Error in fetching data.");
+        setError("Error in fetching data.", error);
       }
     };
 
@@ -86,9 +87,7 @@ export default function AuditLogs() {
 
   // Fetch Audit Logs
   const fetchAuditLogs = async (date) => {
-    const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
-
-    if (!token) {
+    if (!accessToken) {
       setError("No token found. Please log in.");
       return;
     }
@@ -100,7 +99,7 @@ export default function AuditLogs() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -111,12 +110,12 @@ export default function AuditLogs() {
       } else {
         const errorText = await response.text();
         failNotify(toastMessage.fail.fetch)
-        setError("Failed to fetch audit logs");
+        setError("Failed to fetch audit logs", errorText);
       }
     } catch (error) {
       failNotify(toastMessage.fail.fetch)
       failNotify(toastMessage.fail.error)
-      setError("Error fetching audit logs");
+      setError("Error fetching audit logs", error);
     }
   };
 

@@ -1,11 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+import { route } from "../../utils/route";
+
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
+
 import "react-datepicker/dist/react-datepicker.css";
-import { route } from "../../utils/route";
 
 export default function FeedbackDiagnosis() {
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,14 +21,12 @@ export default function FeedbackDiagnosis() {
 
   useEffect(() => {
     const fetchPatientData = async () => {
-      const token = localStorage.getItem("accessToken");
-
       try {
         const response = await fetch(`${appURL}/${route.patient.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -44,8 +48,6 @@ export default function FeedbackDiagnosis() {
 
   useEffect(() => {
     const fetchDiagnosisData = async () => {
-      const token = localStorage.getItem("accessToken");
-
       try {
         const response = await fetch(
           `${appURL}/${route.soap.getPatientSoap}${patientData._id}`,
@@ -53,7 +55,7 @@ export default function FeedbackDiagnosis() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );

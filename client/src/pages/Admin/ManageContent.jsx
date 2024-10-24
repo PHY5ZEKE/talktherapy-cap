@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
 
 // Components
@@ -12,6 +14,10 @@ export default function ManageContent() {
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
 
+  const { authState } = useContext(AuthContext);
+
+  const accessToken = authState.accessToken;
+  
   // Handle Add Content Modal Open
   const [isOpen, setIsOpen] = useState(false);
   const handleAdd = () => {
@@ -21,14 +27,12 @@ export default function ManageContent() {
   // Fetch admin data from the backend
   useEffect(() => {
     const fetchAdminData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
       try {
         const response = await fetch(`${appURL}/${route.admin.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 

@@ -1,3 +1,6 @@
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
@@ -10,13 +13,10 @@ import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 
 // DatePicker
-import { useState, useEffect } from "react";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function ManageSchedule() {
   // DatePicker Instance
-  const [startDate, setStartDate] = useState(new Date());
   const [adminData, setAdminData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -25,6 +25,10 @@ export default function ManageSchedule() {
     []
   );
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const { authState } = useContext(AuthContext);
+
+  const accessToken = authState.accessToken;
 
   const failNotify = (message) =>
     toast.error(message, {
@@ -35,14 +39,13 @@ export default function ManageSchedule() {
   // Fetch admin data from the backend
   useEffect(() => {
     const fetchAdminData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
 
       try {
         const response = await fetch(`${appURL}/${route.admin.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 
@@ -69,7 +72,7 @@ export default function ManageSchedule() {
           `${appURL}/${route.admin.getAllClinicians}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -94,7 +97,7 @@ export default function ManageSchedule() {
     try {
       const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
       const data = await response.json();

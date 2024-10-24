@@ -7,7 +7,8 @@ import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 // DatePicker
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemom, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -15,6 +16,9 @@ import AddSchedule from "../../components/Modals/AddSchedule";
 import EditSchedule from "../../components/Modals/EditSchedule"; // Import the EditSchedule component
 
 export default function ManageSchedule() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   // DatePicker Instance
   const [startDate, setStartDate] = useState(new Date());
   const [schedules, setSchedules] = useState([]);
@@ -72,8 +76,6 @@ export default function ManageSchedule() {
   }, []);
 
   const handleDelete = useCallback(async (scheduleId) => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
     try {
       const response = await fetch(
         `${appURL}/${route.schedule.delete}/${scheduleId}`,
@@ -81,7 +83,7 @@ export default function ManageSchedule() {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -101,15 +103,13 @@ export default function ManageSchedule() {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
     const fetchClinicianData = async () => {
       try {
         const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 
@@ -133,7 +133,7 @@ export default function ManageSchedule() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 

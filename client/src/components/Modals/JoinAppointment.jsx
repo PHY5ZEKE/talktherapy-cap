@@ -1,7 +1,8 @@
 import "./modal.css";
 import Form from "react-bootstrap/Form";
 import FloatingLabel from "react-bootstrap/FloatingLabel";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 
 // Utils
 import { route } from "../../utils/route";
@@ -15,6 +16,9 @@ export default function JoinAppointment({
   patientId,
   closeModal,
 }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [medicalDiagnosis, setMedicalDiagnosis] = useState("");
   const [sourceOfReferral, setSourceOfReferral] = useState("");
   const [chiefComplaint, setChiefComplaint] = useState("");
@@ -63,8 +67,6 @@ export default function JoinAppointment({
     };
 
     try {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
-
       // Send JSON to Server
       const response = await fetch(
         `${appURL}/${route.appointment.createJSON}`,
@@ -72,7 +74,7 @@ export default function JoinAppointment({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
           body: JSON.stringify(formJson),
         }
@@ -92,7 +94,7 @@ export default function JoinAppointment({
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
           body: formData,
         }

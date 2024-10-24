@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide} from "react-toastify";
 
 export default function RegisterClinician({ openModal }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [email, setEmail] = useState("");
@@ -30,9 +34,6 @@ export default function RegisterClinician({ openModal }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    const accessToken = localStorage.getItem("accessToken"); // Retrieve the token from local storage
-
     try {
       const response = await fetch(
         `${appURL}/${route.clinician.addClinician}`,
@@ -57,10 +58,10 @@ export default function RegisterClinician({ openModal }) {
         setMessage(data.message);
         setEmail(""); // Clear the input field on success
       }
-    } catch (err) {
+    } catch (error) {
       failNotify(toastMessage.fail.error)
       setError(true);
-      setMessage("An error occurred. Please try again.");
+      setMessage("An error occurred. Please try again.", error);
     }
   };
 

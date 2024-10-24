@@ -1,6 +1,8 @@
 import "./modal.css";
 import { Link } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { route } from "../../utils/route";
@@ -9,6 +11,9 @@ import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
 export default function AppointmentDetails({ openModal, appointment }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [loading, setLoading] = useState(false);
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -37,7 +42,7 @@ export default function AppointmentDetails({ openModal, appointment }) {
         { status: newStatus },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );

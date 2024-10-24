@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
@@ -18,6 +20,9 @@ const VIEW_MODES = {
 };
 
 export default function ManageSchedule() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+  
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -52,14 +57,12 @@ export default function ManageSchedule() {
 
   useEffect(() => {
     const fetchClinicianData = async () => {
-      const token = localStorage.getItem("accessToken");
-
       try {
         const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -88,7 +91,7 @@ export default function ManageSchedule() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -118,7 +121,7 @@ export default function ManageSchedule() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -155,7 +158,7 @@ export default function ManageSchedule() {
         `${appURL}/${route.clinician.getPatientById}${patientId}`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );

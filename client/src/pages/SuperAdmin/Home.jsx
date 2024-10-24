@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import axios from "axios";
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
@@ -11,6 +13,10 @@ import EditProfile from "../../components/Modals/EditProfile";
 import RegisterAdmin from "../../components/Modals/RegisterAdmin";
 
 export default function Home() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+  const role = authState.userRole;
+
   // Get Super Admin and Admins
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -45,13 +51,12 @@ export default function Home() {
 
   const onProfileUpdate = async (updatedDetails) => {
     try {
-      const token = localStorage.getItem("accessToken");
       const response = await axios.put(
         `${appURL}/${editProfileAPI}`,
         updatedDetails,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -59,15 +64,14 @@ export default function Home() {
       notify(toastMessage.success.edit)
     } catch (error) {
       failNotify(toastMessage.fail.error)
+      setError("Error updating profile", error);
     }
   };
 
   //Super Admin
   useEffect(() => {
     const fetchSuperAdmin = async () => {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
-
-      if (!token) {
+      if (!accessToken) {
         setError("No token found. Please log in.");
         return;
       }
@@ -77,7 +81,7 @@ export default function Home() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -89,13 +93,12 @@ export default function Home() {
         } else {
           const errorText = await response.text();
           failNotify(toastMessage.fail.fetch)
-
-          setError("Failed to fetch super admin data");
+          setError("Failed to fetch super admin data", errorText);
         }
       } catch (error) {
         failNotify(toastMessage.fail.fetch)
         failNotify(toastMessage.fail.error)
-        setError("Error fetching super admin data");
+        setError("Error fetching super admin data", error);
       }
     };
 
@@ -104,19 +107,18 @@ export default function Home() {
 
   useEffect(() => {
     const fetchAdmins = async () => {
-      const token = localStorage.getItem("accessToken"); // Retrieve token from local storage
       try {
         const response = await axios.get(
           `${appURL}/${route.sudo.getAllAdmins}`,
           {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
         setAdmins(response.data.admins);
-      } catch (err) {
-        setError("An error occurred while retrieving admins.");
+      } catch (error) {
+        setError("An error occurred while retrieving admins.", error);
       } finally {
         setLoading(false);
       }
@@ -140,7 +142,7 @@ export default function Home() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ email: adminData.email }), // Automatically pass the selected admin's email
       });
@@ -162,6 +164,7 @@ export default function Home() {
       }
     } catch (error) {
       failNotify(toastMessage.fail.error);
+      setError("An error occurred while updating admin status.", error);
     } finally {
       setIsProcessing(false); // Stop processing
     }
@@ -177,7 +180,7 @@ export default function Home() {
           userDetails={userDetails}
           closeModal={handleModal}
           isOwner={false}
-          whatRole={"superAdmin"}
+          whatRole={role}
           onProfileUpdate={onProfileUpdate}
         />
       )}

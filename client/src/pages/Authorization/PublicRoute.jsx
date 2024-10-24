@@ -1,9 +1,13 @@
-import React from "react";
+import { useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { Navigate } from "react-router-dom";
 
 const PublicRoute = ({ children }) => {
-  const accessToken = localStorage.getItem("accessToken");
-  const userRole = localStorage.getItem("userRole"); // Assuming userRole is stored in localStorage
+  const { authState } = useContext(AuthContext);
+
+  const accessToken = authState.accessToken;
+  const userRole = authState.userRole;
 
   if (accessToken) {
     switch (userRole) {

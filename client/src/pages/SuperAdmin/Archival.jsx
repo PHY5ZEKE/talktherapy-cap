@@ -1,5 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
+
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 import { useNavigate } from "react-router-dom";
@@ -14,6 +17,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function Archival() {
+  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const nav = useNavigate();
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
@@ -34,9 +40,7 @@ export default function Archival() {
   //Super Admin
   useEffect(() => {
     const fetchSuperAdmin = async () => {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token from localStorage
-
-      if (!token) {
+      if (!accessToken) {
         setError("No token found. Please log in.");
         return;
       }
@@ -48,7 +52,7 @@ export default function Archival() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }
         );
@@ -58,15 +62,14 @@ export default function Archival() {
           setSuperAdmin(data.superAdmin);
         } else if (response.status === 401) {
           setError("Unauthorized. Please log in again.");
-          localStorage.removeItem("accessToken")
-          localStorage.removeItem("userRole")
+          clearOnLogOut();
           failNotify(toastMessage.fail.unauthorized)
           nav("/unauthorized")
         } else {
           const errorText = await response.text();
           failNotify(toastMessage.fail.error)
           failNotify(toastMessage.fail.fetch)
-          setError("Failed to fetch data.")
+          setError("Failed to fetch data.", errorText);
         }
       } catch (error) {
         failNotify(toastMessage.fail.error)

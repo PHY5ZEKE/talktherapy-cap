@@ -1,4 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 
 import "../../styles/containers.css";
@@ -64,6 +66,10 @@ const useMediaStream = (localVideoRef) => {
 };
 
 export default function Room() {
+  const { authState, userState } = useContext(AuthContext);
+  const role = authState.userRole;
+  const currentUser = userState.id;
+
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
   const { roomid } = useParams();
@@ -97,9 +103,6 @@ export default function Room() {
       { urls: "stun:stun.l.google.com:19302" },
     ],
   };
-
-  const role = localStorage.getItem("userRole");
-  const currentUser = localStorage.getItem("userId");
 
   const {
     getMediaStream,

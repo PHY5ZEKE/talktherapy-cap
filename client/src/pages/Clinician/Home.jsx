@@ -14,12 +14,16 @@ import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 import AppointmentDetailsClinician from "../../components/Modals/AppointmentDetailsClinician";
 
 // React
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 
 const appURL = import.meta.env.VITE_APP_URL;
 
 export default function Home() {
+  const { authState, setUserState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [appointments, setAppointments] = useState([]);
   const [clinicianData, setClinicianData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -68,12 +72,11 @@ export default function Home() {
   // Modal Information
   const openModal = async (appointmentId) => {
     try {
-      const token = localStorage.getItem("accessToken"); // Retrieve the token from local storage or another source
       const response = await axios.get(
         `${appURL}/${route.appointment.getById}/${appointmentId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -95,14 +98,12 @@ export default function Home() {
 
   useEffect(() => {
     const fetchClinicianData = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
       try {
         const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
           },
         });
 
@@ -112,11 +113,7 @@ export default function Home() {
 
         const data = await response.json();
         setClinicianData(data.clinician);
-        localStorage.setItem("userId", data.clinician._id);
-        localStorage.setItem(
-          "userName",
-          `${data.clinician.firstName} ${data.clinician.lastName}`
-        );
+        setUserState(data.clinician._id);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -129,8 +126,6 @@ export default function Home() {
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
       try {
         const response = await fetch(
           `${appURL}/${route.appointment.getByClinician}`,
@@ -138,7 +133,7 @@ export default function Home() {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+              Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
             },
           }
         );

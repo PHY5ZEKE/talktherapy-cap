@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 import "./modal.css";
 import { route } from "../../utils/route";
 
 export default function Soap({ openModal, clinicianId, clinicianName, patientId }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [date, setDate] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
   const appURL = import.meta.env.VITE_APP_URL;
@@ -23,12 +27,11 @@ export default function Soap({ openModal, clinicianId, clinicianName, patientId 
     };
 
     try {
-      const token = localStorage.getItem("accessToken");
       const response = await fetch(`${appURL}/${route.soap.create}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(soapData),
       });

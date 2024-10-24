@@ -1,4 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -10,6 +12,10 @@ import MenuDropdown from "../../components/Layout/PatientMenu";
 import { route } from "../../utils/route";
 
 export default function Profile() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+  const role = authState.userRole;
+
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,14 +32,12 @@ export default function Profile() {
   };
 
   const fetchPatientData = async () => {
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
-
     try {
       const response = await fetch(`${appURL}/${route.patient.fetch}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Include the Bearer token in the headers
+          Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
         },
       });
 
@@ -64,7 +68,7 @@ export default function Profile() {
           userDetails={patientData}
           closeModal={handleModal}
           isOwner={true}
-          whatRole={"patient"}
+          whatRole={role}
           onProfileUpdate={fetchPatientData} // Pass the callback function
         />
       )}

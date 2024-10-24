@@ -1,8 +1,12 @@
 import "./modal.css";
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 
 export default function AddSchedule({ closeModal, onScheduleAdded }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   // Callback Function
   const handleClose = (e) => {
     e.preventDefault();
@@ -51,8 +55,6 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored
-
     const formattedStartTime = formatTime(startTime);
     const formattedEndTime = formatTime(endTime);
     const schedule = {
@@ -66,7 +68,7 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(schedule),
       });
@@ -79,7 +81,7 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
         setErrorMessage(data.message); // Set error message
       }
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again."); // Set generic error message
+      setErrorMessage("An error occurred. Please try again.", error); // Set generic error message
     }
   };
 

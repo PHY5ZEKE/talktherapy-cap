@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 
 // UI Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -12,6 +13,9 @@ import "../../styles/text.css";
 export default function Home() {
   const appURL = import.meta.env.VITE_APP_URL;
 
+  const { authState, setUserState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [patientData, setPatientData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -20,22 +24,20 @@ export default function Home() {
 
   useEffect(() => {
     const fetchPatientData = async () => {
-      const token = localStorage.getItem("accessToken");
-
       try {
         const [patientRes, appointmentsRes] = await Promise.all([
           fetch(`${appURL}/${route.patient.fetch}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }),
           fetch(`${appURL}/${route.appointment.get}`, {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${accessToken}`,
             },
           }),
         ]);
@@ -48,7 +50,7 @@ export default function Home() {
         const appointmentsData = await appointmentsRes.json();
 
         setPatientData(patientData.patient);
-        localStorage.setItem("userId", patientData.patient._id);
+        setUserState(patientData.patient._id);
         setAppointments(appointmentsData);
         setLoading(false);
       } catch (error) {

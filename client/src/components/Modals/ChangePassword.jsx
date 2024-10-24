@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -7,6 +8,9 @@ import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
 export default function ChangePassword({ editPasswordAPI, closeModal }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [showPasswordModal, setShowPasswordModal] = useState(true);
 
   const appURL = import.meta.env.VITE_APP_URL;
@@ -50,7 +54,6 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
 
   const handleChangePasswordSubmit = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("accessToken");
 
     // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
@@ -63,7 +66,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ currentPassword, newPassword }),
       });

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
 
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import EditProfile from "../../components/Modals/EditProfile";
@@ -14,6 +15,9 @@ import { page } from "../../utils/page-route";
 import { Link } from "react-router-dom";
 
 export default function Profile() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
@@ -41,9 +45,7 @@ export default function Profile() {
   };
 
   const fetchUserDetails = async () => {
-    const token = localStorage.getItem("accessToken");
-
-    if (!token) {
+    if (!accessToken) {
       setError("No token found. Please log in.");
       return;
     }
@@ -54,7 +56,7 @@ export default function Profile() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -66,12 +68,12 @@ export default function Profile() {
       } else {
         const errorText = await response.text();
         failNotify(toastMessage.fail.fetch)
-        setError("Failed to fetch super admin data");
+        setError("Failed to fetch super admin data", errorText);
       }
     } catch (error) {
       failNotify(toastMessage.fail.fetch)
       failNotify(toastMessage.fail.error)
-      setError("Error fetching super admin data");
+      setError("Error fetching super admin data", error);
     }
   };
 

@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
 
 export default function TemporaryReschedule({
@@ -7,6 +9,9 @@ export default function TemporaryReschedule({
   onScheduleSelect,
   appointment, // Add appointment to props
 }) {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [schedules, setSchedules] = useState([]);
   const [reason, setReason] = useState("");
   const [selectedSchedule, setSelectedSchedule] = useState(null); // Add state for selected schedule
@@ -44,7 +49,7 @@ export default function TemporaryReschedule({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             appointmentId: appointment._id,
@@ -68,12 +73,11 @@ export default function TemporaryReschedule({
   };
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
     const fetchSchedules = async () => {
       try {
         const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
         const data = await response.json();
