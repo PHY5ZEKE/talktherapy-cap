@@ -135,7 +135,7 @@ export default function Perform() {
                       </div>
                       {/* PERFORMANCE */}
                       <p className="mb-3 w-100 bg-secondary-subtle text-center p-3 rounded-2">
-                        Session of Rico Noapl Nieto with Ako.
+                        
                       </p>
                     </div>
                   </div>

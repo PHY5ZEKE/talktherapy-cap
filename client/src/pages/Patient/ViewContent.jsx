@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { route } from "../../utils/route";
+import { useNavigate } from "react-router-dom";
+
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -13,6 +15,7 @@ export default function ViewContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+  const navigate = useNavigate();
 
   // Fetch admin data from the backend
   useEffect(() => {
@@ -43,6 +46,11 @@ export default function ViewContent() {
 
     fetchPatientData();
   }, []);
+
+  const handleCardClick = () => {
+    navigate("/patient/perform");
+  };
+
 
   return (
     <>
@@ -90,6 +98,7 @@ export default function ViewContent() {
                     <div
                       className="card exercise-container"
                       style={{ width: "18rem" }}
+                      onClick={handleCardClick}
                     >
                       <img
                         src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
@@ -109,6 +118,7 @@ export default function ViewContent() {
                     <div
                       className="card exercise-container"
                       style={{ width: "18rem" }}
+                      onClick={handleCardClick}
                     >
                       <img
                         src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
@@ -128,6 +138,7 @@ export default function ViewContent() {
                     <div
                       className="card exercise-container"
                       style={{ width: "18rem" }}
+                      onClick={handleCardClick}
                     >
                       <img
                         src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
