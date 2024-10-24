@@ -85,6 +85,7 @@ app.use((err, req, res, next) => {
 // Rooms
 let rooms = {};
 const MAX = 2;
+let currentRoom = null;
 
 const roomFullMessage = JSON.stringify({
   type: "room-full",
@@ -101,8 +102,6 @@ const userAlreadyInRoomMessage = JSON.stringify({
 try {
   // ws connection start
   wss.on("connection", (ws) => {
-    let currentRoom = null;
-
     ws.on("message", (message) => {
       const data = JSON.parse(message);
       if (data.type === "join-room") {
@@ -110,69 +109,73 @@ try {
 
         // Create room if not array rooms
         if (!rooms[currentRoom]) {
-          rooms[currentRoom] = {};
-          rooms[currentRoom].clients = [];
+          rooms[currentRoom] = {
+            users: [],
+          };
         }
 
         // Check room capacity
-        if (rooms[currentRoom].clients.length >= MAX) {
+        if (rooms[currentRoom].users.length >= MAX) {
           console.log(
-            `Room full! Capacity: ${rooms[currentRoom].clients.length}`
+            `Room full! Capacity: ${rooms[currentRoom].users.length}`
           );
+
           ws.send(roomFullMessage);
           ws.close();
         } else {
-            rooms[currentRoom].clients.push(ws);
-            console.log(
-              `Joining... Capacity: ${rooms[currentRoom].clients.length}`
-            );
-            console.log(
-              `${data.user} successfully joined room ${data.roomID}.`
-            );
-            console.log(
-              `Current clients in room ${currentRoom}:`,
-              rooms[currentRoom].clients.map((client) => client.user)
-            );
-          
+          rooms[currentRoom].users.push({
+            name: data.user,
+            connection: ws,
+          });
+
+          console.log(
+            `Joining... Capacity: ${rooms[currentRoom].users.length}`
+          );
+
+          console.log(
+            `Current users in room ${currentRoom}:`,
+            rooms[currentRoom].users.map((user) => user.name)
+          );
         }
       }
 
-      if (data.type === "message") {
+      if (data.type === "chat-message") {
         if (currentRoom) {
           const broadcastMessage = JSON.stringify({
-            type: "message",
+            type: "chat-message",
             message: data.message,
             sender: data.sender,
           });
 
-          rooms[currentRoom].clients.forEach((client) => {
-            if (client.readyState === WebSocket.OPEN) {
-              client.send(broadcastMessage);
+          console.log(`${data.sender}: ${data.message}`);
+
+          rooms[currentRoom].users.forEach((user) => {
+            if (user.connection.readyState === WebSocket.OPEN) {
+              user.connection.send(broadcastMessage);
             }
           });
         }
       }
 
       if (data.type === "leave-room") {
-        if (currentRoom) {
-          console.log(`User ${data.user} has left the room: ${currentRoom}`);
-          rooms[currentRoom].clients = rooms[currentRoom].clients.filter(
-            (client) => client !== ws
-          );
-          console.log(
-            `Updated clients in room ${currentRoom}:`,
-            rooms[currentRoom].clients.map((client) => client.user)
-          );
-        }
+        console.log(`User ${data.user} has left the room: ${currentRoom}`);
+
+        rooms[currentRoom].users = rooms[currentRoom].users.filter(
+          (client) => client.name !== data.user
+        );
+
+        console.log(
+          `Capacity in room ${currentRoom} is : ${rooms[currentRoom].users.length}
+          with users ${rooms[currentRoom].users}`
+        );
       }
 
       if (
         ["offer", "answer", "ice-candidate"].includes(data.type) &&
         currentRoom
       ) {
-        // Relay WebRTC signaling messages only to other clients in the same room
         if (currentRoom) {
-          rooms[currentRoom].clients.forEach((client) => {
+          rooms[currentRoom].users.forEach((client) => {
             if (client !== ws && client.readyState === WebSocket.OPEN) {
               client.send(JSON.stringify(data));
             }
@@ -183,17 +186,7 @@ try {
 
     ws.on("close", () => {
       // Remove the client from the room when they disconnect
-      if (currentRoom) {
-        rooms[currentRoom].clients = rooms[currentRoom].clients.filter(
-          (client) => client !== ws
-        );
-
-        // Clean up the room if it's empty
-        if (rooms[currentRoom].clients.length === 0) {
-          delete rooms[currentRoom];
-          console.log(`Room ${currentRoom} is empty and deleted`);
-        }
-      }
+      console.log(`successfully disconnected from connection`);
     });
   });
 } catch (error) {

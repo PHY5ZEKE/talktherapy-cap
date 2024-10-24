@@ -4,7 +4,6 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../../styles/containers.css";
 import "../../styles/diagnostic.css";
 
-// UI Components
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVideo,
@@ -13,7 +12,6 @@ import {
   faMicrophoneSlash,
 } from "@fortawesome/free-solid-svg-icons";
 
-// Import the voice recognition functionalities
 import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
 import { init } from "../../machinelearning/script.js";
 
@@ -25,6 +23,7 @@ const useMediaStream = (localVideoRef) => {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         localStream.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
+        console.log(localStream.current.getTracks());
       } catch (error) {
         console.error("Error accessing media devices.", error);
       }
@@ -32,13 +31,36 @@ const useMediaStream = (localVideoRef) => {
     [localVideoRef]
   );
 
+  const stopVideoStream = useCallback(() => {
+    const videoTrack = localStream.current.getVideoTracks()[0];
+    videoTrack.stop()
+
+    localStream.current?.getVideoTracks().forEach((track) => track.stop());
+    if (localVideoRef.current) localVideoRef.current.srcObject = null;
+
+    localStream.current.removeTrack(videoTrack);
+  }, [localVideoRef]);
+
+  const stopAudioStream = useCallback(() => {
+    const audioTrack = localStream.current.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+    }
+  }, []);
+
   const stopMediaStream = useCallback(() => {
     localStream.current?.getTracks().forEach((track) => track.stop());
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
     localStream.current = null;
   }, [localVideoRef]);
 
-  return { getMediaStream, stopMediaStream, localStream };
+  return {
+    getMediaStream,
+    stopMediaStream,
+    stopVideoStream,
+    stopAudioStream,
+    localStream,
+  };
 };
 
 export default function Room() {
@@ -79,8 +101,13 @@ export default function Room() {
   const role = localStorage.getItem("userRole");
   const currentUser = localStorage.getItem("userId");
 
-  const { getMediaStream, stopMediaStream, localStream } =
-    useMediaStream(localVideoRef);
+  const {
+    getMediaStream,
+    stopMediaStream,
+    stopVideoStream,
+    stopAudioStream,
+    localStream,
+  } = useMediaStream(localVideoRef);
 
   useEffect(() => {
     const initializeModel = async () => {
@@ -90,7 +117,19 @@ export default function Room() {
   }, []);
 
   useEffect(() => {
+    const initiateConnection = async () => {
+      try {
+        await pageReady();
+
+        InitializeWebSocket();
+      } catch (error) {
+        console.error("Error in pageReady:", error);
+        handleCloseConnection();
+      }
+    };
+
     setUserRole(role);
+
     if (
       (role === "patientslp" &&
         appointmentDetails?.patientId._id !== currentUser) ||
@@ -99,22 +138,20 @@ export default function Room() {
       roomid === "errorRoomId"
     ) {
       handleCloseConnection();
-      navigate("/unauthorized");
     } else {
-      pageReady();
+      initiateConnection();
     }
 
+    // Cleanup function when component unmounts
     return () => {
       if (socket.current) {
         handleCloseConnection();
-        navigate("/")
       }
     };
   }, []);
 
   const pageReady = async () => {
     await getMediaStream({ video: true, audio: true });
-    InitializeWebSocket();
   };
 
   const InitializeWebSocket = () => {
@@ -127,10 +164,7 @@ export default function Room() {
         socket.current.send(
           JSON.stringify({
             type: "join-room",
-            user:
-              userRole === "patientslp"
-                ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
-                : appointmentDetails?.selectedSchedule.clinicianName,
+            user: getUserName(),
             roomID: roomid,
           })
         );
@@ -164,7 +198,6 @@ export default function Room() {
     peerConnection.current.onicecandidate = gotIceCandidate;
     peerConnection.current.ontrack = gotRemoteStream;
 
-    console.log("Okay na!");
     localStream.current
       ?.getTracks()
       .forEach((track) =>
@@ -192,8 +225,7 @@ export default function Room() {
       processQueues();
     } else if (signal.type === "room-full") {
       handleCloseConnection();
-      navigate("/unauthorized");
-    } else if (signal.type === "message") {
+    } else if (signal.type === "chat-message") {
       setMessages((prevMessages) => {
         const messageExists = prevMessages.some(
           (msg) =>
@@ -202,7 +234,7 @@ export default function Room() {
         if (!messageExists) {
           return [
             ...prevMessages,
-            { message: signal.message, sender: signal.sender, isSent: false },
+            { message: signal.message, sender: signal.sender },
           ];
         }
         return prevMessages;
@@ -222,11 +254,9 @@ export default function Room() {
         .setRemoteDescription(new RTCSessionDescription(sdp))
         .then(() => {
           if (sdp.type === "offer") {
-            peerConnection.current
-              .createAnswer()
-              .then(createDescription)
+            peerConnection.current.createAnswer().then(createDescription);
           }
-        })
+        });
     }
 
     // Process ICE queue
@@ -235,8 +265,7 @@ export default function Room() {
       peerConnection.current.signalingState !== "closed"
     ) {
       const iceCandidate = iceQueue.current.shift();
-      peerConnection.current
-        .addIceCandidate(new RTCIceCandidate(iceCandidate))
+      peerConnection.current.addIceCandidate(new RTCIceCandidate(iceCandidate));
     }
   }
 
@@ -259,23 +288,21 @@ export default function Room() {
   };
 
   const createDescription = (description) => {
-    peerConnection.current
-      .setLocalDescription(description)
-      .then(() => {
-        if (socket.current.readyState === WebSocket.OPEN) {
-          socket.current.send(
-            JSON.stringify({
-              sdp: peerConnection.current.localDescription,
-              uuid: getUserName(),
-              type: description.type,
-            })
-          );
-        } else {
-          console.warn(
-            `WebSocket is not open (current state: ${socket.current.readyState}). Cannot send SDP.`
-          );
-        }
-      })
+    peerConnection.current.setLocalDescription(description).then(() => {
+      if (socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(
+          JSON.stringify({
+            sdp: peerConnection.current.localDescription,
+            uuid: getUserName(),
+            type: description.type,
+          })
+        );
+      } else {
+        console.warn(
+          `WebSocket is not open (current state: ${socket.current.readyState}). Cannot send SDP.`
+        );
+      }
+    });
   };
 
   const gotRemoteStream = (event) => {
@@ -284,21 +311,20 @@ export default function Room() {
   };
 
   const toggleMic = () => {
-    const audioTrack = localStream.current?.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
-      setIsMicEnabled(audioTrack.enabled);
-    }
+    stopAudioStream();
+    setIsMicEnabled(!isMicEnabled);
   };
 
   const toggleCamera = async () => {
-    isCameraEnabled ? stopMediaStream() : await getMediaStream({ video: true });
-    setIsCameraEnabled((prev) => !prev);
+    isCameraEnabled
+      ? stopVideoStream()
+      : await getMediaStream({ video: true, audio: true });
+    setIsCameraEnabled(!isCameraEnabled);
   };
 
-  const handleCloseConnection = async () => {
-    if(socket.current) {
-      socket.current?.send(
+  const handleCloseConnection = () => {
+    if (socket.current) {
+      socket.current.send(
         JSON.stringify({
           type: "leave-room",
           user: getUserName(),
@@ -308,14 +334,15 @@ export default function Room() {
       socket.current?.close();
       peerConnection.current?.close();
     }
+    navigate("/");
   };
 
-  const handleSendMessage = (message) => {
-    if (message) {
+  const handleSendMessage = (data) => {
+    if (data) {
       socket.current.send(
         JSON.stringify({
-          type: "message",
-          message,
+          type: "chat-message",
+          message: data,
           roomID: roomid,
           sender: getUserName(),
         })
@@ -349,7 +376,7 @@ export default function Room() {
         <div className="row justify-content-center-md mx-auto w-100 vh-100">
           <div className="col-sm">
             <video
-              muted
+              
               ref={localVideoRef}
               className="mx-auto video-local bg-black"
               autoPlay
@@ -371,7 +398,6 @@ export default function Room() {
             <button
               onClick={() => {
                 handleCloseConnection();
-                navigate("/");
               }}
               type="submit"
               className="text-button border"
@@ -500,7 +526,7 @@ export default function Room() {
 
                   {/* INPUT CHAT */}
                   <form
-                    className="input-group my-3"
+                    className="input-group my-3 p-3"
                     onSubmit={(e) => {
                       e.preventDefault();
                       handleSendMessage(type);
