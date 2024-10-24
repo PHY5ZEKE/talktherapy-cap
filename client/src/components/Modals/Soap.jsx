@@ -1,9 +1,8 @@
 import { useState } from "react";
 import "./modal.css";
-import Calendar from "../../assets/icons/Calendar";
 import { route } from "../../utils/route";
 
-export default function Soap({ openModal, clinicianId, patientId }) {
+export default function Soap({ openModal, clinicianId, clinicianName, patientId }) {
   const [date, setDate] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
   const appURL = import.meta.env.VITE_APP_URL;
@@ -22,8 +21,6 @@ export default function Soap({ openModal, clinicianId, patientId }) {
       date,
       diagnosis,
     };
-
-    console.log("Submitting SOAP data:", soapData); // Log the request payload
 
     try {
       const token = localStorage.getItem("accessToken");
@@ -73,14 +70,14 @@ export default function Soap({ openModal, clinicianId, patientId }) {
 
               <div className="col">
                 <p className="fw-bold mb-0">Attending Clinician</p>
-                <p>Dr. Dela Cruz Reyes</p>
+                <p>Dr. {clinicianName}</p>
               </div>
             </div>
           </div>
 
-          <div className="container d-flex justify-content-center">
-            <form className="container" onSubmit={handleSubmit}>
-              <p className="text-center">Diagnosis</p>
+          <div className="d-flex justify-content-center">
+            <form className="container w-100" onSubmit={handleSubmit}>
+              <p className="fw-bold text-center mb-1">Diagnosis</p>
               <textarea
                 className="form-control"
                 aria-label="With textarea"

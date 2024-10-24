@@ -1,25 +1,26 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
-
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
+import RequestView from "../../components/Modals/RequestView";
 
 // Utils
 import { route } from "../../utils/route";
-import { page } from "../../utils/page-route"
+import { page } from "../../utils/page-route";
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 export default function Profile() {
   const [adminData, setAdminData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const [isViewRequests, setIsViewRequests] = useState(false);
 
   const failNotify = (message) =>
     toast.error(message, {
@@ -58,8 +59,8 @@ export default function Profile() {
       setAdminData(data.admin);
       setLoading(false);
     } catch (error) {
-      failNotify(toastMessage.fail.fetch)
-      failNotify(toastMessage.fail.error)
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
       setError(error.message);
       setLoading(false);
     }
@@ -165,12 +166,17 @@ export default function Profile() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-
                     <Link to={page.admin.archival}>
                       <div className="mb-3 fw-bold text-button border w-100">
                         Archival
                       </div>
                     </Link>
+
+                    <div
+                    onClick={() => setIsViewRequests(true)}
+                    className="mb-3 fw-bold text-button border w-100">
+                      Clinician Requests
+                    </div>
 
                     <div
                       className="mb-3 fw-bold text-button border w-100"
@@ -190,7 +196,33 @@ export default function Profile() {
               </div>
 
               {/* THIRD COL */}
-              <div className="col-sm bg-white"></div>
+              <div className="col-sm bg-white">
+                {isViewRequests && (
+                  <>
+                    <div className="row p-3">
+                      <div className="col bg-white border rounded-4 p-3">
+                        <p className="mb-0 fw-bold">View Clinician Requests</p>
+                        <p className="mb-0">
+                          All clinician requests for access to patient records.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="row p-3">
+                      <div
+                        className="col bg-white border rounded-4 p-3 overflow-auto"
+                        style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                      >
+                        <RequestView
+                          header={"Dr. Rico Nieto - Access Request"}
+                          details={
+                            "Ito reason ko aha! Uh u can include the patient name na din"
+                          }
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
           </div>
         </div>

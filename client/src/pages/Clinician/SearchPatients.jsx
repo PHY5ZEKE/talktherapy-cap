@@ -7,17 +7,31 @@ import { toast, Slide } from "react-toastify";
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 import Soap from "../../components/Modals/Soap";
+import ViewProgress from "../../components/Modals/ViewProgress";
+import ViewRecord from "../../components/Modals/ViewRecord";
+import RequestAccess from "../../components/Modals/RequestAccess";
+
+const VIEW_MODES = {
+  NONE: "NONE",
+  RECORDS: "RECORDS",
+  PROGRESS: "PROGRESS",
+};
 
 export default function ManageSchedule() {
+  const appURL = import.meta.env.VITE_APP_URL;
+
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
   const [assignedPatients, setAssignedPatients] = useState([]);
+  const [clinicianData, setClinicianData] = useState(null);
+
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [clinicianData, setClinicianData] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const appURL = import.meta.env.VITE_APP_URL;
+
+  const [viewMode, setViewMode] = useState(VIEW_MODES.NONE);
 
   const failNotify = (message) =>
     toast.error(message, {
@@ -25,10 +39,15 @@ export default function ManageSchedule() {
       autoClose: 2000,
     });
 
-  // Modal
+  //  Request Access Modal
+  const [isRequestAccess, setIsRequestAccess] = useState(false);
+  const openRequestAccess = () => {
+    setIsRequestAccess((prevState) => !prevState);
+  };
+  // Add SOAP Modal
   const [showModal, setShowModal] = useState(false);
   const handleOpen = () => {
-    setShowModal(!showModal);
+    setShowModal((prevState) => !prevState);
   };
 
   useEffect(() => {
@@ -165,13 +184,18 @@ export default function ManageSchedule() {
 
   return (
     <>
+      {/* Add SOAP Modal */}
       {showModal && (
         <Soap
           openModal={handleOpen}
           clinicianId={clinicianData?._id}
+          clinicianName={`${clinicianData?.firstName} ${clinicianData?.lastName}`}
           patientId={selectedPatient?._id}
         />
       )}
+
+      {/* Request Access Modal */}
+      {isRequestAccess && <RequestAccess openModal={openRequestAccess} />}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -222,7 +246,7 @@ export default function ManageSchedule() {
                         <div
                           key={patient._id}
                           onClick={() => handleClinicianClick(patient)}
-                          className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          className="mb-3 border border-top-0 border-start-0 border-end-0"
                           style={{ cursor: "pointer" }}
                         >
                           <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.lastName}`}</h5>
@@ -289,10 +313,20 @@ export default function ManageSchedule() {
                                 >
                                   Add SOAP
                                 </button>
-                                <button className="text-button border w-100">
+                                <button
+                                  onClick={() =>
+                                    setViewMode(VIEW_MODES.PROGRESS)
+                                  }
+                                  className="text-button border w-100"
+                                >
                                   View Progress
                                 </button>
-                                <button className="text-button border w-100">
+                                <button
+                                  onClick={() =>
+                                    setViewMode(VIEW_MODES.RECORDS)
+                                  }
+                                  className="text-button border w-100"
+                                >
                                   View Records
                                 </button>
                                 <button className="text-button border w-100">
@@ -300,7 +334,10 @@ export default function ManageSchedule() {
                                 </button>
                               </>
                             ) : (
-                              <button className="text-button border w-100">
+                              <button
+                                onClick={openRequestAccess}
+                                className="text-button border w-100"
+                              >
                                 Request Access
                               </button>
                             )}
@@ -331,32 +368,21 @@ export default function ManageSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh", minHeight: "60vh" }}
                   >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-pending">PENDING</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-accepted">ACCEPTED</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-cancelled">CANCELLED</div>
-                    </div>
+                    {viewMode === VIEW_MODES.RECORDS ? (
+                      <ViewRecord
+                        header="Diagnosis - Clinician - Date"
+                        details="Sample diagnosis details"
+                      />
+                    ) : viewMode === VIEW_MODES.PROGRESS ? (
+                      <ViewProgress
+                        header="Exercise - Progress"
+                        details="Sample progress details"
+                      />
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        Select an option to view related information.
+                      </h5>
+                    )}
                   </div>
                 </div>
               </div>
