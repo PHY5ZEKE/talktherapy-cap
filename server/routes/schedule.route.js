@@ -10,11 +10,10 @@ router.delete(
   verifyToken,
   scheduleController.deleteSchedule
 );
-router.get(
-  "/edit-schedules/:id",
-  verifyToken,
-  scheduleController.deleteSchedule
-);
+
+router.get("/get-schedule/:id", scheduleController.getScheduleById);
+
+router.put("/edit-schedule/:id", verifyToken, scheduleController.editSchedule);
 
 // PATIENT GET
 router.get(

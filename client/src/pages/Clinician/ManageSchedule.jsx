@@ -1,6 +1,6 @@
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
@@ -12,6 +12,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import AddSchedule from "../../components/Modals/AddSchedule";
+import EditSchedule from "../../components/Modals/EditSchedule"; // Import the EditSchedule component
 
 export default function ManageSchedule() {
   // DatePicker Instance
@@ -36,19 +37,67 @@ export default function ManageSchedule() {
     });
 
   // Handle Add Schedule Modal Open
-  const [isOpen, setIsOpen] = useState(false);
+  const [isAddOpen, setIsAddOpen] = useState(false);
   const handleAdd = useCallback(() => {
-    setIsOpen((prevIsOpen) => !prevIsOpen);
+    setIsAddOpen((prevIsOpen) => !prevIsOpen);
   }, []);
 
   const handleScheduleAdded = useCallback((newSchedule) => {
-    notify(toastMessage.success.addSchedule)
+    notify(toastMessage.success.addSchedule);
     setSchedules((prevSchedules) => [...prevSchedules, newSchedule]);
   }, []);
 
   const handleDateChange = useCallback((date) => {
     setStartDate(date);
     setSelectedDate(date);
+  }, []);
+
+  // Handle Edit Schedule Modal Open
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [selectedScheduleId, setSelectedScheduleId] = useState(null);
+
+  const handleEdit = useCallback((scheduleId) => {
+    setSelectedScheduleId(scheduleId);
+    setIsEditOpen(true);
+  }, []);
+
+  const handleScheduleUpdated = useCallback((updatedSchedule) => {
+    notify(toastMessage.success.editSchedule);
+    setSchedules((prevSchedules) =>
+      prevSchedules.map((schedule) =>
+        schedule._id === updatedSchedule._id ? updatedSchedule : schedule
+      )
+    );
+    setIsEditOpen(false);
+  }, []);
+
+  const handleDelete = useCallback(async (scheduleId) => {
+    const token = localStorage.getItem("accessToken"); // Adjust this to where your token is stored (e.g., sessionStorage, cookies)
+
+    try {
+      const response = await fetch(
+        `${appURL}/${route.schedule.delete}/${scheduleId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete schedule");
+      }
+
+      notify(toastMessage.success.deleteSchedule);
+      setSchedules((prevSchedules) =>
+        prevSchedules.filter((schedule) => schedule._id !== scheduleId)
+      );
+    } catch (error) {
+      failNotify(toastMessage.fail.error);
+      setError(error.message);
+    }
   }, []);
 
   useEffect(() => {
@@ -72,7 +121,7 @@ export default function ManageSchedule() {
         setClinicianData(data.clinician);
         setLoading(false);
       } catch (error) {
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.error);
         setError(error.message);
         setLoading(false);
       }
@@ -95,7 +144,7 @@ export default function ManageSchedule() {
         const data = await response.json();
         setSchedules(data);
       } catch (error) {
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.error);
         setError(error.message);
       }
     };
@@ -129,10 +178,19 @@ export default function ManageSchedule() {
   return (
     <>
       {/* Add Schedule Modal */}
-      {isOpen && (
+      {isAddOpen && (
         <AddSchedule
           closeModal={handleAdd}
           onScheduleAdded={handleScheduleAdded}
+        />
+      )}
+
+      {/* Edit Schedule Modal */}
+      {isEditOpen && (
+        <EditSchedule
+          closeModal={() => setIsEditOpen(false)}
+          onScheduleUpdated={handleScheduleUpdated}
+          scheduleId={selectedScheduleId}
         />
       )}
 
@@ -239,9 +297,22 @@ export default function ManageSchedule() {
                             </p>
                           </div>
 
-                          <div className="mb-3 fw-bold text-button border">
-                            Edit
-                          </div>
+                          {schedule.status !== "Booked" && (
+                            <>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() => handleEdit(schedule._id)}
+                              >
+                                Edit
+                              </div>
+                              <div
+                                className="mb-3 fw-bold text-button border"
+                                onClick={() => handleDelete(schedule._id)}
+                              >
+                                Delete
+                              </div>
+                            </>
+                          )}
                         </div>
                       ))
                     )}

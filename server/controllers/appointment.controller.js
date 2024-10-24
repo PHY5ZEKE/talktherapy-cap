@@ -257,17 +257,26 @@ exports.getAllAppointments = async (req, res) => {
     const decryptedAppointments = appointments.map((appointment) => {
       if (appointment.patientId) {
         try {
-          if (appointment.patientId.firstName) {
+          if (
+            appointment.patientId.firstName &&
+            appointment.patientId.firstName.includes(":")
+          ) {
             appointment.patientId.firstName = decrypt(
               appointment.patientId.firstName
             );
           }
-          if (appointment.patientId.middleName) {
+          if (
+            appointment.patientId.middleName &&
+            appointment.patientId.middleName.includes(":")
+          ) {
             appointment.patientId.middleName = decrypt(
               appointment.patientId.middleName
             );
           }
-          if (appointment.patientId.lastName) {
+          if (
+            appointment.patientId.lastName &&
+            appointment.patientId.lastName.includes(":")
+          ) {
             appointment.patientId.lastName = decrypt(
               appointment.patientId.lastName
             );
@@ -314,17 +323,26 @@ exports.getPatientAppointment = async (req, res) => {
     const decryptedAppointments = appointments.map((appointment) => {
       if (appointment.patientId) {
         try {
-          if (appointment.patientId.firstName) {
+          if (
+            appointment.patientId.firstName &&
+            appointment.patientId.firstName.includes(":")
+          ) {
             appointment.patientId.firstName = decrypt(
               appointment.patientId.firstName
             );
           }
-          if (appointment.patientId.middleName) {
+          if (
+            appointment.patientId.middleName &&
+            appointment.patientId.middleName.includes(":")
+          ) {
             appointment.patientId.middleName = decrypt(
               appointment.patientId.middleName
             );
           }
-          if (appointment.patientId.lastName) {
+          if (
+            appointment.patientId.lastName &&
+            appointment.patientId.lastName.includes(":")
+          ) {
             appointment.patientId.lastName = decrypt(
               appointment.patientId.lastName
             );

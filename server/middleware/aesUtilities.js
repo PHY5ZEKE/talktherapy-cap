@@ -12,17 +12,33 @@ const encrypt = (text) => {
 };
 
 const decrypt = (text) => {
-  const textParts = text.split(":");
-  const iv = Buffer.from(textParts.shift(), "hex");
-  const encryptedText = Buffer.from(textParts.join(":"), "hex");
-  const decipher = crypto.createDecipheriv(
-    algorithm,
-    Buffer.from(secretKey),
-    iv
-  );
-  let decrypted = decipher.update(encryptedText);
-  decrypted = Buffer.concat([decrypted, decipher.final()]);
-  return decrypted.toString();
+  try {
+    const textParts = text.split(":");
+    if (textParts.length !== 2) {
+      console.error(`Invalid encrypted text format: ${text}`);
+      throw new Error("Invalid encrypted text format");
+    }
+
+    const iv = Buffer.from(textParts.shift(), "hex");
+    const encryptedText = Buffer.from(textParts.join(":"), "hex");
+
+    if (iv.length !== 16) {
+      console.error(`Invalid IV length for text: ${text}`);
+      throw new Error("Invalid IV length");
+    }
+
+    const decipher = crypto.createDecipheriv(
+      algorithm,
+      Buffer.from(secretKey),
+      iv
+    );
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
+  } catch (error) {
+    console.error("Error decrypting text:", error);
+    throw error;
+  }
 };
 
 module.exports = { encrypt, decrypt };

@@ -69,6 +69,7 @@ export const route = {
   schedule: {
     create: "api/schedule-slp/add-schedule",
     get: "api/schedule-slp/get-schedules",
+    getScheduleById: "api/schedule-slp/get-schedule",
     edit: "api/schedule-slp/edit-schedule",
     delete: "api/schedule-slp/delete-schedule",
     clinician: "api/schedule-slp/clinician-schedules",
