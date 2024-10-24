@@ -89,7 +89,7 @@ export default function Home() {
 
   // Handle Appointment Details Modal
 
-  console.log(appointments)
+  console.log(appointments);
   return (
     <>
       <div className="container-fluid p-0 vh-100">
@@ -179,10 +179,7 @@ export default function Home() {
                                 <div
                                   className="mb-3 fw-bold text-button border"
                                   onClick={() =>
-                                    joinMeeting(
-                                      appointment.roomId,
-                                      appointment
-                                    )
+                                    joinMeeting(appointment.roomId, appointment)
                                   }
                                 >
                                   Join

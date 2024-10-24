@@ -310,24 +310,35 @@ exports.getPatientAppointment = async (req, res) => {
       },
     ]);
 
-    // Decrpyt patient name
-    appointments.forEach((appointment) => {
+    // Decrypt patient details
+    const decryptedAppointments = appointments.map((appointment) => {
       if (appointment.patientId) {
-        appointment.patientId.firstName = decrypt(
-          appointment.patientId.firstName
-        );
-        appointment.patientId.middleName = decrypt(
-          appointment.patientId.middleName
-        );
-        appointment.patientId.lastName = decrypt(
-          appointment.patientId.lastName
-        );
+        try {
+          if (appointment.patientId.firstName) {
+            appointment.patientId.firstName = decrypt(
+              appointment.patientId.firstName
+            );
+          }
+          if (appointment.patientId.middleName) {
+            appointment.patientId.middleName = decrypt(
+              appointment.patientId.middleName
+            );
+          }
+          if (appointment.patientId.lastName) {
+            appointment.patientId.lastName = decrypt(
+              appointment.patientId.lastName
+            );
+          }
+        } catch (decryptError) {
+          console.error("Error decrypting patient details:", decryptError);
+        }
       }
+      return appointment;
     });
 
-    res.status(200).json(appointments);
+    res.status(200).json(decryptedAppointments);
   } catch (error) {
-    console.error("Error fetching patient appointments:", error);
+    console.error("Error fetching appointments:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
