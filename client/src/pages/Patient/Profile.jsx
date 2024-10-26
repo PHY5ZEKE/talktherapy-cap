@@ -58,6 +58,15 @@ export default function Profile() {
     fetchPatientData();
   }, []);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
   return (
     <>
       {/* EDIT MODAL */}
@@ -131,8 +140,8 @@ export default function Profile() {
                           {patientData?.firstName} {patientData?.middleName}{" "}
                           {patientData?.lastName}
                         </h5>
-                        <p className="mb-0">{patientData?.diagnosis}</p>
-                        <p className="mb-0">{patientData?.birthday}</p>
+                        <p className="mb-0">{patientData?.diagnosis} Patient</p>
+                        <p className="mb-0">{formatDate(patientData?.birthday)}</p>
                         <p className="mb-0">{patientData?.mobile}</p>
                         <p className="mb-0">{patientData?.email}</p>
                       </div>

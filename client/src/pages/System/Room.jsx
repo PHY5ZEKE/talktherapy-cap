@@ -34,7 +34,7 @@ const useMediaStream = (localVideoRef) => {
 
   const stopVideoStream = useCallback(() => {
     const videoTrack = localStream.current.getVideoTracks()[0];
-    videoTrack.stop()
+    videoTrack.stop();
 
     localStream.current?.getVideoTracks().forEach((track) => track.stop());
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
@@ -65,7 +65,7 @@ const useMediaStream = (localVideoRef) => {
 };
 
 export default function Room() {
-  const { authState, userState } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const role = authState.userRole;
   const currentUser = authState.userId;
 
@@ -144,11 +144,20 @@ export default function Room() {
       initiateConnection();
     }
 
+    const handleBeforeUnload = () => {
+      if (socket.current) {
+        handleCloseConnection();
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     // Cleanup function when component unmounts
     return () => {
       if (socket.current) {
         handleCloseConnection();
       }
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
@@ -378,9 +387,9 @@ export default function Room() {
         <div className="row justify-content-center-md mx-auto w-100 vh-100">
           <div className="col-sm">
             <video
-              
               ref={localVideoRef}
               className="mx-auto video-local bg-black"
+              muted
               autoPlay
             />
           </div>

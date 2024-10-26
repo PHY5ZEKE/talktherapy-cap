@@ -89,9 +89,6 @@ export default function Home() {
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Handle Appointment Details Modal
-
-  console.log(appointments);
   return (
     <>
       <div className="container-fluid p-0 vh-100">

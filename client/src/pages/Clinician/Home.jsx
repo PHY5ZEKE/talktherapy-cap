@@ -450,7 +450,11 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <h5 className="text-center fw-bold mb-0">No new notif.</h5>
+                    {appointments.length === 0 && (
+                      <h5 className="text-center fw-bold mb-0">
+                        No appointments for today.
+                      </h5>
+                    )}
 
                     {appointments.map((appointment) => (
                       <div
@@ -464,7 +468,7 @@ export default function Home() {
                           {new Date(appointment.createdAt).toLocaleTimeString()}
                         </p>
                         <p className="mb-3">
-                          Session of Dr. {appointment.selectedClinician} with{" "}
+                          Session of Dr. {appointment.selectedSchedule.clinicianName} with{" "}
                           {appointment.patientId.firstName}{" "}
                           {appointment.patientId.lastName} has started.
                         </p>
