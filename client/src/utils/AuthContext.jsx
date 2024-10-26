@@ -1,24 +1,28 @@
 import { createContext, useState, useEffect } from "react";
+import { encrypt, decrypt } from './aesUtilities';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const initialAuthState = {
-    accessToken: localStorage.getItem('accessToken'),
-    userRole: localStorage.getItem('userRole'),
-    userId: localStorage.getItem('userId'),
+    accessToken: localStorage.getItem('accessToken') ? decrypt(localStorage.getItem('accessToken')) : null,
+    userRole: localStorage.getItem('userRole') ? decrypt(localStorage.getItem('userRole')) : null,
+    userId: localStorage.getItem('userId') ? decrypt(localStorage.getItem('userId')) : null,
   };
 
   const [authState, setAuthState] = useState(initialAuthState);
 
   const setAuthInfo = (accessToken, userRole) => {
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('userRole', userRole);
+    const encryptedAccessToken = encrypt(accessToken);
+    const encryptedUserRole = encrypt(userRole);
+    localStorage.setItem('accessToken', encryptedAccessToken);
+    localStorage.setItem('userRole', encryptedUserRole);
     setAuthState({ ...authState, accessToken, userRole });
   };
 
   const setUserId = (userId) => {
-    localStorage.setItem('userId', userId);
+    const encryptedUserId = encrypt(userId);
+    localStorage.setItem('userId', encryptedUserId);
     setAuthState({ ...authState, userId });
   };
 
@@ -26,13 +30,14 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
-    setAuthState({ accessToken: null, userRole: null, userId: null });  };
+    setAuthState({ accessToken: null, userRole: null, userId: null });
+  };
 
   useEffect(() => {
     const storedAuthState = {
-      accessToken: localStorage.getItem('accessToken'),
-      userRole: localStorage.getItem('userRole'),
-      userId: localStorage.getItem('userId'),
+      accessToken: localStorage.getItem('accessToken') ? decrypt(localStorage.getItem('accessToken')) : null,
+      userRole: localStorage.getItem('userRole') ? decrypt(localStorage.getItem('userRole')) : null,
+      userId: localStorage.getItem('userId') ? decrypt(localStorage.getItem('userId')) : null,
     };
     setAuthState(storedAuthState);
   }, []);
