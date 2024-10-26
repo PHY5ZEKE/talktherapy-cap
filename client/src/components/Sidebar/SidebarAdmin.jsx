@@ -16,12 +16,12 @@ import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 export default function Sidebar() {
-  const { clearOnLogout } = useContext(AuthContext);
+  const { clearOnLogOut } = useContext(AuthContext);
   
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    clearOnLogout();
+    clearOnLogOut();
 
     // Redirect to the login page
     navigate("/login");

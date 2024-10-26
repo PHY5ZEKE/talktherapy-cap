@@ -7,7 +7,7 @@ import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 // DatePicker
-import { useState, useEffect, useCallback, useMemom, useContext } from "react";
+import { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

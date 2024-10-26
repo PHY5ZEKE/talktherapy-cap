@@ -21,7 +21,7 @@ import { route } from "../../utils/route";
 const appURL = import.meta.env.VITE_APP_URL;
 
 export default function Home() {
-  const { authState, setUserState } = useContext(AuthContext);
+  const { authState, setUserId } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [appointments, setAppointments] = useState([]);
@@ -113,7 +113,7 @@ export default function Home() {
 
         const data = await response.json();
         setClinicianData(data.clinician);
-        setUserState(data.clinician._id);
+        setUserId(data.clinician._id);
         setLoading(false);
       } catch (error) {
         setError(error.message);

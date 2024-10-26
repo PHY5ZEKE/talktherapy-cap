@@ -25,7 +25,6 @@ const useMediaStream = (localVideoRef) => {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         localStream.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
-        console.log(localStream.current.getTracks());
       } catch (error) {
         console.error("Error accessing media devices.", error);
       }
@@ -68,7 +67,7 @@ const useMediaStream = (localVideoRef) => {
 export default function Room() {
   const { authState, userState } = useContext(AuthContext);
   const role = authState.userRole;
-  const currentUser = userState.id;
+  const currentUser = authState.userId;
 
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
