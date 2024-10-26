@@ -13,7 +13,7 @@ import "../../styles/text.css";
 export default function Home() {
   const appURL = import.meta.env.VITE_APP_URL;
 
-  const { authState, setUserState } = useContext(AuthContext);
+  const { authState, setUserId } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
@@ -50,7 +50,7 @@ export default function Home() {
         const appointmentsData = await appointmentsRes.json();
 
         setPatientData(patientData.patient);
-        setUserState(patientData.patient._id);
+        setUserId(patientData.patient._id);
         setAppointments(appointmentsData);
         setLoading(false);
       } catch (error) {

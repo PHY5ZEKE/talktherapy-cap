@@ -1,6 +1,9 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
@@ -227,12 +230,12 @@ export default function ManageSchedule() {
             <div className="row h-100">
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">List of Patients</p>
+                  <div className="col d-flex align-items-center gap-3 bg-white border rounded-4 p-3">
+                  <FontAwesomeIcon icon={faMagnifyingGlass} />
                     <input
-                      type="text"
+                      type="text "
                       placeholder="Search for patient"
-                      className="search-input rounded-3"
+                      className="search-input rounded-3 w-100"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -369,7 +372,7 @@ export default function ManageSchedule() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                    style={{ maxHeight: "75vh" }}
                   >
                     {viewMode === VIEW_MODES.RECORDS ? (
                       <ViewRecord

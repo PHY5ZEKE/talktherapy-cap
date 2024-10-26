@@ -17,6 +17,9 @@ import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
 import { useState, useEffect, useCallback, useMemo, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStethoscope } from "@fortawesome/free-solid-svg-icons";
+
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -425,6 +428,7 @@ export default function BookSchedule() {
                               {schedule.startTime} - {schedule.endTime}
                             </h5>
                             <h6 className="fw-bold mb-0">
+                              <FontAwesomeIcon icon={faStethoscope} size="xs" /> {" "}
                               {schedule.clinicianName}
                             </h6>
                             <p className="mb-0">{schedule.day}</p>

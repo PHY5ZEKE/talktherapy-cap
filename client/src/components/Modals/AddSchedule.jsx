@@ -98,7 +98,11 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
             <div className="container row text-center scrollable-table">
               <div className="col">
                 <p className="mb-0">Day</p>
-                <select value={selectedWeekday} onChange={handleWeekdayChange}>
+                <select
+                  className="schedule-options rounded-3 p-3"
+                  value={selectedWeekday}
+                  onChange={handleWeekdayChange}
+                >
                   {weekdays.map((weekday) => (
                     <option key={weekday} value={weekday}>
                       {weekday}
@@ -110,6 +114,7 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
               <div className="col">
                 <p className="mb-0">Start Time</p>
                 <input
+                  className="schedule-time rounded-3 p-3"
                   type="time"
                   value={startTime}
                   onChange={handleStartTimeChange}
@@ -117,6 +122,7 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
                 />
                 <p className="mb-0">End Time</p>
                 <input
+                  className="schedule-time rounded-3 p-3"
                   type="time"
                   value={endTime}
                   onChange={handleEndTimeChange}

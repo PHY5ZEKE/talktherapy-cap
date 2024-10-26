@@ -216,8 +216,8 @@ export default function ClinicianRegister() {
               <div className="col-sm d-flex flex-column mb-3">
                 <p className="mb-0 fw-bold">Birthday</p>
                 <input
-                  type="date"
                   aria-label="Date"
+                  type="date"
                   name="birthday"
                   value={formData.birthday}
                   onChange={handleChange}

@@ -68,16 +68,16 @@ export default function AuditLogs() {
         } else if (response.status === 401) {
           setError("Unauthorized. Please log in again.");
           clearOnLogOut();
-          failNotify(toastMessage.fail.unauthorized)
-          nav("/unauthorized")
+          failNotify(toastMessage.fail.unauthorized);
+          nav("/unauthorized");
         } else {
           const errorText = await response.text();
-          failNotify(toastMessage.fail.error)
-          failNotify(toastMessage.fail.fetch)
+          failNotify(toastMessage.fail.error);
+          failNotify(toastMessage.fail.fetch);
           setError("Failed to fetch data.", errorText);
         }
       } catch (error) {
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.error);
         setError("Error in fetching data.", error);
       }
     };
@@ -109,12 +109,12 @@ export default function AuditLogs() {
         setAuditLogs(data.auditLogs);
       } else {
         const errorText = await response.text();
-        failNotify(toastMessage.fail.fetch)
+        failNotify(toastMessage.fail.fetch);
         setError("Failed to fetch audit logs", errorText);
       }
     } catch (error) {
-      failNotify(toastMessage.fail.fetch)
-      failNotify(toastMessage.fail.error)
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
       setError("Error fetching audit logs", error);
     }
   };
@@ -173,14 +173,22 @@ export default function AuditLogs() {
                         </p>
                       </div>
 
-                      <DatePicker
+                      <input
+                        aria-label="Date"
+                        type="date"
+                        name="birthday"
+                        selected={selectedDate}
+                        onChange={handleDateChange}
+                        className="form-input rounded"
+                      />
+
+                      {/* <DatePicker
                         className="calendar text-center"
                         showIcon
                         selected={selectedDate}
-                        onChange={handleDateChange}
                         icon={Icon}
                         dateFormat={"yyyy/MM/dd"}
-                      />
+                      /> */}
                     </div>
                   </div>
                 </div>

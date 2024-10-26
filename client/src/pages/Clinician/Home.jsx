@@ -216,6 +216,12 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
+                    {appointments.length === 0 && (
+                      <h5 className="text-center fw-bold mb-0">
+                        No appointments for today.
+                      </h5>
+                    )}
+
                     {appointments
                       .filter(
                         (appointment) => appointment.status === "Accepted"
@@ -257,10 +263,7 @@ export default function Home() {
                               <button
                                 className="mb-3 text-button border"
                                 onClick={() =>
-                                  joinMeeting(
-                                    appointment.roomId,
-                                    appointment
-                                  )
+                                  joinMeeting(appointment.roomId, appointment)
                                 }
                               >
                                 Join
@@ -447,6 +450,8 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
+                    <h5 className="text-center fw-bold mb-0">No new notif.</h5>
+
                     {appointments.map((appointment) => (
                       <div
                         key={appointment._id}

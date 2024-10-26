@@ -2,6 +2,9 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
@@ -134,9 +137,13 @@ export default function FeedbackDiagnosis() {
               </div>
               <div className="col-sm-8 bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Search</p>
-                    <p className="mb-0">.</p>
+                  <div className="col d-flex align-items-center gap-3 bg-white border rounded-4 p-3">
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
+                    <input
+                      type="text "
+                      placeholder="Search for your records"
+                      className="search-input rounded-3 w-100"
+                    />
                   </div>
                 </div>
                 <div className="row p-3">

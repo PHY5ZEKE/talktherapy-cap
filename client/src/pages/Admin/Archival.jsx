@@ -88,11 +88,11 @@ export default function Archival() {
                         <p className="mb-0">Date Here</p>
                       </div>
 
-                      <DatePicker
-                        className="calendar text-center"
-                        showIcon
-                        icon={Icon}
-                        dateFormat={"yyyy/MM/dd"}
+                      <input
+                        aria-label="Date"
+                        type="date"
+                        name="birthday"
+                        className="form-input rounded"
                       />
 
                       <div className="d-flex gap-3">
