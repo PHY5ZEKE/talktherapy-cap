@@ -358,7 +358,7 @@ export default function Home() {
                         className="mb-3 border border border-top-0 border-start-0 border-end-0"
                       >
                         <p className="mb-0 fw-bold">{notification.body}</p>
-                        <p className="mb-0">{notification.date}</p>
+                        <p className="mb-0">{notification.dateTime}</p>
                       </div>
                     ))}
 
