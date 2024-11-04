@@ -24,6 +24,8 @@ export const route = {
     picture: "api/admin-slp/update-profile-picture",
     editClinician: "api/admin-slp/edit-clinician",
     editPatient: "api/admin-slp/edit-patient",
+    pendingRequests: "api/admin-slp/pending-requests",
+    updateRequestStatus: "api/admin-slp/update-request-status",
   },
   clinician: {
     addClinician: "api/clinician-slp/add-clinician",
@@ -37,6 +39,7 @@ export const route = {
     getPatientById: "api/clinician-slp/getPatientById/",
     picture: "api/clinician-slp/update-profile-picture",
     getAssignedPatients: "api/clinician-slp/get-assigned-patients",
+    requestAccess: "api/clinician-slp/request-access",
   },
   patient: {
     deactivate: "api/patient-SLP/remove-slp-patient",

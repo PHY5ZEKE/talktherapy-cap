@@ -279,7 +279,15 @@ export default function ManageSchedule() {
       )}
 
       {/* Request Access Modal */}
-      {isRequestAccess && <RequestAccess openModal={openRequestAccess} />}
+
+      {isRequestAccess && (
+        <RequestAccess
+          openModal={openRequestAccess}
+          clinicianId={clinicianData?._id}
+          patientId={selectedPatient?._id}
+          accessToken={accessToken}
+        />
+      )}
 
       {/*Edit Soap Modal */}
       {editSoapRecord && (
@@ -471,7 +479,7 @@ export default function ManageSchedule() {
                             } ${record.clinician.lastName}`}
                             details={`Diagnosis: ${record.diagnosis}`}
                             onDelete={() => handleDeleteSoapRecord(record._id)}
-                            onEdit={() => setEditSoapRecord(record)}
+                            onEdit={() => setEditSoapRecord(record)} // Add this line
                           />
                         ))}
                       </div>

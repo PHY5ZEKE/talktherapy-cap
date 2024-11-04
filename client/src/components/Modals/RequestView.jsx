@@ -1,4 +1,48 @@
-export default function ViewProgress({ header, details }) {
+import { useState, useContext } from "react";
+import { toast } from "react-toastify";
+import { route } from "../../utils/route";
+import { AuthContext } from "../../utils/AuthContext";
+
+export default function RequestView({
+  header,
+  details,
+  requestId,
+  onStatusChange,
+}) {
+  const [loading, setLoading] = useState(false);
+  const { authState } = useContext(AuthContext);
+  const appURL = import.meta.env.VITE_APP_URL;
+  const accessToken = authState.accessToken;
+
+  const handleStatusChange = async (status) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${appURL}/${route.admin.updateRequestStatus}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ requestId, status }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to update status");
+      }
+
+      const data = await response.json();
+      toast.success(data.message);
+      onStatusChange(requestId, status);
+    } catch (error) {
+      toast.error("Failed to update status");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <details className="accordion mb-3 border border rounded-3">
       <summary className="open:bg-danger p-3 rounded-top-3">{header}</summary>
@@ -6,8 +50,20 @@ export default function ViewProgress({ header, details }) {
       <p className="px-3 mt-3">{details}</p>
 
       <div className="d-flex gap-3 m-3 border border-bottom-0 border-start-0 border-end-0">
-        <p className="fw-bold mt-3 mb-0 text-button border">Accept</p>
-        <p className="fw-bold mt-3 mb-0 text-button border">Reject</p>
+        <p
+          className="fw-bold mt-3 mb-0 text-button border"
+          onClick={() => handleStatusChange("Assigned")}
+          disabled={loading}
+        >
+          Accept
+        </p>
+        <p
+          className="fw-bold mt-3 mb-0 text-button border"
+          onClick={() => handleStatusChange("Denied")}
+          disabled={loading}
+        >
+          Reject
+        </p>
       </div>
     </details>
   );

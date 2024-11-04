@@ -1,5 +1,6 @@
 const Admin = require("../models/adminSLP.model");
 const Clinician = require("../models/clinicianSLP.model");
+const AssignmentSLP = require("../models/assignmentSLP.model");
 const Patient = require("../models/patientSlp.model");
 const jwt = require("jsonwebtoken");
 const {
@@ -754,3 +755,48 @@ exports.editClinician = [
     }
   },
 ];
+
+exports.getPendingRequests = async (req, res) => {
+  try {
+    const pendingRequests = await AssignmentSLP.find({
+      status: "Pending",
+    }).populate("clinicianId patientId");
+
+    // Decrypt patient names
+    pendingRequests.forEach((request) => {
+      if (request.patientId) {
+        request.patientId.firstName = decrypt(request.patientId.firstName);
+        request.patientId.middleName = decrypt(request.patientId.middleName);
+        request.patientId.lastName = decrypt(request.patientId.lastName);
+      }
+    });
+
+    res.status(200).json({ pendingRequests });
+  } catch (error) {
+    console.error("Error fetching pending requests:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.updateRequestStatus = async (req, res) => {
+  const { requestId, status } = req.body;
+
+  if (!["Assigned", "Denied"].includes(status)) {
+    return res.status(400).json({ message: "Invalid status" });
+  }
+
+  try {
+    const request = await AssignmentSLP.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    request.status = status;
+    await request.save();
+
+    res.status(200).json({ message: "Status updated successfully", request });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+};

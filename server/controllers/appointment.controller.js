@@ -66,6 +66,8 @@ const handlePendingStatus = async (appointment, status) => {
       const clinicianPatient = new AssignmentSLP({
         clinicianId: appointment.selectedClinician,
         patientId: appointment.patientId,
+        status: "Assigned",
+        reason: "",
       });
       await clinicianPatient.save();
     }

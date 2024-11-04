@@ -34,5 +34,14 @@ router.put(
 
 router.put("/edit-clinician", verifyToken, adminController.editClinician);
 router.put("/edit-patient", verifyToken, adminController.editPatient);
-
+router.get(
+  "/pending-requests",
+  verifyToken,
+  adminController.getPendingRequests
+);
+router.post(
+  "/update-request-status",
+  verifyToken,
+  adminController.updateRequestStatus
+);
 module.exports = router;

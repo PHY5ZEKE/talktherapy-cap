@@ -50,4 +50,6 @@ router.get(
   clinicianController.getAssignedPatients
 );
 
+router.post("/request-access", verifyToken, clinicianController.requestAccess);
+
 module.exports = router;

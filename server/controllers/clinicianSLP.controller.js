@@ -633,6 +633,7 @@ exports.getAssignedPatients = async (req, res) => {
 
     const assignedPatients = await AssignmentSLP.find({
       clinicianId,
+      status: "Assigned",
     }).populate("patientId");
 
     const patients = assignedPatients.map((assignment) => assignment.patientId);
@@ -640,6 +641,26 @@ exports.getAssignedPatients = async (req, res) => {
     res.status(200).json({ assignedPatients: patients });
   } catch (error) {
     console.error("Error fetching assigned patients:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.requestAccess = async (req, res) => {
+  try {
+    const { clinicianId, patientId, reason, status } = req.body;
+
+    const newAssignment = new AssignmentSLP({
+      clinicianId,
+      patientId,
+      reason,
+      status,
+    });
+
+    await newAssignment.save();
+
+    res.status(201).json({ message: "Access requested successfully" });
+  } catch (error) {
+    console.error("Error requesting access:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

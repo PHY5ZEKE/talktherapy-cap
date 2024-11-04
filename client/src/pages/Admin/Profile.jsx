@@ -1,15 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { Link } from "react-router-dom";
-
-// Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import RequestView from "../../components/Modals/RequestView";
-
-// Utils
 import { route } from "../../utils/route";
 import { page } from "../../utils/page-route";
 import { toastMessage } from "../../utils/toastHandler";
@@ -20,37 +16,31 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
-
   const { authState } = useContext(AuthContext);
-
   const accessToken = authState.accessToken;
-
   const [isViewRequests, setIsViewRequests] = useState(false);
-
+  const [pendingRequests, setPendingRequests] = useState([]);
   const failNotify = (message) =>
     toast.error(message, {
       transition: Slide,
       autoClose: 2000,
     });
-
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
     setIsOpen(!isOpen);
   };
-
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
   };
 
-  // Fetch admin data from the backend
   const fetchAdminData = async () => {
     try {
       const response = await fetch(`${appURL}/${route.admin.fetch}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -69,13 +59,42 @@ export default function Profile() {
     }
   };
 
+  const fetchPendingRequests = async () => {
+    try {
+      const response = await fetch(`${appURL}/${route.admin.pendingRequests}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch pending requests");
+      }
+
+      const data = await response.json();
+      setPendingRequests(data.pendingRequests);
+    } catch (error) {
+      failNotify("Failed to fetch pending requests");
+    }
+  };
+
+  const handleStatusChange = (requestId, status) => {
+    setPendingRequests((prevRequests) =>
+      prevRequests.map((request) =>
+        request._id === requestId ? { ...request, status } : request
+      )
+    );
+  };
+
   useEffect(() => {
     fetchAdminData();
+    fetchPendingRequests();
   }, []);
 
   return (
     <>
-      {/* EDIT MODAL */}
       {isOpen && (
         <EditProfile
           editProfileAPI={route.admin.edit}
@@ -83,11 +102,10 @@ export default function Profile() {
           userDetails={adminData}
           closeModal={handleModal}
           isOwner={true}
-          onProfileUpdate={fetchAdminData} // Pass the callback function
+          onProfileUpdate={fetchAdminData}
         />
       )}
 
-      {/* CHANGE PASS MODAL */}
       {isPasswordModalOpen && (
         <ChangePassword
           editPasswordAPI={route.admin.password}
@@ -97,10 +115,7 @@ export default function Profile() {
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
-          {/* SIDEBAR */}
           <Sidebar />
-
-          {/* MAIN CONTENT */}
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
@@ -117,12 +132,9 @@ export default function Profile() {
                   <p>Fetching data.</p>
                 )}
               </div>
-
               <MenuDropdown />
             </div>
-
             <div className="row h-100">
-              {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -130,7 +142,6 @@ export default function Profile() {
                     <p className="mb-0">Make changes to your profile.</p>
                   </div>
                 </div>
-
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3 overflow-auto">
                     <div className="card">
@@ -153,8 +164,6 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-
-              {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -162,7 +171,6 @@ export default function Profile() {
                     <p className="mb-0">Perform account changes.</p>
                   </div>
                 </div>
-
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
@@ -173,20 +181,18 @@ export default function Profile() {
                         Archival
                       </div>
                     </Link>
-
                     <div
-                    onClick={() => setIsViewRequests(true)}
-                    className="mb-3 fw-bold text-button border w-100">
+                      onClick={() => setIsViewRequests(true)}
+                      className="mb-3 fw-bold text-button border w-100"
+                    >
                       Clinician Requests
                     </div>
-
                     <div
                       className="mb-3 fw-bold text-button border w-100"
                       onClick={handleModal}
                     >
                       Edit Profile
                     </div>
-
                     <div
                       className="mb-3 fw-bold text-button border w-100"
                       onClick={handlePasswordModal}
@@ -196,8 +202,6 @@ export default function Profile() {
                   </div>
                 </div>
               </div>
-
-              {/* THIRD COL */}
               <div className="col-sm bg-white">
                 {isViewRequests && (
                   <>
@@ -214,12 +218,15 @@ export default function Profile() {
                         className="col bg-white border rounded-4 p-3 overflow-auto"
                         style={{ maxHeight: "75vh", minHeight: "60vh" }}
                       >
-                        <RequestView
-                          header={"Dr. Rico Nieto - Access Request"}
-                          details={
-                            "Ito reason ko aha! Uh u can include the patient name na din"
-                          }
-                        />
+                        {pendingRequests.map((request) => (
+                          <RequestView
+                            key={request._id}
+                            header={`${request.clinicianId.firstName} ${request.clinicianId.lastName} - Access Request for ${request.patientId.firstName} ${request.patientId.lastName}`}
+                            details={request.reason}
+                            requestId={request._id}
+                            onStatusChange={handleStatusChange}
+                          />
+                        ))}
                       </div>
                     </div>
                   </>
