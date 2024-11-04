@@ -1,4 +1,4 @@
-export default function ViewRecord({ header, details }) {
+export default function ViewRecord({ header, details, onDelete, onEdit }) {
   return (
     <details className="accordion mb-3 border border rounded-3">
       <summary className="open:bg-danger p-3 rounded-top-3">{header}</summary>
@@ -6,8 +6,12 @@ export default function ViewRecord({ header, details }) {
       <p className="px-3 mt-3">{details}</p>
 
       <div className="d-flex gap-3 m-3 border border-bottom-0 border-start-0 border-end-0">
-        <p className="fw-bold mt-3 mb-0 text-button border">Edit</p>
-        <p className="fw-bold mt-3 mb-0 text-button border">Delete</p>
+        <p className="fw-bold mt-3 mb-0 text-button border" onClick={onEdit}>
+          Edit
+        </p>
+        <p className="fw-bold mt-3 mb-0 text-button border" onClick={onDelete}>
+          Delete
+        </p>
       </div>
     </details>
   );

@@ -10,4 +10,12 @@ router.get(
   verifyToken,
   soapSLPController.getSOAPDiagnosesByPatient
 );
+router.delete(
+  "/delete-soap/:id",
+  verifyToken,
+  soapSLPController.deleteSOAPDiagnosis
+);
+
+router.put("/edit-soap/:id", verifyToken, soapSLPController.updateSoap);
+
 module.exports = router;

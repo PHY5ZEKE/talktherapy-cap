@@ -12,6 +12,7 @@ import { toast, Slide } from "react-toastify";
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 import Soap from "../../components/Modals/Soap";
+import EditSoap from "../../components/Modals/EditSoap";
 import ViewProgress from "../../components/Modals/ViewProgress";
 import ViewRecord from "../../components/Modals/ViewRecord";
 import RequestAccess from "../../components/Modals/RequestAccess";
@@ -25,7 +26,7 @@ const VIEW_MODES = {
 export default function ManageSchedule() {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
-  
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -35,11 +36,14 @@ export default function ManageSchedule() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [editSoapRecord, setEditSoapRecord] = useState(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [viewMode, setViewMode] = useState(VIEW_MODES.NONE);
+  const [soapRecords, setSoapRecords] = useState([]);
+  const [selectedSoapRecord, setSelectedSoapRecord] = useState(null);
 
   const failNotify = (message) =>
     toast.error(message, {
@@ -180,8 +184,82 @@ export default function ManageSchedule() {
     }
   };
 
+  const fetchSoapRecords = async (patientId) => {
+    try {
+      const response = await fetch(
+        `${appURL}/${route.soap.getPatientSoap}${patientId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+
+      if (!data.error) {
+        setSoapRecords(data);
+      } else {
+        failNotify(toastMessage.fail.fetch);
+      }
+    } catch (error) {
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
+    }
+  };
+
   const handleClinicianClick = (patient) => {
+    setSelectedPatient(null);
+    setSoapRecords([]);
+    setViewMode(VIEW_MODES.NONE);
     fetchPatientDetails(patient._id);
+  };
+
+  const handleViewRecords = () => {
+    if (selectedPatient) {
+      fetchSoapRecords(selectedPatient._id);
+      setViewMode(VIEW_MODES.RECORDS);
+    }
+  };
+
+  const handleSoapRecordClick = (record) => {
+    setSelectedSoapRecord(record);
+  };
+
+  const handleDeleteSoapRecord = async (id) => {
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this SOAP record?"
+    );
+    if (!isConfirmed) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${appURL}/${route.soap.delete}/${id}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+
+        throw new Error("Failed to delete SOAP record");
+      }
+
+      // Remove the deleted record from the state
+      setSoapRecords((prevRecords) =>
+        prevRecords.filter((record) => record._id !== id)
+      );
+
+      toast.success("SOAP record deleted successfully", {
+        transition: Slide,
+        autoClose: 2000,
+      });
+    } catch (error) {
+      console.error("Error deleting SOAP record:", error);
+      failNotify("Failed to delete SOAP record");
+    }
   };
 
   const isPatientAssigned = (patientId) => {
@@ -202,6 +280,14 @@ export default function ManageSchedule() {
 
       {/* Request Access Modal */}
       {isRequestAccess && <RequestAccess openModal={openRequestAccess} />}
+
+      {/*Edit Soap Modal */}
+      {editSoapRecord && (
+        <EditSoap
+          openModal={() => setEditSoapRecord(null)}
+          soapRecord={editSoapRecord}
+        />
+      )}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -231,7 +317,7 @@ export default function ManageSchedule() {
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col d-flex align-items-center gap-3 bg-white border rounded-4 p-3">
-                  <FontAwesomeIcon icon={faMagnifyingGlass} />
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
                     <input
                       type="text "
                       placeholder="Search for patient"
@@ -328,9 +414,7 @@ export default function ManageSchedule() {
                                   View Progress
                                 </button>
                                 <button
-                                  onClick={() =>
-                                    setViewMode(VIEW_MODES.RECORDS)
-                                  }
+                                  onClick={handleViewRecords}
                                   className="text-button border w-100"
                                 >
                                   View Records
@@ -375,10 +459,22 @@ export default function ManageSchedule() {
                     style={{ maxHeight: "75vh" }}
                   >
                     {viewMode === VIEW_MODES.RECORDS ? (
-                      <ViewRecord
-                        header="Diagnosis - Clinician - Date"
-                        details="Sample diagnosis details"
-                      />
+                      <div>
+                        <h5 className="mb-0 fw-bold">SOAP Records</h5>
+                        {soapRecords.map((record) => (
+                          <ViewRecord
+                            key={record._id}
+                            header={`Date: ${new Date(
+                              record.date
+                            ).toLocaleDateString()} - Clinician: ${
+                              record.clinician.firstName
+                            } ${record.clinician.lastName}`}
+                            details={`Diagnosis: ${record.diagnosis}`}
+                            onDelete={() => handleDeleteSoapRecord(record._id)}
+                            onEdit={() => setEditSoapRecord(record)}
+                          />
+                        ))}
+                      </div>
                     ) : viewMode === VIEW_MODES.PROGRESS ? (
                       <ViewProgress
                         header="Exercise - Progress"

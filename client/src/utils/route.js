@@ -80,5 +80,6 @@ export const route = {
     edit: "api/soap-slp/edit-soap",
     delete: "api/soap-slp/delete-soap",
     getPatientSoap: "api/soap-slp/get-soap/",
+    update: "api/soap-slp/edit-soap",
   },
 };

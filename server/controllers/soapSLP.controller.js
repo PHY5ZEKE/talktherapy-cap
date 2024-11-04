@@ -70,3 +70,47 @@ exports.getSOAPDiagnosesByPatient = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.deleteSOAPDiagnosis = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate input
+    if (!id) {
+      console.log("SOAP ID is required");
+      return res.status(400).json({ message: "SOAP ID is required" });
+    }
+
+    // Delete SOAP diagnosis
+    const deletedSOAP = await SOAP.findByIdAndDelete(id);
+
+    if (!deletedSOAP) {
+      console.log("SOAP diagnosis not found");
+      return res.status(404).json({ message: "SOAP diagnosis not found" });
+    }
+
+    console.log("SOAP diagnosis deleted successfully");
+    res.status(200).json({ message: "SOAP diagnosis deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting SOAP diagnosis:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.updateSoap = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { diagnosis } = req.body;
+    const updatedSoap = await SOAP.findByIdAndUpdate(
+      id,
+      { diagnosis },
+      { new: true }
+    );
+    if (!updatedSoap) {
+      return res.status(404).json({ message: "SOAP record not found" });
+    }
+    res.status(200).json(updatedSoap);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
