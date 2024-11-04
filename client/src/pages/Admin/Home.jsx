@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import axios from "axios";
 
@@ -88,6 +88,47 @@ export default function Home() {
   // Handle Add Clinician Modal
   const [isAddClinician, setIsAddClinician] = useState(false);
   const closeAddClinician = () => setIsAddClinician(!isAddClinician);
+
+  // WebSocket Notification
+  const socket = useRef(null);
+  const [notifications, setNotifications] = useState([]);
+  useEffect(() => {
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (message) => {
+      message.data.text().then((text) => {
+        const data = JSON.parse(text);
+        if (data.show_to === 'admin') {
+          setNotifications((prevNotifications) => [...prevNotifications, data]);
+        }
+        console.log("Message from the server: ", data);
+      });
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
+  }, []);
+
+  const sendNotification = () => {
+    const notification = {
+      body: "Example notification from admin",
+      dateTime: new Date().toISOString(),
+      show_to: "superadmin"
+    };
+
+    if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(JSON.stringify(notification));
+    }
+  };
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -704,6 +745,7 @@ export default function Home() {
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Notifications</p>
+                    <button onClick={sendNotification}>Send Notification</button>
                     <p className="mb-0">
                       Account and system related activities will be shown here.
                     </p>
@@ -715,10 +757,19 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                  {notifications.map((notification, index) => (
+                      <div
+                        key={index}
+                        className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                      >
+                        <p className="mb-0 fw-bold">{notification.body}</p>
+                        <p className="mb-0">{notification.date}</p>
+                      </div>
+                    ))}
+                    {/* <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
                       <p className="mb-0 fw-bold">Date and Time</p>
                       <p className="mb-3">System activity.</p>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

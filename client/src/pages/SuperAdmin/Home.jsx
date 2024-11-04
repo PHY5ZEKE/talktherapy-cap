@@ -1,10 +1,10 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import axios from "axios";
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -61,10 +61,51 @@ export default function Home() {
         }
       );
       // Handle the response as needed
-      notify(toastMessage.success.edit)
+      notify(toastMessage.success.edit);
     } catch (error) {
-      failNotify(toastMessage.fail.error)
+      failNotify(toastMessage.fail.error);
       setError("Error updating profile", error);
+    }
+  };
+
+  // WebSocket Notification
+  const socket = useRef(null);
+  const [notifications, setNotifications] = useState([]);
+  useEffect(() => {
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (message) => {
+      message.data.text().then((text) => {
+        const data = JSON.parse(text);
+        if (data.show_to === 'superadmin') {
+          setNotifications((prevNotifications) => [...prevNotifications, data]);
+        }
+        console.log("Message from the server: ", data);
+      });
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
+  }, []);
+
+  const sendNotification = () => {
+    const notification = {
+      body: "Example notification from super admin",
+      dateTime: new Date().toISOString(),
+      show_to: "admin"
+    };
+
+    if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(JSON.stringify(notification));
     }
   };
 
@@ -92,12 +133,12 @@ export default function Home() {
           setError("Unauthorized. Please log in again.");
         } else {
           const errorText = await response.text();
-          failNotify(toastMessage.fail.fetch)
+          failNotify(toastMessage.fail.fetch);
           setError("Failed to fetch super admin data", errorText);
         }
       } catch (error) {
-        failNotify(toastMessage.fail.fetch)
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
         setError("Error fetching super admin data", error);
       }
     };
@@ -299,6 +340,7 @@ export default function Home() {
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Notifications</p>
+                    <button onClick={sendNotification}>Send Notification</button>
                     <p className="mb-0">
                       Account and system related activities will be shown here.
                     </p>
@@ -310,32 +352,24 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
+                    {notifications.map((notification, index) => (
+                      <div
+                        key={index}
+                        className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                      >
+                        <p className="mb-0 fw-bold">{notification.body}</p>
+                        <p className="mb-0">{notification.date}</p>
+                      </div>
+                    ))}
+
+                    {/* <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
                       <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
                       <p className="mb-3">
                         Session of Rico Noapl Nieto with Ako.
                       </p>
                       <div className="mb-3 text-pending">PENDING</div>
-                    </div>
+                    </div> */}
 
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-accepted">ACCEPTED</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-cancelled">CANCELLED</div>
-                    </div>
                   </div>
                 </div>
               </div>

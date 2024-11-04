@@ -86,6 +86,7 @@ app.use((err, req, res, next) => {
 let rooms = {};
 const MAX = 2;
 let currentRoom = null;
+const clients = new Set()
 
 const roomFullMessage = JSON.stringify({
   type: "room-full",
@@ -102,8 +103,17 @@ const userAlreadyInRoomMessage = JSON.stringify({
 try {
   // ws connection start
   wss.on("connection", (ws) => {
+    clients.add(ws);
+
     ws.on("message", (message) => {
       const data = JSON.parse(message);
+
+      clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      });
+      
       if (data.type === "join-room") {
         currentRoom = data.roomID;
 
@@ -182,6 +192,9 @@ try {
           });
         }
       }
+
+      // Notifications
+
     });
 
     ws.on("close", () => {
