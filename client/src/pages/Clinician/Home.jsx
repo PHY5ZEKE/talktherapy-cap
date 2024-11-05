@@ -268,12 +268,6 @@ export default function Home() {
                               >
                                 Join
                               </button>
-                              <button
-                                className="mb-3 text-button border"
-                                onClick={openConfirmModal}
-                              >
-                                Cancel
-                              </button>
                             </div>
                           </div>
                         </div>
@@ -468,7 +462,8 @@ export default function Home() {
                           {new Date(appointment.createdAt).toLocaleTimeString()}
                         </p>
                         <p className="mb-3">
-                          Session of Dr. {appointment.selectedSchedule.clinicianName} with{" "}
+                          Session of Dr.{" "}
+                          {appointment.selectedSchedule.clinicianName} with{" "}
                           {appointment.patientId.firstName}{" "}
                           {appointment.patientId.lastName} has started.
                         </p>

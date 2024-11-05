@@ -379,8 +379,8 @@ export default function BookSchedule() {
                         value={selectedSpecialization}
                         onChange={handleSpecializationChange}
                       >
-                        <option value="default" disabled>
-                          Specialization
+                        <option value="default" selected>
+                          Select a Specialization
                         </option>
                         <option value="Aphasia">Aphasia</option>
                         <option value="Stroke">Stroke</option>
@@ -428,7 +428,7 @@ export default function BookSchedule() {
                               {schedule.startTime} - {schedule.endTime}
                             </h5>
                             <h6 className="fw-bold mb-0">
-                              <FontAwesomeIcon icon={faStethoscope} size="xs" /> {" "}
+                              <FontAwesomeIcon icon={faStethoscope} size="xs" />{" "}
                               {schedule.clinicianName}
                             </h6>
                             <p className="mb-0">{schedule.day}</p>

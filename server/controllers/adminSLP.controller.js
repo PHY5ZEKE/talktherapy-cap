@@ -36,6 +36,7 @@ exports.addAdmin = async (req, res) => {
   }
 
   const existingAdmin = await Admin.findOne({ email });
+  const existingClinician = await Clinician.findOne({ email });
 
   if (existingAdmin) {
     if (existingAdmin.active === true) {
@@ -55,6 +56,13 @@ exports.addAdmin = async (req, res) => {
         message: "Email already exists.",
       });
     }
+  }
+
+  if (existingClinician) {
+    return res.status(400).json({
+      error: true,
+      message: "Email already exists in the clinician records.",
+    });
   }
 
   const newAdmin = new Admin({
