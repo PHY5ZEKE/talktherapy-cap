@@ -18,6 +18,14 @@ exports.addSchedule = async (req, res) => {
     const startMoment = moment(startTime, "hh:mm A");
     const endMoment = moment(endTime, "hh:mm A");
 
+    // Check if the schedule block is exactly 1 hour
+    const duration = moment.duration(endMoment.diff(startMoment));
+    if (duration.asHours() !== 1) {
+      return res
+        .status(400)
+        .json({ message: "Each schedule block must be exactly 1 hour." });
+    }
+
     // Check for overlapping schedules
     const existingSchedules = await Schedule.find({
       clinicianId,
@@ -152,6 +160,14 @@ exports.editSchedule = async (req, res) => {
     const startMoment = moment(startTime, "hh:mm A");
     const endMoment = moment(endTime, "hh:mm A");
 
+    // Check if the schedule block is exactly 1 hour
+    const duration = moment.duration(endMoment.diff(startMoment));
+    if (duration.asHours() !== 1) {
+      return res
+        .status(400)
+        .json({ message: "Each schedule block must be exactly 1 hour." });
+    }
+
     // Check for overlapping schedules
     const existingSchedules = await Schedule.find({
       clinicianId,
@@ -200,7 +216,7 @@ exports.editSchedule = async (req, res) => {
       await createAuditLog(
         "editSchedule",
         clinician.email, // Pass the clinician's email
-        `Clinician with  ${clinician.email} edited a schedule on ${day} from ${startTime} to ${endTime}`
+        `Clinician with ${clinician.email} edited a schedule on ${day} from ${startTime} to ${endTime}`
       );
     } catch (auditLogError) {
       console.error("Error creating audit log:", auditLogError);
