@@ -85,4 +85,8 @@ export const route = {
     getPatientSoap: "api/soap-slp/get-soap/",
     update: "api/soap-slp/edit-soap",
   },
+  notification: {
+    create: "api/notification-slp/create-notifications",
+    get: "api/notification-slp/get-notifications"
+  }
 };

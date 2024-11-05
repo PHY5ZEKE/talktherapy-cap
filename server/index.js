@@ -42,6 +42,8 @@ const scheduleRoutes = require("./routes/schedule.route.js");
 const contentRoute = require("./routes/content.route.js");
 const appointmentRoute = require("./routes/appointment.route.js");
 const soapSLPRoute = require("./routes/soapSLP.route.js");
+const notificationRoutes = require("./routes/notification.route.js");
+const { send } = require("process");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -75,6 +77,7 @@ app.use("/api/schedule-slp", scheduleRoutes);
 app.use("/api/contents", contentRoute);
 app.use("/api/appointments-slp", appointmentRoute);
 app.use("/api/soap-slp", soapSLPRoute);
+app.use("/api/notification-slp", notificationRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -100,17 +103,26 @@ const userAlreadyInRoomMessage = JSON.stringify({
   redirectURL: "/",
 });
 
+const notificationAlert = JSON.stringify(
+  {
+    type: "notification",
+    message: "New notification for user."
+  }
+)
+
 try {
   // ws connection start
   wss.on("connection", (ws) => {
     clients.add(ws);
 
+
     ws.on("message", (message) => {
       const data = JSON.parse(message);
-
+      
       clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(message);
+          console.log("SENT NOTIF");
         }
       });
       
@@ -178,6 +190,10 @@ try {
           `Capacity in room ${currentRoom} is : ${rooms[currentRoom].users.length}
           with users ${rooms[currentRoom].users}`
         );
+      }
+
+      if (data.type === "notification") {
+        ws.send(notificationAlert)
       }
 
       if (
