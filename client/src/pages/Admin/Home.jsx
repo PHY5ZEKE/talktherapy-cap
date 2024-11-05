@@ -129,13 +129,30 @@ export default function Home() {
     };
   }, []);
 
-  const sendNotification = async () => {
-    const notification = {
-      body: "Example notification from admin",
-      date: new Date(),
-      show_to: "superadmin",
-    };
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
 
+    let notification = {};
+
+    if (parsed.type === "higherAccountEdit") {
+      notification = {
+        body: `${adminData?.firstName} ${adminData.lastName} edited ${parsed.user}'s profile information`,
+        date: new Date(),
+        show_to: role !== "admin" ? "superadmin" : "admin",
+      };
+    }
+
+    if (parsed.type === 'appointmentRequestStatus') {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+
+    console.log(JSON.stringify(notification));
+    console.log(notification);
     try {
       const response = await fetch(`${appURL}/${route.notification.create}`, {
         method: "POST",
@@ -151,17 +168,14 @@ export default function Home() {
       }
       const result = await response.json();
 
+      // Notify WebSocket server
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
         socket.current.send(JSON.stringify(result));
       }
-
-      console.log("Notification sent:", result);
     } catch (error) {
       console.error("Error sending notification:", error);
     }
   };
-
-  console.log(notifications);
 
   useEffect(() => {
     const fetchAppointments = async () => {
@@ -375,6 +389,7 @@ export default function Home() {
         <AppointmentDetails
           openModal={closeModal}
           appointment={selectedAppointment}
+          onWebSocket={webSocketNotification}
         />
       )}
 
@@ -387,6 +402,7 @@ export default function Home() {
           closeModal={handleModal}
           isOwner={false}
           whatRole={role}
+          onWebSocket={webSocketNotification}
         />
       )}
 
@@ -408,7 +424,7 @@ export default function Home() {
                   <>
                     <p className="mb-0 mt-3">Hello,</p>
                     <p className="fw-bold">
-                      {adminData?.firstName} {adminData?.lastName}
+                      {adminData?.firstName} {adminData?.lastName}{" "}
                     </p>
                   </>
                 ) : (
@@ -778,9 +794,6 @@ export default function Home() {
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Notifications</p>
-                    <button onClick={sendNotification}>
-                      Send Notification
-                    </button>
                     <p className="mb-0">
                       Account and system related activities will be shown here.
                     </p>
@@ -793,7 +806,8 @@ export default function Home() {
                     style={{ maxHeight: "75vh" }}
                   >
                     {notifications.length > 0 ? (
-                      notifications.filter((notif) => notif.show_to === "admin")
+                      notifications
+                      .filter((notif) => notif.show_to.includes(adminData?._id))
                         .map((notification) => (
                           <div
                             key={notification._id}

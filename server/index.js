@@ -122,7 +122,6 @@ try {
       clients.forEach((client) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(message);
-          console.log("SENT NOTIF");
         }
       });
       
@@ -208,8 +207,6 @@ try {
           });
         }
       }
-
-      // Notifications
 
     });
 

@@ -7,22 +7,28 @@ const createNotification = [
   verifyToken,
   async (req, res) => {
     try {
-      const { body, date, show_to } = req.body;
-      console.log(`body: ${body}, date:${date}, show:${show_to}`);
+      let { body, date, show_to } = req.body;
+
       if (!body || !show_to) {
         return res.status(400).json({ error: "Missing required fields" });
       }
+
+      // Ensure show_to is an array
+      if (!Array.isArray(show_to)) {
+        show_to = [show_to];
+      }
+
+      const encryptedShowTo = show_to.map((user) => encrypt(user));
+
       const notification = new Notification({
         body,
         date,
-        show_to: encrypt(show_to),
+        show_to: encryptedShowTo,
       });
-      console.log(notification);
-      await notification.save();
 
+      await notification.save();
       res.status(201).json(notification);
     } catch (error) {
-      console.log(error);
       res.status(400).json({ error: error.message });
     }
   },
@@ -33,11 +39,10 @@ const getNotifications = async (req, res) => {
   try {
     const notifications = await Notification.find();
     const decryptedNotifications = notifications.map(notification => ({
-        ...notification._doc,
-        show_to: decrypt(notification.show_to),
-      }));
-      console.log(decryptedNotifications);
-      return res.status(200).json({ error: false, decryptedNotifications });
+      ...notification._doc,
+      show_to: notification.show_to.map(user => decrypt(user)),
+    }));
+    return res.status(200).json({ error: false, decryptedNotifications });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

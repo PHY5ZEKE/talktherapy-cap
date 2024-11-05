@@ -87,7 +87,6 @@ export default function Home() {
     };
 
     fetchNotifications();
-    console.log(notifications);
 
     socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
 
@@ -108,25 +107,18 @@ export default function Home() {
     };
   }, []);
 
-  // const sendNotification = () => {
-  //   const notification = {
-  //     body: "Example notification from super admin",
-  //     dateTime: new Date().toISOString(),
-  //     show_to: "admin"
-  //   };
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
 
-  //   if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-  //     socket.current.send(JSON.stringify(notification));
-  //   }
-  // };
-
-  const sendNotification = async () => {
-    const notification = {
-      body: "Example notification from super admin",
-      date: new Date(),
-      show_to: "admin",
-    };
-
+    let notification = {};
+    if (parsed.type === "higherAccountEdit") {
+      notification = {
+        body: `${superAdmin.firstName} edited ${parsed.user}'s profile information.`,
+        date: new Date(),
+        show_to: role !== "admin" ? `${parsed.id}` : "admin",
+      };
+    }
     try {
       const response = await fetch(`${appURL}/${route.notification.create}`, {
         method: "POST",
@@ -143,12 +135,9 @@ export default function Home() {
       const result = await response.json();
 
       // Notify WebSocket server
-
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
         socket.current.send(JSON.stringify(result));
       }
-
-      console.log("Notification sent:", result);
     } catch (error) {
       console.error("Error sending notification:", error);
     }
@@ -268,6 +257,7 @@ export default function Home() {
           isOwner={false}
           whatRole={role}
           onProfileUpdate={onProfileUpdate}
+          onWebSocket={webSocketNotification}
         />
       )}
 
@@ -385,9 +375,6 @@ export default function Home() {
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Notifications</p>
-                    <button onClick={sendNotification}>
-                      Send Notification
-                    </button>
                     <p className="mb-0">
                       Account and system related activities will be shown here.
                     </p>
@@ -401,7 +388,7 @@ export default function Home() {
                   >
                     {notifications.length > 0 ? (
                       notifications
-                        .filter((notif) => notif.show_to === "superadmin")
+                        .filter((notif) => notif.show_to.includes("superadmin"))
                         .map((notification) => (
                           <div
                             key={notification._id}

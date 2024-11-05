@@ -14,7 +14,7 @@ import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 import AppointmentDetailsClinician from "../../components/Modals/AppointmentDetailsClinician";
 
 // React
-import { useState, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 
@@ -95,6 +95,92 @@ export default function Home() {
       },
     });
   };
+
+    // WebSocket Notification
+    const socket = useRef(null);
+    const [notifications, setNotifications] = useState([]);
+    useEffect(() => {
+      // Get Notifications from MongoDB
+      const fetchNotifications = async () => {
+        try {
+          const response = await fetch(`${appURL}/${route.notification.get}`);
+          if (!response.ok) {
+            throw new Error("Failed to fetch notif");
+          }
+          const data = await response.json();
+  
+          setNotifications(data.decryptedNotifications);
+        } catch (error) {
+          console.error("Error fetch notif", error);
+        }
+      };
+  
+      fetchNotifications();
+  
+      socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+  
+      socket.current.onopen = () => {
+        console.log("Connected to the server");
+      };
+  
+      socket.current.onmessage = (message) => {
+        fetchNotifications();
+      };
+  
+      socket.current.onclose = () => {
+        console.log("Disconnected from the server");
+      };
+  
+      return () => {
+        socket.current.close();
+      };
+    }, []);
+  
+    const webSocketNotification = async (message) => {
+      const response = JSON.stringify(message);
+      const parsed = JSON.parse(response);
+  
+      let notification = {};
+  
+      if (parsed.type === "higherAccountEdit") {
+        notification = {
+          body: `${adminData?.firstName} ${adminData.lastName} edited ${parsed.user}'s profile information`,
+          date: new Date(),
+          show_to: role !== "admin" ? "superadmin" : "admin",
+        };
+      }
+  
+      if (parsed.type === "appointmentRequestStatus") {
+        notification = {
+          body: `${parsed.body}`,
+          date: new Date(),
+          show_to: parsed.show_to,
+        };
+      }
+      try {
+        const response = await fetch(`${appURL}/${route.notification.create}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify(notification),
+        });
+  
+        if (!response.ok) {
+          throw new Error("Failed to send notification");
+        }
+        const result = await response.json();
+  
+        // Notify WebSocket server
+        if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+          socket.current.send(JSON.stringify(result));
+        }
+      } catch (error) {
+        console.error("Error sending notification:", error);
+      }
+    };
+  
 
   useEffect(() => {
     const fetchClinicianData = async () => {
@@ -444,31 +530,23 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    {appointments.length === 0 && (
-                      <h5 className="text-center fw-bold mb-0">
-                        No appointments for today.
-                      </h5>
+                    {notifications.length > 0 ? (
+                      notifications
+                        .filter((notif) =>
+                          notif.show_to.includes(clinicianData?._id)
+                        )
+                        .map((notification) => (
+                          <div
+                            key={notification._id}
+                            className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          >
+                            <p className="mb-0 fw-bold">{notification.body}</p>
+                            <p className="mb-0">{notification.date}</p>
+                          </div>
+                        ))
+                    ) : (
+                      <p>No notifications available</p>
                     )}
-
-                    {appointments.map((appointment) => (
-                      <div
-                        key={appointment._id}
-                        className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                      >
-                        <h5 className="mb-0 fw-bold">
-                          {new Date(appointment.createdAt).toLocaleDateString()}
-                        </h5>
-                        <p className="mb-0 fw-bold">
-                          {new Date(appointment.createdAt).toLocaleTimeString()}
-                        </p>
-                        <p className="mb-3">
-                          Session of Dr.{" "}
-                          {appointment.selectedSchedule.clinicianName} with{" "}
-                          {appointment.patientId.firstName}{" "}
-                          {appointment.patientId.lastName} has started.
-                        </p>
-                      </div>
-                    ))}
                   </div>
                 </div>
               </div>

@@ -10,7 +10,11 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
-export default function AppointmentDetails({ openModal, appointment }) {
+export default function AppointmentDetails({
+  openModal,
+  appointment,
+  onWebSocket,
+}) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
@@ -46,6 +50,15 @@ export default function AppointmentDetails({ openModal, appointment }) {
           },
         }
       );
+      const userUpdate = {
+        type: "appointmentRequestStatus",
+        body: `Appointment of patient ${appointment.patientId?.firstName} ${appointment.patientId?.middleName} ${appointment.patientId?.lastName} with clinician ${appointment.selectedSchedule?.clinicianName} has been ${newStatus}`,
+        show_to: [
+          appointment.patientId?._id,
+          appointment.selectedClinician
+        ],
+      };
+      onWebSocket(userUpdate);
       notify(toastMessage.success.statusBook);
       setTimeout(() => {
         window.location.reload();

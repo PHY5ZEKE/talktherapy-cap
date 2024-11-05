@@ -245,7 +245,6 @@ exports.getAdmin = async (req, res) => {
     if (!admin) {
       return res.status(404).json({ error: true, message: "Admin not found." });
     }
-
     return res.status(200).json({ error: false, admin });
   } catch (error) {
     console.error("Error fetching admin:", error);

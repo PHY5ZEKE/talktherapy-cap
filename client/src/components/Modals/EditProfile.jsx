@@ -16,6 +16,7 @@ export default function EditProfile({
   isOwner,
   whatRole,
   onProfileUpdate,
+  onWebSocket
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -40,6 +41,8 @@ export default function EditProfile({
       transition: Slide,
       autoClose: 2000,
     });
+
+
 
   // Form Inputs
   const [firstName, setFirstName] = useState("");
@@ -90,6 +93,12 @@ export default function EditProfile({
         notify(toastMessage.success.edit);
         setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
+        const userUpdate = {
+          type: 'higherAccountEdit',
+          user: `${firstName} ${middleName} ${lastName}`,
+          id: userData._id
+        };
+        onWebSocket(userUpdate);
       } else {
         failNotify(toastMessage.fail.edit);
       }

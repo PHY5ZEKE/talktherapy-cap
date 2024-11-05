@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
-import { useState, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 // UI Components
@@ -21,6 +21,91 @@ export default function Home() {
   const [error, setError] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const navigate = useNavigate();
+
+  // WebSocket Notification
+  const socket = useRef(null);
+  const [notifications, setNotifications] = useState([]);
+  useEffect(() => {
+    // Get Notifications from MongoDB
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(`${appURL}/${route.notification.get}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch notif");
+        }
+        const data = await response.json();
+
+        setNotifications(data.decryptedNotifications);
+      } catch (error) {
+        console.error("Error fetch notif", error);
+      }
+    };
+
+    fetchNotifications();
+
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (message) => {
+      fetchNotifications();
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
+  }, []);
+
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
+
+    let notification = {};
+
+    if (parsed.type === "higherAccountEdit") {
+      notification = {
+        body: `${adminData?.firstName} ${adminData.lastName} edited ${parsed.user}'s profile information`,
+        date: new Date(),
+        show_to: role !== "admin" ? "superadmin" : "admin",
+      };
+    }
+
+    if (parsed.type === "appointmentRequestStatus") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+    try {
+      const response = await fetch(`${appURL}/${route.notification.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(notification),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send notification");
+      }
+      const result = await response.json();
+
+      // Notify WebSocket server
+      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify(result));
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -280,34 +365,25 @@ export default function Home() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                    style={{ maxHeight: "75vh" }}
                   >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-pending">PENDING</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-accepted">ACCEPTED</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-cancelled">CANCELLED</div>
-                    </div>
+                    {notifications.length > 0 ? (
+                      notifications
+                        .filter((notif) =>
+                          notif.show_to.includes(patientData?._id)
+                        )
+                        .map((notification) => (
+                          <div
+                            key={notification._id}
+                            className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                          >
+                            <p className="mb-0 fw-bold">{notification.body}</p>
+                            <p className="mb-0">{notification.date}</p>
+                          </div>
+                        ))
+                    ) : (
+                      <p>No notifications available</p>
+                    )}
                   </div>
                 </div>
               </div>
