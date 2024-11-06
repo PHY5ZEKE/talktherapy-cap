@@ -154,18 +154,29 @@ export default function FeedbackDiagnosis() {
                     {selectedDiagnosis ? (
                       <div className="mb-3">
                         <h4 className="mb-0 fw-bold">Diagnosis</h4>
+                        <br />
                         <p className="mb-0">
                           Diagnosed by {selectedDiagnosis.clinician.firstName}{" "}
                           {selectedDiagnosis.clinician.middleName}{" "}
                           {selectedDiagnosis.clinician.lastName}
                         </p>
+                        <p className="mb-0">
+                          Clinic Address: {selectedDiagnosis.clinician.address}{" "}
+                        </p>
+                        <p className="mb-0">
+                          Email: {selectedDiagnosis.clinician.email}{" "}
+                        </p>
+                        <p className="mb-0">
+                          Contact: {selectedDiagnosis.clinician.mobile}{" "}
+                        </p>
                         <p className="mb-3">
+                          Date of Diagnosis:{" "}
                           {new Date(
                             selectedDiagnosis.date
                           ).toLocaleDateString()}
                         </p>
                         <p className="text-justify">
-                          {selectedDiagnosis.diagnosis}
+                          Diagnosis: {selectedDiagnosis.diagnosis}
                         </p>
                       </div>
                     ) : (

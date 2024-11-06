@@ -131,9 +131,14 @@ export default function Profile() {
                           {clinicianData?.firstName} {clinicianData?.middleName}{" "}
                           {clinicianData?.lastName}
                         </h5>
-                        <p className="mb-0">{clinicianData?.address}</p>
-                        <p className="mb-0">{clinicianData?.mobile}</p>
-                        <p className="mb-0">{clinicianData?.email}</p>
+                        <p className="mb-0">
+                          Specialization: {clinicianData?.specialization}
+                        </p>
+                        <p className="mb-0">
+                          Clinic Address: {clinicianData?.address}
+                        </p>
+                        <p className="mb-0">Contact: {clinicianData?.mobile}</p>
+                        <p className="mb-0">Email: {clinicianData?.email}</p>
                       </div>
                     </div>
                   </div>

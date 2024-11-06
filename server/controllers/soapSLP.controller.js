@@ -55,7 +55,7 @@ exports.getSOAPDiagnosesByPatient = async (req, res) => {
       diagnoses.map(async (diagnosis) => {
         const clinician = await Clinician.findById(
           diagnosis.clinicianId,
-          "firstName lastName middleName"
+          "firstName lastName middleName address email mobile specialization"
         );
         return {
           ...diagnosis.toObject(),

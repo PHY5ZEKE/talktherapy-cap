@@ -90,8 +90,27 @@ exports.getSchedules = async (req, res) => {
 // Get All Clinicain User Schedules
 exports.getClinicianSched = async (req, res) => {
   try {
+    // Fetch all schedules
     const schedules = await Schedule.find();
-    res.status(200).json(schedules);
+
+    // Fetch clinician details for each schedule
+    const schedulesWithSpecialization = await Promise.all(
+      schedules.map(async (schedule) => {
+        const clinician = await ClinicianSLP.findById(schedule.clinicianId);
+        if (clinician) {
+          return {
+            ...schedule.toObject(),
+            specialization: clinician.specialization,
+            contact: clinician.mobile,
+            email: clinician.email,
+            address: clinician.address,
+          };
+        }
+        return schedule;
+      })
+    );
+
+    res.status(200).json(schedulesWithSpecialization);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

@@ -7,7 +7,7 @@ import ChangePassword from "../../components/Modals/ChangePassword";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 
 import { toastMessage } from "../../utils/toastHandler";
-import { toast, Slide} from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 // utils
 import { route } from "../../utils/route";
@@ -67,12 +67,12 @@ export default function Profile() {
         setError("Unauthorized. Please log in again.");
       } else {
         const errorText = await response.text();
-        failNotify(toastMessage.fail.fetch)
+        failNotify(toastMessage.fail.fetch);
         setError("Failed to fetch super admin data", errorText);
       }
     } catch (error) {
-      failNotify(toastMessage.fail.fetch)
-      failNotify(toastMessage.fail.error)
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
       setError("Error fetching super admin data", error);
     }
   };
@@ -161,9 +161,9 @@ export default function Profile() {
                           {userDetails?.firstName} {userDetails?.middleName}{" "}
                           {userDetails?.lastName}
                         </h5>
-                        <p className="mb-0">{userDetails?.address}</p>
-                        <p className="mb-0">{userDetails?.mobile}</p>
-                        <p className="mb-0">{userDetails?.email}</p>
+                        <p className="mb-0">Address: {userDetails?.address}</p>
+                        <p className="mb-0">Contact: {userDetails?.mobile}</p>
+                        <p className="mb-0">Email: {userDetails?.email}</p>
                       </div>
                     </div>
                   </div>

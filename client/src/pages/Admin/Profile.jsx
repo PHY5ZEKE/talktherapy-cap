@@ -156,9 +156,9 @@ export default function Profile() {
                           {adminData?.firstName} {adminData?.middleName}{" "}
                           {adminData?.lastName}
                         </h5>
-                        <p className="mb-0">{adminData?.address}</p>
-                        <p className="mb-0">{adminData?.mobile}</p>
-                        <p className="mb-0">{adminData?.email}</p>
+                        <p className="mb-0">Address: {adminData?.address}</p>
+                        <p className="mb-0">Contact: {adminData?.mobile}</p>
+                        <p className="mb-0">Email: {adminData?.email}</p>
                       </div>
                     </div>
                   </div>

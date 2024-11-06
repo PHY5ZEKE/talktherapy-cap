@@ -362,7 +362,8 @@ export default function BookSchedule() {
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Book an Appointment</p>
                     <p className="mb-0">
-                      Select a date to view available clinician schedules.
+                      Select a specialization and a date to view available
+                      clinician schedules.
                     </p>
                   </div>
                 </div>
@@ -380,7 +381,7 @@ export default function BookSchedule() {
                         onChange={handleSpecializationChange}
                       >
                         <option value="default" selected>
-                          Select a Specialization
+                          All Specializations
                         </option>
                         <option value="Aphasia">Aphasia</option>
                         <option value="Stroke">Stroke</option>
@@ -425,16 +426,38 @@ export default function BookSchedule() {
                         >
                           <div className="w-100">
                             <h5 className="fw-bold mb-0">
-                              {schedule.startTime} - {schedule.endTime}
+                              Time: {schedule.startTime} - {schedule.endTime}
                             </h5>
                             <h6 className="fw-bold mb-0">
                               <FontAwesomeIcon icon={faStethoscope} size="xs" />{" "}
-                              {schedule.clinicianName}
+                              Clinician: {schedule.clinicianName}
                             </h6>
-                            <p className="mb-0">{schedule.day}</p>
+                            <p className="mb-0">Day: {schedule.day}</p>
+                            <p className="mb-0 my-2">
+                              Specialization:{" "}
+                              <span className="fw-bold">
+                                {schedule.specialization}
+                              </span>
+                            </p>
                             <p className="mb-0 my-2">
                               Status:{" "}
                               <span className="fw-bold">{schedule.status}</span>
+                            </p>
+                            <p className="mb-0 my-2">
+                              Clinic Address:{" "}
+                              <span className="fw-bold">
+                                {schedule.address}
+                              </span>
+                            </p>
+                            <p className="mb-0 my-2">
+                              Contact:{" "}
+                              <span className="fw-bold">
+                                {schedule.contact}
+                              </span>
+                            </p>
+                            <p className="mb-0 my-2">
+                              Email:{" "}
+                              <span className="fw-bold">{schedule.email}</span>
                             </p>
                           </div>
                           {schedule.status !== "Booked" && !hasBooked && (

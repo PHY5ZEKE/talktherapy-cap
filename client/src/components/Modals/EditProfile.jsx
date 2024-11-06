@@ -16,7 +16,7 @@ export default function EditProfile({
   isOwner,
   whatRole,
   onProfileUpdate,
-  onWebSocket
+  onWebSocket,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -42,8 +42,6 @@ export default function EditProfile({
       autoClose: 2000,
     });
 
-
-
   // Form Inputs
   const [firstName, setFirstName] = useState("");
   const [middleName, setMiddleName] = useState("");
@@ -67,7 +65,6 @@ export default function EditProfile({
     closeModal();
   };
 
-  // Edit Profile Submit Listener
   const handleEditProfileSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -94,11 +91,14 @@ export default function EditProfile({
         setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
         const userUpdate = {
-          type: 'higherAccountEdit',
+          type: "higherAccountEdit",
           user: `${firstName} ${middleName} ${lastName}`,
-          id: userData._id
+          id: userData._id,
         };
         onWebSocket(userUpdate);
+        setTimeout(() => {
+          window.location.reload(); // Reload the page on success
+        }, 500); // Add a slight delay to ensure the modal closes before reloading
       } else {
         failNotify(toastMessage.fail.edit);
       }
@@ -106,6 +106,7 @@ export default function EditProfile({
       failNotify(toastMessage.fail.error);
     }
   };
+
   // Change Profile Picture Listener
   const handleProfilePictureChange = (e) => {
     setProfilePicture(e.target.files[0]);
@@ -114,7 +115,7 @@ export default function EditProfile({
   // Upload Profile Picture Listener
   const handleProfilePictureUpload = async () => {
     if (!profilePicture) {
-      failNotify("Select an image for profile picture upload.")
+      failNotify("Select an image for profile picture upload.");
       return;
     }
 

@@ -143,7 +143,7 @@ export default function Home() {
       };
     }
 
-    if (parsed.type === 'appointmentRequestStatus') {
+    if (parsed.type === "appointmentRequestStatus") {
       notification = {
         body: `${parsed.body}`,
         date: new Date(),
@@ -748,6 +748,7 @@ export default function Home() {
                               {clinician.firstName} {clinician.middleName}{" "}
                               {clinician.lastName}
                             </p>
+                            <p className="mb-0">{clinician.specialization}</p>
                             <p className="mb-0">{clinician.email}</p>
                             <p className="mb-0">{clinician.address}</p>
                             <p className="mb-3">{clinician.mobile}</p>
@@ -807,7 +808,9 @@ export default function Home() {
                   >
                     {notifications.length > 0 ? (
                       notifications
-                      .filter((notif) => notif.show_to.includes(adminData?._id))
+                        .filter((notif) =>
+                          notif.show_to.includes(adminData?._id)
+                        )
                         .map((notification) => (
                           <div
                             key={notification._id}
