@@ -221,7 +221,9 @@ export default function Profile() {
                         {pendingRequests.map((request) => (
                           <RequestView
                             key={request._id}
-                            header={`${request.clinicianId.firstName} ${request.clinicianId.lastName} - Access Request for ${request.patientId.firstName} ${request.patientId.lastName}`}
+                            clinicianId={request.clinicianId._id}
+                            headerClinician={`${request.clinicianId.firstName} ${request.clinicianId.lastName}`}
+                            headerPatient={`${request.patientId.firstName} ${request.patientId.lastName}`}
                             details={request.reason}
                             requestId={request._id}
                             onStatusChange={handleStatusChange}

@@ -91,7 +91,7 @@ export default function EditProfile({
         setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
         const userUpdate = {
-          type: "higherAccountEdit",
+          notif: "higherAccountEdit",
           user: `${firstName} ${middleName} ${lastName}`,
           id: userData._id,
         };

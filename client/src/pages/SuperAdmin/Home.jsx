@@ -3,6 +3,7 @@ import { AuthContext } from "../../utils/AuthContext";
 
 import axios from "axios";
 import { route } from "../../utils/route";
+import formatDate from "../../utils/formatDate";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
@@ -94,8 +95,11 @@ export default function Home() {
       console.log("Connected to the server");
     };
 
-    socket.current.onmessage = (message) => {
-      fetchNotifications();
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "notification") {
+        fetchNotifications();
+      }
     };
 
     socket.current.onclose = () => {
@@ -112,7 +116,7 @@ export default function Home() {
     const parsed = JSON.parse(response);
 
     let notification = {};
-    if (parsed.type === "higherAccountEdit") {
+    if (parsed.notif === "higherAccountEdit") {
       notification = {
         body: `${superAdmin.firstName} edited ${parsed.user}'s profile information.`,
         date: new Date(),
@@ -132,16 +136,20 @@ export default function Home() {
       if (!response.ok) {
         throw new Error("Failed to send notification");
       }
+
       const result = await response.json();
+      const resultWithNotif = { ...result, type: "notification" };
+      console.log("Notification sent:", JSON.stringify(resultWithNotif));
 
       // Notify WebSocket server
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify(result));
+        socket.current.send(JSON.stringify(resultWithNotif));
       }
     } catch (error) {
       console.error("Error sending notification:", error);
     }
   };
+
 
   //Super Admin
   useEffect(() => {
@@ -395,20 +403,13 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">{notification.date}</p>
+                            <p className="mb-0">{formatDate(notification.date)}</p>
                           </div>
                         ))
                     ) : (
                       <p>No notifications available</p>
                     )}
 
-                    {/* <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-pending">PENDING</div>
-                    </div> */}
                   </div>
                 </div>
               </div>

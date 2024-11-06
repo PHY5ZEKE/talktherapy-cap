@@ -1,7 +1,9 @@
+import { useState, useRef, useEffect, useContext } from "react";
+
 import { useNavigate } from "react-router-dom";
 import { route } from "../../utils/route";
-import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
+import formatDate from "../../utils/formatDate";
 
 // UI Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
@@ -26,88 +28,7 @@ export default function Home() {
   const socket = useRef(null);
   const [notifications, setNotifications] = useState([]);
   useEffect(() => {
-    // Get Notifications from MongoDB
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.notification.get}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch notif");
-        }
-        const data = await response.json();
-
-        setNotifications(data.decryptedNotifications);
-      } catch (error) {
-        console.error("Error fetch notif", error);
-      }
-    };
-
-    fetchNotifications();
-
-    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
-
-    socket.current.onopen = () => {
-      console.log("Connected to the server");
-    };
-
-    socket.current.onmessage = (message) => {
-      fetchNotifications();
-    };
-
-    socket.current.onclose = () => {
-      console.log("Disconnected from the server");
-    };
-
-    return () => {
-      socket.current.close();
-    };
-  }, []);
-
-  const webSocketNotification = async (message) => {
-    const response = JSON.stringify(message);
-    const parsed = JSON.parse(response);
-
-    let notification = {};
-
-    if (parsed.type === "higherAccountEdit") {
-      notification = {
-        body: `${adminData?.firstName} ${adminData.lastName} edited ${parsed.user}'s profile information`,
-        date: new Date(),
-        show_to: role !== "admin" ? "superadmin" : "admin",
-      };
-    }
-
-    if (parsed.type === "appointmentRequestStatus") {
-      notification = {
-        body: `${parsed.body}`,
-        date: new Date(),
-        show_to: parsed.show_to,
-      };
-    }
-    try {
-      const response = await fetch(`${appURL}/${route.notification.create}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(notification),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send notification");
-      }
-      const result = await response.json();
-
-      // Notify WebSocket server
-      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify(result));
-      }
-    } catch (error) {
-      console.error("Error sending notification:", error);
-    }
-  };
-
-  useEffect(() => {
+    // Fetch Appointments
     const fetchPatientData = async () => {
       try {
         const [patientRes, appointmentsRes] = await Promise.all([
@@ -144,7 +65,45 @@ export default function Home() {
       }
     };
 
+    // Get Notifications from MongoDB
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch(`${appURL}/${route.notification.get}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch notif");
+        }
+        const data = await response.json();
+
+        setNotifications(data.decryptedNotifications);
+      } catch (error) {
+        console.error("Error fetch notif", error);
+      }
+    };
+
     fetchPatientData();
+    fetchNotifications();
+
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "notification") {
+        fetchPatientData();
+        fetchNotifications();
+      }
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
   }, []);
 
   // Filter accepted appointments
@@ -378,7 +337,7 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">{notification.date}</p>
+                            <p className="mb-0">{formatDate(notification.date)}</p>
                           </div>
                         ))
                     ) : (

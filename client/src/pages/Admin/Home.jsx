@@ -16,6 +16,7 @@ import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
+import formatDate from "../../utils/formatDate"
 
 const appURL = import.meta.env.VITE_APP_URL;
 
@@ -116,8 +117,11 @@ export default function Home() {
       console.log("Connected to the server");
     };
 
-    socket.current.onmessage = (message) => {
-      fetchNotifications();
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "notification") {
+        fetchNotifications();
+      }
     };
 
     socket.current.onclose = () => {
@@ -135,7 +139,7 @@ export default function Home() {
 
     let notification = {};
 
-    if (parsed.type === "higherAccountEdit") {
+    if (parsed.notif === "higherAccountEdit") {
       notification = {
         body: `${adminData?.firstName} ${adminData.lastName} edited ${parsed.user}'s profile information`,
         date: new Date(),
@@ -143,7 +147,7 @@ export default function Home() {
       };
     }
 
-    if (parsed.type === "appointmentRequestStatus") {
+    if (parsed.notif === "appointmentRequestStatus") {
       notification = {
         body: `${parsed.body}`,
         date: new Date(),
@@ -151,8 +155,6 @@ export default function Home() {
       };
     }
 
-    console.log(JSON.stringify(notification));
-    console.log(notification);
     try {
       const response = await fetch(`${appURL}/${route.notification.create}`, {
         method: "POST",
@@ -169,8 +171,10 @@ export default function Home() {
       const result = await response.json();
 
       // Notify WebSocket server
+      const resultWithNotif = { ...result, type: "notification" };
+
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify(result));
+        socket.current.send(JSON.stringify(resultWithNotif));
       }
     } catch (error) {
       console.error("Error sending notification:", error);
@@ -809,7 +813,7 @@ export default function Home() {
                     {notifications.length > 0 ? (
                       notifications
                         .filter((notif) =>
-                          notif.show_to.includes(adminData?._id)
+                          notif.show_to.includes(adminData?._id) || notif.show_to.includes("admin")
                         )
                         .map((notification) => (
                           <div
@@ -817,7 +821,7 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">{notification.date}</p>
+                            <p className="mb-0">{formatDate(notification.date)}</p>
                           </div>
                         ))
                     ) : (

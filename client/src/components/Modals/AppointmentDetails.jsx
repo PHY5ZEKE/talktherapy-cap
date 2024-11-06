@@ -51,7 +51,7 @@ export default function AppointmentDetails({
         }
       );
       const userUpdate = {
-        type: "appointmentRequestStatus",
+        notif: "appointmentRequestStatus",
         body: `Appointment of patient ${appointment.patientId?.firstName} ${appointment.patientId?.middleName} ${appointment.patientId?.lastName} with clinician ${appointment.selectedSchedule?.clinicianName} has been ${newStatus}`,
         show_to: [
           appointment.patientId?._id,

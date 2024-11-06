@@ -4,10 +4,13 @@ import { route } from "../../utils/route";
 import { AuthContext } from "../../utils/AuthContext";
 
 export default function RequestView({
-  header,
+  clinicianId,
+  headerClinician,
+  headerPatient,
   details,
   requestId,
   onStatusChange,
+  onWebSocket
 }) {
   const [loading, setLoading] = useState(false);
   const { authState } = useContext(AuthContext);
@@ -34,6 +37,15 @@ export default function RequestView({
       }
 
       const data = await response.json();
+
+      const userUpdate = {
+        notif: "appointmentRequestAccess",
+        body: `${headerClinician} request record access for ${headerPatient} has been ${status != "Assigned" ? "rejected" : "granted permission"}.`,
+        show_to: [clinicianId],
+      };
+
+      onWebSocket(userUpdate);
+      
       toast.success(data.message);
       onStatusChange(requestId, status);
     } catch (error) {
@@ -45,7 +57,7 @@ export default function RequestView({
 
   return (
     <details className="accordion mb-3 border border rounded-3">
-      <summary className="open:bg-danger p-3 rounded-top-3">{header}</summary>
+      <summary className="open:bg-danger p-3 rounded-top-3">{headerClinician} is requesting access for {headerPatient}</summary>
 
       <p className="px-3 mt-3">{details}</p>
 

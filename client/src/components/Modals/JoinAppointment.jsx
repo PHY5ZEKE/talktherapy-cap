@@ -108,6 +108,7 @@ export default function JoinAppointment({
       notify(toastMessage.success.book);
       window.location.reload(); // Reload the page on success
     } catch (error) {
+      console.error(error);
       failNotify(toastMessage.fail.error);
     }
   };

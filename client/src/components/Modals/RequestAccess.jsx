@@ -8,6 +8,9 @@ export default function RequestAccess({
   clinicianId,
   patientId,
   accessToken,
+  clinicianName,
+  patientName,
+  onWebSocket,
 }) {
   const [reason, setReason] = useState("");
   const appURL = import.meta.env.VITE_APP_URL;
@@ -40,10 +43,16 @@ export default function RequestAccess({
 
       const data = await response.json();
 
+      const userUpdate = {
+        notif: "appointmentRequestAccess",
+        body: `${clinicianName} is requesting record access for ${patientName}`,
+        show_to: ["admin"],
+      };
+      
       if (!response.ok) {
         throw new Error(data.message || "Failed to request access");
       }
-
+      onWebSocket(userUpdate);
       toast.success("Access requested successfully");
       openModal();
     } catch (error) {

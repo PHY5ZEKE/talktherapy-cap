@@ -4,8 +4,8 @@ const config = require("./config.json");
 const mongoose = require("mongoose");
 const express = require("express");
 const cors = require("cors");
-const WebSocket = require("ws");
-const WebSocketServer = WebSocket.Server;
+const WebSocketServer = require("./websocket");
+
 
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
@@ -20,19 +20,7 @@ mongoose
 
 // Express App
 const app = express();
-
-// WSS Initialize
-const WSS_PORT = 8080;
 const server = http.createServer(app);
-
-const wss = new WebSocketServer({
-  port: Number(process.env.PORT) || WSS_PORT,
-});
-
-const PORT = process.env.PORT || 8000;
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
 const clinicianSLPRoutes = require("./routes/clinicianSLP.route.js");
@@ -85,136 +73,11 @@ app.use((err, req, res, next) => {
   res.status(500).send("Something broke!");
 });
 
-// Rooms
-let rooms = {};
-const MAX = 2;
-let currentRoom = null;
-const clients = new Set()
+// WebSocket Server
+WebSocketServer.initialize(server);
 
-const roomFullMessage = JSON.stringify({
-  type: "room-full",
-  message: "Room is full, redirecting to home page.",
-  redirectURL: "/",
+const PORT = process.env.PORT || 8000;
+
+server.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server is running on port ${PORT}`);
 });
-
-const userAlreadyInRoomMessage = JSON.stringify({
-  type: "user-already-in-room",
-  message: "User is already in the room.",
-  redirectURL: "/",
-});
-
-const notificationAlert = JSON.stringify(
-  {
-    type: "notification",
-    message: "New notification for user."
-  }
-)
-
-try {
-  // ws connection start
-  wss.on("connection", (ws) => {
-    clients.add(ws);
-
-
-    ws.on("message", (message) => {
-      const data = JSON.parse(message);
-      
-      clients.forEach((client) => {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(message);
-        }
-      });
-      
-      if (data.type === "join-room") {
-        currentRoom = data.roomID;
-
-        // Create room if not array rooms
-        if (!rooms[currentRoom]) {
-          rooms[currentRoom] = {
-            users: [],
-          };
-        }
-
-        // Check room capacity
-        if (rooms[currentRoom].users.length >= MAX) {
-          console.log(
-            `Room full! Capacity: ${rooms[currentRoom].users.length}`
-          );
-
-          ws.send(roomFullMessage);
-          ws.close();
-        } else {
-          rooms[currentRoom].users.push({
-            name: data.user,
-            connection: ws,
-          });
-
-          console.log(
-            `Joining... Capacity: ${rooms[currentRoom].users.length}`
-          );
-
-          console.log(
-            `Current users in room ${currentRoom}:`,
-            rooms[currentRoom].users.map((user) => user.name)
-          );
-        }
-      }
-
-      if (data.type === "chat-message") {
-        if (currentRoom) {
-          const broadcastMessage = JSON.stringify({
-            type: "chat-message",
-            message: data.message,
-            sender: data.sender,
-          });
-
-          console.log(`${data.sender}: ${data.message}`);
-
-          rooms[currentRoom].users.forEach((user) => {
-            if (user.connection.readyState === WebSocket.OPEN) {
-              user.connection.send(broadcastMessage);
-            }
-          });
-        }
-      }
-
-      if (data.type === "leave-room") {
-        console.log(`User ${data.user} has left the room: ${currentRoom}`);
-
-        rooms[currentRoom].users = rooms[currentRoom].users.filter(
-          (client) => client.name !== data.user
-        );
-
-        console.log(
-          `Capacity in room ${currentRoom} is : ${rooms[currentRoom].users.length}
-          with users ${rooms[currentRoom].users}`
-        );
-      }
-
-      if (data.type === "notification") {
-        ws.send(notificationAlert)
-      }
-
-      if (
-        ["offer", "answer", "ice-candidate"].includes(data.type) &&
-        currentRoom
-      ) {
-        if (currentRoom) {
-          rooms[currentRoom].users.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-              client.send(JSON.stringify(data));
-            }
-          });
-        }
-      }
-
-    });
-
-    ws.on("close", () => {
-      // Remove the client from the room when they disconnect
-      console.log(`successfully disconnected from connection`);
-    });
-  });
-} catch (error) {
-  console.error(error);
-}

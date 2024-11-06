@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useRef, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -45,6 +45,8 @@ export default function ManageSchedule() {
   const [soapRecords, setSoapRecords] = useState([]);
   const [selectedSoapRecord, setSelectedSoapRecord] = useState(null);
 
+  const [patientName, setPatientName] = useState("");
+
   const failNotify = (message) =>
     toast.error(message, {
       transition: Slide,
@@ -53,7 +55,8 @@ export default function ManageSchedule() {
 
   //  Request Access Modal
   const [isRequestAccess, setIsRequestAccess] = useState(false);
-  const openRequestAccess = () => {
+  const openRequestAccess = (name) => {
+    setPatientName(name);
     setIsRequestAccess((prevState) => !prevState);
   };
   // Add SOAP Modal
@@ -62,64 +65,10 @@ export default function ManageSchedule() {
     setShowModal((prevState) => !prevState);
   };
 
+  // WebSocket Notification
+  const socket = useRef(null);
   useEffect(() => {
-    const fetchClinicianData = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch clinician data");
-        }
-
-        const data = await response.json();
-        setClinicianData(data.clinician);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchClinicianData();
-  }, []);
-
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.clinician.getAllPatients}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!data.error) {
-          setPatients(data.patients);
-        } else {
-          failNotify(toastMessage.fail.fetch);
-        }
-      } catch (error) {
-        failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
-      }
-    };
-
-    fetchPatients();
-  }, []);
-
-  useEffect(() => {
+    // Fetch Assigned Patients
     const fetchAssignedPatients = async () => {
       try {
         const response = await fetch(
@@ -147,6 +96,126 @@ export default function ManageSchedule() {
     };
 
     fetchAssignedPatients();
+
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "notification") {
+        fetchAssignedPatients();
+      }
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
+  }, []);
+
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
+
+    let notification = {};
+
+    if (parsed.notif === "appointmentRequestAccess") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+
+    try {
+      const response = await fetch(`${appURL}/${route.notification.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(notification),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send notification");
+      }
+      const result = await response.json();
+
+      // Notify WebSocket server
+      const resultWithNotif = { ...result, type: "notification" };
+
+      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify(resultWithNotif));
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  useEffect(() => {
+    // Clinician Data
+    const fetchClinicianData = async () => {
+      try {
+        const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch clinician data");
+        }
+
+        const data = await response.json();
+        setClinicianData(data.clinician);
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchClinicianData();
+  }, []);
+
+  useEffect(() => {
+    // Fetch Patients
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch(
+          `${appURL}/${route.clinician.getAllPatients}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!data.error) {
+          setPatients(data.patients);
+        } else {
+          failNotify(toastMessage.fail.fetch);
+        }
+      } catch (error) {
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
+      }
+    };
+
+    fetchPatients();
   }, []);
 
   const filteredPatients = patients.filter(
@@ -286,6 +355,9 @@ export default function ManageSchedule() {
           clinicianId={clinicianData?._id}
           patientId={selectedPatient?._id}
           accessToken={accessToken}
+          clinicianName={`${clinicianData?.firstName} ${clinicianData?.lastName}`}
+          patientName={`${patientName}`}
+          onWebSocket={webSocketNotification}
         />
       )}
 
@@ -433,7 +505,11 @@ export default function ManageSchedule() {
                               </>
                             ) : (
                               <button
-                                onClick={openRequestAccess}
+                                onClick={() =>
+                                  openRequestAccess(
+                                    `${selectedPatient?.firstName} ${selectedPatient?.lastName}`
+                                  )
+                                }
                                 className="text-button border w-100"
                               >
                                 Request Access
