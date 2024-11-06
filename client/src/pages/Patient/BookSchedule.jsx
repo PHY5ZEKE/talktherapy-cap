@@ -14,7 +14,7 @@ import TemporaryRescheduleConfirmation from "../../components/Modals/TemporaryRe
 import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
 
 // DatePicker
-import { useState, useEffect, useCallback, useMemo, useContext } from "react";
+import { useState, useEffect, useCallback, useMemo, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -80,7 +80,6 @@ export default function BookSchedule() {
       transition: Slide,
       autoClose: 2000,
     });
-    window.location.reload(); // Reload the page on success
   };
 
   const failNotify = (message) =>
@@ -144,6 +143,7 @@ export default function BookSchedule() {
     setIsTemporaryReschedule(true);
   };
 
+  const socket = useRef(null);
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
@@ -216,7 +216,89 @@ export default function BookSchedule() {
     fetchPatientData();
     fetchAll();
     fetchAppointments();
+
+    // WebSocket
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "notification") {
+        fetchAll();
+        fetchAppointments();
+      }
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
   }, []);
+
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
+
+    let notification = {};
+
+    if (parsed.notif === "appointmentJoin") {
+      notification = {
+        type: "notification"
+      }
+      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify(notification));
+      }
+    }
+
+    if (parsed.notif === "appointmentResched") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+        reason: parsed.reason,
+      };
+    }
+
+    if (parsed.notif === "appointmentChange") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+        reason: parsed.reason,
+      };
+    }
+
+    try {
+      const response = await fetch(`${appURL}/${route.notification.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(notification),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send notification");
+      }
+      const result = await response.json();
+
+      // Notify WebSocket server
+      const resultWithNotif = { ...result, type: "notification" };
+
+      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify(resultWithNotif));
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
 
   function isBooked(appointments) {
     // Check if the patient has any appointments that are Accepted if so, return true
@@ -281,6 +363,7 @@ export default function BookSchedule() {
           selectedSchedule={selectedSchedule}
           patientId={patientData?._id}
           closeModal={closeModal} // Pass the closeModal function
+          onWebSocket={webSocketNotification}
         />
       )}
 
@@ -301,6 +384,8 @@ export default function BookSchedule() {
           clinicianId={clinicianIdForReschedule}
           onScheduleSelect={onScheduleSelect}
           appointment={appointmentToReschedule} // Pass the appointment details
+          onWebSocket={webSocketNotification}
+          patientName={`${patientData?.firstName} ${patientData?.lastName}`}
         />
       )}
 
@@ -309,6 +394,7 @@ export default function BookSchedule() {
           closeModal={() => setIsTemporaryReschedule(false)}
           openTemporarySchedule={openTemporaryScheduleModal} // Pass the new function
           appointment={appointmentToReschedule}
+
         />
       )}
 
@@ -318,6 +404,8 @@ export default function BookSchedule() {
           clinicianId={clinicianIdForReschedule}
           onScheduleSelect={onScheduleSelect}
           appointment={appointmentToReschedule}
+          onWebSocket={webSocketNotification}
+          patientName={`${patientData?.firstName} ${patientData?.lastName}`}
         />
       )}
 

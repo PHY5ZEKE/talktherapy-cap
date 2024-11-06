@@ -770,15 +770,37 @@ exports.getPendingRequests = async (req, res) => {
     }).populate("clinicianId patientId");
 
     // Decrypt patient names
-    pendingRequests.forEach((request) => {
+    const decryptedRequests = pendingRequests.map((request) => {
       if (request.patientId) {
-        request.patientId.firstName = decrypt(request.patientId.firstName);
-        request.patientId.middleName = decrypt(request.patientId.middleName);
-        request.patientId.lastName = decrypt(request.patientId.lastName);
+        try {
+          if (
+            request.patientId.firstName &&
+            request.patientId.firstName.includes(":")
+          ) {
+            request.patientId.firstName = decrypt(request.patientId.firstName);
+          }
+          if (
+            request.patientId.middleName &&
+            request.patientId.middleName.includes(":")
+          ) {
+            request.patientId.middleName = decrypt(
+              request.patientId.middleName
+            );
+          }
+          if (
+            request.patientId.lastName &&
+            request.patientId.lastName.includes(":")
+          ) {
+            request.patientId.lastName = decrypt(request.patientId.lastName);
+          }
+        } catch (decryptError) {
+          console.error("Error decrypting patient details:", decryptError);
+        }
       }
+      return request;
     });
 
-    res.status(200).json({ pendingRequests });
+    res.status(200).json({ pendingRequests: decryptedRequests });
   } catch (error) {
     console.error("Error fetching pending requests:", error);
     res.status(500).json({ message: "Internal server error" });

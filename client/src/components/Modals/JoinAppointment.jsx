@@ -15,6 +15,7 @@ export default function JoinAppointment({
   selectedSchedule,
   patientId,
   closeModal,
+  onWebSocket,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -105,8 +106,14 @@ export default function JoinAppointment({
         throw new Error(fileData.message || "Failed to create appointment");
       }
 
+      const userUpdate = {
+        notif: "appointmentJoin",
+      };
+      onWebSocket(userUpdate);
+
       notify(toastMessage.success.book);
-      window.location.reload(); // Reload the page on success
+      // window.location.reload(); // Reload the page on success
+      closeModal();
     } catch (error) {
       console.error(error);
       failNotify(toastMessage.fail.error);

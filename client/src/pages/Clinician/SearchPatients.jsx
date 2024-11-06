@@ -133,6 +133,14 @@ export default function ManageSchedule() {
       };
     }
 
+    if (parsed.notif === "addSOAP") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+
     try {
       const response = await fetch(`${appURL}/${route.notification.create}`, {
         method: "POST",
@@ -344,6 +352,7 @@ export default function ManageSchedule() {
           clinicianId={clinicianData?._id}
           clinicianName={`${clinicianData?.firstName} ${clinicianData?.lastName}`}
           patientId={selectedPatient?._id}
+          onWebSocket={webSocketNotification}
         />
       )}
 

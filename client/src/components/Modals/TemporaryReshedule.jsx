@@ -8,6 +8,8 @@ export default function TemporaryReschedule({
   clinicianId,
   onScheduleSelect,
   appointment, // Add appointment to props
+  onWebSocket,
+  patientName
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -65,6 +67,16 @@ export default function TemporaryReschedule({
 
       const data = await response.json();
       onScheduleSelect(data.appointment);
+
+      const userUpdate = {
+        notif: "appointmentResched",
+        body: `${patientName} is request a permanent change in schedule with Dr. ${appointment?.selectedSchedule?.clinicianName} to be set at ${selectedSchedule.day} ${selectedSchedule.startTime} ${selectedSchedule.endTime}.`,
+        show_to: ["admin"],
+        reason: `${reason}`,
+      };
+      
+      onWebSocket(userUpdate);
+
       setSuccessMessage("Schedule change request submitted successfully");
       closeModal();
     } catch (error) {
@@ -133,7 +145,9 @@ export default function TemporaryReschedule({
                           <td>
                             <button
                               className="text-button-table border"
-                              onClick={() => setSelectedSchedule(schedule)} // Set selected schedule
+                              onClick={() => {
+                                setSelectedSchedule(schedule);
+                              }} // Set selected schedule
                             >
                               <p className="fw-bold my-0 status">Select</p>
                             </button>

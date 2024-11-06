@@ -94,6 +94,33 @@ export default function Home() {
   const socket = useRef(null);
   const [notifications, setNotifications] = useState([]);
   useEffect(() => {
+    // Fetch Appointments
+    const fetchAppointments = async () => {
+      try {
+        const response = await fetch(`${appURL}/${route.appointment.getAll}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch appointments");
+        }
+        const data = await response.json();
+        setAppointments(data);
+      } catch (error) {
+        failNotify(toastMessage.fail.fetch);
+        setError(error.message);
+        console.log("Error fetch appointments :", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointments();
+
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
       try {
@@ -120,6 +147,7 @@ export default function Home() {
     socket.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "notification") {
+        fetchAppointments();
         fetchNotifications();
       }
     };
@@ -180,34 +208,6 @@ export default function Home() {
       console.error("Error sending notification:", error);
     }
   };
-
-  useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.appointment.getAll}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch appointments");
-        }
-        const data = await response.json();
-        setAppointments(data);
-      } catch (error) {
-        failNotify(toastMessage.fail.fetch);
-        setError(error.message);
-        console.log("Error fetch appointments :", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAppointments();
-  }, []);
 
   useEffect(() => {
     const fetchAdminData = async () => {
@@ -821,6 +821,11 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
+                            {notification.reason && (
+                              <p className="mb-0">
+                              {`Reason: ${notification.reason}`}
+                              </p>
+                            )}
                             <p className="mb-0">{formatDate(notification.date)}</p>
                           </div>
                         ))

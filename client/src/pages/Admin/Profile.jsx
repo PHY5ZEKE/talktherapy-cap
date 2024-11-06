@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
@@ -32,6 +32,71 @@ export default function Profile() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
+  };
+
+  // WebSocket Notification
+  const socket = useRef(null);
+  useEffect(() => {
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "notification") {
+        fetchPendingRequests();
+      }
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
+  }, []);
+
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
+
+    let notification = {};
+
+    if (parsed.notif === "appointmentRequestAccess") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+
+    try {
+      const response = await fetch(`${appURL}/${route.notification.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(notification),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send notification");
+      }
+      const result = await response.json();
+
+      const resultWithNotif = { ...result, type: "notification" };
+
+      // Notify WebSocket server
+      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify(resultWithNotif));
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
   };
 
   const fetchAdminData = async () => {
@@ -226,6 +291,7 @@ export default function Profile() {
                             headerPatient={`${request.patientId.firstName} ${request.patientId.lastName}`}
                             details={request.reason}
                             requestId={request._id}
+                            onWebSocket={webSocketNotification}
                             onStatusChange={handleStatusChange}
                           />
                         ))}

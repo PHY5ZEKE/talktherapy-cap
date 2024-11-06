@@ -7,7 +7,7 @@ const createNotification = [
   verifyToken,
   async (req, res) => {
     try {
-      let { body, date, show_to } = req.body;
+      let { body, date, show_to, reason } = req.body;
 
       if (!body || !show_to) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -24,6 +24,7 @@ const createNotification = [
         body,
         date,
         show_to: encryptedShowTo,
+        reason,
       });
 
       await notification.save();

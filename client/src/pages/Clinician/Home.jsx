@@ -199,7 +199,7 @@ export default function Home() {
 
     let notification = {};
 
-    if (parsed.type === "appointmentRequestStatus") {
+    if (parsed.notif === "appointmentRequestStatus") {
       notification = {
         body: `${parsed.body}`,
         date: new Date(),
@@ -220,10 +220,11 @@ export default function Home() {
         throw new Error("Failed to send notification");
       }
       const result = await response.json();
+      const resultWithNotif = { ...result, type: "notification" };
 
       // Notify WebSocket server
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify(result));
+        socket.current.send(JSON.stringify(resultWithNotif));
       }
     } catch (error) {
       console.error("Error sending notification:", error);
@@ -533,6 +534,7 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
+                            
                             <p className="mb-0">
                               {formatDate(notification.date)}
                             </p>

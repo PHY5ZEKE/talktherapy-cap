@@ -8,6 +8,8 @@ export default function ChooseSchedule({
   clinicianId,
   onScheduleSelect,
   appointment, // Add appointment to props
+  onWebSocket,
+  patientName,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -66,6 +68,16 @@ export default function ChooseSchedule({
       const data = await response.json();
       onScheduleSelect(data.appointment);
       setSuccessMessage("Schedule change request submitted successfully");
+
+      const userUpdate = {
+        notif: "appointmentChange",
+        body: `${patientName} is request a permanent change in schedule with Dr. ${appointment?.selectedSchedule?.clinicianName} to be set at ${selectedSchedule.day} ${selectedSchedule.startTime} ${selectedSchedule.endTime}.`,
+        show_to: ["admin"],
+        reason: `${reason}`,
+      };
+      
+      onWebSocket(userUpdate);
+
       closeModal();
     } catch (error) {
       setError(error.message);
@@ -130,7 +142,9 @@ export default function ChooseSchedule({
                           <td>
                             <button
                               className="text-button-table border"
-                              onClick={() => setSelectedSchedule(schedule)} // Set selected schedule
+                              onClick={() => {
+                                setSelectedSchedule(schedule);
+                              }} // Set selected schedule
                             >
                               <p className="fw-bold my-0 status">Select</p>
                             </button>

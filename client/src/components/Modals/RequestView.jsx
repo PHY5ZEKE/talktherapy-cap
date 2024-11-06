@@ -10,7 +10,7 @@ export default function RequestView({
   details,
   requestId,
   onStatusChange,
-  onWebSocket
+  onWebSocket,
 }) {
   const [loading, setLoading] = useState(false);
   const { authState } = useContext(AuthContext);
@@ -45,10 +45,11 @@ export default function RequestView({
       };
 
       onWebSocket(userUpdate);
-      
+
       toast.success(data.message);
       onStatusChange(requestId, status);
     } catch (error) {
+      console.log(error);
       toast.error("Failed to update status");
     } finally {
       setLoading(false);

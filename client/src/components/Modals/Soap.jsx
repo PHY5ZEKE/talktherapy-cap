@@ -3,7 +3,13 @@ import { AuthContext } from "../../utils/AuthContext";
 import "./modal.css";
 import { route } from "../../utils/route";
 
-export default function Soap({ openModal, clinicianId, clinicianName, patientId }) {
+export default function Soap({
+  openModal,
+  clinicianId,
+  clinicianName,
+  patientId,
+  onWebSocket,
+}) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
@@ -43,7 +49,15 @@ export default function Soap({ openModal, clinicianId, clinicianName, patientId 
       }
 
       const data = await response.json();
-      console.log("SOAP diagnosis created successfully:", data);
+
+      const userUpdate = {
+        notif: "addSOAP",
+        body: `Dr. ${clinicianName} has added a SOAP/Diagnosis. Kindly check your feedbacks.`,
+        show_to: [patientId],
+      };
+      
+      onWebSocket(userUpdate);
+
       openModal(); // Close the modal after successful submission
     } catch (error) {
       console.error("Error creating SOAP diagnosis:", error);
