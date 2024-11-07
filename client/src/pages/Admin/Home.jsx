@@ -16,7 +16,8 @@ import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
-import formatDate from "../../utils/formatDate"
+import formatDate from "../../utils/formatDate";
+import SocketFetch from "../../utils/SocketFetch";
 
 const appURL = import.meta.env.VITE_APP_URL;
 
@@ -93,7 +94,11 @@ export default function Home() {
   // WebSocket Notification
   const socket = useRef(null);
   const [notifications, setNotifications] = useState([]);
+
   useEffect(() => {
+    // Fetch Admin Data
+    fetchAdminData()
+
     // Fetch Appointments
     const fetchAppointments = async () => {
       try {
@@ -120,6 +125,9 @@ export default function Home() {
     };
 
     fetchAppointments();
+
+    fetchClinicians();
+    fetchPatients();
 
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
@@ -149,6 +157,11 @@ export default function Home() {
       if (message.type === "notification") {
         fetchAppointments();
         fetchNotifications();
+      }
+
+      if (message.type === "fetch-action") {
+        fetchClinicians();
+        fetchPatients();
       }
     };
 
@@ -183,6 +196,14 @@ export default function Home() {
       };
     }
 
+    if (parsed.notif === "registerClinician") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+
     try {
       const response = await fetch(`${appURL}/${route.notification.create}`, {
         method: "POST",
@@ -209,86 +230,75 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    const fetchAdminData = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.admin.fetch}`, {
-          method: "GET",
+  const webSocketFetch = async () => {
+    SocketFetch(socket);
+  };
+
+  const fetchAdminData = async () => {
+    try {
+      const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch admin data");
+      }
+
+      const data = await response.json();
+      setAdminData(data.admin);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
+
+  const fetchClinicians = async () => {
+    try {
+      const response = await fetch(
+        `${appURL}/${route.admin.getAllClinicians}`,
+        {
           headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`,
           },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch admin data");
         }
+      );
+      const data = await response.json();
 
-        const data = await response.json();
-        setAdminData(data.admin);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchAdminData();
-  }, []);
-
-  useEffect(() => {
-    const fetchClinicians = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.admin.getAllClinicians}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-
-        if (!data.error) {
-          setClinicians(data.clinicians);
-        } else {
-          failNotify(toastMessage.fail.fetch);
-        }
-      } catch (error) {
+      if (!data.error) {
+        setClinicians(data.clinicians);
+      } else {
         failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
       }
-    };
+    } catch (error) {
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
+    }
+  };
 
-    fetchClinicians();
-  }, []);
+  const fetchPatients = async () => {
+    try {
+      const response = await fetch(`${appURL}/${route.admin.getAllPatients}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = await response.json();
 
-  useEffect(() => {
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.admin.getAllPatients}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        const data = await response.json();
-
-        if (!data.error) {
-          setPatients(data.patients);
-        } else {
-          failNotify(toastMessage.fail.fetch);
-        }
-      } catch (error) {
+      if (!data.error) {
+        setPatients(data.patients);
+      } else {
         failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
       }
-    };
-
-    fetchPatients();
-  }, []);
+    } catch (error) {
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
+    }
+  };
 
   const handleUserTypeChange = (type) => {
     setSelectedUserType(type);
@@ -407,11 +417,12 @@ export default function Home() {
           isOwner={false}
           whatRole={role}
           onWebSocket={webSocketNotification}
+          onFetch={webSocketFetch}
         />
       )}
 
       {/* ADD CLINICIAN MODAL */}
-      {isAddClinician && <RegisterClinician openModal={closeAddClinician} />}
+      {isAddClinician && <RegisterClinician openModal={closeAddClinician} admin={adminData} onWebSocket={webSocketNotification} />}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -812,8 +823,10 @@ export default function Home() {
                   >
                     {notifications.length > 0 ? (
                       notifications
-                        .filter((notif) =>
-                          notif.show_to.includes(adminData?._id) || notif.show_to.includes("admin")
+                        .filter(
+                          (notif) =>
+                            notif.show_to.includes(adminData?._id) ||
+                            notif.show_to.includes("admin")
                         )
                         .map((notification) => (
                           <div
@@ -823,14 +836,16 @@ export default function Home() {
                             <p className="mb-0 fw-bold">{notification.body}</p>
                             {notification.reason && (
                               <p className="mb-0">
-                              {`Reason: ${notification.reason}`}
+                                {`Reason: ${notification.reason}`}
                               </p>
                             )}
-                            <p className="mb-0">{formatDate(notification.date)}</p>
+                            <p className="mb-0">
+                              {formatDate(notification.date)}
+                            </p>
                           </div>
                         ))
                     ) : (
-                      <p>No notifications available</p>
+                      <p className="fw-bold text-center mb-0">No notifications available</p>
                     )}
                     {/* <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
                       <p className="mb-0 fw-bold">Date and Time</p>

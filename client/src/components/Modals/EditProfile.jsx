@@ -15,14 +15,13 @@ export default function EditProfile({
   closeModal,
   isOwner,
   whatRole,
-  onProfileUpdate,
   onWebSocket,
+  onFetch,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [userData, setUserData] = useState(userDetails);
-  const [updatedUser, setUpdatedUser] = useState(null);
 
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -88,22 +87,23 @@ export default function EditProfile({
 
       if (response.ok) {
         notify(toastMessage.success.edit);
-        setUpdatedUser(data.patient); // Ensure this matches the server response
         handleCloseModal();
-        const userUpdate = {
-          notif: "higherAccountEdit",
-          user: `${firstName} ${middleName} ${lastName}`,
-          id: userData._id,
-        };
-        onWebSocket(userUpdate);
-        setTimeout(() => {
-          window.location.reload(); // Reload the page on success
-        }, 500); // Add a slight delay to ensure the modal closes before reloading
+        if (!isOwner) {
+          const userUpdate = {
+            notif: "higherAccountEdit",
+            user: `${firstName} ${middleName} ${lastName}`,
+            id: userData._id,
+          };
+          onWebSocket(userUpdate);
+        }
+        onFetch();
+        closeModal();
       } else {
         failNotify(toastMessage.fail.edit);
       }
     } catch (error) {
       failNotify(toastMessage.fail.error);
+      console.log(error)
     }
   };
 
@@ -135,11 +135,7 @@ export default function EditProfile({
 
       if (response.ok) {
         notify(toastMessage.success.edit);
-        setUpdatedUser((prevData) => ({
-          ...prevData,
-          profilePicture: data.profilePicture,
-        }));
-        onProfileUpdate();
+        onFetch();
       } else {
         failNotify(toastMessage.fail.edit);
       }

@@ -3,7 +3,7 @@ import { route } from "../../utils/route";
 import { toast, Slide } from "react-toastify";
 import { toastMessage } from "../../utils/toastHandler";
 
-export default function RegisterAdmin({ openModal }) {
+export default function RegisterAdmin({ openModal, onFetch }) {
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [email, setEmail] = useState("");
@@ -45,6 +45,7 @@ export default function RegisterAdmin({ openModal }) {
         setError(true);
         setMessage(data.message);
       } else {
+        onFetch();
         notify(toastMessage.success.register)
         setError(false);
         setMessage(data.message);

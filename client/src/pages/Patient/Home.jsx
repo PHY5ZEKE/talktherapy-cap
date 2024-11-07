@@ -27,43 +27,9 @@ export default function Home() {
   // WebSocket Notification
   const socket = useRef(null);
   const [notifications, setNotifications] = useState([]);
+
   useEffect(() => {
-    // Fetch Appointments
-    const fetchPatientData = async () => {
-      try {
-        const [patientRes, appointmentsRes] = await Promise.all([
-          fetch(`${appURL}/${route.patient.fetch}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }),
-          fetch(`${appURL}/${route.appointment.get}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }),
-        ]);
-
-        if (!patientRes.ok || !appointmentsRes.ok) {
-          throw new Error("Failed to fetch data");
-        }
-
-        const patientData = await patientRes.json();
-        const appointmentsData = await appointmentsRes.json();
-
-        setPatientData(patientData.patient);
-        setUserId(patientData.patient._id);
-        setAppointments(appointmentsData);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
+    fetchPatientData();
 
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
@@ -80,7 +46,6 @@ export default function Home() {
       }
     };
 
-    fetchPatientData();
     fetchNotifications();
 
     socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
@@ -105,6 +70,43 @@ export default function Home() {
       socket.current.close();
     };
   }, []);
+
+  // Fetch Appointments
+  const fetchPatientData = async () => {
+    try {
+      const [patientRes, appointmentsRes] = await Promise.all([
+        fetch(`${appURL}/${route.patient.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }),
+        fetch(`${appURL}/${route.appointment.get}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }),
+      ]);
+
+      if (!patientRes.ok || !appointmentsRes.ok) {
+        throw new Error("Failed to fetch data");
+      }
+
+      const patientData = await patientRes.json();
+      const appointmentsData = await appointmentsRes.json();
+
+      setPatientData(patientData.patient);
+      setUserId(patientData.patient._id);
+      setAppointments(appointmentsData);
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
+  };
 
   // Filter accepted appointments
   const acceptedAppointments = appointments.filter(
@@ -337,11 +339,15 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">{formatDate(notification.date)}</p>
+                            <p className="mb-0">
+                              {formatDate(notification.date)}
+                            </p>
                           </div>
                         ))
                     ) : (
-                      <p>No notifications available</p>
+                      <p className="fw-bold text-center mb-0">
+                        No notifications available
+                      </p>
                     )}
                   </div>
                 </div>

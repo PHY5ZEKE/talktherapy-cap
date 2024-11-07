@@ -5,7 +5,7 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide} from "react-toastify";
 
-export default function RegisterClinician({ openModal }) {
+export default function RegisterClinician({ openModal, admin, onWebSocket }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
@@ -53,6 +53,12 @@ export default function RegisterClinician({ openModal }) {
         setError(true);
         setMessage(data.message);
       } else {
+        const userUpdate = {
+          notif: "registerClinician",
+          body: `${admin.firstName} ${admin.lastName} registered a new clinician email ${email}.`,
+          show_to: "superadmin",
+        };
+        onWebSocket(userUpdate);
         notify(toastMessage.success.register)
         setError(false);
         setMessage(data.message);

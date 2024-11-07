@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import { Link } from "react-router-dom";
@@ -12,6 +12,7 @@ import MenuDropdown from "../../components/Layout/ClinicianMenu";
 // Utils
 import { route } from "../../utils/route";
 import { page } from "../../utils/page-route";
+import SocketFetch from "../../utils/SocketFetch";
 
 export default function Profile() {
   const { authState } = useContext(AuthContext);
@@ -30,6 +31,37 @@ export default function Profile() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
+  };
+
+  // WebSocket Notification
+  const socket = useRef(null);
+  useEffect(() => {
+    fetchClinicianData();
+
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "fetch-action") {
+        fetchClinicianData();
+      }
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
+  }, []);
+
+  const webSocketFetch = () => {
+    SocketFetch(socket);
   };
 
   const fetchClinicianData = async () => {
@@ -55,10 +87,6 @@ export default function Profile() {
     }
   };
 
-  useEffect(() => {
-    fetchClinicianData();
-  }, []);
-
   return (
     <>
       {/* EDIT MODAL */}
@@ -69,7 +97,7 @@ export default function Profile() {
           userDetails={clinicianData}
           closeModal={handleModal}
           isOwner={true}
-          onProfileUpdate={fetchClinicianData} // Pass the callback function
+          onFetch={webSocketFetch}
         />
       )}
 
@@ -128,8 +156,7 @@ export default function Profile() {
                       />
                       <div className="card-body">
                         <h5 className="">
-                          {clinicianData?.firstName} {clinicianData?.middleName}{" "}
-                          {clinicianData?.lastName}
+                          {`${clinicianData?.firstName} ${clinicianData?.middleName} ${clinicianData?.lastName}`}
                         </h5>
                         <p className="mb-0">
                           Specialization: {clinicianData?.specialization}

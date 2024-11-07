@@ -173,6 +173,9 @@ class WebSocketServer {
         case "notification":
           this.sendNotification(ws);
           break;
+        case "fetch-action":
+          this.fetchAction(ws);
+          break;
         case "offer":
         case "answer":
         case "ice-candidate":
@@ -277,8 +280,13 @@ class WebSocketServer {
     if (!room) return;
 
     room.users.forEach((user) => {
-      if (user.connection !== excludeSocket && user.connection.readyState === WebSocket.OPEN) {
-        user.connection.send(typeof message === "string" ? message : JSON.stringify(message));
+      if (
+        user.connection !== excludeSocket &&
+        user.connection.readyState === WebSocket.OPEN
+      ) {
+        user.connection.send(
+          typeof message === "string" ? message : JSON.stringify(message)
+        );
       }
     });
   }
@@ -288,9 +296,23 @@ class WebSocketServer {
     const notificationMessage = JSON.stringify({
       type: "notification",
       message,
-      date
+      date,
     });
-  
+
+    this.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(notificationMessage);
+      }
+    });
+  }
+
+  fetchAction(data) {
+    const { message } = data;
+    const notificationMessage = JSON.stringify({
+      type: "fetch-action",
+      message,
+    });
+
     this.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(notificationMessage);
@@ -305,7 +327,10 @@ class WebSocketServer {
     if (!room) return;
 
     room.users.forEach((user) => {
-      if (user.connection !== ws && user.connection.readyState === WebSocket.OPEN) {
+      if (
+        user.connection !== ws &&
+        user.connection.readyState === WebSocket.OPEN
+      ) {
         user.connection.send(JSON.stringify(data));
       }
     });

@@ -6,7 +6,6 @@ const express = require("express");
 const cors = require("cors");
 const WebSocketServer = require("./websocket");
 
-
 require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
 mongoose

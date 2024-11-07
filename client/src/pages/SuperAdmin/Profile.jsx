@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -8,6 +8,7 @@ import MenuDropdown from "../../components/Layout/SudoMenu";
 
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
+import SocketFetch from "../../utils/SocketFetch";
 
 // utils
 import { route } from "../../utils/route";
@@ -21,12 +22,6 @@ export default function Profile() {
   const [userDetails, setUserDetails] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
-
-  const notify = (message) =>
-    toast.success(message, {
-      transition: Slide,
-      autoClose: 2000,
-    });
 
   const failNotify = (message) =>
     toast.error(message, {
@@ -44,42 +39,68 @@ export default function Profile() {
     setIsPasswordModalOpen(!isPasswordModalOpen);
   };
 
-  const fetchUserDetails = async () => {
-    if (!accessToken) {
-      setError("No token found. Please log in.");
-      return;
-    }
-
-    const endpoint = `${appURL}/${route.sudo.fetch}`;
-    try {
-      const response = await fetch(endpoint, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setUserDetails(data.superAdmin);
-      } else if (response.status === 401) {
-        setError("Unauthorized. Please log in again.");
-      } else {
-        const errorText = await response.text();
-        failNotify(toastMessage.fail.fetch);
-        setError("Failed to fetch super admin data", errorText);
-      }
-    } catch (error) {
-      failNotify(toastMessage.fail.fetch);
-      failNotify(toastMessage.fail.error);
-      setError("Error fetching super admin data", error);
-    }
-  };
-
+  const socket = useRef(null);
   useEffect(() => {
+    const fetchUserDetails = async () => {
+      if (!accessToken) {
+        setError("No token found. Please log in.");
+        return;
+      }
+
+      const endpoint = `${appURL}/${route.sudo.fetch}`;
+      try {
+        const response = await fetch(endpoint, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserDetails(data.superAdmin);
+        } else if (response.status === 401) {
+          setError("Unauthorized. Please log in again.");
+        } else {
+          const errorText = await response.text();
+          failNotify(toastMessage.fail.fetch);
+          setError("Failed to fetch super admin data", errorText);
+        }
+      } catch (error) {
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
+        setError("Error fetching super admin data", error);
+      }
+    };
+
     fetchUserDetails();
+
+    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+    socket.current.onopen = () => {
+      console.log("Connected to the server");
+    };
+
+    socket.current.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "fetch-action") {
+        fetchUserDetails();
+      }
+    };
+
+    socket.current.onclose = () => {
+      console.log("Disconnected from the server");
+    };
+
+    return () => {
+      socket.current.close();
+    };
   }, []);
+
+  const webSocketFetch = async () => {
+      SocketFetch(socket);
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -105,7 +126,7 @@ export default function Profile() {
           userDetails={userDetails}
           closeModal={handleModal}
           isOwner={true}
-          onProfileUpdate={fetchUserDetails}
+          onFetch={webSocketFetch}
         />
       )}
 

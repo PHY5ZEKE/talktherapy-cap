@@ -6,6 +6,7 @@ import { route } from "../../utils/route";
 import formatDate from "../../utils/formatDate";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
+import SocketFetch from "../../utils/SocketFetch";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
@@ -66,13 +67,36 @@ export default function Home() {
     } catch (error) {
       failNotify(toastMessage.fail.error);
       setError("Error updating profile", error);
+
     }
   };
 
   // WebSocket Notification
   const socket = useRef(null);
   const [notifications, setNotifications] = useState([]);
+
   useEffect(() => {
+    // Fetch Admin List
+    const fetchAdmins = async () => {
+      try {
+        const response = await axios.get(
+          `${appURL}/${route.sudo.getAllAdmins}`,
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+        setAdmins(response.data.admins);
+      } catch (error) {
+        setError("An error occurred while retrieving admins.", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAdmins();
+
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
       try {
@@ -99,6 +123,10 @@ export default function Home() {
       const message = JSON.parse(event.data);
       if (message.type === "notification") {
         fetchNotifications();
+      }
+
+      if (message.type === "fetch-action") {
+        fetchAdmins();
       }
     };
 
@@ -139,17 +167,21 @@ export default function Home() {
 
       const result = await response.json();
       const resultWithNotif = { ...result, type: "notification" };
-      console.log("Notification sent:", JSON.stringify(resultWithNotif));
 
       // Notify WebSocket server
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
         socket.current.send(JSON.stringify(resultWithNotif));
       }
+
+      SocketFetch(socket);
     } catch (error) {
       console.error("Error sending notification:", error);
     }
   };
 
+  const webSocketFetch = () => {
+    SocketFetch(socket);
+  }
 
   //Super Admin
   useEffect(() => {
@@ -186,28 +218,6 @@ export default function Home() {
     };
 
     fetchSuperAdmin();
-  }, []);
-
-  useEffect(() => {
-    const fetchAdmins = async () => {
-      try {
-        const response = await axios.get(
-          `${appURL}/${route.sudo.getAllAdmins}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        setAdmins(response.data.admins);
-      } catch (error) {
-        setError("An error occurred while retrieving admins.", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAdmins();
   }, []);
 
   // Function to toggle activation status
@@ -261,7 +271,7 @@ export default function Home() {
           editProfileAPI={editProfileAPI}
           editPictureAPI={updateProfilePictureAPI}
           userDetails={userDetails}
-          closeModal={handleModal}
+          closeModal={() => setIsOpen((prevState) => !prevState)}
           isOwner={false}
           whatRole={role}
           onProfileUpdate={onProfileUpdate}
@@ -272,7 +282,10 @@ export default function Home() {
       {/* REGISTER ADMIN MODAL */}
       {isAdd && (
         <>
-          <RegisterAdmin openModal={() => setIsAdd(!isAdd)} />
+          <RegisterAdmin
+            openModal={() => setIsAdd((prevState) => !prevState)}
+            onFetch={webSocketFetch}
+          />
         </>
       )}
 
@@ -316,7 +329,7 @@ export default function Home() {
                       <button
                         className="fw-bold text-button border"
                         style={{ cursor: "pointer" }}
-                        onClick={() => setIsAdd(!isAdd)}
+                        onClick={() => setIsAdd((prevState) => !prevState)}
                       >
                         Add Admin
                       </button>
@@ -403,13 +416,14 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">{formatDate(notification.date)}</p>
+                            <p className="mb-0">
+                              {formatDate(notification.date)}
+                            </p>
                           </div>
                         ))
                     ) : (
-                      <p>No notifications available</p>
+                      <p className="fw-bold text-center mb-0">No notifications available</p>
                     )}
-
                   </div>
                 </div>
               </div>

@@ -60,9 +60,6 @@ export default function AppointmentDetails({
       };
       onWebSocket(userUpdate);
       notify(toastMessage.success.statusBook);
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000); // Reload after 2 seconds
     } catch (error) {
       failNotify(toastMessage.fail.status);
     } finally {

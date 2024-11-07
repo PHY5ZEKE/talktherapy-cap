@@ -26,6 +26,7 @@ const upload = multer({
   }),
 }).single("file");
 
+// Utility Functions
 const findAppointmentDetails = async (appointmentId) => {
   return await Appointment.findById(appointmentId).populate([
     "selectedSchedule",
@@ -92,16 +93,20 @@ const handleScheduleChangeRequest = async (appointment, status) => {
     appointment.status = "Accepted";
     const oldSchedule = appointment.selectedSchedule;
     oldSchedule.status = "Available";
+
     await oldSchedule.save();
+
     appointment.selectedSchedule = appointment.newSchedule;
     appointment.newSchedule = null;
     appointment.changeReason = "";
     appointment.selectedSchedule.status = "Booked";
+
     await appointment.selectedSchedule.save();
   } else if (status === "Rejected") {
     appointment.status = "Rejected";
     const oldSchedule = appointment.selectedSchedule;
     oldSchedule.status = "Available";
+
     await oldSchedule.save();
   }
 };
@@ -115,6 +120,7 @@ const handleTemporaryRescheduleRequest = async (appointment, status) => {
     appointment.status = "Temporarily Rescheduled";
     const temporaryReschedule = appointment.temporaryReschedule;
     temporaryReschedule.status = "Booked";
+
     await temporaryReschedule.save();
   } else if (status === "Rejected") {
     appointment.status = "Accepted";
@@ -124,8 +130,38 @@ const handleTemporarilyRescheduled = async (appointment) => {
   appointment.status = "Accepted";
   const temporaryReschedule = appointment.temporaryReschedule;
   temporaryReschedule.status = "Available";
+
   await temporaryReschedule.save();
 };
+
+const decryptPatientDetails = (appointment) => {
+  if (appointment.patientId) {
+    try {
+      if (appointment.patientId.firstName && appointment.patientId.firstName.includes(":")) {
+        appointment.patientId.firstName = decrypt(appointment.patientId.firstName);
+      }
+      if (appointment.patientId.middleName && appointment.patientId.middleName.includes(":")) {
+        appointment.patientId.middleName = decrypt(appointment.patientId.middleName);
+      }
+      if (appointment.patientId.lastName && appointment.patientId.lastName.includes(":")) {
+        appointment.patientId.lastName = decrypt(appointment.patientId.lastName);
+      }
+    } catch (error) {
+      console.error("Error decrypting patient details:", error);
+    }
+  }
+  return appointment;
+};
+
+function generateRoomId() {
+  const length = 8;
+  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
 
 // Create a new appointment JSON first
 exports.createAppointmentJSON = async (req, res) => {
@@ -490,16 +526,6 @@ exports.getAppointmentById = async (req, res) => {
   }
 };
 
-function generateRoomId() {
-  const length = 8;
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-}
-
 exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
@@ -616,21 +642,7 @@ exports.getClinicianAppointments = async (req, res) => {
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
 
-    // Decrypt patient details
-    const decryptedAppointments = appointments.map((appointment) => {
-      if (appointment.patientId) {
-        appointment.patientId.firstName = decrypt(
-          appointment.patientId.firstName
-        );
-        appointment.patientId.middleName = decrypt(
-          appointment.patientId.middleName
-        );
-        appointment.patientId.lastName = decrypt(
-          appointment.patientId.lastName
-        );
-      }
-      return appointment;
-    });
+    const decryptedAppointments = appointments.map(decryptPatientDetails);
 
     res.status(200).json(decryptedAppointments);
   } catch (error) {

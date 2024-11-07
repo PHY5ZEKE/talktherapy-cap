@@ -541,7 +541,7 @@ export default function Home() {
                           </div>
                         ))
                     ) : (
-                      <p>No notifications available</p>
+                      <p className="fw-bold text-center mb-0">No notifications available</p>
                     )}
                   </div>
                 </div>

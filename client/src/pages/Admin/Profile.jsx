@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { Link } from "react-router-dom";
+
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import RequestView from "../../components/Modals/RequestView";
+
 import { route } from "../../utils/route";
 import { page } from "../../utils/page-route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
+import SocketFetch from "../../utils/SocketFetch";
 
 export default function Profile() {
   const [adminData, setAdminData] = useState(null);
@@ -20,6 +23,7 @@ export default function Profile() {
   const accessToken = authState.accessToken;
   const [isViewRequests, setIsViewRequests] = useState(false);
   const [pendingRequests, setPendingRequests] = useState([]);
+
   const failNotify = (message) =>
     toast.error(message, {
       transition: Slide,
@@ -47,6 +51,10 @@ export default function Profile() {
       const message = JSON.parse(event.data);
       if (message.type === "notification") {
         fetchPendingRequests();
+      }
+
+      if (message.type === "fetch-action") {
+        fetchAdminData();
       }
     };
 
@@ -97,6 +105,10 @@ export default function Profile() {
     } catch (error) {
       console.error("Error sending notification:", error);
     }
+  };
+
+  const webSocketFetch = () => {
+    SocketFetch(socket);
   };
 
   const fetchAdminData = async () => {
@@ -167,7 +179,7 @@ export default function Profile() {
           userDetails={adminData}
           closeModal={handleModal}
           isOwner={true}
-          onProfileUpdate={fetchAdminData}
+          onFetch={webSocketFetch}
         />
       )}
 
@@ -281,20 +293,24 @@ export default function Profile() {
                     <div className="row p-3">
                       <div
                         className="col bg-white border rounded-4 p-3 overflow-auto"
-                        style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                        style={{ maxHeight: "75vh" }}
                       >
-                        {pendingRequests.map((request) => (
-                          <RequestView
-                            key={request._id}
-                            clinicianId={request.clinicianId._id}
-                            headerClinician={`${request.clinicianId.firstName} ${request.clinicianId.lastName}`}
-                            headerPatient={`${request.patientId.firstName} ${request.patientId.lastName}`}
-                            details={request.reason}
-                            requestId={request._id}
-                            onWebSocket={webSocketNotification}
-                            onStatusChange={handleStatusChange}
-                          />
-                        ))}
+                        {pendingRequests.length > 0 ? (
+                          pendingRequests.map((request) => (
+                            <RequestView
+                              key={request._id}
+                              clinicianId={request.clinicianId._id}
+                              headerClinician={`${request.clinicianId.firstName} ${request.clinicianId.lastName}`}
+                              headerPatient={`${request.patientId.firstName} ${request.patientId.lastName}`}
+                              details={request.reason}
+                              requestId={request._id}
+                              onWebSocket={webSocketNotification}
+                              onStatusChange={handleStatusChange}
+                            />
+                          ))
+                        ) : (
+                          <p className="fw-bold text-center mb-0">No pending requests.</p>
+                        )}
                       </div>
                     </div>
                   </>
