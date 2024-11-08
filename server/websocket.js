@@ -209,7 +209,8 @@ class WebSocketServer {
         })
       );
       return;
-    } else if (room.users.length >= this.MAX_CAPACITY) {
+    }
+    if (room.users.length >= this.MAX_CAPACITY) {
       ws.send(
         JSON.stringify({
           type: "room-full",
@@ -219,22 +220,17 @@ class WebSocketServer {
       );
       ws.close();
       return;
-    } else {
-      room.users.push({ name: user, connection: ws });
-      console.log(
-        `User ${user} joined room ${roomID}. Current users:`,
-        room.users.map((u) => u.name)
-      );
-
-      this.broadcastToRoom(
-        roomID,
-        {
-          type: "user-joined",
-          user,
-        },
-        ws
-      );
     }
+    room.users.push({ name: user, connection: ws });
+    console.log(
+      `User ${user} joined room ${roomID}. Current users:`,
+      room.users.map((u) => u.name)
+    );
+
+    this.broadcastToRoom(roomID, {
+      type: "join-room",
+      user,
+    });
   }
 
   leaveRoom(data) {
@@ -244,6 +240,7 @@ class WebSocketServer {
     if (!room) return;
 
     room.users = room.users.filter((u) => u.name !== user);
+
     console.log(
       `User ${user} left room ${roomID}. Remaining users:`,
       room.users.map((u) => u.name)
@@ -252,12 +249,12 @@ class WebSocketServer {
     if (room.users.length === 0) {
       delete this.rooms[roomID];
       console.log(`Room ${roomID} deleted as it is now empty.`);
-    } else {
-      this.broadcastToRoom(roomID, {
-        type: "user-left",
-        user,
-      });
     }
+
+    this.broadcastToRoom(roomID, {
+      type: "leave-room",
+      user,
+    });
   }
 
   broadcastMessage(ws, data) {
@@ -284,6 +281,7 @@ class WebSocketServer {
         user.connection !== excludeSocket &&
         user.connection.readyState === WebSocket.OPEN
       ) {
+        console.log("Message :", message);
         user.connection.send(
           typeof message === "string" ? message : JSON.stringify(message)
         );

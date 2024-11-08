@@ -122,8 +122,36 @@ export default function Room() {
     const initiateConnection = async () => {
       try {
         await pageReady();
+        socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
 
-        InitializeWebSocket();
+        socket.current.onopen = () => {
+          isSocketOpen.current = true;
+          console.log("Connection open");
+
+          if (!hasJoinedRoom.current) {
+            socket.current.send(
+              JSON.stringify({
+                type: "join-room",
+                user: getUserName(),
+                roomID: roomid,
+              })
+            );
+            hasJoinedRoom.current = true;
+            console.log("Joined the room");
+            startConnection(true);
+          }
+        };
+
+        socket.current.onmessage = gotMessageFromServer;
+
+        socket.current.onerror = (error) =>
+          console.error("WebSocket error:", error);
+
+        socket.current.onclose = () => {
+          console.warn("WebSocket connection closed");
+          isSocketOpen.current = false;
+          hasJoinedRoom.current = false;
+        };
       } catch (error) {
         console.error("Error in pageReady:", error);
         handleCloseConnection();
@@ -140,61 +168,19 @@ export default function Room() {
       roomid === "errorRoomId"
     ) {
       handleCloseConnection();
-    } else {
-      initiateConnection();
     }
-
-    const handleBeforeUnload = () => {
-      if (socket.current) {
-        handleCloseConnection();
-      }
-    };
-
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    initiateConnection();
 
     // Cleanup function when component unmounts
     return () => {
       if (socket.current) {
         handleCloseConnection();
       }
-      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
   const pageReady = async () => {
     await getMediaStream({ video: true, audio: true });
-  };
-
-  const InitializeWebSocket = () => {
-    socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
-
-    socket.current.onopen = () => {
-      isSocketOpen.current = true;
-      console.log("Connection open");
-      if (!hasJoinedRoom.current) {
-        socket.current.send(
-          JSON.stringify({
-            type: "join-room",
-            user: getUserName(),
-            roomID: roomid,
-          })
-        );
-        hasJoinedRoom.current = true;
-        console.log("Joined the room");
-        startConnection(true);
-      }
-    };
-
-    socket.current.onmessage = gotMessageFromServer;
-
-    socket.current.onerror = (error) =>
-      console.error("WebSocket error:", error);
-
-    socket.current.onclose = () => {
-      console.warn("WebSocket connection closed");
-      isSocketOpen.current = false;
-      hasJoinedRoom.current = false;
-    };
   };
 
   const startConnection = (isCaller) => {
@@ -251,6 +237,7 @@ export default function Room() {
         return prevMessages;
       });
     } else if (signal.type === "leave-room") {
+      console.log("Got leave-room from ws")
       handleCloseConnection();
     }
   };
@@ -334,18 +321,22 @@ export default function Room() {
   };
 
   const handleCloseConnection = () => {
-    if (socket.current) {
-      socket.current.send(
-        JSON.stringify({
-          type: "leave-room",
-          user: getUserName(),
-        })
-      );
-      stopMediaStream();
-      socket.current?.close();
-      peerConnection.current?.close();
-    }
-    navigate("/");
+
+    // stopMediaStream();
+
+    socket.current.send(
+      JSON.stringify({
+        type: "leave-room",
+        roomID: roomid,
+        user: getUserName(),
+      })
+    );
+
+    
+    // peerConnection.current.close();
+    // socket.current.close();
+
+    // navigate("/");
   };
 
   const handleSendMessage = (data) => {
@@ -358,6 +349,8 @@ export default function Room() {
           sender: getUserName(),
         })
       );
+
+      console.log("Sent a message:", data);
     }
   };
 
