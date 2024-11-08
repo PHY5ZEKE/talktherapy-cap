@@ -66,15 +66,15 @@ const useMediaStream = (localVideoRef) => {
 
 export default function Room() {
   const { authState } = useContext(AuthContext);
-  const role = authState.userRole;
+  const userRole = authState.userRole;
   const currentUser = authState.userId;
 
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
   const { roomid } = useParams();
+
   const navigate = useNavigate();
 
-  const [userRole, setUserRole] = useState(null);
   const [messages, setMessages] = useState([]);
   const [type, setType] = useState("");
 
@@ -126,8 +126,6 @@ export default function Room() {
 
         socket.current.onopen = () => {
           isSocketOpen.current = true;
-          console.log("Connection open");
-
           if (!hasJoinedRoom.current) {
             socket.current.send(
               JSON.stringify({
@@ -137,12 +135,13 @@ export default function Room() {
               })
             );
             hasJoinedRoom.current = true;
-            console.log("Joined the room");
             startConnection(true);
           }
         };
 
-        socket.current.onmessage = gotMessageFromServer;
+        socket.current.onmessage = (message) => {
+          gotMessageFromServer(message);
+        };
 
         socket.current.onerror = (error) =>
           console.error("WebSocket error:", error);
@@ -158,12 +157,10 @@ export default function Room() {
       }
     };
 
-    setUserRole(role);
-
     if (
-      (role === "patientslp" &&
+      (userRole === "patientslp" &&
         appointmentDetails?.patientId._id !== currentUser) ||
-      (role === "clinician" &&
+      (userRole === "clinician" &&
         appointmentDetails?.selectedClinician !== currentUser) ||
       roomid === "errorRoomId"
     ) {
@@ -171,11 +168,27 @@ export default function Room() {
     }
     initiateConnection();
 
-    // Cleanup function when component unmounts
+    // Fuck u refresh
+    const handleBeforeUnload = (event) => {
+      socket.current.send(
+        JSON.stringify({
+          type: "leave-room",
+          roomID: roomid,
+          user: getUserName(),
+        })
+      );
+      const message = "Refreshing the page? We will try to reconnect you again.";
+      event.preventDefault();
+      event.returnValue = message;
+      return message
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
       if (socket.current) {
         handleCloseConnection();
       }
+      window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
@@ -236,8 +249,10 @@ export default function Room() {
         }
         return prevMessages;
       });
-    } else if (signal.type === "leave-room") {
-      console.log("Got leave-room from ws")
+    } else if (
+      signal.type === "leave-room" ||
+      signal.type === "user-already-in-room"
+    ) {
       handleCloseConnection();
     }
   };
@@ -321,8 +336,7 @@ export default function Room() {
   };
 
   const handleCloseConnection = () => {
-
-    // stopMediaStream();
+    stopMediaStream();
 
     socket.current.send(
       JSON.stringify({
@@ -331,12 +345,11 @@ export default function Room() {
         user: getUserName(),
       })
     );
-
     
-    // peerConnection.current.close();
-    // socket.current.close();
+    peerConnection.current.close();
+    socket.current.close();
 
-    // navigate("/");
+    navigate("/");
   };
 
   const handleSendMessage = (data) => {
@@ -349,8 +362,6 @@ export default function Room() {
           sender: getUserName(),
         })
       );
-
-      console.log("Sent a message:", data);
     }
   };
 

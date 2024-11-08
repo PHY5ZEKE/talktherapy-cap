@@ -227,10 +227,13 @@ class WebSocketServer {
       room.users.map((u) => u.name)
     );
 
-    this.broadcastToRoom(roomID, {
-      type: "join-room",
-      user,
-    });
+    const broadcastData = JSON.stringify(
+      {
+        type: "join-room",
+        user
+      }
+    )
+    this.broadcastToRoom(roomID, broadcastData);
   }
 
   leaveRoom(data) {
@@ -266,25 +269,22 @@ class WebSocketServer {
     const broadcastData = JSON.stringify({
       type: "chat-message",
       message,
+      roomID,
       sender,
     });
 
-    this.broadcastToRoom(roomID, broadcastData, ws);
+    console.log("Broadcasting chat message:", broadcastData);
+    this.broadcastToRoom(roomID, broadcastData);
   }
 
   broadcastToRoom(roomID, message, excludeSocket = null) {
     const room = this.rooms[roomID];
     if (!room) return;
 
+    console.log(`Broadcasting to room ${roomID}:`, message);
     room.users.forEach((user) => {
-      if (
-        user.connection !== excludeSocket &&
-        user.connection.readyState === WebSocket.OPEN
-      ) {
-        console.log("Message :", message);
-        user.connection.send(
-          typeof message === "string" ? message : JSON.stringify(message)
-        );
+      if (user.connection.readyState === WebSocket.OPEN) {
+        user.connection.send(message);
       }
     });
   }
