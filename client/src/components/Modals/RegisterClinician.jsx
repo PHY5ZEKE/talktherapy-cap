@@ -62,6 +62,30 @@ export default function RegisterClinician({ openModal, admin, onWebSocket }) {
         notify(toastMessage.success.register)
         setError(false);
         setMessage(data.message);
+
+        const payload = {
+          email: email,
+          header: "Email has been registered | TalkTherapy",
+          content:
+            "Your email has been registered as a clinician. You may now register at talktherapy.site and login.",
+        };
+  
+        const sendEmail = await fetch(`${appURL}/${route.system.email}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        });
+  
+        const emailData = await sendEmail.json();
+  
+        if (sendEmail.ok) {
+          console.log("Notification sent successfully:", emailData.message);
+        } else {
+          console.error("Error sending notification:", emailData.message);
+        }
+
         setEmail(""); // Clear the input field on success
       }
     } catch (error) {

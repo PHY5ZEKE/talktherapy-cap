@@ -97,7 +97,7 @@ export default function Home() {
 
   useEffect(() => {
     // Fetch Admin Data
-    fetchAdminData()
+    fetchAdminData();
 
     // Fetch Appointments
     const fetchAppointments = async () => {
@@ -422,7 +422,13 @@ export default function Home() {
       )}
 
       {/* ADD CLINICIAN MODAL */}
-      {isAddClinician && <RegisterClinician openModal={closeAddClinician} admin={adminData} onWebSocket={webSocketNotification} />}
+      {isAddClinician && (
+        <RegisterClinician
+          openModal={closeAddClinician}
+          admin={adminData}
+          onWebSocket={webSocketNotification}
+        />
+      )}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -492,169 +498,190 @@ export default function Home() {
                       <p>{error}</p>
                     ) : appointments ? (
                       <>
-                        {appointments
-                          .filter(
-                            (appointment) =>
-                              appointment.status === "Pending" ||
-                              appointment.status ===
-                                "Schedule Change Request" ||
-                              appointment.status ===
-                                "Temporary Reschedule Request" // Include Temporary Reschedule Request
-                          )
-                          .map((appointment, index) => (
-                            <div
-                              key={index}
-                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => openModal(appointment._id)}
-                            >
-                              <h5 className="mb-0 fw-bold">
-                                {appointment.status ===
-                                "Schedule Change Request"
-                                  ? appointment.newSchedule?.day
-                                  : appointment.status ===
-                                    "Temporary Reschedule Request" // Include Temporary Reschedule Request
-                                  ? appointment.temporaryReschedule?.day
-                                  : appointment.selectedSchedule?.day}
-                              </h5>
-                              <p className="mb-0">
-                                {appointment.status ===
-                                "Schedule Change Request"
-                                  ? `${appointment.newSchedule?.startTime} to ${appointment.newSchedule?.endTime}`
-                                  : appointment.status ===
-                                    "Temporary Reschedule Request" // Include Temporary Reschedule Request
-                                  ? `${appointment.temporaryReschedule?.startTime} to ${appointment.temporaryReschedule?.endTime}`
-                                  : `${appointment.selectedSchedule?.startTime} to ${appointment.selectedSchedule?.endTime}`}
-                              </p>
-                              <p className="mb-0">
-                                {appointment.status ===
-                                "Schedule Change Request"
-                                  ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested for a change in her schedule`
-                                  : appointment.status ===
-                                    "Temporary Reschedule Request" // Include Temporary Reschedule Request
-                                  ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a temporary reschedule`
-                                  : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule?.clinicianName}`}
-                              </p>
-                              <div className="mb-3 text-pending">
-                                {appointment.status === "Pending"
-                                  ? "Pending"
-                                  : appointment.status ===
-                                    "Schedule Change Request"
-                                  ? "Schedule Change Request"
-                                  : "Temporary Schedule Request"}{" "}
-                                {/* Include Temporary Schedule Request */}
+                        {appointments.filter(
+                          (appointment) =>
+                            appointment.status === "Pending" ||
+                            appointment.status === "Schedule Change Request" ||
+                            appointment.status ===
+                              "Temporary Reschedule Request"
+                        ).length > 0 &&
+                          appointments
+                            .filter(
+                              (appointment) =>
+                                appointment.status === "Pending" ||
+                                appointment.status ===
+                                  "Schedule Change Request" ||
+                                appointment.status ===
+                                  "Temporary Reschedule Request"
+                            )
+                            .map((appointment, index) => (
+                              <div
+                                key={index}
+                                className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => openModal(appointment._id)}
+                              >
+                                <h5 className="mb-0 fw-bold">
+                                  {appointment.status ===
+                                  "Schedule Change Request"
+                                    ? appointment.newSchedule?.day
+                                    : appointment.status ===
+                                      "Temporary Reschedule Request"
+                                    ? appointment.temporaryReschedule?.day
+                                    : appointment.selectedSchedule?.day}
+                                </h5>
+                                <p className="mb-0">
+                                  {appointment.status ===
+                                  "Schedule Change Request"
+                                    ? `${appointment.newSchedule?.startTime} to ${appointment.newSchedule?.endTime}`
+                                    : appointment.status ===
+                                      "Temporary Reschedule Request"
+                                    ? `${appointment.temporaryReschedule?.startTime} to ${appointment.temporaryReschedule?.endTime}`
+                                    : `${appointment.selectedSchedule?.startTime} to ${appointment.selectedSchedule?.endTime}`}
+                                </p>
+                                <p className="mb-0">
+                                  {appointment.status ===
+                                  "Schedule Change Request"
+                                    ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested for a change in her schedule`
+                                    : appointment.status ===
+                                      "Temporary Reschedule Request"
+                                    ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a temporary reschedule`
+                                    : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule?.clinicianName}`}
+                                </p>
+                                <div className="mb-3 text-pending">
+                                  {appointment.status === "Pending"
+                                    ? "Pending"
+                                    : appointment.status ===
+                                      "Schedule Change Request"
+                                    ? "Schedule Change Request"
+                                    : "Temporary Schedule Request"}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
 
-                        {appointments
-                          .filter(
-                            (appointment) =>
-                              appointment.status === "Accepted" ||
-                              appointment.status === "Temporarily Rescheduled"
-                          )
-                          .map((appointment, index) => (
-                            <div
-                              key={index}
-                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => openModal(appointment._id)}
-                            >
-                              <h5 className="mb-0 fw-bold">
-                                {appointment.status ===
-                                "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule?.day
-                                  : appointment.selectedSchedule?.day}
-                              </h5>
-                              <p className="mb-0">
-                                {appointment.status ===
-                                "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule?.startTime
-                                  : appointment.selectedSchedule
-                                      ?.startTime}{" "}
-                                to{" "}
-                                {appointment.status ===
-                                "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule?.endTime
-                                  : appointment.selectedSchedule?.endTime}
-                              </p>
-                              <p className="mb-0">
-                                {appointment.patientId.firstName}{" "}
-                                {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName} has a session
-                                with{" "}
-                                {appointment.status ===
-                                "Temporarily Rescheduled"
-                                  ? appointment.temporaryReschedule
-                                      ?.clinicianName
-                                  : appointment.selectedSchedule?.clinicianName}
-                              </p>
-                              <div className="mb-3 text-accepted">
-                                {appointment.status}
+                        {appointments.filter(
+                          (appointment) =>
+                            appointment.status === "Accepted" ||
+                            appointment.status === "Temporarily Rescheduled"
+                        ).length > 0 &&
+                          appointments
+                            .filter(
+                              (appointment) =>
+                                appointment.status === "Accepted" ||
+                                appointment.status === "Temporarily Rescheduled"
+                            )
+                            .map((appointment, index) => (
+                              <div
+                                key={index}
+                                className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => openModal(appointment._id)}
+                              >
+                                <h5 className="mb-0 fw-bold">
+                                  {appointment.status ===
+                                  "Temporarily Rescheduled"
+                                    ? appointment.temporaryReschedule?.day
+                                    : appointment.selectedSchedule?.day}
+                                </h5>
+                                <p className="mb-0">
+                                  {appointment.status ===
+                                  "Temporarily Rescheduled"
+                                    ? appointment.temporaryReschedule?.startTime
+                                    : appointment.selectedSchedule
+                                        ?.startTime}{" "}
+                                  to{" "}
+                                  {appointment.status ===
+                                  "Temporarily Rescheduled"
+                                    ? appointment.temporaryReschedule?.endTime
+                                    : appointment.selectedSchedule?.endTime}
+                                </p>
+                                <p className="mb-0">
+                                  {appointment.patientId.firstName}{" "}
+                                  {appointment.patientId.middleName}{" "}
+                                  {appointment.patientId.lastName} has a session
+                                  with{" "}
+                                  {appointment.status ===
+                                  "Temporarily Rescheduled"
+                                    ? appointment.temporaryReschedule
+                                        ?.clinicianName
+                                    : appointment.selectedSchedule
+                                        ?.clinicianName}
+                                </p>
+                                <div className="mb-3 text-accepted">
+                                  {appointment.status}
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        {appointments
-                          .filter(
-                            (appointment) => appointment.status === "Rejected"
-                          )
-                          .map((appointment, index) => (
-                            <div
-                              key={index}
-                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => openModal(appointment._id)}
-                            >
-                              <h5 className="mb-0 fw-bold">
-                                {appointment.selectedSchedule.day}
-                              </h5>
-                              <p className="mb-0">
-                                {appointment.selectedSchedule.startTime} to{" "}
-                                {appointment.selectedSchedule.endTime}
-                              </p>
-                              <p className="mb-0">
-                                {appointment.patientId.firstName}{" "}
-                                {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName} session request
-                                with{" "}
-                                {appointment.selectedSchedule.clinicianName} was
-                                rejected
-                              </p>
-                              <div className="mb-3 text-cancelled">
-                                Rejected
+                            ))}
+
+                        {appointments.filter(
+                          (appointment) => appointment.status === "Rejected"
+                        ).length > 0 &&
+                          appointments
+                            .filter(
+                              (appointment) => appointment.status === "Rejected"
+                            )
+                            .map((appointment, index) => (
+                              <div
+                                key={index}
+                                className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => openModal(appointment._id)}
+                              >
+                                <h5 className="mb-0 fw-bold">
+                                  {appointment.selectedSchedule.day}
+                                </h5>
+                                <p className="mb-0">
+                                  {appointment.selectedSchedule.startTime} to{" "}
+                                  {appointment.selectedSchedule.endTime}
+                                </p>
+                                <p className="mb-0">
+                                  {appointment.patientId.firstName}{" "}
+                                  {appointment.patientId.middleName}{" "}
+                                  {appointment.patientId.lastName} session
+                                  request with{" "}
+                                  {appointment.selectedSchedule.clinicianName}{" "}
+                                  was rejected
+                                </p>
+                                <div className="mb-3 text-cancelled">
+                                  Rejected
+                                </div>
                               </div>
-                            </div>
-                          ))}
-                        {appointments
-                          .filter(
-                            (appointment) => appointment.status === "Completed"
-                          )
-                          .map((appointment, index) => (
-                            <div
-                              key={index}
-                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => openModal(appointment._id)}
-                            >
-                              <h5 className="mb-0 fw-bold">
-                                {appointment.selectedSchedule.day}
-                              </h5>
-                              <p className="mb-0">
-                                {appointment.selectedSchedule.startTime} to{" "}
-                                {appointment.selectedSchedule.endTime}
-                              </p>
-                              <p className="mb-0">
-                                {appointment.patientId.firstName}{" "}
-                                {appointment.patientId.middleName}{" "}
-                                {appointment.patientId.lastName} has requested a
-                                session with{" "}
-                                {appointment.selectedSchedule.clinicianName}
-                              </p>
-                              <div className="mb-3 text-accepted">
-                                {appointment.status}
+                            ))}
+
+                        {appointments.filter(
+                          (appointment) => appointment.status === "Completed"
+                        ).length > 0 &&
+                          appointments
+                            .filter(
+                              (appointment) =>
+                                appointment.status === "Completed"
+                            )
+                            .map((appointment, index) => (
+                              <div
+                                key={index}
+                                className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                                style={{ cursor: "pointer" }}
+                                onClick={() => openModal(appointment._id)}
+                              >
+                                <h5 className="mb-0 fw-bold">
+                                  {appointment.selectedSchedule?.day}
+                                </h5>
+                                <p className="mb-0">
+                                  {appointment.selectedSchedule?.startTime} to{" "}
+                                  {appointment.selectedSchedule?.endTime}
+                                </p>
+                                <p className="mb-0">
+                                  {appointment.patientId.firstName}{" "}
+                                  {appointment.patientId.middleName}{" "}
+                                  {appointment.patientId.lastName} has requested
+                                  a session with{" "}
+                                  {appointment.selectedSchedule?.clinicianName}
+                                </p>
+                                <div className="mb-3 text-accepted">
+                                  {appointment.status}
+                                </div>
                               </div>
-                            </div>
-                          ))}
+                            ))}
                       </>
                     ) : (
                       <p>Fetching data.</p>
@@ -845,7 +872,9 @@ export default function Home() {
                           </div>
                         ))
                     ) : (
-                      <p className="fw-bold text-center mb-0">No notifications available</p>
+                      <p className="fw-bold text-center mb-0">
+                        No notifications available
+                      </p>
                     )}
                     {/* <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
                       <p className="mb-0 fw-bold">Date and Time</p>

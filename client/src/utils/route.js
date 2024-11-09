@@ -56,6 +56,7 @@ export const route = {
     otp: "api/super-admin-slp/verify-otp",
     reset: "api/super-admin-slp/reset-password",
     audit: "api/super-admin-slp/audit-logs",
+    email: "api/super-admin-slp/email-notification",
   },
   appointment: {
     createFile: "api/appointments-slp/create-appointment/file",

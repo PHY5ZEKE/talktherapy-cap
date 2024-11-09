@@ -196,6 +196,36 @@ exports.getSuperAdmin = [
   },
 ];
 
+// Notification
+exports.sendNotification = async (req, res) => {
+  const { email, header, content } = req.body;
+
+  // Send to email and body WOW!
+  const transporter = nodemailer.createTransport({
+    service: "Gmail",
+    auth: {
+      user: "talktherapycapstone@gmail.com",
+      pass: "bvxj gwqk oirf lcgy",
+    },
+  });
+
+  const mailOptions = {
+    to: email,
+    from: process.env.EMAIL,
+    subject: header,
+    text: content,
+  };
+
+  transporter.sendMail(mailOptions, async (err) => {
+    if (err) {
+      return res
+        .status(500)
+        .json({ error: true, message: "Email notification could not be sent." });
+    }
+    res.status(200).json({ error: false, message: "Email notification sent." });
+  });
+}
+
 // Forgot Password Function
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
