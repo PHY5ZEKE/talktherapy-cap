@@ -13,10 +13,24 @@ export default function RequestView({
   onWebSocket,
 }) {
   const [loading, setLoading] = useState(false);
+
   const { authState } = useContext(AuthContext);
   const appURL = import.meta.env.VITE_APP_URL;
   const accessToken = authState.accessToken;
 
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+    const failNotify = (message) =>
+      toast.error(message, {
+        transition: Slide,
+        autoClose: 2000,
+      });
+
+      
   const handleStatusChange = async (status) => {
     setLoading(true);
     try {
@@ -46,11 +60,11 @@ export default function RequestView({
 
       onWebSocket(userUpdate);
 
-      toast.success(data.message);
+      notify("Status updated successfully");
       onStatusChange(requestId, status);
     } catch (error) {
       console.log(error);
-      toast.error("Failed to update status");
+      failNotify("Failed to update status");
     } finally {
       setLoading(false);
     }

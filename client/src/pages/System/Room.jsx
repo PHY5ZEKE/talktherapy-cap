@@ -17,6 +17,8 @@ import {
 import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
 import { init } from "../../machinelearning/script.js";
 
+import Soap from "../../components/Modals/Soap.jsx";
+
 const useMediaStream = (localVideoRef) => {
   const localStream = useRef(null);
   const getMediaStream = useCallback(
@@ -71,6 +73,10 @@ export default function Room() {
 
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
+  const [patientId, setPatientId] = useState(appointmentDetails?.patientId._id);
+  const [clinicianId, setClinicianId] = useState(appointmentDetails?.selectedClinician);
+  const [clinicianName, setClinicianName] = useState(appointmentDetails?.selectedSchedule.clinicianName);
+
   const { roomid } = useParams();
 
   const navigate = useNavigate();
@@ -78,8 +84,8 @@ export default function Room() {
   const [messages, setMessages] = useState([]);
   const [type, setType] = useState("");
 
-  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
-  const [isMicEnabled, setIsMicEnabled] = useState(true);
+  const [isCameraEnabled, setIsCameraEnabled] = useState(false);
+  const [isMicEnabled, setIsMicEnabled] = useState(false);
   const [speechScore, setSpeechScore] = useState({
     pronunciationScore: 0,
     fluencyScore: 0,
@@ -193,7 +199,10 @@ export default function Room() {
   }, []);
 
   const pageReady = async () => {
+    // we get then turn it off
     await getMediaStream({ video: true, audio: true });
+    localStream.current.getVideoTracks().forEach(track => track.enabled = false);
+    localStream.current.getAudioTracks().forEach(track => track.enabled = false);
   };
 
   const startConnection = (isCaller) => {
@@ -375,8 +384,67 @@ export default function Room() {
     runSpeechRecognition(setSpeechScore);
   };
 
+  const webSocketNotification = async (message) => {
+    const response = JSON.stringify(message);
+    const parsed = JSON.parse(response);
+
+    let notification = {};
+
+    if (parsed.notif === "addSOAP") {
+      notification = {
+        body: `${parsed.body}`,
+        date: new Date(),
+        show_to: parsed.show_to,
+      };
+    }
+
+    try {
+      const response = await fetch(`${appURL}/${route.notification.create}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(notification),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to send notification");
+      }
+      const result = await response.json();
+
+      // Notify WebSocket server
+      const resultWithNotif = { ...result, type: "notification" };
+
+      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
+        socket.current.send(JSON.stringify(resultWithNotif));
+      }
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+    // Add SOAP Modal
+    const [soapModal, setSoapModal] = useState(false);
+    const handleSoapModal = () => {
+      setSoapModal((prevState) => !prevState);
+    };
+
   return (
     <>
+    {/* STARTCALL.JSX MODAL */}
+    {/* <StartCall/> */}
+
+    {/* Add SOAP Modal */}
+    {soapModal && (
+        <Soap
+          openModal={handleSoapModal}
+          clinicianId={clinicianId}
+          clinicianName={clinicianName}
+          patientId={patientId}
+          onWebSocket={webSocketNotification}
+        />
+      )}
       <div className="container-fluid d-flex flex-column justify-content-between vh-100">
         <div className="row text-center py-2 border border-start-0 border-[#B9B9B9] stick-top">
           <p className="mb-0">
@@ -466,7 +534,7 @@ export default function Room() {
                           </a>
                         </li>
                         <li>
-                          <a role="button" className="dropdown-item" href="#">
+                          <a role="button" className="dropdown-item" href="#" onClick={handleSoapModal}>
                             Add Diagnostic
                           </a>
                         </li>

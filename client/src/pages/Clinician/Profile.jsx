@@ -8,6 +8,7 @@ import Sidebar from "../../components/Sidebar/SidebarClinician";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
+import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
 
 // Utils
 import { route } from "../../utils/route";

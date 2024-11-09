@@ -5,6 +5,7 @@ import { toast, Slide } from "react-toastify";
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
+import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
 
 // DatePicker
 import { useState, useEffect, useCallback, useMemo, useContext } from "react";
@@ -175,6 +176,21 @@ export default function ManageSchedule() {
     [schedules]
   );
 
+  // Confirmation Dialog
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
+  const [scheduleToDelete, setScheduleToDelete] = useState(null);
+
+  const handleConfirmationDialog = (scheduleId) => {
+    setIsConfirmationOpen(!isConfirmationOpen);
+    setScheduleToDelete(scheduleId);
+  };
+
+  const handleConfirmDelete = () => {
+    setIsConfirmationOpen(!isConfirmationOpen);
+    handleDelete(scheduleToDelete);
+    notify("Successfully deleted this schedule.")
+  };
+
   return (
     <>
       {/* Add Schedule Modal */}
@@ -184,7 +200,6 @@ export default function ManageSchedule() {
           onScheduleAdded={handleScheduleAdded}
         />
       )}
-
       {/* Edit Schedule Modal */}
       {isEditOpen && (
         <EditSchedule
@@ -193,7 +208,17 @@ export default function ManageSchedule() {
           scheduleId={selectedScheduleId}
         />
       )}
-
+      {/* Confirmation Dialog */}
+      {isConfirmationOpen && (
+        <ConfirmationDialog
+          header={"Delete this schedule?"}
+          body={
+            "Please verify your action. Are you sure to delete this schedule?"
+          }
+          handleModal={handleConfirmationDialog}
+          confirm={handleConfirmDelete}
+        />
+      )}
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
           {/* SIDEBAR */}
@@ -307,7 +332,9 @@ export default function ManageSchedule() {
                               </div>
                               <div
                                 className="mb-3 fw-bold text-button border"
-                                onClick={() => handleDelete(schedule._id)}
+                                onClick={() =>
+                                  handleConfirmationDialog(schedule._id)
+                                }
                               >
                                 Delete
                               </div>

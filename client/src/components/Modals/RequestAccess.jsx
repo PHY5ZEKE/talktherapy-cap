@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./modal.css";
+
 import { route } from "../../utils/route";
 import { toast } from "react-toastify";
 
@@ -14,6 +15,19 @@ export default function RequestAccess({
 }) {
   const [reason, setReason] = useState("");
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+    const failNotify = (message) =>
+      toast.error(message, {
+        transition: Slide,
+        autoClose: 2000,
+      });
+
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -52,11 +66,11 @@ export default function RequestAccess({
       if (!response.ok) {
         throw new Error(data.message || "Failed to request access");
       }
+      notify("Access requested successfully");
       onWebSocket(userUpdate);
-      toast.success("Access requested successfully");
       openModal();
     } catch (error) {
-      toast.error(error.message || "Failed to request access");
+      failNotify(error.message);
     }
   };
 

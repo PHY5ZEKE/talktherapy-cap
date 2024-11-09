@@ -3,9 +3,23 @@ import { AuthContext } from "../../utils/AuthContext";
 import "./modal.css";
 import { route } from "../../utils/route";
 
-export default function EditSoap({ openModal, soapRecord }) {
+import { toast, Slide } from "react-toastify";
+
+export default function EditSoap({ openModal, soapRecord, onFetch }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -48,10 +62,12 @@ export default function EditSoap({ openModal, soapRecord }) {
       }
 
       const data = await response.json();
-      console.log("SOAP diagnosis updated successfully:", data);
+      onFetch();
+      notify("Edited SOAP successfully.")
       openModal(); // Close the modal after successful submission
     } catch (error) {
-      console.error("Error updating SOAP diagnosis:", error);
+      failNotify("Failed to edit SOAP.")
+      console.log(error)
     }
   };
 

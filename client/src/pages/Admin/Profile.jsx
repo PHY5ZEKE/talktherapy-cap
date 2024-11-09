@@ -29,6 +29,7 @@ export default function Profile() {
       transition: Slide,
       autoClose: 2000,
     });
+
   const [isOpen, setIsOpen] = useState(false);
   const handleModal = () => {
     setIsOpen(!isOpen);

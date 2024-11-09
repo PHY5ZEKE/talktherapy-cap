@@ -17,6 +17,8 @@ import ViewProgress from "../../components/Modals/ViewProgress";
 import ViewRecord from "../../components/Modals/ViewRecord";
 import RequestAccess from "../../components/Modals/RequestAccess";
 
+import SocketFetch from "../../utils/SocketFetch";
+
 const VIEW_MODES = {
   NONE: "NONE",
   RECORDS: "RECORDS",
@@ -47,6 +49,12 @@ export default function ManageSchedule() {
 
   const [patientName, setPatientName] = useState("");
 
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
   const failNotify = (message) =>
     toast.error(message, {
       transition: Slide,
@@ -68,6 +76,36 @@ export default function ManageSchedule() {
   // WebSocket Notification
   const socket = useRef(null);
   useEffect(() => {
+    // Fetch Patients
+    // Fetch Patients
+    const fetchPatients = async () => {
+      try {
+        const response = await fetch(
+          `${appURL}/${route.clinician.getAllPatients}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!data.error) {
+          setPatients(data.patients);
+        } else {
+          failNotify(toastMessage.fail.fetch);
+        }
+      } catch (error) {
+        failNotify(toastMessage.fail.fetch);
+        failNotify(toastMessage.fail.error);
+      }
+    };
+
+    fetchPatients();
+
     // Fetch Assigned Patients
     const fetchAssignedPatients = async () => {
       try {
@@ -107,6 +145,10 @@ export default function ManageSchedule() {
       const message = JSON.parse(event.data);
       if (message.type === "notification") {
         fetchAssignedPatients();
+      }
+
+      if (message.type === "fetch-action") {
+        fetchSoapRecords();
       }
     };
 
@@ -195,37 +237,6 @@ export default function ManageSchedule() {
     fetchClinicianData();
   }, []);
 
-  useEffect(() => {
-    // Fetch Patients
-    const fetchPatients = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.clinician.getAllPatients}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!data.error) {
-          setPatients(data.patients);
-        } else {
-          failNotify(toastMessage.fail.fetch);
-        }
-      } catch (error) {
-        failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
-      }
-    };
-
-    fetchPatients();
-  }, []);
-
   const filteredPatients = patients.filter(
     (patient) =>
       patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -274,7 +285,7 @@ export default function ManageSchedule() {
       const data = await response.json();
 
       if (!data.error) {
-        setSoapRecords(data);
+        setSoapRecords(Array.isArray(data) ? data : []);
       } else {
         failNotify(toastMessage.fail.fetch);
       }
@@ -303,13 +314,6 @@ export default function ManageSchedule() {
   };
 
   const handleDeleteSoapRecord = async (id) => {
-    const isConfirmed = window.confirm(
-      "Are you sure you want to delete this SOAP record?"
-    );
-    if (!isConfirmed) {
-      return;
-    }
-
     try {
       const response = await fetch(`${appURL}/${route.soap.delete}/${id}`, {
         method: "DELETE",
@@ -328,19 +332,18 @@ export default function ManageSchedule() {
       setSoapRecords((prevRecords) =>
         prevRecords.filter((record) => record._id !== id)
       );
-
-      toast.success("SOAP record deleted successfully", {
-        transition: Slide,
-        autoClose: 2000,
-      });
+      notify("SOAP record deleted successfully");
     } catch (error) {
-      console.error("Error deleting SOAP record:", error);
       failNotify("Failed to delete SOAP record");
     }
   };
 
   const isPatientAssigned = (patientId) => {
     return assignedPatients.some((patient) => patient._id === patientId);
+  };
+
+  const webSocketFetch = () => {
+    SocketFetch(socket);
   };
 
   return (
@@ -375,6 +378,7 @@ export default function ManageSchedule() {
         <EditSoap
           openModal={() => setEditSoapRecord(null)}
           soapRecord={editSoapRecord}
+          onFetch={webSocketFetch}
         />
       )}
 

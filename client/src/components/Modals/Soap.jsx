@@ -1,7 +1,11 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
+
 import "./modal.css";
+
 import { route } from "../../utils/route";
+import { toastMessage } from "../../utils/toastHandler";
+import { toast, Slide } from "react-toastify";
 
 export default function Soap({
   openModal,
@@ -16,6 +20,18 @@ export default function Soap({
   const [date, setDate] = useState("");
   const [diagnosis, setDiagnosis] = useState("");
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const notify = (message) =>
+    toast.success(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
+
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -56,11 +72,12 @@ export default function Soap({
         show_to: [patientId],
       };
       
+      notify("SOAP diagnosis created successfully");
       onWebSocket(userUpdate);
 
       openModal(); // Close the modal after successful submission
     } catch (error) {
-      console.error("Error creating SOAP diagnosis:", error);
+      failNotify("Failed to create SOAP diagnosis");
     }
   };
 
