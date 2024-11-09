@@ -69,6 +69,7 @@ export default function Soap({
       const userUpdate = {
         notif: "addSOAP",
         body: `Dr. ${clinicianName} has added a SOAP/Diagnosis. Kindly check your feedbacks.`,
+        diagnosis: diagnosis,
         show_to: [patientId],
       };
       

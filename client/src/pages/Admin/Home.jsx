@@ -16,8 +16,10 @@ import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
 import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
+import { emailEditInfo } from "../../utils/emailEditInfo";
 import formatDate from "../../utils/formatDate";
 import SocketFetch from "../../utils/SocketFetch";
+import { emailAccountStatus } from "../../utils/emailAccountStatus";
 
 const appURL = import.meta.env.VITE_APP_URL;
 
@@ -232,6 +234,7 @@ export default function Home() {
 
   const webSocketFetch = async () => {
     SocketFetch(socket);
+    sendEmail(userDetails.email)
   };
 
   const fetchAdminData = async () => {
@@ -340,6 +343,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.error) {
+        emailAccountStatus(userData.email, userData.active ? "deactivated" : "activated")
         notify(toastMessage.success.status);
         // Optionally, update the clinicians list to reflect the change
         setClinicians(
@@ -379,6 +383,7 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.error) {
+        emailAccountStatus(userData.email, userData.active ? "deactivated" : "activated")
         notify(toastMessage.success.status);
         // Optionally, update the patients list to reflect the change
         setPatients(
@@ -395,6 +400,10 @@ export default function Home() {
       setIsProcessing(false); // Stop processing
     }
   };
+
+  const sendEmail = (email) => {
+    emailEditInfo(email)
+  }
 
   return (
     <>

@@ -361,11 +361,11 @@ export default function Home() {
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
                           <h5 className="mb-0 fw-bold">
-                            {appointment.selectedSchedule.day}
+                            {appointment.selectedSchedule?.day}
                           </h5>
                           <p className="mb-0 fw-bold">
-                            {appointment.selectedSchedule.startTime} -{" "}
-                            {appointment.selectedSchedule.endTime}
+                            {appointment.selectedSchedule?.startTime} -{" "}
+                            {appointment.selectedSchedule?.endTime}
                           </p>
                           <p className="mb-3">
                             Scheduled appointment with{" "}
@@ -476,7 +476,7 @@ export default function Home() {
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
                           <h5 className="mb-0 fw-bold">
-                            {appointment.newSchedule.day}
+                            {appointment.newSchedule?.day}
                           </h5>
                           <p className="mb-0 fw-bold">
                             {appointment.newSchedule.startTime} -{" "}

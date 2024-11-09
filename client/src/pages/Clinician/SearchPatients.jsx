@@ -18,6 +18,8 @@ import ViewRecord from "../../components/Modals/ViewRecord";
 import RequestAccess from "../../components/Modals/RequestAccess";
 
 import SocketFetch from "../../utils/SocketFetch";
+import { emailRequestAccess } from "../../utils/emailRequestAccess";
+import { emailSoap } from "../../utils/emailSoap";
 
 const VIEW_MODES = {
   NONE: "NONE",
@@ -173,6 +175,7 @@ export default function ManageSchedule() {
         date: new Date(),
         show_to: parsed.show_to,
       };
+      sendEmail(parsed.reason, accessToken);
     }
 
     if (parsed.notif === "addSOAP") {
@@ -181,6 +184,7 @@ export default function ManageSchedule() {
         date: new Date(),
         show_to: parsed.show_to,
       };
+      emailSoap(selectedPatient.email, parsed.diagnosis, clinicianData)
     }
 
     try {
@@ -344,6 +348,10 @@ export default function ManageSchedule() {
 
   const webSocketFetch = () => {
     SocketFetch(socket);
+  };
+
+  const sendEmail = (reason, token) => {
+    emailRequestAccess(clinicianData, selectedPatient, reason, token);
   };
 
   return (
@@ -518,11 +526,11 @@ export default function ManageSchedule() {
                               </>
                             ) : (
                               <button
-                                onClick={() =>
+                                onClick={() => {
                                   openRequestAccess(
                                     `${selectedPatient?.firstName} ${selectedPatient?.lastName}`
-                                  )
-                                }
+                                  );
+                                }}
                                 className="text-button border w-100"
                               >
                                 Request Access

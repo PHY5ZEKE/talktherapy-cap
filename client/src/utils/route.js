@@ -57,6 +57,7 @@ export const route = {
     reset: "api/super-admin-slp/reset-password",
     audit: "api/super-admin-slp/audit-logs",
     email: "api/super-admin-slp/email-notification",
+    getEmailAdmins: "api/super-admin-slp/email-admins",
   },
   appointment: {
     createFile: "api/appointments-slp/create-appointment/file",

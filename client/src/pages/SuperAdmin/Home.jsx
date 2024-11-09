@@ -6,6 +6,7 @@ import { route } from "../../utils/route";
 import formatDate from "../../utils/formatDate";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
+import { emailEditInfo } from "../../utils/emailEditInfo";
 import SocketFetch from "../../utils/SocketFetch";
 
 // Components
@@ -13,6 +14,7 @@ import Sidebar from "../../components/Sidebar/SidebarSuper";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterAdmin from "../../components/Modals/RegisterAdmin";
+import { emailAccountStatus } from "../../utils/emailAccountStatus";
 
 export default function Home() {
   const { authState } = useContext(AuthContext);
@@ -67,7 +69,6 @@ export default function Home() {
     } catch (error) {
       failNotify(toastMessage.fail.error);
       setError("Error updating profile", error);
-
     }
   };
 
@@ -150,6 +151,7 @@ export default function Home() {
         date: new Date(),
         show_to: role !== "admin" ? `${parsed.id}` : "admin",
       };
+      emailEditInfo(userDetails.email);
     }
     try {
       const response = await fetch(`${appURL}/${route.notification.create}`, {
@@ -181,7 +183,7 @@ export default function Home() {
 
   const webSocketFetch = () => {
     SocketFetch(socket);
-  }
+  };
 
   //Super Admin
   useEffect(() => {
@@ -251,6 +253,8 @@ export default function Home() {
               : admin
           )
         );
+
+        emailAccountStatus(adminData.email, adminData.active ? "deactivated" : "activated")
         notify(toastMessage.success.status);
       } else {
         failNotify(toastMessage.fail.status);
@@ -276,6 +280,7 @@ export default function Home() {
           whatRole={role}
           onProfileUpdate={onProfileUpdate}
           onWebSocket={webSocketNotification}
+          onFetch={webSocketFetch}
         />
       )}
 
@@ -422,7 +427,9 @@ export default function Home() {
                           </div>
                         ))
                     ) : (
-                      <p className="fw-bold text-center mb-0">No notifications available</p>
+                      <p className="fw-bold text-center mb-0">
+                        No notifications available
+                      </p>
                     )}
                   </div>
                 </div>

@@ -3,6 +3,7 @@ const Admin = require("../models/adminSLP.model");
 const Clinician = require("../models/clinicianSLP.model");
 const Patient = require("../models/patientSlp.model");
 const AuditLog = require("../models/auditLogSLP.model");
+
 const { createAuditLog } = require("../middleware/auditLog.js");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -196,7 +197,7 @@ exports.getSuperAdmin = [
   },
 ];
 
-// Notification
+// Email Notification
 exports.sendNotification = async (req, res) => {
   const { email, header, content } = req.body;
 
@@ -218,13 +219,14 @@ exports.sendNotification = async (req, res) => {
 
   transporter.sendMail(mailOptions, async (err) => {
     if (err) {
-      return res
-        .status(500)
-        .json({ error: true, message: "Email notification could not be sent." });
+      return res.status(500).json({
+        error: true,
+        message: "Email notification could not be sent.",
+      });
     }
     res.status(200).json({ error: false, message: "Email notification sent." });
   });
-}
+};
 
 // Forgot Password Function
 exports.forgotPassword = async (req, res) => {
@@ -793,3 +795,35 @@ exports.getAuditLogs = async (req, res) => {
     res.status(500).json({ error: "Error fetching audit logs" });
   }
 };
+
+exports.getAllAdminsEmail = [
+  verifyToken,
+  async (req, res) => {
+    const { clinicianId } = req.body;
+    const existingClinician = await Clinician.findOne({ clinicianId });
+
+    if (!existingClinician) {
+      return res
+        .status(400)
+        .json({ message: "Clinician does not exist. Please login and authenticate."});
+    }
+
+    try {
+      const admins = await Admin.find({});
+      return res.status(200).json({
+        error: false,
+        message: "Admins retrieved successfully.",
+        admins: admins.map((admin) => ({
+          _id: admin._id,
+          email: admin.email,
+          active: admin.active,
+        })),
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred while retrieving admins.",
+      });
+    }
+  },
+];

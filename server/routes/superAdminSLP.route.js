@@ -41,4 +41,6 @@ router.get("/audit-logs", verifyToken, superAdminController.getAuditLogs);
 
 router.post("/email-notification", superAdminController.sendNotification)
 
+router.get("/email-admins", verifyToken, superAdminController.getAllAdminsEmail);
+
 module.exports = router;

@@ -10,6 +10,8 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
+import { emailRequestStatus } from "../../utils/emailRequestStatus";
+
 export default function AppointmentDetails({
   openModal,
   appointment,
@@ -38,6 +40,8 @@ export default function AppointmentDetails({
     openModal();
   };
 
+  console.log(appointment);
+
   const updateStatus = async (newStatus) => {
     setLoading(true);
     try {
@@ -58,6 +62,7 @@ export default function AppointmentDetails({
           appointment.selectedClinician
         ],
       };
+      emailRequestStatus(appointment.patientId?.email, newStatus, appointment);
       onWebSocket(userUpdate);
       notify(toastMessage.success.statusBook);
     } catch (error) {

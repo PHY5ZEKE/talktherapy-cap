@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./modal.css";
 
 import { route } from "../../utils/route";
-import { toast } from "react-toastify";
+import { toast, Slide } from "react-toastify";
 
 export default function RequestAccess({
   openModal,
@@ -60,6 +60,7 @@ export default function RequestAccess({
       const userUpdate = {
         notif: "appointmentRequestAccess",
         body: `${clinicianName} is requesting record access for ${patientName}`,
+        reason: reason,
         show_to: ["admin"],
       };
       
