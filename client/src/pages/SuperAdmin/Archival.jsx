@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 import UnarchiveUser from "../../components/Modals/UnarchiveUser";
+import { emailAccountRestore } from "../../utils/emailAccountRestore";
 
 // Calendar
 import "react-datepicker/dist/react-datepicker.css";
@@ -125,6 +126,7 @@ export default function Archival() {
   };
 
   const refetch = () => {
+    emailAccountRestore(selectedUser.email);
     fetchArchivedUsers();
   };
 

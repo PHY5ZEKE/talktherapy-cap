@@ -4,8 +4,6 @@ import { AuthContext } from "../../utils/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 // Calendar
-import Icon from "../../assets/icons/CalendarIcon";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import { route } from "../../utils/route";
@@ -123,8 +121,8 @@ export default function AuditLogs() {
     fetchAuditLogs(selectedDate);
   }, [selectedDate]);
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
+  const handleDateChange = (e) => {
+    setSelectedDate(new Date(e.target.value));
   };
 
   const filteredLogs = auditLogs.filter((log) => {
@@ -177,18 +175,12 @@ export default function AuditLogs() {
                         aria-label="Date"
                         type="date"
                         name="birthday"
+                        value={selectedDate.toISOString().split("T")[0]}
                         selected={selectedDate}
                         onChange={handleDateChange}
                         className="form-input rounded"
                       />
 
-                      {/* <DatePicker
-                        className="calendar text-center"
-                        showIcon
-                        selected={selectedDate}
-                        icon={Icon}
-                        dateFormat={"yyyy/MM/dd"}
-                      /> */}
                     </div>
                   </div>
                 </div>

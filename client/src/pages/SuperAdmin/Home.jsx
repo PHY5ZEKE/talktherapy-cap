@@ -15,6 +15,7 @@ import MenuDropdown from "../../components/Layout/SudoMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterAdmin from "../../components/Modals/RegisterAdmin";
 import { emailAccountStatus } from "../../utils/emailAccountStatus";
+import { emailAccountArchive } from "../../utils/emailAccountArchive";
 import ArchiveUser from "../../components/Modals/ArchiveUser";
 
 export default function Home() {
@@ -278,6 +279,11 @@ export default function Home() {
     setArchive(!isArchive);
   };
 
+  const archiveFetch = () => {
+    SocketFetch(socket);
+    emailAccountArchive(userDetails.email);
+  };
+
   return (
     <>
       {/* EDIT MODAL */}
@@ -311,7 +317,7 @@ export default function Home() {
           <ArchiveUser
             handleModal={handleArchive}
             userDetails={userDetails}
-            onFetch={webSocketFetch}
+            onFetch={archiveFetch}
           />
         </>
       )}

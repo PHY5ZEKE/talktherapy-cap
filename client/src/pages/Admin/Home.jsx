@@ -8,6 +8,7 @@ import AppointmentDetails from "../../components/Modals/AppointmentDetails";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterClinician from "../../components/Modals/RegisterClinician";
+import ArchiveUser from "../../components/Modals/ArchiveUser";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
@@ -20,6 +21,7 @@ import { emailEditInfo } from "../../utils/emailEditInfo";
 import formatDate from "../../utils/formatDate";
 import SocketFetch from "../../utils/SocketFetch";
 import { emailAccountStatus } from "../../utils/emailAccountStatus";
+import { emailAccountArchive } from "../../utils/emailAccountArchive";
 
 const appURL = import.meta.env.VITE_APP_URL;
 
@@ -411,6 +413,18 @@ export default function Home() {
     emailEditInfo(email);
   };
 
+  // Archive/Soft Deletion Modal
+  const [isArchive, setArchive] = useState(false);
+  const handleArchive = (user) => {
+    setUserDetails(user);
+    setArchive(!isArchive);
+  };
+
+  const archiveFetch = () => {
+    SocketFetch(socket);
+    emailAccountArchive(userDetails.email);
+  };
+
   return (
     <>
       {/* VIEW APPOINTMENT DETAILS MODAL */}
@@ -443,6 +457,17 @@ export default function Home() {
           admin={adminData}
           onWebSocket={webSocketNotification}
         />
+      )}
+
+      {/* Archive User Modal */}
+      {isArchive && (
+        <>
+          <ArchiveUser
+            handleModal={handleArchive}
+            userDetails={userDetails}
+            onFetch={archiveFetch}
+          />
+        </>
       )}
 
       <div className="container-fluid p-0 vh-100">
@@ -790,8 +815,9 @@ export default function Home() {
                             <div
                               className="mb-3 fw-bold text-button border"
                               style={{ cursor: "pointer" }}
+                              onClick={() => handleArchive(patient)}
                             >
-                              Delete
+                              Disable
                             </div>
                             <div
                               className="mb-3 fw-bold text-button border"
@@ -836,8 +862,9 @@ export default function Home() {
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 style={{ cursor: "pointer" }}
+                                onClick={() => handleArchive(clinician)}
                               >
-                                Delete
+                                Disable
                               </div>
                               <div
                                 className="mb-3 fw-bold text-button border"

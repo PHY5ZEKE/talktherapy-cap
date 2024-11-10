@@ -20,6 +20,7 @@ const path = require("path");
 
 const multer = require("multer");
 const upload = require("../middleware/uploadProfilePicture");
+const { encrypt, decrypt } = require("../middleware/aesUtilities.js");
 
 // Helper Function
 const findUserById = async (id) => {
@@ -933,6 +934,7 @@ exports.getAllArchivedUsers = [
         active: false,
       });
 
+
       const archivedUsers = [
         ...admins.map((admin) => ({
           _id: admin._id,
@@ -946,8 +948,8 @@ exports.getAllArchivedUsers = [
         })),
         ...clinicians.map((clinician) => ({
           _id: clinician._id,
-          firstName: clinician.firstName,
-          lastName: clinician.lastName,
+          firstName: clinician.firstName ? decrypt(clinician.firstName) : clinician.firstName,
+          lastName: clinician.lastName ? decrypt(clinician.lastName) : clinician.lastName,
           email: clinician.email,
           active: clinician.active,
           status: clinician.status,
@@ -956,8 +958,8 @@ exports.getAllArchivedUsers = [
         })),
         ...patients.map((patient) => ({
           _id: patient._id,
-          firstName: patient.firstName,
-          lastName: patient.lastName,
+          firstName: patient.firstName ? decrypt(patient.firstName) : patient.firstName,
+          lastName: patient.lastName ? decrypt(patient.lastName) : patient.lastName,
           email: patient.email,
           active: patient.active,
           status: patient.status,
