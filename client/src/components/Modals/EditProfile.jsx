@@ -21,6 +21,7 @@ export default function EditProfile({
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
+  console.log(userDetails)
   const [userData, setUserData] = useState(userDetails);
 
   const appURL = import.meta.env.VITE_APP_URL;

@@ -51,25 +51,19 @@ const getNotifications = async (req, res) => {
 
 // Delete notifications older than 1 week
 const deleteOldNotifications = async () => {
-  // const oneWeekAgo = new Date();
-  // oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-  const threeMinutesAgo = new Date();
-  threeMinutesAgo.setMinutes(threeMinutesAgo.getMinutes() - 3);
+  const oneWeekAgo = new Date();
+  oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
   try {
-    await Notification.deleteMany({ date: { $lt: threeMinutesAgo } });
+    await Notification.deleteMany({ date: { $lt: oneWeekAgo } });
     console.log("Old notifications deleted");
   } catch (error) {
     console.error("Error deleting old notifications:", error);
   }
 };
 
-// Schedule the deletion of old notifications 24 hrs ahu
-// setInterval(deleteOldNotifications, 24 * 60 * 60 * 1000);
-setInterval(deleteOldNotifications, 3 * 60 * 1000);
-
 module.exports = {
   createNotification,
   getNotifications,
+  deleteOldNotifications,
 };

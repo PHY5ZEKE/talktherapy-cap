@@ -43,4 +43,9 @@ router.post("/email-notification", superAdminController.sendNotification)
 
 router.get("/email-admins", verifyToken, superAdminController.getAllAdminsEmail);
 
+router.put("/archive-user", verifyToken, superAdminController.archiveUser);
+router.put("/unarchive-user", verifyToken, superAdminController.unarchiveUser);
+
+router.get("/get-archived-users", verifyToken, superAdminController.getAllArchivedUsers);
+
 module.exports = router;

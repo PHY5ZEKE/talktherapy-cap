@@ -10,6 +10,7 @@ const superAdminSLPSchema = new Schema({
   address: { type: String },
   mobile: { type: String },
   userRole: { type: String },
+  lastActivity: { type: Date},
   profilePicture: {
     type: String,
     default:

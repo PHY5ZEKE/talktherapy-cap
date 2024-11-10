@@ -12,6 +12,8 @@ const adminSLPSchema = new Schema({
   createdOn: { type: Date },
   addedOn: { type: Date },
   active: { type: Boolean },
+  status: { type: String},
+  lastActivity: { type: Date },
   userRole: { type: String },
   profilePicture: {
     type: String,

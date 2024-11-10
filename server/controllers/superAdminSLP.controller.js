@@ -21,6 +21,23 @@ const path = require("path");
 const multer = require("multer");
 const upload = require("../middleware/uploadProfilePicture");
 
+// Helper Function
+const findUserById = async (id) => {
+  let userInfo = await SuperAdmin.findOne({ _id: id });
+  if (userInfo) return { userInfo, userRole: "superAdmin" };
+
+  userInfo = await Admin.findOne({ _id: id });
+  if (userInfo) return { userInfo, userRole: "admin" };
+
+  userInfo = await Clinician.findOne({ _id: id });
+  if (userInfo) return { userInfo, userRole: "clinician" };
+
+  userInfo = await Patient.findOne({ _id: id });
+  if (userInfo) return { userInfo, userRole: "patientslp" };
+
+  return { userInfo: null, userRole: null };
+};
+
 exports.signup = async (req, res) => {
   const { email, password, firstName, middleName, lastName, address, mobile } =
     req.body;
@@ -153,7 +170,11 @@ exports.login = async (req, res) => {
       expiresIn: "1h",
     });
 
+    // Add last activity date
+    userInfo.lastActivity = new Date();
+
     await createAuditLog("login", email, `${email} has logged in`);
+    await userInfo.save();
 
     return res.json({
       error: false,
@@ -438,6 +459,7 @@ exports.getAllAdmins = [
           address: admin.address,
           mobile: admin.mobile,
           active: admin.active,
+          status: admin.status,
           createdOn: admin.createdOn,
           addedOn: admin.addedOn,
         })),
@@ -803,9 +825,9 @@ exports.getAllAdminsEmail = [
     const existingClinician = await Clinician.findOne({ clinicianId });
 
     if (!existingClinician) {
-      return res
-        .status(400)
-        .json({ message: "Clinician does not exist. Please login and authenticate."});
+      return res.status(400).json({
+        message: "Clinician does not exist. Please login and authenticate.",
+      });
     }
 
     try {
@@ -827,3 +849,183 @@ exports.getAllAdminsEmail = [
     }
   },
 ];
+
+// For Account Archival/Soft Deletion
+exports.archiveUser = [
+  verifyToken,
+  async (req, res) => {
+    const { id } = req.body;
+
+    try {
+      const { userInfo } = await findUserById(id);
+
+      if (!userInfo) {
+        return res
+          .status(404)
+          .json({ error: true, message: "User not found." });
+      }
+
+      userInfo.active = false;
+      userInfo.status = "archival";
+
+      await userInfo.save();
+      await createAuditLog(
+        "editAdmin",
+        userInfo.email,
+        `User ${userInfo.email} account is tagged as 'For Archival' and disabled.`
+      );
+
+      return res.json({
+        error: false,
+        userInfo,
+        message: "Admin status and activity updated successfully.",
+      });
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred while changing admin status and activity.",
+      });
+    }
+  },
+];
+
+exports.unarchiveUser = [
+  verifyToken,
+  async (req, res) => {
+    const { id } = req.body;
+
+    try {
+      const { userInfo } = await findUserById(id);
+
+      if (!userInfo) {
+        return res
+          .status(404)
+          .json({ error: true, message: "User not found." });
+      }
+
+      userInfo.active = true;
+      userInfo.status = "";
+
+      await userInfo.save();
+      await createAuditLog(
+        "editAdmin",
+        userInfo.email,
+        `User ${userInfo.email} account is tagged as 'For Archival' and disabled.`
+      );
+
+      return res.json({
+        error: false,
+        userInfo,
+        message: "Admin status and activity updated successfully.",
+      });
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred while changing admin status and activity.",
+      });
+    }
+  },
+];
+
+exports.getAllArchivedUsers = [
+  verifyToken,
+  async (req, res) => {
+    try {
+      const admins = await Admin.find({ status: "archival", active: false });
+      const clinicians = await Clinician.find({
+        status: "archival",
+        active: false,
+      });
+      const patients = await Patient.find({
+        status: "archival",
+        active: false,
+      });
+
+      const archivedUsers = [
+        ...admins.map((admin) => ({
+          _id: admin._id,
+          firstName: admin.firstName,
+          lastName: admin.lastName,
+          email: admin.email,
+          active: admin.active,
+          status: admin.status,
+          lastActivity: admin.lastActivity,
+          userRole: admin.userRole,
+        })),
+        ...clinicians.map((clinician) => ({
+          _id: clinician._id,
+          firstName: clinician.firstName,
+          lastName: clinician.lastName,
+          email: clinician.email,
+          active: clinician.active,
+          status: clinician.status,
+          lastActivity: clinician.lastActivity,
+          userRole: clinician.userRole,
+        })),
+        ...patients.map((patient) => ({
+          _id: patient._id,
+          firstName: patient.firstName,
+          lastName: patient.lastName,
+          email: patient.email,
+          active: patient.active,
+          status: patient.status,
+          lastActivity: patient.lastActivity,
+          userRole: patient.userRole,
+        })),
+      ];
+
+      return res.status(200).json({
+        error: false,
+        message: "Archived users retrieved successfully.",
+        users: archivedUsers,
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        error: true,
+        message: "An error occurred while retrieving admins.",
+      });
+    }
+  },
+];
+
+// Archive Users With No Activity for the last 3 Months based on lastActivity
+const archiveInactiveUsers = async () => {
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+  try {
+    // Archive SuperAdmins
+    await SuperAdmin.updateMany(
+      { lastActivity: { $lt: threeMonthsAgo }, active: true },
+      { $set: { status: "archival", active: false } }
+    );
+
+    // Archive Admins
+    await Admin.updateMany(
+      { lastActivity: { $lt: threeMonthsAgo }, active: true },
+      { $set: { status: "archival", active: false } }
+    );
+
+    // Archive Clinicians
+    await Clinician.updateMany(
+      { lastActivity: { $lt: threeMonthsAgo }, active: true },
+      { $set: { status: "archival", active: false } }
+    );
+
+    // Archive Patients
+    await Patient.updateMany(
+      { lastActivity: { $lt: threeMonthsAgo }, active: true },
+      { $set: { status: "archival", active: false } }
+    );
+
+    console.log("Inactive users archived successfully.");
+  } catch (error) {
+    console.error("Error archiving inactive users:", error);
+  }
+};
+
+module.exports = {
+  archiveInactiveUsers,
+};

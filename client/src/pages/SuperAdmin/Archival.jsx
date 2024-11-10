@@ -10,10 +10,9 @@ import { useNavigate } from "react-router-dom";
 // Components
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import MenuDropdown from "../../components/Layout/SudoMenu";
+import UnarchiveUser from "../../components/Modals/UnarchiveUser";
 
 // Calendar
-import Icon from "../../assets/icons/CalendarIcon";
-import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function Archival() {
@@ -24,6 +23,8 @@ export default function Archival() {
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+
+  const [archivedUsers, setArchivedUsers] = useState(null);
 
   const notify = (message) =>
     toast.success(message, {
@@ -37,51 +38,116 @@ export default function Archival() {
       autoClose: 2000,
     });
 
-  //Super Admin
+  // Fetch Data
   useEffect(() => {
-    const fetchSuperAdmin = async () => {
-      if (!accessToken) {
-        setError("No token found. Please log in.");
-        return;
-      }
-
-      try {
-        const response = await fetch(
-          `${appURL}/${route.sudo.fetch}`, // Ensure this URL is correct
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setSuperAdmin(data.superAdmin);
-        } else if (response.status === 401) {
-          setError("Unauthorized. Please log in again.");
-          clearOnLogOut();
-          failNotify(toastMessage.fail.unauthorized)
-          nav("/unauthorized")
-        } else {
-          const errorText = await response.text();
-          failNotify(toastMessage.fail.error)
-          failNotify(toastMessage.fail.fetch)
-          setError("Failed to fetch data.", errorText);
-        }
-      } catch (error) {
-        failNotify(toastMessage.fail.error)
-        setError("Error in fetching data.");
-      }
-    };
-
     fetchSuperAdmin();
+    fetchArchivedUsers();
   }, []);
+
+  // Fetch Super Admin Data
+  const fetchSuperAdmin = async () => {
+    if (!accessToken) {
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${appURL}/${route.sudo.fetch}`, // Ensure this URL is correct
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSuperAdmin(data.superAdmin);
+      } else if (response.status === 401) {
+        setError("Unauthorized. Please log in again.");
+        clearOnLogOut();
+        failNotify(toastMessage.fail.unauthorized);
+        nav("/unauthorized");
+      } else {
+        const errorText = await response.text();
+        failNotify(toastMessage.fail.error);
+        failNotify(toastMessage.fail.fetch);
+        setError("Failed to fetch data.", errorText);
+      }
+    } catch (error) {
+      failNotify(toastMessage.fail.error);
+      setError("Error in fetching data.");
+    }
+  };
+
+  // Fetch Archived Users Data
+  const fetchArchivedUsers = async () => {
+    if (!accessToken) {
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${appURL}/${route.sudo.getArchivedAdmins}`, // Ensure this URL is correct
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setArchivedUsers(data.users);
+      } else if (response.status === 401) {
+        setError("Unauthorized. Please log in again.");
+        clearOnLogOut();
+        failNotify(toastMessage.fail.unauthorized);
+        nav("/unauthorized");
+      } else {
+        const errorText = await response.text();
+        failNotify(toastMessage.fail.error);
+        failNotify(toastMessage.fail.fetch);
+        setError("Failed to fetch data.", errorText);
+        console.log(error);
+      }
+    } catch (err) {
+      failNotify(toastMessage.fail.error);
+      setError("Error in fetching data.");
+      console.log(err);
+    }
+  };
+
+  const refetch = () => {
+    fetchArchivedUsers();
+  };
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [isUnarchive, setUnarchive] = useState(false);
+  const handleModal = (user) => {
+    setSelectedUser(user);
+    setUnarchive(!isUnarchive);
+  };
 
   return (
     <>
+      {/* Unarchive Modal */}
+      {isUnarchive && (
+        <>
+          <UnarchiveUser
+            handleModal={handleModal}
+            userDetails={selectedUser}
+            onFetch={refetch}
+          />
+        </>
+      )}
+
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
           {/* SIDEBAR */}
@@ -115,8 +181,10 @@ export default function Archival() {
                   <div className="col bg-white border rounded-4 p-3">
                     <div className="d-flex flex-wrap gap-3 align-items-center justify-content-start">
                       <div>
-                        <p className="mb-0 fw-bold">System Activities</p>
-                        <p className="mb-0">Date Here</p>
+                        <p className="mb-0 fw-bold">Data Archival</p>
+                        <p className="mb-0">
+                          {new Date().toLocaleDateString()}
+                        </p>
                       </div>
 
                       <input
@@ -156,41 +224,47 @@ export default function Archival() {
                           <th scope="col">Email Address</th>
                           <th scope="col">First Name</th>
                           <th scope="col">Last Name</th>
+                          <th scope="col">Role</th>
+                          <th scope="col">
+                            <p className="text-center mb-0">Action</p>
+                          </th>
                           <th scope="col" style={{ width: "70" }}>
-                            <button className="action-btn btn-text-blue">
+                            <button className="d-flex mx-auto action-btn btn-text-blue">
                               Select All
                             </button>
                           </th>
                         </tr>
                       </thead>
                       <tbody>
-                        <tr>
-                          <th scope="row">July 5, 2024</th>
-                          <td>Mark@gmail.com</td>
-                          <td>Mark</td>
-                          <td>Villar</td>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <th scope="row">July 5, 2024</th>
-                          <td>Mark@gmail.com</td>
-                          <td>Mark</td>
-                          <td>Villar</td>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                        </tr>
-                        <tr>
-                          <th scope="row">July 5, 2024</th>
-                          <td>Mark@gmail.com</td>
-                          <td>Mark</td>
-                          <td>Villar</td>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                        </tr>
+                        {archivedUsers &&
+                          archivedUsers.map((user) => (
+                            <tr key={user._id}>
+                              <th scope="row">
+                                {new Date(
+                                  user.lastActivity
+                                ).toLocaleDateString()}
+                              </th>
+                              <td>{user.email}</td>
+                              <td>{user.firstName}</td>
+                              <td>{user.lastName}</td>
+                              <td>{user.userRole}</td>
+                              <td className="d-flex justify-content-center mx-auto">
+                                <button
+                                  className="fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={()=>handleModal(user)}
+                                >
+                                  Restore
+                                </button>
+                              </td>
+                              <td className="">
+                                <input
+                                  className="d-flex justify-content-center mx-auto"
+                                  type="checkbox"
+                                />
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                   </div>

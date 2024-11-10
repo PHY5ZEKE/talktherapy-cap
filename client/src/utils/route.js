@@ -8,6 +8,9 @@ export const route = {
     getAllAdmins: "api/super-admin-slp/getAllAdmins",
     getAdminById: "api/super-admin-slp/getAdminById/",
     updateProfilePicture: "api/super-admin-slp/update-profile-picture",
+    archiveUser: "api/super-admin-slp/archive-user",
+    unarchiveUser: "api/super-admin-slp/unarchive-user",
+    getArchivedAdmins: "api/super-admin-slp/get-archived-users",
   },
   admin: {
     addAdmin: "api/admin-slp/add-admin",

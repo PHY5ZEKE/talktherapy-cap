@@ -75,6 +75,9 @@ app.use((err, req, res, next) => {
 // WebSocket Server
 WebSocketServer.initialize(server);
 
+// Cron
+require('./cron-job.js')
+
 const PORT = process.env.PORT || 8000;
 
 server.listen(PORT, "0.0.0.0", () => {

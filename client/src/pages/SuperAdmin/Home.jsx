@@ -15,6 +15,7 @@ import MenuDropdown from "../../components/Layout/SudoMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterAdmin from "../../components/Modals/RegisterAdmin";
 import { emailAccountStatus } from "../../utils/emailAccountStatus";
+import ArchiveUser from "../../components/Modals/ArchiveUser";
 
 export default function Home() {
   const { authState } = useContext(AuthContext);
@@ -254,7 +255,10 @@ export default function Home() {
           )
         );
 
-        emailAccountStatus(adminData.email, adminData.active ? "deactivated" : "activated")
+        emailAccountStatus(
+          adminData.email,
+          adminData.active ? "deactivated" : "activated"
+        );
         notify(toastMessage.success.status);
       } else {
         failNotify(toastMessage.fail.status);
@@ -265,6 +269,13 @@ export default function Home() {
     } finally {
       setIsProcessing(false); // Stop processing
     }
+  };
+
+  // Archive/Soft Deletion Modal
+  const [isArchive, setArchive] = useState(false);
+  const handleArchive = (user) => {
+    setUserDetails(user);
+    setArchive(!isArchive);
   };
 
   return (
@@ -289,6 +300,17 @@ export default function Home() {
         <>
           <RegisterAdmin
             openModal={() => setIsAdd((prevState) => !prevState)}
+            onFetch={webSocketFetch}
+          />
+        </>
+      )}
+
+      {/* Archive User Modal */}
+      {isArchive && (
+        <>
+          <ArchiveUser
+            handleModal={handleArchive}
+            userDetails={userDetails}
             onFetch={webSocketFetch}
           />
         </>
@@ -351,43 +373,48 @@ export default function Home() {
                       <p>{error}</p>
                     ) : superAdmin ? (
                       <>
-                        {admins.map((admin) => (
-                          <div
-                            key={admin._id}
-                            className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                          >
-                            <h5 className="mb-0 fw-bold">
-                              {admin.firstName} {admin.lastName}
-                            </h5>
-                            <p className="mb-0">{admin.email}</p>
-                            <p className="mb-0">{admin.address}</p>
-                            <p className="mb-3">{admin.mobile}</p>
+                        {admins
+                          .filter((admin) => admin.status !== "archival")
+                          .map((admin) => (
+                            <div
+                              key={admin._id}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                            >
+                              <h5 className="mb-0 fw-bold">
+                                {admin.firstName} {admin.lastName}
+                              </h5>
+                              <p className="mb-0">{admin.email}</p>
+                              <p className="mb-0">{admin.address}</p>
+                              <p className="mb-3">{admin.mobile}</p>
 
-                            <div className="d-flex gap-3">
-                              <div
-                                className="mb-3 fw-bold text-button border"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => handleModal(admin)}
-                              >
-                                Edit
-                              </div>
-                              <div
-                                className="mb-3 fw-bold text-button border"
-                                style={{ cursor: "pointer" }}
-                              >
-                                Delete
-                              </div>
-                              <div
-                                className="mb-3 fw-bold text-button border"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => toggleAdminStatus(admin)}
-                                disabled={isProcessing}
-                              >
-                                {admin.active ? "Deactivate" : "Activate"}
+                              <div className="d-flex gap-3">
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleModal(admin)}
+                                >
+                                  Edit
+                                </div>
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleArchive(admin)}
+                                >
+                                  {admin.status === "archival"
+                                    ? "Enable"
+                                    : "Disable"}
+                                </div>
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => toggleAdminStatus(admin)}
+                                  disabled={isProcessing}
+                                >
+                                  {admin.active ? "Deactivate" : "Activate"}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </>
                     ) : (
                       <p>Fetching data.</p>

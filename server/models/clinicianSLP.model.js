@@ -20,6 +20,8 @@ const clinicianSLPSchema = new Schema({
   createdOn: { type: Date },
   addedOn: { type: Date },
   active: { type: Boolean },
+  status: { type: String },
+  lastActivity: { type: Date },
   userRole: { type: String },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

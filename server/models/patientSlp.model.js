@@ -14,6 +14,8 @@ const patientSlpSchema = new Schema({
   createdOn: { type: Date },
   active: { type: Boolean },
   userRole: { type: String },
+  status: { type: String},
+  lastActivity: { type: Date },
   profilePicture: {
     type: String,
     default:
