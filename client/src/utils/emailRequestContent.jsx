@@ -2,7 +2,11 @@ const appURL = import.meta.env.VITE_APP_URL;
 
 import { route } from "./route";
 
-export const emailRequestAccess = async (clinicianData, patientData, reason, accessToken) => {
+export const emailRequestContent = async (
+  clinicianData,
+  request,
+  accessToken
+) => {
   const response = await fetch(`${appURL}/${route.system.getEmailAdmins}`, {
     method: "GET",
     headers: {
@@ -10,24 +14,23 @@ export const emailRequestAccess = async (clinicianData, patientData, reason, acc
       Authorization: `Bearer ${accessToken}`,
     },
   });
+
   const data = await response.json();
 
-  const admins = data.admins
-  const activeAdmins = admins.filter(admin => admin.active === true);
+  const admins = data.admins;
+  const activeAdmins = admins.filter((admin) => admin.active === true);
 
-  const emails = activeAdmins.map(admin => admin.email);
+  const emails = activeAdmins.map((admin) => admin.email);
 
   const payload = {
     email: emails,
-    header: 'Clinician Request Access | TalkTherapy',
-    content: `${clinicianData.firstName} ${clinicianData.middleName} ${clinicianData.lastName} is requesting for record access for the follow patient:
+    header: "Clinician Request Access | TalkTherapy",
+    content: `${clinicianData.firstName} ${clinicianData.middleName} ${clinicianData.lastName} is requesting for content.
     
     =====================
-    PATIENT DETAILS
+    REQUEST DETAILS
     =====================
-    Name: ${patientData.firstName} ${patientData.lastName}
-
-    With the reason of: ${reason}
+    ${request}
     `,
   };
 

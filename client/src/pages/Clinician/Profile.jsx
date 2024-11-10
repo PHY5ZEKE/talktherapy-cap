@@ -9,6 +9,7 @@ import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
+import RequestContent from "../../components/Modals/RequestContent";
 
 // Utils
 import { route } from "../../utils/route";
@@ -88,6 +89,12 @@ export default function Profile() {
     }
   };
 
+  // Request Content
+  const [isRequestContent, setRequestContent] = useState(false);
+  const handleRequestContent = () => {
+    setRequestContent(!isRequestContent);
+  };
+
   return (
     <>
       {/* EDIT MODAL */}
@@ -108,6 +115,13 @@ export default function Profile() {
           editPasswordAPI={route.clinician.password}
           closeModal={handlePasswordModal}
         />
+      )}
+
+      {/* Request Content */}
+      {isRequestContent && (
+        <>
+          <RequestContent handleModal={handleRequestContent} clinicianData={clinicianData} />
+        </>
       )}
 
       <div className="container-fluid p-0 vh-100">
@@ -188,7 +202,9 @@ export default function Profile() {
                     style={{ maxHeight: "75vh" }}
                   >
                     <Link to={page.clinician.profile}>
-                      <div className="mb-3 fw-bold text-button border w-100">
+                      <div className="mb-3 fw-bold text-button border w-100"
+                      onClick={handleRequestContent}
+                      >
                         Request Content
                       </div>
                     </Link>

@@ -198,10 +198,14 @@ exports.createAppointmentJSON = async (req, res) => {
       return res.status(400).json({ message: "Invalid patient selected" });
     }
 
-    // Check if appointment already exists for the patient
-    const existingAppointment = await Appointment.findOne({ patientId });
-    const existingSchedule = await Appointment.findOne({ selectedSchedule });
-    if (existingAppointment && existingSchedule) {
+    // Check if patient has an existing appointment
+    // Status gets all appointments that are not completed and rejected
+    const existingAppointment = await Appointment.find({
+      patientId: patientId,
+      status: { $nin: ["Completed", "Rejected"] } 
+    });
+
+    if (!existingAppointment) {
       return res
         .status(400)
         .json({ message: "Patient already has an appointment" });

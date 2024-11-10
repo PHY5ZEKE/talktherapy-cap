@@ -310,14 +310,20 @@ export default function Home() {
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <h5 className="mb-0 fw-bold">
-                            {appointment.selectedSchedule.day}
-                          </h5>
+                          <div className="d-flex gap-3 align-items-center">
+                            <h5 className="mb-0 fw-bold">
+                              {appointment.selectedSchedule.day}
+                            </h5>
+                            <div className="mb-0 text-accepted">
+                              {appointment.status}
+                            </div>
+                          </div>
+
                           <p className="mb-0 fw-bold">
                             {appointment.selectedSchedule.startTime} -{" "}
                             {appointment.selectedSchedule.endTime}
                           </p>
-                          <p className="mb-3">
+                          <p className="mb-0">
                             Scheduled appointment with{" "}
                             {appointment.patientId.firstName}{" "}
                             {appointment.patientId.lastName}
@@ -330,25 +336,17 @@ export default function Home() {
                               openModal(appointment._id);
                             }}
                           >
-                            View Appointment Details
+                            <p>View Appointment Details</p>
                           </a>
 
-                          <div className="d-flex justify-content-between gap-1 mt-3">
-                            <div className="mb-3 text-accepted">
-                              {appointment.status}
-                            </div>
-
-                            <div className="d-flex flex-nowrap gap-1">
-                              <button
-                                className="mb-3 text-button border"
-                                onClick={() =>
-                                  joinMeeting(appointment.roomId, appointment)
-                                }
-                              >
-                                Join
-                              </button>
-                            </div>
-                          </div>
+                          <button
+                            className="mb-3 text-button border"
+                            onClick={() =>
+                              joinMeeting(appointment.roomId, appointment)
+                            }
+                          >
+                            Join
+                          </button>
                         </div>
                       ))}
                     {appointments
@@ -360,9 +358,15 @@ export default function Home() {
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <h5 className="mb-0 fw-bold">
-                            {appointment.selectedSchedule?.day}
-                          </h5>
+                          <div className="d-flex align-items-center gap-3">
+                            <h5 className="mb-0 fw-bold">
+                              {appointment.selectedSchedule?.day}
+                            </h5>
+                            <div className="my-3 text-accepted">
+                              {appointment.status}
+                            </div>
+                          </div>
+
                           <p className="mb-0 fw-bold">
                             {appointment.selectedSchedule?.startTime} -{" "}
                             {appointment.selectedSchedule?.endTime}
@@ -382,10 +386,6 @@ export default function Home() {
                           >
                             View Appointment Details
                           </a>
-
-                          <div className="my-3 text-accepted">
-                            {appointment.status}
-                          </div>
                         </div>
                       ))}
                     {appointments
@@ -398,9 +398,14 @@ export default function Home() {
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <h5 className="mb-0 fw-bold">
-                            {appointment.temporaryReschedule.day}
-                          </h5>
+                          <div className="d-flex align-items-center gap-3">
+                            <h5 className="mb-0 fw-bold">
+                              {appointment.temporaryReschedule?.day}
+                            </h5>
+                            <div className="my-3 text-accepted">
+                              {appointment.status}
+                            </div>
+                          </div>
                           <p className="mb-0 fw-bold">
                             {appointment.temporaryReschedule.startTime} -{" "}
                             {appointment.temporaryReschedule.endTime}
@@ -420,10 +425,6 @@ export default function Home() {
                           >
                             View Appointment Details
                           </a>
-
-                          <div className="my-3 text-accepted">
-                            {appointment.status}
-                          </div>
                         </div>
                       ))}
                     {appointments
@@ -436,9 +437,15 @@ export default function Home() {
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <h5 className="mb-0 fw-bold">
-                            {appointment.temporaryReschedule.day}
-                          </h5>
+                          <div className="d-flex align-items-center gap-3">
+                            <h5 className="mb-0 fw-bold">
+                              {appointment.temporaryReschedule?.day}
+                            </h5>
+                            <div className="my-3 text-pending">
+                              {appointment.status}
+                            </div>
+                          </div>
+
                           <p className="mb-0 fw-bold">
                             {appointment.temporaryReschedule.startTime} -{" "}
                             {appointment.temporaryReschedule.endTime}
@@ -459,10 +466,6 @@ export default function Home() {
                           >
                             View Appointment Details
                           </a>
-
-                          <div className="my-3 text-pending">
-                            {appointment.status}
-                          </div>
                         </div>
                       ))}
                     {appointments
@@ -475,9 +478,14 @@ export default function Home() {
                           key={appointment._id}
                           className="mb-3 border border border-top-0 border-start-0 border-end-0"
                         >
-                          <h5 className="mb-0 fw-bold">
-                            {appointment.newSchedule?.day}
-                          </h5>
+                          <div className="d-flex align-items-center gap-3">
+                            <h5 className="mb-0 fw-bold">
+                              {appointment.newSchedule?.day}
+                            </h5>
+                            <div className="my-3 text-pending">
+                              {appointment.status}
+                            </div>
+                          </div>
                           <p className="mb-0 fw-bold">
                             {appointment.newSchedule.startTime} -{" "}
                             {appointment.newSchedule.endTime}
@@ -497,10 +505,6 @@ export default function Home() {
                           >
                             View Appointment Details
                           </a>
-
-                          <div className="my-3 text-pending">
-                            {appointment.status}
-                          </div>
                         </div>
                       ))}
                   </div>
@@ -534,14 +538,16 @@ export default function Home() {
                             className="mb-3 border border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">{notification.body}</p>
-                            
+
                             <p className="mb-0">
                               {formatDate(notification.date)}
                             </p>
                           </div>
                         ))
                     ) : (
-                      <p className="fw-bold text-center mb-0">No notifications available</p>
+                      <p className="fw-bold text-center mb-0">
+                        No notifications available
+                      </p>
                     )}
                   </div>
                 </div>

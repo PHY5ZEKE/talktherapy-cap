@@ -821,15 +821,6 @@ exports.getAuditLogs = async (req, res) => {
 exports.getAllAdminsEmail = [
   verifyToken,
   async (req, res) => {
-    const { clinicianId } = req.body;
-    const existingClinician = await Clinician.findOne({ clinicianId });
-
-    if (!existingClinician) {
-      return res.status(400).json({
-        message: "Clinician does not exist. Please login and authenticate.",
-      });
-    }
-
     try {
       const admins = await Admin.find({});
       return res.status(200).json({
@@ -1026,6 +1017,4 @@ const archiveInactiveUsers = async () => {
   }
 };
 
-module.exports = {
-  archiveInactiveUsers,
-};
+exports.archiveInactiveUsers = archiveInactiveUsers;

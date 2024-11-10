@@ -14,11 +14,25 @@ import TemporaryRescheduleConfirmation from "../../components/Modals/TemporaryRe
 import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
 
 // DatePicker
-import { useState, useEffect, useCallback, useMemo, useContext, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useContext,
+  useRef,
+} from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faStethoscope } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCalendar,
+  faStethoscope,
+  faUserDoctor,
+  faLocationDot,
+  faPhone,
+  faEnvelope,
+} from "@fortawesome/free-solid-svg-icons";
 
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -249,8 +263,8 @@ export default function BookSchedule() {
 
     if (parsed.notif === "appointmentJoin") {
       notification = {
-        type: "notification"
-      }
+        type: "notification",
+      };
       if (socket.current && socket.current.readyState === WebSocket.OPEN) {
         socket.current.send(JSON.stringify(notification));
       }
@@ -394,7 +408,6 @@ export default function BookSchedule() {
           closeModal={() => setIsTemporaryReschedule(false)}
           openTemporarySchedule={openTemporaryScheduleModal} // Pass the new function
           appointment={appointmentToReschedule}
-
         />
       )}
 
@@ -510,42 +523,39 @@ export default function BookSchedule() {
                       getAllSchedulesForSelectedDay.map((schedule, index) => (
                         <div
                           key={index}
-                          className="d-flex justify-content-start align-items-center w-100 p-2 border-top border-bottom"
+                          className="d-flex justify-content-start align-items-center w-100 px-4 py-3 mb-3 border-bottom border-top rounded-3"
                         >
                           <div className="w-100">
-                            <h5 className="fw-bold mb-0">
-                              Time: {schedule.startTime} - {schedule.endTime}
+                            <h5 className="fw-bold d-flex gap-2 align-items-center">
+                              {schedule.startTime} - {schedule.endTime}{" "}
+                              <p className="fw-medium mb-0 status-booked">
+                                {schedule.status}
+                              </p>
                             </h5>
-                            <h6 className="fw-bold mb-0">
+                            <p className="mb-0">
+                              <FontAwesomeIcon icon={faCalendar} />{" "}
+                              {schedule.day}
+                            </p>
+                            <p className="mb-0">
                               <FontAwesomeIcon icon={faStethoscope} size="xs" />{" "}
-                              Clinician: {schedule.clinicianName}
-                            </h6>
-                            <p className="mb-0">Day: {schedule.day}</p>
-                            <p className="mb-0 my-2">
-                              Specialization:{" "}
-                              <span className="fw-bold">
-                                {schedule.specialization}
-                              </span>
+                              {schedule.clinicianName}
                             </p>
-                            <p className="mb-0 my-2">
-                              Status:{" "}
-                              <span className="fw-bold">{schedule.status}</span>
+                            <p className="">
+                              <FontAwesomeIcon icon={faUserDoctor} />{" "}
+                              {schedule.specialization}
                             </p>
+
                             <p className="mb-0 my-2">
-                              Clinic Address:{" "}
-                              <span className="fw-bold">
-                                {schedule.address}
-                              </span>
+                              <FontAwesomeIcon icon={faLocationDot} />{" "}
+                              {schedule.address}
                             </p>
-                            <p className="mb-0 my-2">
-                              Contact:{" "}
-                              <span className="fw-bold">
-                                {schedule.contact}
-                              </span>
+                            <p className="mb-0">
+                              <FontAwesomeIcon icon={faPhone} />{" "}
+                              {schedule.contact}
                             </p>
-                            <p className="mb-0 my-2">
-                              Email:{" "}
-                              <span className="fw-bold">{schedule.email}</span>
+                            <p className="mb-0">
+                              <FontAwesomeIcon icon={faEnvelope} />{" "}
+                              {schedule.email}
                             </p>
                           </div>
                           {schedule.status !== "Booked" && !hasBooked && (
@@ -607,7 +617,7 @@ export default function BookSchedule() {
                               ? `${appointment.temporaryReschedule.startTime} - ${appointment.temporaryReschedule.endTime}`
                               : `${appointment.selectedSchedule.startTime} - ${appointment.selectedSchedule.endTime}`}
                           </p>
-                          <h6 className=" mb-0">
+                          <h6 className="mb-2">
                             Session with{" "}
                             <span className="fw-bold">
                               {appointment.status === "Schedule Change Request"
@@ -632,7 +642,7 @@ export default function BookSchedule() {
                           </a>
                           {/* IF PENDING */}
                           {appointment.status === "Pending" && (
-                            <div className="row p-2">
+                            <div className="row mt-2">
                               <div className="d-flex justify-content-between flex-wrap gap-3">
                                 <div className="mb-3 text-pending">PENDING</div>
                                 <div className="d-flex gap-3">
@@ -683,7 +693,7 @@ export default function BookSchedule() {
                           )}
                           {/* IF SCHEDULE CHANGE REQUEST */}
                           {appointment.status === "Schedule Change Request" && (
-                            <div className="row p-2 gap-3">
+                            <div className="row mt-2 gap-3">
                               <div className="mb-3 text-pending">
                                 FOR APPROVAL
                               </div>
@@ -692,7 +702,7 @@ export default function BookSchedule() {
                           {/* IF TEMPORARY RESCHEDULE REQUEST */}
                           {appointment.status ===
                             "Temporary Reschedule Request" && (
-                            <div className="row p-2 gap-3">
+                            <div className="row mt-2 gap-3">
                               <div className="mb-3 text-pending">
                                 FOR APPROVAL
                               </div>
@@ -713,7 +723,7 @@ export default function BookSchedule() {
                           )}
                           {/* IF REJECTED */}
                           {appointment.status === "Rejected" && (
-                            <div className="row p-2 gap-3">
+                            <div className="row mt-2 gap-3">
                               <div className="mb-3 text-cancelled">
                                 Rejected
                               </div>

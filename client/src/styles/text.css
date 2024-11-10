@@ -1,6 +1,9 @@
 .text-pending {
   width: max-content;
-  padding: 0.5em;
+  font-size: 0.75em!important;
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
   text-align: center;
   border: #ffa500 1px solid;
   border-radius: 25px;
@@ -10,7 +13,10 @@
 
 .text-accepted {
   width: max-content;
-  padding: 0.5em;
+  font-size: 0.75em!important;
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
   text-align: center;
   border: #4caf50 1px solid;
   border-radius: 25px;
@@ -20,7 +26,10 @@
 
 .text-cancelled {
   width: max-content;
-  padding: 0.5em;
+  font-size: 0.75em!important;
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
   text-align: center;
   border: #f44336 1px solid;
   border-radius: 25px;
@@ -40,7 +49,7 @@
 
 .text-button {
   width: 120px;
-  padding: 0.5em;
+  padding: 0.4em;
   text-align: center;
   border-radius: 25px;
   color: #1c9dff;
@@ -99,6 +108,19 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.status-booked {
+  display: flex;
+  align-items: center;
+  font-size: 0.5em!important;
+  background-color: #ececec;
+  width: min-content;
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #000;
+  border-radius: 1em;
 }
 
 /* Media query for 768 and below */

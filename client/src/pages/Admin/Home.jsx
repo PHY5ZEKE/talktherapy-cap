@@ -234,7 +234,7 @@ export default function Home() {
 
   const webSocketFetch = async () => {
     SocketFetch(socket);
-    sendEmail(userDetails.email)
+    sendEmail(userDetails.email);
   };
 
   const fetchAdminData = async () => {
@@ -343,7 +343,10 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.error) {
-        emailAccountStatus(userData.email, userData.active ? "deactivated" : "activated")
+        emailAccountStatus(
+          userData.email,
+          userData.active ? "deactivated" : "activated"
+        );
         notify(toastMessage.success.status);
         // Optionally, update the clinicians list to reflect the change
         setClinicians(
@@ -383,7 +386,10 @@ export default function Home() {
       const data = await response.json();
 
       if (!data.error) {
-        emailAccountStatus(userData.email, userData.active ? "deactivated" : "activated")
+        emailAccountStatus(
+          userData.email,
+          userData.active ? "deactivated" : "activated"
+        );
         notify(toastMessage.success.status);
         // Optionally, update the patients list to reflect the change
         setPatients(
@@ -402,8 +408,8 @@ export default function Home() {
   };
 
   const sendEmail = (email) => {
-    emailEditInfo(email)
-  }
+    emailEditInfo(email);
+  };
 
   return (
     <>
@@ -530,15 +536,27 @@ export default function Home() {
                                 style={{ cursor: "pointer" }}
                                 onClick={() => openModal(appointment._id)}
                               >
-                                <h5 className="mb-0 fw-bold">
-                                  {appointment.status ===
-                                  "Schedule Change Request"
-                                    ? appointment.newSchedule?.day
-                                    : appointment.status ===
-                                      "Temporary Reschedule Request"
-                                    ? appointment.temporaryReschedule?.day
-                                    : appointment.selectedSchedule?.day}
-                                </h5>
+                                <div className="d-flex align-items-center gap-3 mb-2">
+                                  <h5 className="mb-0 fw-bold">
+                                    {appointment.status ===
+                                    "Schedule Change Request"
+                                      ? appointment.newSchedule?.day
+                                      : appointment.status ===
+                                        "Temporary Reschedule Request"
+                                      ? appointment.temporaryReschedule?.day
+                                      : appointment.selectedSchedule?.day}
+                                  </h5>
+
+                                  <div className="mb-0 text-pending">
+                                    {appointment.status === "Pending"
+                                      ? "Pending"
+                                      : appointment.status ===
+                                        "Schedule Change Request"
+                                      ? "Schedule Change Request"
+                                      : "Temporary Schedule Request"}
+                                  </div>
+                                </div>
+
                                 <p className="mb-0">
                                   {appointment.status ===
                                   "Schedule Change Request"
@@ -548,7 +566,7 @@ export default function Home() {
                                     ? `${appointment.temporaryReschedule?.startTime} to ${appointment.temporaryReschedule?.endTime}`
                                     : `${appointment.selectedSchedule?.startTime} to ${appointment.selectedSchedule?.endTime}`}
                                 </p>
-                                <p className="mb-0">
+                                <p className="mb-3">
                                   {appointment.status ===
                                   "Schedule Change Request"
                                     ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested for a change in her schedule`
@@ -557,14 +575,6 @@ export default function Home() {
                                     ? `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a temporary reschedule`
                                     : `${appointment.patientId.firstName} ${appointment.patientId.middleName} ${appointment.patientId.lastName} has requested a session with ${appointment.selectedSchedule?.clinicianName}`}
                                 </p>
-                                <div className="mb-3 text-pending">
-                                  {appointment.status === "Pending"
-                                    ? "Pending"
-                                    : appointment.status ===
-                                      "Schedule Change Request"
-                                    ? "Schedule Change Request"
-                                    : "Temporary Schedule Request"}
-                                </div>
                               </div>
                             ))}
 
@@ -586,12 +596,18 @@ export default function Home() {
                                 style={{ cursor: "pointer" }}
                                 onClick={() => openModal(appointment._id)}
                               >
-                                <h5 className="mb-0 fw-bold">
-                                  {appointment.status ===
-                                  "Temporarily Rescheduled"
-                                    ? appointment.temporaryReschedule?.day
-                                    : appointment.selectedSchedule?.day}
-                                </h5>
+                                <div className="d-flex align-items-center gap-3 mb-3">
+                                  <h5 className="mb-0 fw-bold">
+                                    {appointment.status ===
+                                    "Temporarily Rescheduled"
+                                      ? appointment.temporaryReschedule?.day
+                                      : appointment.selectedSchedule?.day}
+                                  </h5>
+                                  <div className="mb-0 text-accepted">
+                                    {appointment.status}
+                                  </div>
+                                </div>
+
                                 <p className="mb-0">
                                   {appointment.status ===
                                   "Temporarily Rescheduled"
@@ -604,7 +620,7 @@ export default function Home() {
                                     ? appointment.temporaryReschedule?.endTime
                                     : appointment.selectedSchedule?.endTime}
                                 </p>
-                                <p className="mb-0">
+                                <p className="mb-3">
                                   {appointment.patientId.firstName}{" "}
                                   {appointment.patientId.middleName}{" "}
                                   {appointment.patientId.lastName} has a session
@@ -616,9 +632,6 @@ export default function Home() {
                                     : appointment.selectedSchedule
                                         ?.clinicianName}
                                 </p>
-                                <div className="mb-3 text-accepted">
-                                  {appointment.status}
-                                </div>
                               </div>
                             ))}
 
@@ -636,14 +649,20 @@ export default function Home() {
                                 style={{ cursor: "pointer" }}
                                 onClick={() => openModal(appointment._id)}
                               >
-                                <h5 className="mb-0 fw-bold">
-                                  {appointment.selectedSchedule.day}
-                                </h5>
+                                <div className="d-flex align-items-center gap-3 mb-3">
+                                  <h5 className="mb-0 fw-bold">
+                                    {appointment.selectedSchedule.day}
+                                  </h5>
+                                  <div className="mb-0 text-cancelled">
+                                    Rejected
+                                  </div>
+                                </div>
+
                                 <p className="mb-0">
                                   {appointment.selectedSchedule.startTime} to{" "}
                                   {appointment.selectedSchedule.endTime}
                                 </p>
-                                <p className="mb-0">
+                                <p className="mb-3">
                                   {appointment.patientId.firstName}{" "}
                                   {appointment.patientId.middleName}{" "}
                                   {appointment.patientId.lastName} session
@@ -651,9 +670,6 @@ export default function Home() {
                                   {appointment.selectedSchedule.clinicianName}{" "}
                                   was rejected
                                 </p>
-                                <div className="mb-3 text-cancelled">
-                                  Rejected
-                                </div>
                               </div>
                             ))}
 
@@ -672,9 +688,15 @@ export default function Home() {
                                 style={{ cursor: "pointer" }}
                                 onClick={() => openModal(appointment._id)}
                               >
-                                <h5 className="mb-0 fw-bold">
-                                  {appointment.selectedSchedule?.day}
-                                </h5>
+                                <div className="d-flex align-items-center gap-3 mb-3">
+                                  <h5 className="mb-0 fw-bold">
+                                    {appointment.selectedSchedule?.day}
+                                  </h5>
+                                  <div className="mb-3 text-accepted">
+                                    {appointment.status}
+                                  </div>
+                                </div>
+
                                 <p className="mb-0">
                                   {appointment.selectedSchedule?.startTime} to{" "}
                                   {appointment.selectedSchedule?.endTime}
@@ -686,9 +708,6 @@ export default function Home() {
                                   a session with{" "}
                                   {appointment.selectedSchedule?.clinicianName}
                                 </p>
-                                <div className="mb-3 text-accepted">
-                                  {appointment.status}
-                                </div>
                               </div>
                             ))}
                       </>
