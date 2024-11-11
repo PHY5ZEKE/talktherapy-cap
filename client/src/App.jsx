@@ -55,10 +55,17 @@ import PublicRoute from "./pages/Authorization/PublicRoute";
 // Teleconference
 import Room from "./pages/System/Room";
 
+//Test Exercises
+import PageStart from './pages/Exercises/Pages';
+
+import ML from "./pages/Exercises/SpeechML";
+import Perform from "./pages/Exercises/Exercise";
+
+
 // Error Handlers
 import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
-
+ 
 const routes = (
   <Router>
     <Routes>
@@ -83,6 +90,11 @@ const routes = (
           </PrivateRoute>
         }
       />
+
+      {/* Test pages for exercises */}
+      <Route path="/start" element={<PageStart />} />
+      <Route path="/ml" element={<ML />} />
+      <Route path="/exer" element={<Perform />} />
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route

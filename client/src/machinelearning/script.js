@@ -1,6 +1,47 @@
-const URL = "https://talktherapy.site/src/machinelearning/my_model/";
+let URL = "https://talktherapy.site/src/machinelearning/my_model/";
 import * as tf from '@tensorflow/tfjs'; 
 import Chart from 'chart.js/auto';
+
+async function loadModel() {
+    try {
+      const checkpointURL = URL + "model.json";
+      const metadataURL = URL + "metadata.json";
+  
+      const recognizer = await window.speechCommands.create(
+        "BROWSER_FFT", 
+        undefined, 
+        checkpointURL, 
+        metadataURL
+      );
+  
+      await recognizer.ensureModelLoaded();
+      console.log("Model loaded from production URL");
+      return recognizer;
+    } catch (error) {
+      console.warn("Failed to load from production URL, switching to localhost:", error);
+  
+      URL = "http://localhost:8000/src/machinelearning/my_model/";
+      try {
+        const checkpointURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+  
+        const recognizer = await window.speechCommands.create(
+          "BROWSER_FFT", 
+          undefined, 
+          checkpointURL, 
+          metadataURL
+        );
+  
+        await recognizer.ensureModelLoaded();
+        console.log("Model loaded from localhost URL");
+        return recognizer;
+      } catch (error) {
+        console.error("Failed to load model from both URLs:", error);
+        throw error;
+      }
+    }
+  }
+
 
 export async function createModel() {
     const checkpointURL = URL + "model.json";
@@ -19,7 +60,7 @@ export async function createModel() {
 }
 
 export async function init() {
-    const recognizer = await createModel();
+    const recognizer = await loadModel();
     const classLabels = recognizer.wordLabels();
     const labelContainer = document.getElementById("label-container");
     labelContainer.innerHTML = '';

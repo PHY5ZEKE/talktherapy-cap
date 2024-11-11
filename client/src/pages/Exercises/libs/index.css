@@ -1,0 +1,197 @@
+.page {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+	background: #f5f5f5;
+  }
+
+  input, textarea {
+	font-size: 24px;
+	visibility: hidden; /* Make the input invisible */
+  }
+  
+  .page-center {
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+  }
+  
+  .page-absolute {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+  }
+  
+  .title {
+	font-size: 2rem;
+	font-weight: bold;
+	margin-bottom: 20px;
+  }
+  
+  .description {
+	font-size: 1.1rem;
+	margin-bottom: 20px;
+  }
+  
+  .loading, .microphone {
+	font-size: 1rem;
+	margin-bottom: 10px;
+  }
+  
+  .button {
+	background-color: #4CAF50;
+	color: white;
+	padding: 10px 20px;
+	margin: 10px;
+	border: none;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+	background-color: #45a049;
+  }
+  
+  .panel-counter {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 30px;
+  }
+
+
+  #page-main {
+	display: flex; /* Change to flex */
+	flex-direction: column; /* Stack children vertically */
+	justify-content: center; /* Center children vertically */
+	align-items: center; /* Center children horizontally */
+	background: #f4f4f4;
+	border-radius: 15px;
+	width: 80%;
+	max-width: 900px;
+	padding: 20px;
+	box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+ #page-main .content {
+	display: flex; /* Use flexbox for content */
+	flex-direction: column; /* Stack children vertically */
+	align-items: center; /* Center children horizontally */
+	width: 100%; /* Ensure it takes the full width */
+  }
+
+  #phrase-number-input {
+    position: absolute; /* Remove it from the normal flow */
+    opacity: 0; /* Make it invisible */
+    width: 0; /* Set width to 0 */
+    height: 0; /* Set height to 0 */
+    pointer-events: none; /* Prevent interaction */
+}
+  
+  
+ #page-main #panel-counter {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 20px;
+	font-size: 36px;
+	margin-bottom: 20px;
+  }
+  #page-main #panel-counter #phrase-number {
+	font-size: 36px;
+  }
+  #page-main #panel-counter .button-arrow {
+	cursor: pointer;
+	font-size: 48px;
+  }
+  #page-main #panel-counter #caption {
+	font-size: 14px;
+	color: #777;
+  }
+  
+  /* Phrase Section */
+  #page-main #panel-phrase {
+	display: flex;
+	justify-content: center;
+	gap: 15px;
+	margin-bottom: 30px;
+  }
+
+  #page-main #panel-phrase #phrase {
+	padding: 20px;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	font-size: 32px;
+	min-width: 150px;
+	text-align: center;
+  }
+  
+  /* Recognition Panel */
+  #page-main #panel-recognition {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 20px;
+	position: relative;
+  }
+
+
+#page-main #panel-recognition #recognition[correct="true"] {
+  color: #0b0;
+  font-size: 32px;
+}
+#page-main #panel-recognition[mode="recognition"] #compare {
+  display: none;
+  font-size: 32px;
+}
+#page-main #panel-recognition[mode="compare"] #recognition {
+  display: none;
+  font-size: 32px;
+}
+  
+  /* Record & Listen Buttons */
+  #page-main #panel-recognition #panel-record {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+  }
+  #page-main #panel-recognition #panel-record #button-record {
+	background: #f44336;
+	color: white;
+	padding: 12px 25px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.3s ease;
+  }
+  #page-main #panel-recognition #panel-record #button-record[record="true"] {
+	background: #e57373;
+  }
+  #page-main #panel-recognition #panel-record #button-record:hover {
+	background: #e53935;
+  }
+  #page-main #panel-recognition #panel-record #button-listen {
+	background: #2196F3;
+	color: white;
+	padding: 12px 25px;
+	border-radius: 8px;
+	cursor: pointer;
+	transition: background 0.3s ease;
+  }
+  #page-main #panel-recognition #panel-record #button-listen[hidden] {
+	display: none;
+  }
+  #page-main #panel-recognition #panel-record #button-listen:hover {
+	background: #1976D2;
+  }
+  
+  

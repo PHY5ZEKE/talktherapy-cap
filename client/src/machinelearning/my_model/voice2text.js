@@ -1,7 +1,7 @@
 export async function runSpeechRecognition(setScore) {
     var output = document.getElementById("output");
     var action = document.getElementById("action");
-    var phonemeContainer = document.getElementById("phoneme-output"); 
+    var phonemeCont = document.getElementById("phoneme-output"); 
     var scoreOutput = document.getElementById("score-output"); 
 
     // try {
@@ -47,8 +47,7 @@ export async function runSpeechRecognition(setScore) {
 
         if (phonemeSequence.length > 0) {
             var phonemeArray = phonemeSequence[0].split(" ");
-            //displayPhonemes(firstWord, phonemeArray);
-            var phonemeContainer = document.getElementById("phoneme-output");
+            var phonemeContainer = phonemeCont;
             var phonemeElement = document.createElement("div");
             phonemeElement.innerText = words + ": " + phonemeArray.join(", ");
 
