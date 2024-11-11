@@ -20,7 +20,7 @@ async function loadModel() {
     } catch (error) {
       console.warn("Failed to load from production URL, switching to localhost:", error);
   
-      URL = "http://localhost:8000/src/machinelearning/my_model/";
+      URL = "http://localhost:5173/src/machinelearning/my_model/";
       try {
         const checkpointURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
@@ -43,21 +43,21 @@ async function loadModel() {
   }
 
 
-export async function createModel() {
-    const checkpointURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
+// export async function createModel() {
+//     const checkpointURL = URL + "model.json";
+//     const metadataURL = URL + "metadata.json";
 
-    const recognizer = await window.speechCommands.create(
-        "BROWSER_FFT", 
-        undefined, 
-        checkpointURL, 
-        metadataURL
-    );
+//     const recognizer = await window.speechCommands.create(
+//         "BROWSER_FFT", 
+//         undefined, 
+//         checkpointURL, 
+//         metadataURL
+//     );
 
-    await recognizer.ensureModelLoaded();
+//     await recognizer.ensureModelLoaded();
 
-    return recognizer;
-}
+//     return recognizer;
+// }
 
 export async function init() {
     const recognizer = await loadModel();

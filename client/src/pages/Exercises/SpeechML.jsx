@@ -57,6 +57,7 @@ export default function ML() {
         <div id="chartContainer">
           <canvas id="outputChart"></canvas>
         </div>
+        <div id="label-container"></div>
       </div>
 
       <div className="controls-container">
