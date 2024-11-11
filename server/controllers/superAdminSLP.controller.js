@@ -39,6 +39,15 @@ const findUserById = async (id) => {
   return { userInfo: null, userRole: null };
 };
 
+const safeDecrypt = (text) => {
+  try {
+    return text && text.includes(":") ? decrypt(text) : text;
+  } catch (error) {
+    console.error("Error decrypting text:", error);
+    return text;
+  }
+};
+
 exports.signup = async (req, res) => {
   const { email, password, firstName, middleName, lastName, address, mobile } =
     req.body;
@@ -911,7 +920,7 @@ exports.unarchiveUser = [
         message: "Admin status and activity updated successfully.",
       });
     } catch (error) {
-      console.log(error)
+      console.log(error);
       return res.status(500).json({
         error: true,
         message: "An error occurred while changing admin status and activity.",
@@ -934,7 +943,6 @@ exports.getAllArchivedUsers = [
         active: false,
       });
 
-
       const archivedUsers = [
         ...admins.map((admin) => ({
           _id: admin._id,
@@ -948,8 +956,8 @@ exports.getAllArchivedUsers = [
         })),
         ...clinicians.map((clinician) => ({
           _id: clinician._id,
-          firstName: clinician.firstName ? decrypt(clinician.firstName) : clinician.firstName,
-          lastName: clinician.lastName ? decrypt(clinician.lastName) : clinician.lastName,
+          firstName: safeDecrypt(clinician.firstName),
+          lastName: safeDecrypt(clinician.lastName),
           email: clinician.email,
           active: clinician.active,
           status: clinician.status,
@@ -958,8 +966,8 @@ exports.getAllArchivedUsers = [
         })),
         ...patients.map((patient) => ({
           _id: patient._id,
-          firstName: patient.firstName ? decrypt(patient.firstName) : patient.firstName,
-          lastName: patient.lastName ? decrypt(patient.lastName) : patient.lastName,
+          firstName: safeDecrypt(patient.firstName),
+          lastName: safeDecrypt(patient.lastName),
           email: patient.email,
           active: patient.active,
           status: patient.status,
@@ -973,7 +981,6 @@ exports.getAllArchivedUsers = [
         message: "Archived users retrieved successfully.",
         users: archivedUsers,
       });
-
     } catch (error) {
       return res.status(500).json({
         error: true,
