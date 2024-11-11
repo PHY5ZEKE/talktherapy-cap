@@ -13,7 +13,6 @@ import { page } from "../../utils/page-route";
 
 import { useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
-import { Tooltip } from "react-tooltip";
 
 export default function Sidebar() {
   const { clearOnLogOut } = useContext(AuthContext);
@@ -39,13 +38,13 @@ export default function Sidebar() {
         </div>
 
         <div className="d-flex flex-column gap-5 mb-auto text-link">
-          <Link to={page.sudo.home} className={`text-link home ${isActive(page.sudo.home) ? 'active' : ''}`}>
+          <Link to={page.sudo.home} className={`text-link ${isActive(page.sudo.home) ? 'active' : ''}`}>
             <FontAwesomeIcon icon={faHouse} size="xl" />
           </Link>
-          <Link to={page.sudo.audit} className={`text-link audit ${isActive(page.sudo.audit) ? 'active' : ''}`}>
+          <Link to={page.sudo.audit} className={`text-link ${isActive(page.sudo.audit) ? 'active' : ''}`}>
             <FontAwesomeIcon icon={faCalendar} size="xl" />
           </Link>
-          <Link to={page.sudo.profile} className={`text-link profile ${isActive(page.sudo.profile) ? 'active' : ''}`}>
+          <Link to={page.sudo.profile} className={`text-link ${isActive(page.sudo.profile) ? 'active' : ''}`}>
             <FontAwesomeIcon icon={faGear} size="xl" />
           </Link>
         </div>

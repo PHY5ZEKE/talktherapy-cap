@@ -9,7 +9,7 @@ import {
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { page } from "../../utils/page-route";
 
@@ -20,6 +20,7 @@ export default function Sidebar() {
   const { clearOnLogOut } = useContext(AuthContext);
   
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     clearOnLogOut();
@@ -27,6 +28,8 @@ export default function Sidebar() {
     // Redirect to the login page
     navigate("/login");
   };
+  
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div className="d-none d-md-flex flex-column gap-3 text-center h-100 bg-white p-3">
@@ -38,19 +41,19 @@ export default function Sidebar() {
       </div>
 
       <div className="d-flex flex-column gap-5 mb-auto text-link">
-        <Link to={page.patient.home} className="text-link">
+        <Link to={page.patient.home} className={`text-link ${isActive(page.patient.home) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faHouse} size="xl" />
         </Link>
-        <Link to={page.patient.feedback} className="text-link">
+        <Link to={page.patient.feedback} className={`text-link ${isActive(page.patient.feedback) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faStethoscope} size="xl" />
         </Link>
-        <Link to={page.patient.content} className="text-link">
+        <Link to={page.patient.content} className={`text-link ${isActive(page.patient.content) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
         </Link>
-        <Link to={page.patient.book} className="text-link">
+        <Link to={page.patient.book} className={`text-link ${isActive(page.patient.book) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faCalendar} size="xl" />
         </Link>
-        <Link to={page.patient.profile} className="text-link">
+        <Link to={page.patient.profile} className={`text-link ${isActive(page.patient.profile) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faGear} size="xl" />
         </Link>
       </div>

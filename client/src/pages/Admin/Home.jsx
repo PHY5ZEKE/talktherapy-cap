@@ -825,7 +825,7 @@ export default function Home() {
                                 style={{ cursor: "pointer" }}
                                 onClick={() => handleArchive(patient)}
                               >
-                                Disable
+                                Archive
                               </div>
                               <div
                                 className="mb-3 fw-bold text-button border"
@@ -878,7 +878,7 @@ export default function Home() {
                                   style={{ cursor: "pointer" }}
                                   onClick={() => handleArchive(clinician)}
                                 >
-                                  Disable
+                                  Archive
                                 </div>
                                 <div
                                   className="mb-3 fw-bold text-button border"
