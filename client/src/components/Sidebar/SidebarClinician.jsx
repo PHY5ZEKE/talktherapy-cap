@@ -9,7 +9,7 @@ import {
   faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 import { page } from "../../utils/page-route";
 
@@ -20,12 +20,15 @@ export default function Sidebar() {
   const { clearOnLogOut } = useContext(AuthContext);
   
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     clearOnLogOut();
     // Redirect to the login page
     navigate("/login");
   };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <div className="d-none d-md-flex flex-column gap-3 text-center h-100 bg-white p-3">
@@ -37,19 +40,19 @@ export default function Sidebar() {
       </div>
 
       <div className="d-flex flex-column gap-5 mb-auto text-link">
-        <Link to={page.clinician.home} className="text-link">
+        <Link to={page.clinician.home} className={`text-link ${isActive(page.clinician.home) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faHouse} size="xl" />
         </Link>
-        <Link to={page.clinician.content} className="text-link">
+        <Link to={page.clinician.content} className={`text-link ${isActive(page.clinician.content) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
         </Link>
-        <Link to={page.clinician.patients} className="text-link">
+        <Link to={page.clinician.patients} className={`text-link ${isActive(page.clinician.patients) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faUsers} size="xl" />
         </Link>
-        <Link to={page.clinician.schedule} className="text-link">
+        <Link to={page.clinician.schedule} className={`text-link ${isActive(page.clinician.schedule) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faCalendar} size="xl" />
         </Link>
-        <Link to={page.clinician.profile} className="text-link">
+        <Link to={page.clinician.profile} className={`text-link ${isActive(page.clinician.profile) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faGear} size="xl" />
         </Link>
       </div>
