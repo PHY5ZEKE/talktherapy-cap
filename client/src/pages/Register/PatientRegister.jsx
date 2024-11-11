@@ -255,6 +255,7 @@ export default function ClinicianRegister() {
                   <option value="Stroke">Stroke</option>
                   <option value="Stuttering">Stuttering</option>
                   <option value="Aphasia">Aphasia</option>
+                  <option value="Others">Others</option>
                 </select>
               </div>
             </div>

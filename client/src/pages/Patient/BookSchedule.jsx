@@ -484,8 +484,25 @@ export default function BookSchedule() {
                         <option value="default" selected>
                           All Specializations
                         </option>
-                        <option value="Aphasia">Aphasia</option>
+                        <option value="Autism Spectrum Disorder">
+                          Autism Spectrum Disorder
+                        </option>
+                        <option value="Attention-Deficit Hyperactivity Disorder">
+                          Attention-Deficit Hyperactivity Disorder
+                        </option>
+                        <option value="Global Developmental Delay">GDD</option>
+                        <option value="Cerebral Palsy">Cerebral Palsy</option>
+                        <option value="Down Syndrome">Down Syndrome</option>
+                        <option value="Hearing Impairment">
+                          Hearing Impairment
+                        </option>
+                        <option value="Cleft Lip and/or Palate">
+                          Cleft Lip and/or Palate
+                        </option>
                         <option value="Stroke">Stroke</option>
+                        <option value="Stuttering">Stuttering</option>
+                        <option value="Aphasia">Aphasia</option>
+                        <option value="Others">Others</option>
                       </select>
 
                       <DatePicker

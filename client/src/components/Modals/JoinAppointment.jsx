@@ -154,15 +154,17 @@ export default function JoinAppointment({
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label className="fw-bold">Chief Complaint</Form.Label>
+                  <Form.Label className="fw-bold">
+                    Reason for Consultation
+                  </Form.Label>
                   <FloatingLabel
                     controlId="floatingTextarea"
-                    label="Chief Complaint"
+                    label="Reason for Consultation"
                     className="mb-3"
                   >
                     <Form.Control
                       as="textarea"
-                      placeholder="Chief complaint"
+                      placeholder="Reason for Consultation"
                       value={chiefComplaint}
                       onChange={(e) => setChiefComplaint(e.target.value)}
                     />
