@@ -717,7 +717,7 @@ export default function Home() {
                                   <h5 className="mb-0 fw-bold">
                                     {appointment.selectedSchedule?.day}
                                   </h5>
-                                  <div className="mb-3 text-accepted">
+                                  <div className="mb-0 text-accepted">
                                     {appointment.status}
                                   </div>
                                 </div>
@@ -788,73 +788,34 @@ export default function Home() {
                     </div>
 
                     {selectedUserType === "patients" && patients ? (
-                      patients.map((patient) => (
-                        <div
-                          key={patient._id}
-                          className="mb-3 border border-top-0 border-start-0 border-end-0"
-                        >
-                          <p className="mb-0 fw-bold">
-                            <span className="me-2">
-                              <FontAwesomeIcon icon={faUser} />
-                            </span>
-                            {patient.firstName} {patient.middleName}{" "}
-                            {patient.lastName}
-                          </p>
-                          <p className="mb-0">{patient.email}</p>
-                          <p className="mb-0">{patient.address}</p>
-                          <p className="mb-3">{patient.mobile}</p>
-
-                          <div className="d-flex gap-3">
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => handleModal(patient, "patientslp")}
-                            >
-                              Edit
-                            </div>
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => handleArchive(patient)}
-                            >
-                              Disable
-                            </div>
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={() => togglePatientStatus(patient)}
-                              disabled={isProcessing}
-                            >
-                              {patient.active ? "Deactivate" : "Activate"}
-                            </div>
-                          </div>
-                        </div>
-                      ))
-                    ) : selectedUserType === "clinicians" && clinicians ? (
-                      <>
-                        {clinicians.map((clinician) => (
+                      patients
+                        .filter(
+                          (patient) =>
+                            patient.status !== "archival" &&
+                            patient.active !== false
+                        )
+                        .map((patient) => (
                           <div
-                            key={clinician._id}
+                            key={patient._id}
                             className="mb-3 border border-top-0 border-start-0 border-end-0"
                           >
                             <p className="mb-0 fw-bold">
                               <span className="me-2">
-                                <FontAwesomeIcon icon={faUserDoctor} />
+                                <FontAwesomeIcon icon={faUser} />
                               </span>
-                              {clinician.firstName} {clinician.middleName}{" "}
-                              {clinician.lastName}
+                              {patient.firstName} {patient.middleName}{" "}
+                              {patient.lastName}
                             </p>
-                            <p className="mb-0">{clinician.specialization}</p>
-                            <p className="mb-0">{clinician.email}</p>
-                            <p className="mb-0">{clinician.address}</p>
-                            <p className="mb-3">{clinician.mobile}</p>
+                            <p className="mb-0">{patient.email}</p>
+                            <p className="mb-0">{patient.address}</p>
+                            <p className="mb-3">{patient.mobile}</p>
 
                             <div className="d-flex gap-3">
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 style={{ cursor: "pointer" }}
                                 onClick={() =>
-                                  handleModal(clinician, "clinician")
+                                  handleModal(patient, "patientslp")
                                 }
                               >
                                 Edit
@@ -862,21 +823,76 @@ export default function Home() {
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 style={{ cursor: "pointer" }}
-                                onClick={() => handleArchive(clinician)}
+                                onClick={() => handleArchive(patient)}
                               >
                                 Disable
                               </div>
                               <div
                                 className="mb-3 fw-bold text-button border"
                                 style={{ cursor: "pointer" }}
-                                onClick={() => toggleClinicianStatus(clinician)}
+                                onClick={() => togglePatientStatus(patient)}
                                 disabled={isProcessing}
                               >
-                                {clinician.active ? "Deactivate" : "Activate"}
+                                {patient.active ? "Deactivate" : "Activate"}
                               </div>
                             </div>
                           </div>
-                        ))}
+                        ))
+                    ) : selectedUserType === "clinicians" && clinicians ? (
+                      <>
+                        {clinicians
+                          .filter(
+                            (clinician) =>
+                              clinician.status !== "archival" &&
+                              clinician.active !== false
+                          )
+                          .map((clinician) => (
+                            <div
+                              key={clinician._id}
+                              className="mb-3 border border-top-0 border-start-0 border-end-0"
+                            >
+                              <p className="mb-0 fw-bold">
+                                <span className="me-2">
+                                  <FontAwesomeIcon icon={faUserDoctor} />
+                                </span>
+                                {clinician.firstName} {clinician.middleName}{" "}
+                                {clinician.lastName}
+                              </p>
+                              <p className="mb-0">{clinician.specialization}</p>
+                              <p className="mb-0">{clinician.email}</p>
+                              <p className="mb-0">{clinician.address}</p>
+                              <p className="mb-3">{clinician.mobile}</p>
+
+                              <div className="d-flex gap-3">
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    handleModal(clinician, "clinician")
+                                  }
+                                >
+                                  Edit
+                                </div>
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() => handleArchive(clinician)}
+                                >
+                                  Disable
+                                </div>
+                                <div
+                                  className="mb-3 fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={() =>
+                                    toggleClinicianStatus(clinician)
+                                  }
+                                  disabled={isProcessing}
+                                >
+                                  {clinician.active ? "Deactivate" : "Activate"}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                       </>
                     ) : (
                       <h5 className="mb-0 fw-bold text-center">

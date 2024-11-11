@@ -6,6 +6,7 @@ import {
   faCalendar,
   faGear,
   faRightFromBracket,
+  faUsers
 } from "@fortawesome/free-solid-svg-icons";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -45,6 +46,9 @@ export default function Sidebar() {
         </Link>
         <Link to={page.admin.schedule} className="text-link">
           <FontAwesomeIcon icon={faCalendar} size="xl" />
+        </Link>
+        <Link to={page.admin.patients} className="text-link">
+          <FontAwesomeIcon icon={faUsers} size="xl" />
         </Link>
         <Link to={page.admin.profile} className="text-link">
           <FontAwesomeIcon icon={faGear} size="xl" />

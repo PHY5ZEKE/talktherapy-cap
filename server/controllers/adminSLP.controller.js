@@ -384,9 +384,9 @@ exports.getPatientById = [
   verifyToken,
   async (req, res) => {
     const { id } = req.user;
-    const { patientId } = req.params; // Extract admin ID from request parameters
+    const { patientId } = req.params;
 
-    // Check if the requester is a SuperAdmin
+    // Check if the admin
     const isAdmin = await Admin.findOne({ _id: id });
 
     if (!isAdmin) {
@@ -394,12 +394,12 @@ exports.getPatientById = [
     }
 
     try {
-      const patient = await Patient.findById(patientId); // Query the database for the admin with the given ID
+      const patient = await Patient.findById(patientId);
 
       if (!patient) {
         return res.status(404).json({
           error: true,
-          message: "Clinician not found.",
+          message: "Patient not found.",
         });
       }
 
@@ -416,6 +416,7 @@ exports.getPatientById = [
           active: patient.active,
           createdOn: patient.createdOn,
           addedOn: patient.addedOn,
+          profilePicture: patient.profilePicture,
         },
       });
     } catch (error) {

@@ -6,6 +6,7 @@ import { AuthProvider } from "./utils/AuthContext";
 
 // Bootstrap
 import "bootstrap/dist/css/bootstrap.min.css";
+import "react-tooltip/dist/react-tooltip.css";
 
 // CSS
 import "./styles/text.css";
@@ -32,6 +33,7 @@ import AdminContent from "./pages/Admin/ManageContent";
 import AdminSchedule from "./pages/Admin/ManageSchedule";
 import AdminArchival from "./pages/Admin/Archival";
 import AdminProfile from "./pages/Admin/Profile";
+import AdminPatients from "./pages/Admin/SearchPatients";
 
 // Clinician TalkTherapy
 import ClinicianHome from "./pages/Clinician/Home";
@@ -56,16 +58,15 @@ import PublicRoute from "./pages/Authorization/PublicRoute";
 import Room from "./pages/System/Room";
 
 //Test Exercises
-import PageStart from './pages/Exercises/Pages';
+import PageStart from "./pages/Exercises/Pages";
 
 import ML from "./pages/Exercises/SpeechML";
 import Perform from "./pages/Exercises/Exercise";
 
-
 // Error Handlers
 import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
- 
+
 const routes = (
   <Router>
     <Routes>
@@ -177,6 +178,14 @@ const routes = (
         element={
           <PrivateRoute allowedRoles={["admin"]}>
             <AdminArchival />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/patients"
+        element={
+          <PrivateRoute allowedRoles={["admin"]}>
+            <AdminPatients />
           </PrivateRoute>
         }
       />

@@ -6,6 +6,7 @@ import { useParams, useNavigate, useLocation } from "react-router-dom";
 import "../../styles/containers.css";
 import "../../styles/diagnostic.css";
 
+import { toast, Slide } from "react-toastify";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faVideo,
@@ -28,7 +29,8 @@ const useMediaStream = (localVideoRef) => {
         localStream.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       } catch (error) {
-        console.error("Error accessing media devices.", error);
+        localStream.current = new MediaStream();
+        failNotify("The teleconfenrence requires both camera and microphone. Please retry again.")
       }
     },
     [localVideoRef]
@@ -66,6 +68,18 @@ const useMediaStream = (localVideoRef) => {
   };
 };
 
+const notify = (message) =>
+  toast.success(message, {
+    transition: Slide,
+    autoClose: 2000,
+  });
+
+const failNotify = (message) =>
+  toast.error(message, {
+    transition: Slide,
+    autoClose: 2000,
+  });
+
 export default function Room() {
   const { authState } = useContext(AuthContext);
   const userRole = authState.userRole;
@@ -101,6 +115,8 @@ export default function Room() {
 
   const sdpQueue = useRef([]);
   const iceQueue = useRef([]);
+
+
 
   const peerConnectionConfig = {
     iceServers: [
@@ -150,10 +166,10 @@ export default function Room() {
         };
 
         socket.current.onerror = (error) =>
-          console.error("WebSocket error:", error);
+          failNotify("Server is having problems. Please wait or try again.")
 
         socket.current.onclose = () => {
-          console.warn("WebSocket connection closed");
+          notify("You have left the teleconference room.")
           isSocketOpen.current = false;
           hasJoinedRoom.current = false;
         };
@@ -207,9 +223,7 @@ export default function Room() {
 
   const startConnection = (isCaller) => {
     if (!socket.current || socket.current.readyState !== WebSocket.OPEN) {
-      console.warn(
-        `WebSocket is not open (current state: ${socket.current.readyState}). Cannot initiate peer connection.`
-      );
+      failNotify("Server is having problems. Please wait or try again.")
       return;
     }
 
@@ -227,7 +241,7 @@ export default function Room() {
       peerConnection.current
         .createOffer()
         .then(createDescription)
-        .catch(console.error);
+        .catch(          failNotify("Server is having problems. Please wait or try again."));
     }
 
     processQueues();
@@ -302,9 +316,7 @@ export default function Room() {
           })
         );
       } else {
-        console.warn(
-          `WebSocket is not open (current state: ${socket.current.readyState}). Cannot send ICE candidate.`
-        );
+        failNotify("Server is having problems. Please wait or try again.")
       }
     }
   };
@@ -320,9 +332,7 @@ export default function Room() {
           })
         );
       } else {
-        console.warn(
-          `WebSocket is not open (current state: ${socket.current.readyState}). Cannot send SDP.`
-        );
+        failNotify("Server is having problems. Please wait or try again.")
       }
     });
   };
@@ -441,6 +451,7 @@ export default function Room() {
           openModal={handleSoapModal}
           clinicianId={clinicianId}
           clinicianName={clinicianName}
+          patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}
           patientId={patientId}
           onWebSocket={webSocketNotification}
         />

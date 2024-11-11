@@ -284,6 +284,13 @@ export default function Home() {
     emailAccountArchive(userDetails.email);
   };
 
+  const filterNotifications = () => {
+    return notifications.filter((notif) =>
+      notif.show_to.includes("superadmin")
+    );
+  };
+
+
   return (
     <>
       {/* EDIT MODAL */}
@@ -430,43 +437,47 @@ export default function Home() {
               </div>
 
               {/* SECOND COL */}
-              <div className="col-sm bg-white">
-                <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Notifications</p>
-                    <p className="mb-0">
-                      Account and system related activities will be shown here.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="row p-3">
-                  <div
-                    className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "75vh" }}
-                  >
-                    {notifications.length > 0 ? (
-                      notifications
-                        .filter((notif) => notif.show_to.includes("superadmin"))
-                        .map((notification) => (
-                          <div
-                            key={notification._id}
-                            className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                          >
-                            <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">
-                              {formatDate(notification.date)}
-                            </p>
-                          </div>
-                        ))
-                    ) : (
-                      <p className="fw-bold text-center mb-0">
-                        No notifications available
+              {filterNotifications.length > 0 ? (
+                <div className="col-sm bg-white">
+                  <div className="row p-3">
+                    <div className="col bg-white border rounded-4 p-3">
+                      <p className="mb-0 fw-bold">Notifications</p>
+                      <p className="mb-0">
+                        Account and system related activities will be shown
+                        here.
                       </p>
-                    )}
+                    </div>
+                  </div>
+
+                  <div className="row p-3">
+                    <div
+                      className="col bg-white border rounded-4 p-3 overflow-auto"
+                      style={{ maxHeight: "75vh" }}
+                    >
+                      {filterNotifications.length > 0 &&
+                        notifications
+                          .filter((notif) =>
+                            notif.show_to.includes("superadmin")
+                          )
+                          .map((notification) => (
+                            <div
+                              key={notification._id}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                            >
+                              <p className="mb-0 fw-bold">
+                                {notification.body}
+                              </p>
+                              <p className="mb-0">
+                                {formatDate(notification.date)}
+                              </p>
+                            </div>
+                          ))}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="col-sm bg-white"></div>
+              )}
 
               {/* THIRD COL */}
               <div className="col-sm bg-white"></div>

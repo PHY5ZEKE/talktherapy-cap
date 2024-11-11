@@ -1,4 +1,7 @@
 import { useState, useContext } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
+
 import { AuthContext } from "../../utils/AuthContext";
 
 import "./modal.css";
@@ -11,6 +14,7 @@ export default function Soap({
   openModal,
   clinicianId,
   clinicianName,
+  patientName,
   patientId,
   onWebSocket,
 }) {
@@ -18,7 +22,14 @@ export default function Soap({
   const accessToken = authState.accessToken;
 
   const [date, setDate] = useState("");
-  const [diagnosis, setDiagnosis] = useState("");
+  const [activityPlan, setActivityPlan] = useState("");
+  const [sessionType, setSessionType] = useState("");
+  const [sessionRecording, setSessionRecording] = useState("");
+  const [subjective, setSubjective] = useState("");
+  const [objective, setObjective] = useState("");
+  const [assessment, setAssessment] = useState("");
+  const [recommendation, setRecommendation] = useState("");
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   const notify = (message) =>
@@ -45,7 +56,13 @@ export default function Soap({
       patientId,
       clinicianId,
       date,
-      diagnosis,
+      activityPlan,
+      sessionType,
+      sessionRecording,
+      subjective,
+      objective,
+      assessment,
+      recommendation,
     };
 
     try {
@@ -69,10 +86,10 @@ export default function Soap({
       const userUpdate = {
         notif: "addSOAP",
         body: `Dr. ${clinicianName} has added a SOAP/Diagnosis. Kindly check your feedbacks.`,
-        diagnosis: diagnosis,
+        diagnosis: recommendation,
         show_to: [patientId],
       };
-      
+
       notify("SOAP diagnosis created successfully");
       onWebSocket(userUpdate);
 
@@ -80,6 +97,13 @@ export default function Soap({
     } catch (error) {
       failNotify("Failed to create SOAP diagnosis");
     }
+  };
+
+  const modules = {
+    toolbar: [
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["bold", "italic"],
+    ],
   };
 
   return (
@@ -93,8 +117,17 @@ export default function Soap({
 
           <div className="container text-center">
             <div className="row">
+              <p className="my-3">
+                <span className="fw-bold">Patient Name: </span>
+                {patientName}
+              </p>
+            </div>
+          </div>
+
+          <div className="container text-center">
+            <div className="row">
               <div className="col mb-3">
-                <p className="fw-bold mb-0">Date</p>
+                <p className="fw-bold mb-0">Session Date</p>
                 <input
                   type="date"
                   className="form-control"
@@ -104,30 +137,110 @@ export default function Soap({
               </div>
 
               <div className="col">
-                <p className="fw-bold mb-0">Attending Clinician</p>
-                <p>Dr. {clinicianName}</p>
+                <p className="fw-bold mb-0">Activity/Assessment Plan</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={activityPlan}
+                  onChange={(e) => setActivityPlan(e.target.value)}
+                />
               </div>
             </div>
           </div>
 
-          <div className="d-flex justify-content-center">
-            <form className="container w-100" onSubmit={handleSubmit}>
-              <p className="fw-bold text-center mb-1">Diagnosis</p>
-              <textarea
-                className="form-control"
-                aria-label="With textarea"
-                value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
-              ></textarea>
-              <div className="d-flex justify-content-center mt-3 gap-3">
-                <button type="submit" className="text-button border">
-                  <p className="fw-bold my-0 status">SUBMIT</p>
-                </button>
-                <button className="text-button border" onClick={handleClose}>
-                  <p className="fw-bold my-0 status">CANCEL</p>
-                </button>
+          <div className="container text-center">
+            <div className="row">
+              <div className="col mb-3">
+                <p className="fw-bold mb-0">Session Type</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={sessionType}
+                  onChange={(e) => setSessionType(e.target.value)}
+                />
               </div>
-            </form>
+
+              <div className="col">
+                <p className="fw-bold mb-0">Session Recording</p>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={sessionRecording}
+                  onChange={(e) => setSessionRecording(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="col bg-white overflow-auto"
+            style={{ maxHeight: "75vh" }}
+          >
+            <div className="container text-center">
+              <div className="row">
+                <div className="col mb-3">
+                  <p className="fw-bold mb-0">Subjective</p>
+                  <ReactQuill
+                    value={subjective}
+                    onChange={setSubjective}
+                    modules={modules}
+                    className="overflow-auto"
+                    style={{ maxHeight: "90px" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="container text-center">
+              <div className="row overflow-auto" style={{ maxHeight: "130px" }}>
+                <div className="col mb-3">
+                  <p className="fw-bold mb-0">Objective/Goals</p>
+                  <ReactQuill
+                    value={objective}
+                    onChange={setObjective}
+                    modules={modules}
+                  />
+                </div>
+
+                <div className="col">
+                  <p className="fw-bold mb-0">Assessment/Performance</p>
+                  <ReactQuill
+                    value={assessment}
+                    onChange={setAssessment}
+                    modules={modules}
+                    className="overflow-auto"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="container text-center">
+              <div className="row">
+                <div className="col mb-3">
+                  <p className="fw-bold mb-0">Plan/Recommendations</p>
+                  <ReactQuill
+                    value={recommendation}
+                    onChange={setRecommendation}
+                    modules={modules}
+                    className="overflow-auto"
+                    style={{ maxHeight: "70px" }}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="d-flex justify-content-center mt-3 gap-3">
+            <button
+              type="submit"
+              className="text-button border"
+              onClick={handleSubmit}
+            >
+              <p className="fw-bold my-0 status">SUBMIT</p>
+            </button>
+            <button className="text-button border" onClick={handleClose}>
+              <p className="fw-bold my-0 status">CANCEL</p>
+            </button>
           </div>
         </div>
       </div>

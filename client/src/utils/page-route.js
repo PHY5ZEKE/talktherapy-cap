@@ -17,7 +17,8 @@ export const page = {
         content: "/admin/content",
         schedule: "/admin/schedule",
         profile: "/admin/profile",
-        archival: "/admin/archival"
+        archival: "/admin/archival",
+        patients: "/admin/patients",
     },
     clinician: {
       home: "/clinician",

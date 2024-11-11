@@ -9,17 +9,11 @@ import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
 // Components
-import Sidebar from "../../components/Sidebar/SidebarClinician";
-import MenuDropdown from "../../components/Layout/ClinicianMenu";
-import Soap from "../../components/Modals/Soap";
-import EditSoap from "../../components/Modals/EditSoap";
+import Sidebar from "../../components/Sidebar/SidebarAdmin";
+import MenuDropdown from "../../components/Layout/AdminMenu";
 import ViewProgress from "../../components/Modals/ViewProgress";
 import ViewRecord from "../../components/Modals/ViewRecord";
-import RequestAccess from "../../components/Modals/RequestAccess";
 
-import SocketFetch from "../../utils/SocketFetch";
-import { emailRequestAccess } from "../../utils/emailRequestAccess";
-import { emailSoap } from "../../utils/emailSoap";
 
 const VIEW_MODES = {
   NONE: "NONE",
@@ -36,21 +30,15 @@ export default function ManageSchedule() {
 
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [patients, setPatients] = useState([]);
-  const [assignedPatients, setAssignedPatients] = useState([]);
-  const [clinicianData, setClinicianData] = useState(null);
+  const [adminData, setAdminData] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [editSoapRecord, setEditSoapRecord] = useState(null);
 
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const [viewMode, setViewMode] = useState(VIEW_MODES.NONE);
   const [soapRecords, setSoapRecords] = useState([]);
-  const [selectedSoapRecord, setSelectedSoapRecord] = useState(null);
-
-  const [patientName, setPatientName] = useState("");
 
   const notify = (message) =>
     toast.success(message, {
@@ -64,28 +52,17 @@ export default function ManageSchedule() {
       autoClose: 2000,
     });
 
-  //  Request Access Modal
-  const [isRequestAccess, setIsRequestAccess] = useState(false);
-  const openRequestAccess = (name) => {
-    setPatientName(name);
-    setIsRequestAccess((prevState) => !prevState);
-  };
-  // Add SOAP Modal
-  const [showModal, setShowModal] = useState(false);
-  const handleOpen = (name) => {
-    setPatientName(name);
-    setShowModal((prevState) => !prevState);
-  };
-
   // WebSocket Notification
   const socket = useRef(null);
   useEffect(() => {
-    // Fetch Patients
+    // Fetch Admin
+    fetchAdminData();
+
     // Fetch Patients
     const fetchPatients = async () => {
       try {
         const response = await fetch(
-          `${appURL}/${route.clinician.getAllPatients}`,
+          `${appURL}/${route.admin.getAllPatients}`,
           {
             method: "GET",
             headers: {
@@ -110,35 +87,6 @@ export default function ManageSchedule() {
 
     fetchPatients();
 
-    // Fetch Assigned Patients
-    const fetchAssignedPatients = async () => {
-      try {
-        const response = await fetch(
-          `${appURL}/${route.clinician.getAssignedPatients}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        const data = await response.json();
-
-        if (!data.error) {
-          setAssignedPatients(data.assignedPatients);
-        } else {
-          failNotify(toastMessage.fail.fetch);
-        }
-      } catch (error) {
-        failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
-      }
-    };
-
-    fetchAssignedPatients();
-
     socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
@@ -148,10 +96,11 @@ export default function ManageSchedule() {
     socket.current.onmessage = (event) => {
       const message = JSON.parse(event.data);
       if (message.type === "notification") {
-        fetchAssignedPatients();
+        fetchPatients();
       }
 
       if (message.type === "fetch-action") {
+        fetchPatients();
         fetchSoapRecords();
       }
     };
@@ -165,84 +114,6 @@ export default function ManageSchedule() {
     };
   }, []);
 
-  const webSocketNotification = async (message) => {
-    const response = JSON.stringify(message);
-    const parsed = JSON.parse(response);
-
-    let notification = {};
-
-    if (parsed.notif === "appointmentRequestAccess") {
-      notification = {
-        body: `${parsed.body}`,
-        date: new Date(),
-        show_to: parsed.show_to,
-      };
-      sendEmail(parsed.reason, accessToken);
-    }
-
-    if (parsed.notif === "addSOAP") {
-      notification = {
-        body: `${parsed.body}`,
-        date: new Date(),
-        show_to: parsed.show_to,
-      };
-      emailSoap(selectedPatient.email, parsed.diagnosis, clinicianData);
-    }
-
-    try {
-      const response = await fetch(`${appURL}/${route.notification.create}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(notification),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to send notification");
-      }
-      const result = await response.json();
-
-      // Notify WebSocket server
-      const resultWithNotif = { ...result, type: "notification" };
-
-      if (socket.current && socket.current.readyState === WebSocket.OPEN) {
-        socket.current.send(JSON.stringify(resultWithNotif));
-      }
-    } catch (error) {
-      console.error("Error sending notification:", error);
-    }
-  };
-
-  useEffect(() => {
-    // Clinician Data
-    const fetchClinicianData = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch clinician data");
-        }
-
-        const data = await response.json();
-        setClinicianData(data.clinician);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchClinicianData();
-  }, []);
-
   const filteredPatients = patients.filter(
     (patient) =>
       patient.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -251,12 +122,33 @@ export default function ManageSchedule() {
       patient.mobile.includes(searchTerm)
   );
 
+  const fetchAdminData = async () => {
+    try {
+      const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch admin data");
+      }
+
+      const data = await response.json();
+      setAdminData(data.admin);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   const fetchPatientDetails = async (patientId) => {
     setIsLoading(true);
 
     try {
       const response = await fetch(
-        `${appURL}/${route.clinician.getPatientById}${patientId}`,
+        `${appURL}/${route.admin.getPatientById}${patientId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -315,84 +207,8 @@ export default function ManageSchedule() {
     }
   };
 
-  const handleSoapRecordClick = (record) => {
-    setSelectedSoapRecord(record);
-  };
-
-  const handleDeleteSoapRecord = async (id) => {
-    try {
-      const response = await fetch(`${appURL}/${route.soap.delete}/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-
-        throw new Error("Failed to delete SOAP record");
-      }
-
-      // Remove the deleted record from the state
-      setSoapRecords((prevRecords) =>
-        prevRecords.filter((record) => record._id !== id)
-      );
-      notify("SOAP record deleted successfully");
-    } catch (error) {
-      failNotify("Failed to delete SOAP record");
-    }
-  };
-
-  const isPatientAssigned = (patientId) => {
-    return assignedPatients.some((patient) => patient._id === patientId);
-  };
-
-  const webSocketFetch = () => {
-    SocketFetch(socket);
-  };
-
-  const sendEmail = (reason, token) => {
-    emailRequestAccess(clinicianData, selectedPatient, reason, token);
-  };
-
   return (
     <>
-      {/* Add SOAP Modal */}
-      {showModal && (
-        <Soap
-          openModal={handleOpen}
-          clinicianId={clinicianData?._id}
-          clinicianName={`${clinicianData?.firstName} ${clinicianData?.lastName}`}
-          patientName={`${patientName}`}
-          patientId={selectedPatient?._id}
-          onWebSocket={webSocketNotification}
-        />
-      )}
-
-      {/* Request Access Modal */}
-
-      {isRequestAccess && (
-        <RequestAccess
-          openModal={openRequestAccess}
-          clinicianId={clinicianData?._id}
-          patientId={selectedPatient?._id}
-          accessToken={accessToken}
-          clinicianName={`${clinicianData?.firstName} ${clinicianData?.lastName}`}
-          patientName={`${patientName}`}
-          onWebSocket={webSocketNotification}
-        />
-      )}
-
-      {/*Edit Soap Modal */}
-      {editSoapRecord && (
-        <EditSoap
-          openModal={() => setEditSoapRecord(null)}
-          soapRecord={editSoapRecord}
-          onFetch={webSocketFetch}
-        />
-      )}
-
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
           <Sidebar />
@@ -402,11 +218,11 @@ export default function ManageSchedule() {
               <div className="col">
                 {error ? (
                   <p>{error}</p>
-                ) : clinicianData ? (
+                ) : adminData ? (
                   <>
                     <p className="mb-0 mt-3">Hello,</p>
                     <p className="fw-bold">
-                      {clinicianData?.firstName} {clinicianData?.lastName}
+                      {adminData?.firstName} {adminData?.lastName}
                     </p>
                   </>
                 ) : (
@@ -501,48 +317,23 @@ export default function ManageSchedule() {
                           <p className="mb-3">{selectedPatient?.email}</p>
 
                           <div className="d-flex flex-column gap-3">
-                            {isPatientAssigned(selectedPatient._id) ? (
-                              <>
-                                <button
-                                  className="text-button border w-100"
-                                  onClick={() => {
-                                    handleOpen(
-                                      `${selectedPatient?.firstName} ${selectedPatient?.lastName}`
-                                    );
-                                  }}
-                                >
-                                  Add SOAP
-                                </button>
-                                <button
-                                  onClick={() =>
-                                    setViewMode(VIEW_MODES.PROGRESS)
-                                  }
-                                  className="text-button border w-100"
-                                >
-                                  View Progress
-                                </button>
-                                <button
-                                  onClick={handleViewRecords}
-                                  className="text-button border w-100"
-                                >
-                                  View SOAP Records
-                                </button>
-                                <button className="text-button border w-100">
-                                  Export Data
-                                </button>
-                              </>
-                            ) : (
+                            <>
                               <button
-                                onClick={() => {
-                                  openRequestAccess(
-                                    `${selectedPatient?.firstName} ${selectedPatient?.lastName}`
-                                  );
-                                }}
+                                onClick={() => setViewMode(VIEW_MODES.PROGRESS)}
                                 className="text-button border w-100"
                               >
-                                Request Access
+                                View Progress
                               </button>
-                            )}
+                              <button
+                                onClick={handleViewRecords}
+                                className="text-button border w-100"
+                              >
+                                View SOAP Records
+                              </button>
+                              <button className="text-button border w-100">
+                                Export Data
+                              </button>
+                            </>
                           </div>
                         </div>
                       </div>
@@ -572,7 +363,7 @@ export default function ManageSchedule() {
                   >
                     {viewMode === VIEW_MODES.RECORDS ? (
                       <div>
-                        <h5 className="text-center fw-bold">SOAP Records</h5>
+                        <h5 className="fw-bold text-center">SOAP Records</h5>
                         {soapRecords.map((record) => (
                           <ViewRecord
                             key={record._id}
@@ -581,21 +372,20 @@ export default function ManageSchedule() {
                             ).toLocaleDateString()} - Dr. ${
                               record.clinician.firstName
                             } ${record.clinician.lastName}`}
-                            details={record}
-                            onDelete={() => handleDeleteSoapRecord(record._id)}
-                            onEdit={() => setEditSoapRecord(record)}
+                            details={record.diagnosis}
                             role={userRole}
                           />
                         ))}
                       </div>
                     ) : viewMode === VIEW_MODES.PROGRESS ? (
                       <>
-                        <h5 className="text-center fw-bold">
+                        <h5 className="fw-bold text-center">
                           Progress Records
                         </h5>
                         <ViewProgress
                           header="Exercise - Progress"
                           details="Sample progress details"
+                          role={userRole}
                         />
                       </>
                     ) : (

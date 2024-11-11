@@ -20,8 +20,8 @@ export default function EditProfile({
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
+  const userRole = authState.userRole;
 
-  console.log(userDetails)
   const [userData, setUserData] = useState(userDetails);
 
   const appURL = import.meta.env.VITE_APP_URL;
@@ -104,7 +104,7 @@ export default function EditProfile({
       }
     } catch (error) {
       failNotify(toastMessage.fail.error);
-      console.log(error)
+      console.log(error);
     }
   };
 
@@ -222,7 +222,7 @@ export default function EditProfile({
             </>
           )}
 
-          {whatRole !== "patient" && (
+          {(whatRole !== "patientslp") && (
             <div className="form-group">
               <p className="mb-0">Clinic Address</p>
               <input

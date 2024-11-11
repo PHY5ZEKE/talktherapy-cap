@@ -47,6 +47,10 @@
   text-decoration: none;
 }
 
+.active {
+  color: #1c9dff;
+}
+
 .text-button {
   width: 120px;
   padding: 0.4em;
@@ -121,6 +125,12 @@
   padding-right: 10px;
   border: 1px solid #000;
   border-radius: 1em;
+}
+
+.view-consent {
+  color:#1c9dff;
+  cursor: pointer;
+  font-size: 0.75em;
 }
 
 /* Media query for 768 and below */

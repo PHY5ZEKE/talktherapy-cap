@@ -106,6 +106,7 @@ export default function FeedbackDiagnosis() {
               </div>
               <MenuDropdown />
             </div>
+
             <div className="row h-100">
               <div className="col-sm-4 bg-white">
                 <div className="row p-3">
@@ -152,32 +153,21 @@ export default function FeedbackDiagnosis() {
                     style={{ maxHeight: "75vh" }}
                   >
                     {selectedDiagnosis ? (
-                      <div className="mb-3">
-                        <h4 className="mb-0 fw-bold">Diagnosis</h4>
-                        <br />
+                      <div>
+                        <h4 className="mb-2 fw-bold">Diagnosis</h4>
                         <p className="mb-0">
-                          Diagnosed by {selectedDiagnosis.clinician.firstName}{" "}
+                          In Charge: {selectedDiagnosis.clinician.firstName}{" "}
                           {selectedDiagnosis.clinician.middleName}{" "}
                           {selectedDiagnosis.clinician.lastName}
                         </p>
-                        <p className="mb-0">
-                          Clinic Address: {selectedDiagnosis.clinician.address}{" "}
-                        </p>
-                        <p className="mb-0">
-                          Email: {selectedDiagnosis.clinician.email}{" "}
-                        </p>
-                        <p className="mb-0">
-                          Contact: {selectedDiagnosis.clinician.mobile}{" "}
-                        </p>
-                        <p className="mb-3">
-                          Date of Diagnosis:{" "}
-                          {new Date(
-                            selectedDiagnosis.date
-                          ).toLocaleDateString()}
-                        </p>
-                        <p className="text-justify">
-                          Diagnosis: {selectedDiagnosis.diagnosis}
-                        </p>
+                        <div>
+                          <strong>Recommendation:</strong>
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: selectedDiagnosis.recommendation,
+                            }}
+                          />
+                        </div>
                       </div>
                     ) : (
                       <p>Select a date to see the diagnosis.</p>
