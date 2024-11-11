@@ -9,7 +9,7 @@ export default function TemporaryReschedule({
   onScheduleSelect,
   appointment, // Add appointment to props
   onWebSocket,
-  patientName
+  patientName,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -74,7 +74,7 @@ export default function TemporaryReschedule({
         show_to: ["admin"],
         reason: `${reason}`,
       };
-      
+
       onWebSocket(userUpdate);
 
       setSuccessMessage("Schedule change request submitted successfully");
@@ -93,7 +93,11 @@ export default function TemporaryReschedule({
           },
         });
         const data = await response.json();
-        setSchedules(data);
+        // Filter schedules based on the selected clinician ID
+        const filteredSchedules = data.filter(
+          (schedule) => schedule.clinicianId === clinicianId
+        );
+        setSchedules(filteredSchedules);
       } catch (error) {
         setError(error.message);
       }

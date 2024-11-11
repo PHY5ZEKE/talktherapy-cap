@@ -75,7 +75,7 @@ export default function ChooseSchedule({
         show_to: ["admin"],
         reason: `${reason}`,
       };
-      
+
       onWebSocket(userUpdate);
 
       closeModal();
@@ -93,7 +93,11 @@ export default function ChooseSchedule({
           },
         });
         const data = await response.json();
-        setSchedules(data);
+        // Filter schedules based on the selected clinician ID
+        const filteredSchedules = data.filter(
+          (schedule) => schedule.clinicianId === clinicianId
+        );
+        setSchedules(filteredSchedules);
       } catch (error) {
         setError(error.message);
       }
