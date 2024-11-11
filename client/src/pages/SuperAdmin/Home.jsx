@@ -414,8 +414,8 @@ export default function Home() {
                                   onClick={() => handleArchive(admin)}
                                 >
                                   {admin.status === "archival"
-                                    ? "Enable"
-                                    : "Disable"}
+                                    ? "Restore"
+                                    : "Archive"}
                                 </div>
                                 <div
                                   className="mb-3 fw-bold text-button border"
