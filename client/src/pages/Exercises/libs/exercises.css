@@ -6,10 +6,12 @@
 	background: #f5f5f5;
   }
 
-  input, textarea {
+  .input-exer {
 	font-size: 24px;
 	visibility: hidden; /* Make the input invisible */
   }
+
+  /* textarea */
   
   .page-center {
 	text-align: center;

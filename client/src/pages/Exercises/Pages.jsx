@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './libs/index.css';
+import './libs/exercises.css';
 
 // PageStart Component
 export default function PageStart() {
@@ -40,7 +40,7 @@ export default function PageStart() {
         {/* Panel Counter */}
         <div id="panel-counter" className="panel-counter">
           <div id="button-prev-phrase" className="button-arrow">&#9668;</div>
-          <input id="phrase-number-input" type="number" className="input-counter" />
+          <input id="phrase-number-input" type="number" className="input-counter input-exer" />
           <div id="phrase-number" className="phrase-number"></div>
           <div id="button-next-phrase" className="button-arrow">&#9658;</div>
         </div>
