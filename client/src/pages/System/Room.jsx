@@ -17,8 +17,11 @@ import {
 
 import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
 import { init } from "../../machinelearning/script.js";
+import { route } from "../../utils/route";
 
-import Soap from "../../components/Modals/Soap.jsx";
+import ConfirmVideoCall from "../../components/Modals/ConfirmVideoCall.jsx";
+import SoapSidebar from "../../components/Modals/SoapSidebar.jsx";
+import ReactQuill from "react-quill";
 
 const useMediaStream = (localVideoRef) => {
   const localStream = useRef(null);
@@ -30,7 +33,9 @@ const useMediaStream = (localVideoRef) => {
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       } catch (error) {
         localStream.current = new MediaStream();
-        failNotify("The teleconfenrence requires both camera and microphone. Please retry again.")
+        failNotify(
+          "The teleconfenrence requires both camera and microphone. Please retry again."
+        );
       }
     },
     [localVideoRef]
@@ -85,11 +90,18 @@ export default function Room() {
   const userRole = authState.userRole;
   const currentUser = authState.userId;
 
+  const appURL = import.meta.env.VITE_APP_URL;
+  const accessToken = authState.accessToken;
+
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
   const [patientId, setPatientId] = useState(appointmentDetails?.patientId._id);
-  const [clinicianId, setClinicianId] = useState(appointmentDetails?.selectedClinician);
-  const [clinicianName, setClinicianName] = useState(appointmentDetails?.selectedSchedule.clinicianName);
+  const [clinicianId, setClinicianId] = useState(
+    appointmentDetails?.selectedClinician
+  );
+  const [clinicianName, setClinicianName] = useState(
+    appointmentDetails?.selectedSchedule.clinicianName
+  );
 
   const { roomid } = useParams();
 
@@ -98,8 +110,8 @@ export default function Room() {
   const [messages, setMessages] = useState([]);
   const [type, setType] = useState("");
 
-  const [isCameraEnabled, setIsCameraEnabled] = useState(false);
-  const [isMicEnabled, setIsMicEnabled] = useState(false);
+  const [isCameraEnabled, setIsCameraEnabled] = useState(true);
+  const [isMicEnabled, setIsMicEnabled] = useState(true);
   const [speechScore, setSpeechScore] = useState({
     pronunciationScore: 0,
     fluencyScore: 0,
@@ -115,8 +127,6 @@ export default function Room() {
 
   const sdpQueue = useRef([]);
   const iceQueue = useRef([]);
-
-
 
   const peerConnectionConfig = {
     iceServers: [
@@ -141,44 +151,6 @@ export default function Room() {
   }, []);
 
   useEffect(() => {
-    const initiateConnection = async () => {
-      try {
-        await pageReady();
-        socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
-
-        socket.current.onopen = () => {
-          isSocketOpen.current = true;
-          if (!hasJoinedRoom.current) {
-            socket.current.send(
-              JSON.stringify({
-                type: "join-room",
-                user: getUserName(),
-                roomID: roomid,
-              })
-            );
-            hasJoinedRoom.current = true;
-            startConnection(true);
-          }
-        };
-
-        socket.current.onmessage = (message) => {
-          gotMessageFromServer(message);
-        };
-
-        socket.current.onerror = (error) =>
-          failNotify("Server is having problems. Please wait or try again.")
-
-        socket.current.onclose = () => {
-          notify("You have left the teleconference room.")
-          isSocketOpen.current = false;
-          hasJoinedRoom.current = false;
-        };
-      } catch (error) {
-        console.error("Error in pageReady:", error);
-        handleCloseConnection();
-      }
-    };
-
     if (
       (userRole === "patientslp" &&
         appointmentDetails?.patientId._id !== currentUser) ||
@@ -188,7 +160,6 @@ export default function Room() {
     ) {
       handleCloseConnection();
     }
-    initiateConnection();
 
     // Fuck u refresh
     const handleBeforeUnload = (event) => {
@@ -199,37 +170,79 @@ export default function Room() {
           user: getUserName(),
         })
       );
-      const message = "Refreshing the page? We will try to reconnect you again.";
+      const message =
+        "Refreshing the page? We will try to reconnect you again.";
       event.preventDefault();
       event.returnValue = message;
-      return message
+      return message;
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => {
       if (socket.current) {
         handleCloseConnection();
+        hasJoinedRoom.current = false;
       }
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
   }, []);
 
+  const initiateConnection = async () => {
+    try {
+      await pageReady();
+      socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+
+      socket.current.onopen = () => {
+        isSocketOpen.current = true;
+        if (!hasJoinedRoom.current) {
+          socket.current.send(
+            JSON.stringify({
+              type: "join-room",
+              user: getUserName(),
+              roomID: roomid,
+            })
+          );
+          hasJoinedRoom.current = true;
+          startConnection(true);
+        }
+      };
+
+      socket.current.onmessage = (message) => {
+        const signal = JSON.parse(message.data);
+        gotMessageFromServer(message);
+      };
+
+      socket.current.onerror = (error) =>
+        failNotify("Server is having problems. Please wait or try again.");
+
+      socket.current.onclose = () => {
+        notify("You have left the teleconference room.");
+        isSocketOpen.current = false;
+        hasJoinedRoom.current = false;
+      };
+    } catch (error) {
+      handleCloseConnection();
+    }
+  };
+
   const pageReady = async () => {
     // we get then turn it off
     await getMediaStream({ video: true, audio: true });
-    localStream.current.getVideoTracks().forEach(track => track.enabled = false);
-    localStream.current.getAudioTracks().forEach(track => track.enabled = false);
   };
 
   const startConnection = (isCaller) => {
     if (!socket.current || socket.current.readyState !== WebSocket.OPEN) {
-      failNotify("Server is having problems. Please wait or try again.")
+      failNotify("Server is having problems. Please wait or try again.");
       return;
     }
 
     peerConnection.current = new RTCPeerConnection(peerConnectionConfig);
     peerConnection.current.onicecandidate = gotIceCandidate;
-    peerConnection.current.ontrack = gotRemoteStream;
+    peerConnection.current.ontrack = (event) => {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = event.streams[0];
+      }
+    };
 
     localStream.current
       ?.getTracks()
@@ -241,7 +254,9 @@ export default function Room() {
       peerConnection.current
         .createOffer()
         .then(createDescription)
-        .catch(          failNotify("Server is having problems. Please wait or try again."));
+        .catch(
+          failNotify("Server is having problems. Please wait or try again.")
+        );
     }
 
     processQueues();
@@ -251,11 +266,44 @@ export default function Room() {
     const signal = JSON.parse(message.data);
 
     if (signal.sdp) {
-      sdpQueue.current.push(signal.sdp);
-      processQueues();
+      peerConnection.current
+        .setRemoteDescription(new RTCSessionDescription(signal.sdp))
+        .then(() => {
+          if (signal.sdp.type === "offer") {
+            peerConnection.current
+              .createAnswer()
+              .then(createDescription)
+              .catch(
+                failNotify(
+                  "Server is having problems. Please wait or try again."
+                )
+              );
+          }
+          // Process queued ICE candidates
+          while (iceQueue.current.length > 0) {
+            const iceCandidate = iceQueue.current.shift();
+            peerConnection.current
+              .addIceCandidate(new RTCIceCandidate(iceCandidate))
+              .catch(
+                failNotify(
+                  "Server is having problems. Please wait or try again."
+                )
+              );
+          }
+        })
+        .catch(
+          failNotify("Server is having problems. Please wait or try again.")
+        );
     } else if (signal.ice) {
-      iceQueue.current.push(signal.ice);
-      processQueues();
+      if (peerConnection.current.remoteDescription) {
+        peerConnection.current
+          .addIceCandidate(new RTCIceCandidate(signal.ice))
+          .catch(
+            failNotify("Server is having problems. Please wait or try again.")
+          );
+      } else {
+        iceQueue.current.push(signal.ice);
+      }
     } else if (signal.type === "room-full") {
       handleCloseConnection();
     } else if (signal.type === "chat-message") {
@@ -290,18 +338,43 @@ export default function Room() {
         .setRemoteDescription(new RTCSessionDescription(sdp))
         .then(() => {
           if (sdp.type === "offer") {
-            peerConnection.current.createAnswer().then(createDescription);
+            peerConnection.current
+              .createAnswer()
+              .then(createDescription)
+              .catch(
+                failNotify(
+                  "Server is having problems. Please wait or try again."
+                )
+              );
           }
-        });
+          // Process queued ICE candidates
+          while (iceQueue.current.length > 0) {
+            const iceCandidate = iceQueue.current.shift();
+            peerConnection.current
+              .addIceCandidate(new RTCIceCandidate(iceCandidate))
+              .catch(
+                failNotify(
+                  "Server is having problems. Please wait or try again."
+                )
+              );
+          }
+        })
+        .catch(
+          failNotify("Server is having problems. Please wait or try again.")
+        );
     }
 
     // Process ICE queue
     while (
       iceQueue.current.length > 0 &&
-      peerConnection.current.signalingState !== "closed"
+      peerConnection.current.remoteDescription
     ) {
       const iceCandidate = iceQueue.current.shift();
-      peerConnection.current.addIceCandidate(new RTCIceCandidate(iceCandidate));
+      peerConnection.current
+        .addIceCandidate(new RTCIceCandidate(iceCandidate))
+        .catch(
+          failNotify("Server is having problems. Please wait or try again.")
+        );
     }
   }
 
@@ -312,11 +385,12 @@ export default function Room() {
           JSON.stringify({
             ice: event.candidate,
             uuid: getUserName(),
+            roomID: roomid,
             type: "ice-candidate",
           })
         );
       } else {
-        failNotify("Server is having problems. Please wait or try again.")
+        failNotify("Server is having problems. Please wait or try again.");
       }
     }
   };
@@ -328,18 +402,14 @@ export default function Room() {
           JSON.stringify({
             sdp: peerConnection.current.localDescription,
             uuid: getUserName(),
+            roomID: roomid,
             type: description.type,
           })
         );
       } else {
-        failNotify("Server is having problems. Please wait or try again.")
+        failNotify("Server is having problems. Please wait or try again.");
       }
     });
-  };
-
-  const gotRemoteStream = (event) => {
-    if (remoteVideoRef.current)
-      remoteVideoRef.current.srcObject = event.streams[0];
   };
 
   const toggleMic = () => {
@@ -364,7 +434,7 @@ export default function Room() {
         user: getUserName(),
       })
     );
-    
+
     peerConnection.current.close();
     socket.current.close();
 
@@ -430,23 +500,34 @@ export default function Room() {
         socket.current.send(JSON.stringify(resultWithNotif));
       }
     } catch (error) {
-      console.error("Error sending notification:", error);
+      console.error(error);
     }
   };
 
-    // Add SOAP Modal
-    const [soapModal, setSoapModal] = useState(false);
-    const handleSoapModal = () => {
-      setSoapModal((prevState) => !prevState);
-    };
+  // Add SOAP Modal
+  const [soapModal, setSoapModal] = useState(false);
+  const handleSoapModal = () => {
+    setSoapModal((prevState) => !prevState);
+  };
+
+  // Confirm Call
+  const [confirmCall, setConfirmCall] = useState(true);
+  const handleConfirmCall = () => {
+    setConfirmCall((prevState) => !prevState);
+  };
+
+  const onConfirm = async () => {
+    initiateConnection();
+    handleConfirmCall();
+  };
 
   return (
     <>
-    {/* STARTCALL.JSX MODAL */}
-    {/* <StartCall/> */}
+      {/* STARTCALL.JSX MODAL */}
+      {/* <StartCall/> */}
 
-    {/* Add SOAP Modal */}
-    {soapModal && (
+      {/* Add SOAP Modal */}
+      {/* {soapModal && (
         <Soap
           openModal={handleSoapModal}
           clinicianId={clinicianId}
@@ -454,6 +535,16 @@ export default function Room() {
           patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}
           patientId={patientId}
           onWebSocket={webSocketNotification}
+        />
+      )} */}
+
+      {confirmCall && (
+        <ConfirmVideoCall
+          close={() => {
+            handleCloseConnection();
+            handleConfirmCall();
+          }}
+          confirm={onConfirm}
         />
       )}
       <div className="container-fluid d-flex flex-column justify-content-between vh-100">
@@ -545,7 +636,13 @@ export default function Room() {
                           </a>
                         </li>
                         <li>
-                          <a role="button" className="dropdown-item" href="#" onClick={handleSoapModal}>
+                          <a
+                            role="button"
+                            className="dropdown-item"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#soapSidebar"
+                            aria-controls="offcanvasWithBothOptions"
+                          >
                             Add Diagnostic
                           </a>
                         </li>
@@ -639,6 +736,16 @@ export default function Room() {
                     </button>
                   </form>
                 </div>
+
+                {/* CANVAS FOR SOAP */}
+                <SoapSidebar
+                  openModal={handleSoapModal}
+                  clinicianId={clinicianId}
+                  clinicianName={clinicianName}
+                  patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}
+                  patientId={patientId}
+                  onWebSocket={webSocketNotification}
+                />
 
                 {/* CANVAS FOR DIAGNOSTIC TOOL */}
                 <div

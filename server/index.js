@@ -43,6 +43,7 @@ app.use(
       "https://talktherapy.site",
       "http://www.talktherapy.site",
       "https://www.talktherapy.site",
+      "http://192.168.1.8:5173"
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
