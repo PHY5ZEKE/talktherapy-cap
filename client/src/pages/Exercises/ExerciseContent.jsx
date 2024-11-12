@@ -245,20 +245,26 @@ export default function ExerciseContent() {
                       overflowY: "auto", // Enable vertical scrolling within this div
                     }}
                   >
-                    {/* Video Image */}
-                    <div
-                      className="w-100 bg-warning exercise-vid rounded-2"
-                      style={{
-                        backgroundImage: contentData?.image ? `url(${contentData.image})` : "none",
-                        backgroundSize: contentData?.image ? "contain" : "none",
-                        backgroundPosition: "center",
-                        aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
-                        width: "100%",
-                        height: "auto",
-                        display: contentData?.image ? "block" : "none", // Hide if no image
-                      }}
-                    ></div>
-
+                    {/* Image */}
+                      <div
+                        className="w-100 bg-warning exercise-vid rounded-2"
+                        style={{
+                          display: contentData?.image ? "inline" : "none",
+                        }}
+                      >
+                        {contentData?.image && (
+                          <img
+                            src={contentData?.image}
+                            alt="Exercise Image"
+                            style={{
+                              width: "100%",
+                              height: "auto",
+                              objectFit: "cover",
+                              aspectRatio: "16 / 9", // Maintain aspect ratio
+                            }}
+                          />
+                        )}
+                      </div>
                     <div
                       className="ql-editor mb-0"
                       dangerouslySetInnerHTML={{
