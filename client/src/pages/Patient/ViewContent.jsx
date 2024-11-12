@@ -4,7 +4,6 @@ import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 import { useNavigate } from "react-router-dom";
 
-
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
@@ -17,12 +16,13 @@ export default function ViewContent() {
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
+  const [contentData, setContentData] = useState([]); // Store content data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
 
-  // Fetch admin data from the backend
+  // Fetch patient data
   useEffect(() => {
     const fetchPatientData = async () => {
       try {
@@ -30,12 +30,12 @@ export default function ViewContent() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch admin data");
+          throw new Error("Failed to fetch patient data");
         }
 
         const data = await response.json();
@@ -48,12 +48,39 @@ export default function ViewContent() {
     };
 
     fetchPatientData();
-  }, []);
+  }, [accessToken, appURL]);
 
-  const handleCardClick = () => {
-    navigate("/patient/perform");
+  // Fetch content data
+  useEffect(() => {
+    const fetchContentData = async () => {
+      try {
+        const response = await fetch(`${appURL}/api/contents`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch content data");
+        }
+
+        const data = await response.json();
+        setContentData(data); // Set the content data for the cards
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchContentData();
+  }, [accessToken, appURL]);
+
+  const handleCardClick = (id) => {
+    navigate(`/patient/content/exercises/${id}`); // Navigate to exercise content with the content ID
   };
-
 
   return (
     <>
@@ -76,7 +103,7 @@ export default function ViewContent() {
                     </p>
                   </>
                 ) : (
-                  <p>Fetching data.</p>
+                  <p>Fetching data...</p>
                 )}
               </div>
 
@@ -98,65 +125,28 @@ export default function ViewContent() {
                     className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
                     style={{ minHeight: "85vh" }}
                   >
-                    <div
-                      className="card exercise-container"
-                      style={{ width: "18rem" }}
-                      onClick={handleCardClick}
-                    >
-                      <img
-                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
-                        className="card-img-top"
-                        alt="..."
-                        style={{ height: "16rem", objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">
-                          Example Long Title Here For Test
-                        </h5>
-                        <p className="">Category</p>
-                        <FontAwesomeIcon icon={faBookmark} />
+                    {contentData.map((content) => (
+                      <div
+                        key={content._id} // Use content ID as key
+                        className="card exercise-container"
+                        style={{ width: "18rem" }}
+                        onClick={() => handleCardClick(content._id)} // Pass the content ID
+                      >
+                        <img
+                          src={content.image} // Dynamic image
+                          className="card-img-top"
+                          alt={content.name}
+                          style={{ height: "16rem", objectFit: "cover" }}
+                        />
+                        <div className="card-body">
+                          <h5 className="card-title fw-bold mb-0 text-truncate">
+                            {content.name} {/* Dynamic title */}
+                          </h5>
+                          <p>{content.category}</p> {/* Dynamic category */}
+                          <FontAwesomeIcon icon={faBookmark} />
+                        </div>
                       </div>
-                    </div>
-
-                    <div
-                      className="card exercise-container"
-                      style={{ width: "18rem" }}
-                      onClick={handleCardClick}
-                    >
-                      <img
-                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
-                        className="card-img-top"
-                        alt="..."
-                        style={{ height: "16rem", objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">
-                          Example Long Title Here For Test
-                        </h5>
-                        <p className="">Category</p>
-                        <FontAwesomeIcon icon={faBookmark} />
-                      </div>
-                    </div>
-
-                    <div
-                      className="card exercise-container"
-                      style={{ width: "18rem" }}
-                      onClick={handleCardClick}
-                    >
-                      <img
-                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
-                        className="card-img-top"
-                        alt="..."
-                        style={{ height: "16rem", objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">
-                          Example Long Title Here For Test
-                        </h5>
-                        <p className="">Category</p>
-                        <FontAwesomeIcon icon={faBookmark} />
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -4,17 +4,23 @@ const contentSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Name is required"],
+      required: [true],
     },
     description: {
       type: String,
-      required: [true, "Description is required"],
+      required: [true],
     },
 
     image: {
       type: String,
       required: false,
     },
+
+    category: { 
+      type: String,
+      required: [true],
+    },
+    
   },
   {
     timestamps: true,

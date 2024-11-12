@@ -48,7 +48,7 @@ import PatientContent from "./pages/Patient/ViewContent";
 import PatientBook from "./pages/Patient/BookSchedule";
 import PatientProfile from "./pages/Patient/Profile";
 import PatientFeedback from "./pages/Patient/FeedbackDiagnosis";
-import PatientPerform from "./pages/Patient/Perform";
+import ExerciseContent from "./pages/Patient/ExerciseContent";
 
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";
@@ -58,10 +58,8 @@ import PublicRoute from "./pages/Authorization/PublicRoute";
 import Room from "./pages/System/Room";
 
 //Test Exercises
-import PageStart from "./pages/Exercises/Pages";
-
-import ML from "./pages/Exercises/SpeechML";
-import Perform from "./pages/Exercises/Exercise";
+import ExerciseStart from "./pages/Exercises/Exercises";
+import AssistSpeech from "./pages/Exercises/AssistSpeech";
 
 // Error Handlers
 import NotFound from "./pages/System/NotFound";
@@ -92,10 +90,9 @@ const routes = (
         }
       />
 
-      {/* Test pages for exercises */}
-      <Route path="/start" element={<PageStart />} />
-      <Route path="/ml" element={<ML />} />
-      <Route path="/exer" element={<Perform />} />
+      {/* Exercises */}
+      <Route path="/exercise" element={<ExerciseStart />} />
+      <Route path="/assist/speech" element={<AssistSpeech />} />
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route
@@ -281,10 +278,10 @@ const routes = (
         }
       />
       <Route
-        path="/patient/perform"
+        path="/patient/content/exercises/:id"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
-            <PatientPerform />
+            <ExerciseContent />
           </PrivateRoute>
         }
       />

@@ -9,6 +9,7 @@ export const page = {
         home: "/patient",
         feedback: "/patient/feedback",
         content: "/patient/content",
+        exercise: "/patient/content/exercises",
         book: "/patient/book",
         profile: "/patient/profile"
     },

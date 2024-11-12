@@ -1,30 +1,62 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
-
 import { route } from "../../utils/route";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import AddContent from "../../components/Modals/AddContent";
+import EditContent from "../../components/Modals/EditContent";
 
-export default function ManageContent() {
+export default function AdminContent() {
   const [adminData, setAdminData] = useState(null);
+  const [contentData, setContentData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingContent, setEditingContent] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
 
   const { authState } = useContext(AuthContext);
-
   const accessToken = authState.accessToken;
-  
-  // Handle Add Content Modal Open
-  const [isOpen, setIsOpen] = useState(false);
-  const handleAdd = () => {
-    setIsOpen(!isOpen);
+
+  // Fetch content data function
+  const fetchContentData = async () => {
+    try {
+      const response = await fetch(`${appURL}/api/contents`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch content data");
+      }
+
+      const data = await response.json();
+      setContentData(data); // Set content data
+      setLoading(false);
+    } catch (error) {
+      setError(error.message);
+      setLoading(false);
+    }
   };
 
-  // Fetch admin data from the backend
+  // Handle Add Content Modal toggle
+  const handleAdd = () => {
+    setIsAddModalOpen(!isAddModalOpen);
+  };
+
+  // Handle Edit Content Modal toggle
+  const handleEdit = (content) => {
+    setEditingContent(content);  // Set the content that is being edited
+    setIsEditModalOpen(true);    // Open the edit modal
+  };
+
+  // Fetch admin data
   useEffect(() => {
     const fetchAdminData = async () => {
       try {
@@ -32,7 +64,7 @@ export default function ManageContent() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -50,12 +82,90 @@ export default function ManageContent() {
     };
 
     fetchAdminData();
-  }, []);
+  }, [accessToken, appURL]);
+
+  // Fetch content data when component loads
+  useEffect(() => {
+    fetchContentData();
+  }, [accessToken, appURL]);
+
+  // Handle Add Content submission
+  const handleAddContent = async (newContent) => {
+    try {
+      const response = await fetch(`${appURL}/api/contents`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(newContent), // Send the new content details
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to add content");
+      }
+
+      // Refetch the content data to show the new content
+      fetchContentData();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  // Handle Edit Content submission
+  const handleEditContent = async (id, updatedContent) => {
+    try {
+      const response = await fetch(`${appURL}/api/contents/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(updatedContent), // Send the updated content details
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update content");
+      }
+
+      // Refetch the content data to show the updated content
+      fetchContentData();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  // Handle Delete Content
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`${appURL}/api/contents/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete content");
+      }
+
+      // Remove the deleted content from the UI
+      setContentData((prevData) => prevData.filter((content) => content._id !== id));
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
   return (
     <>
       {/* ADD CONTENT MODAL */}
-      {isOpen && <AddContent closeModal={handleAdd} />}
+      {isAddModalOpen && <AddContent closeModal={handleAdd} onSubmit={handleAddContent} />}
+      
+      {/* EDIT CONTENT MODAL */}
+      {isEditModalOpen && <EditContent closeModal={() => setIsEditModalOpen(false)} onSubmit={handleEditContent} content={editingContent} />}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -109,38 +219,43 @@ export default function ManageContent() {
                     className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
                     style={{ minHeight: "85vh" }}
                   >
-                    <div
-                      className="card exercise-container"
-                      style={{ width: "18rem" }}
-                    >
-                      <img
-                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
-                        className="card-img-top"
-                        alt="..."
-                        style={{ height: "16rem", objectFit: "cover" }}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">
-                          Example Long Title Here For Test
-                        </h5>
-                        <p>Category</p>
+                    {contentData.map((content) => (
+                      <div
+                        key={content._id}
+                        className="card exercise-container"
+                        style={{ width: "18rem" }}
+                      >
+                        <img
+                          src={content.image}
+                          className="card-img-top"
+                          alt={content.name}
+                          style={{ height: "16rem", objectFit: "cover" }}
+                        />
+                        <div className="card-body">
+                          <h5 className="card-title fw-bold mb-0 text-truncate">
+                            {content.name}
+                          </h5>
+                          <p>{content.category}</p>
 
-                        <div className="d-flex gap-2">
-                          <div
-                            className="fw-bold text-button border"
-                            style={{ cursor: "pointer" }}
-                          >
-                            Edit
-                          </div>
-                          <div
-                            className="fw-bold text-button border"
-                            style={{ cursor: "pointer" }}
-                          >
-                            Delete
+                          <div className="d-flex gap-2">
+                            <div
+                              className="fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleEdit(content)} // Pass content to handleEdit
+                            >
+                              Edit
+                            </div>
+                            <div
+                              className="fw-bold text-button border"
+                              style={{ cursor: "pointer" }}
+                              onClick={() => handleDelete(content._id)}
+                            >
+                              Delete
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>

@@ -47,7 +47,7 @@ export default function Sidebar() {
         <Link to={page.patient.feedback} className={`text-link ${isActive(page.patient.feedback) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faStethoscope} size="xl" />
         </Link>
-        <Link to={page.patient.content} className={`text-link ${isActive(page.patient.content) ? 'active' : ''}`}>
+        <Link to={page.patient.content} className={`text-link ${isActive(page.patient.content) || isActive(page.patient.exercise)? 'active' : ''}`}>
           <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
         </Link>
         <Link to={page.patient.book} className={`text-link ${isActive(page.patient.book) ? 'active' : ''}`}>

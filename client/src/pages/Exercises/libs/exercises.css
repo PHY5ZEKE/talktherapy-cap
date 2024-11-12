@@ -1,199 +1,289 @@
+/* Layout Styles */
 .page {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	height: 100vh;
-	background: #f5f5f5;
-  }
-
-  .input-exer {
-	font-size: 24px;
-	visibility: hidden; /* Make the input invisible */
-  }
-
-  /* textarea */
-  
-  .page-center {
-	text-align: center;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-  }
-  
-  .page-absolute {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-  }
-  
-  .title {
-	font-size: 2rem;
-	font-weight: bold;
-	margin-bottom: 20px;
-  }
-  
-  .description {
-	font-size: 1.1rem;
-	margin-bottom: 20px;
-  }
-  
-  .loading, .microphone {
-	font-size: 1rem;
-	margin-bottom: 10px;
-  }
-  
-  .button {
-	background-color: #4CAF50;
-	color: white;
-	padding: 10px 20px;
-	margin: 10px;
-	border: none;
-	cursor: pointer;
-	transition: background-color 0.3s ease;
-  }
-  
-  .button:hover {
-	background-color: #45a049;
-  }
-  
-  .panel-counter {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-bottom: 30px;
-  }
-
-
-  #page-main {
-	display: flex; /* Change to flex */
-	flex-direction: column; /* Stack children vertically */
-	justify-content: center; /* Center children vertically */
-	align-items: center; /* Center children horizontally */
-	background: #f4f4f4;
-	border-radius: 15px;
-	width: 80%;
-	max-width: 900px;
-	padding: 20px;
-	box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  background: #f5f5f5;
 }
 
- #page-main .content {
-	display: flex; /* Use flexbox for content */
-	flex-direction: column; /* Stack children vertically */
-	align-items: center; /* Center children horizontally */
-	width: 100%; /* Ensure it takes the full width */
-  }
-
-  #phrase-number-input {
-    position: absolute; /* Remove it from the normal flow */
-    opacity: 0; /* Make it invisible */
-    width: 0; /* Set width to 0 */
-    height: 0; /* Set height to 0 */
-    pointer-events: none; /* Prevent interaction */
+.hidden {
+  display: none;
 }
-  
-  
- #page-main #panel-counter {
+
+.text-center {
+  text-align: center;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-container {
+  margin-bottom: 20px;
+}
+
+/* Button Styles */
+.caption-button {
+  margin: 10px;
+  font-size: 16px;
+}
+
+.button-arrow {
+  font-size: 48px;
+  cursor: pointer;
+}
+
+/* Panel Styles */
+.panel-counter {
+  gap: 20px;
+}
+
+
+
+/* Phrase Panel */
+.phrase-box {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  font-size: 32px;
+  text-align: center;
+  min-width: 150px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.panel-phrase {
 	display: flex;
-	justify-content: center;
+	flex-direction: column; /* Stack items vertically */
 	align-items: center;
-	gap: 20px;
-	font-size: 36px;
-	margin-bottom: 20px;
+	gap: 10px; /* Space between the button and phrase */
   }
-  #page-main #panel-counter #phrase-number {
-	font-size: 36px;
+  
+  .panel-phrase > .d-flex {
+	display: flex;
+	align-items: center; /* Align button and phrase horizontally */
+	gap: 10px; /* Space between button and phrase */
   }
-  #page-main #panel-counter .button-arrow {
-	cursor: pointer;
-	font-size: 48px;
-  }
-  #page-main #panel-counter #caption {
+  
+  #display_phoneme {
+	padding: 8px 15px;
 	font-size: 14px;
-	color: #777;
+	transition: background 0.3s;
   }
   
-  /* Phrase Section */
-  #page-main #panel-phrase {
-	display: flex;
-	justify-content: center;
-	gap: 15px;
-	margin-bottom: 30px;
-  }
-
-  #page-main #panel-phrase #phrase {
-	padding: 20px;
-	background: #fff;
-	border-radius: 8px;
-	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-	font-size: 32px;
+  #phonphrase {
+	font-size: 14px;
 	min-width: 150px;
 	text-align: center;
+	padding: 10px;
+	background: #f0f0f0;
+	border-radius: 8px;
+	margin-top: 10px; /* Space between phrase and phonphrase */
+  }
+
+
+
+
+  
+
+/* Recognition Panel */
+.panel-recognition {
+  padding: 20px;
+}
+
+/* Record & Listen Buttons */
+#button-record {
+  background-color: #f44336;
+}
+
+#button-record[record="true"] {
+  background-color: #e57373;
+}
+
+#button-listen {
+  background-color: #2196F3;
+}
+
+#button-listen:hover {
+  background-color: #1976D2;
+}
+
+
+
+
+
+
+
+
+
+
+
+/* modal */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Selector Styles */
+.selector {
+	display: block;
+	margin-bottom: 20px;
+}
+
+.selector::before {
+	content: attr(title);
+	display: block;
+	text-align: left;
+	margin-bottom: 5px;
+}
+
+#speech-voice {
+	display: inline-block;
+	gap: 10px;
   }
   
-  /* Recognition Panel */
-  #page-main #panel-recognition {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 20px;
-	position: relative;
+  #speech-voice .btn {
+	display: inline-block;
+	margin-right: 10px;
   }
+  
+  #speech-voice .btn:last-child {
+	margin-right: 0; /* Remove margin for the last button */
+  }
+  
+  /* Center the Speed Selector buttons */
+  #speech-voice-speed {
+	display: block;
+	justify-content: center; /* Center the buttons horizontally */
+	gap: 10px; /* Add space between the speed buttons */
+	width: 100%;
+  }
+  
+  #speech-voice-speed .btn {
+	display: inline-block;
+	margin-right: 10px; /* Add space between each button */
+  }
+
+  #speech-voice-speed .d-flex {
+	display: flex;
+	justify-content: center; /* Center the buttons horizontally */
+	gap: 10px; /* Add space between the speed buttons */
+	flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  }
+
+  
+  #speech-voice-speed .btn:last-child {
+	margin-right: 0; /* Remove the margin for the last button */
+  }
+
+.selector > div {
+	display: inline-block;
+	width: 100px;
+	cursor: pointer;
+	text-align: center;
+	line-height: 28px;
+	font-size: 16px;
+	background: #eee;
+	margin-top: 5px; /* Space above the selector */
+ 	 margin-bottom: 5px; /* Space below the selector */
+	border-radius: 4px; /* Rounded corners */
+	transition: background 0.3s; /* Smooth background transition */
+}
+
+.selector > div[current]::before {
+	content: '\2714'; /* Checkmark */
+	margin-right: 5px;
+}
+
+.success-ring-btn[current]::before {
+	content: '\2714'; /* Checkmark */
+	margin-right: 5px;
+}
+
+.success-ring-btn[value="yes"] {
+	background: #afa; /* Green background for Yes */
+}
+
+.success-ring-btn[value="no"] {
+	background: #faa; /* Red background for No */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Phoneme Output */
+#page-main #panel-recognition #phoneme,
+#page-main #panel-recognition #phoneme-output {
+	font-size: 20px;
+	padding: 10px; /* Added padding for phoneme output */
+}
 
 
 #page-main #panel-recognition #recognition[correct="true"] {
-  color: #0b0;
-  font-size: 32px;
+	color: #0b0;
+	font-size: 20px;
 }
+
 #page-main #panel-recognition[mode="recognition"] #compare {
-  display: none;
-  font-size: 32px;
-}
-#page-main #panel-recognition[mode="compare"] #recognition {
-  display: none;
-  font-size: 32px;
-}
-  
-  /* Record & Listen Buttons */
-  #page-main #panel-recognition #panel-record {
-	display: flex;
-	justify-content: center;
-	width: 100%;
-  }
-  #page-main #panel-recognition #panel-record #button-record {
-	background: #f44336;
-	color: white;
-	padding: 12px 25px;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: background 0.3s ease;
-  }
-  #page-main #panel-recognition #panel-record #button-record[record="true"] {
-	background: #e57373;
-  }
-  #page-main #panel-recognition #panel-record #button-record:hover {
-	background: #e53935;
-  }
-  #page-main #panel-recognition #panel-record #button-listen {
-	background: #2196F3;
-	color: white;
-	padding: 12px 25px;
-	border-radius: 8px;
-	cursor: pointer;
-	transition: background 0.3s ease;
-  }
-  #page-main #panel-recognition #panel-record #button-listen[hidden] {
 	display: none;
-  }
-  #page-main #panel-recognition #panel-record #button-listen:hover {
-	background: #1976D2;
-  }
-  
-  
+}
+
+#page-main #panel-recognition[mode="compare"] #recognition {
+	display: none;
+}
+
+/* Optional: If you want to add some padding or border to make it more visible */
+#page-main #panel-recognition #compare ins,
+#page-main #panel-recognition #compare span,
+#page-main #panel-recognition #compare del {
+	padding: 2px; /* Add some padding for better visibility */
+	border-radius: 3px; /* Optional: Rounded corners */
+	font-size: 20px;
+}
+
+#page-main #panel-recognition #recognition {
+	font-size: 20px;
+}

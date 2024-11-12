@@ -22,7 +22,7 @@ const getContentById = async (req, res) => {
 const createContent = async (req, res) => {
   try {
     const content = await Content.create(req.body);
-    res.status(200).send(content);
+    res.status(201).send(content);
   } catch (error) {
     res.status(500).send({ message: error.message });
   }

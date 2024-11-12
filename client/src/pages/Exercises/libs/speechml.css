@@ -1,0 +1,93 @@
+/* General body setup for visual appeal */
+body {
+    background-color: #f8f9fa;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+    margin: 0;
+    padding: 0;
+  }
+  
+  /* Header styling */
+  .header h5.title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #007bff;
+  }
+  
+  /* Button Styles */
+  .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    font-weight: bold;
+  }
+  
+  .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+  }
+  
+  /* Card Styles */
+  .card {
+    border-radius: 12px;
+    border: none;
+    transition: box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .card-body {
+    padding: 30px;
+  }
+  
+  /* Canvas styling */
+  #chartContainer {
+    height: 350px;
+  }
+  
+  /* Phoneme Output Styles */
+  #phoneme-container {
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+  }
+  
+  #comment {
+    font-size: 1.1rem;
+  }
+  
+  /* Speech Assessment Scores Styles */
+  #score-output {
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+  
+  .score-text {
+    color: #333;
+  }
+  
+  #output {
+    font-size: 1.1rem;
+    font-weight: normal;
+    color: #777;
+  }
+  
+  /* Visually Hidden Content */
+  .visually-hidden {
+    visibility: hidden;
+  }
+  
+  /* Responsive Styling */
+  @media (max-width: 576px) {
+    .header h5 {
+      font-size: 1.8rem;
+    }
+    .btn-primary {
+      font-size: 1.1rem;
+    }
+    .card-body {
+      padding: 20px;
+    }
+  }
+  

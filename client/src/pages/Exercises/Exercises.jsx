@@ -1,0 +1,112 @@
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import './libs/Exercises.css';
+
+// PageStart Component
+export default function ExerciseStart() {
+
+  const [isRecording, setIsRecording] = useState(false);
+
+  const handleRecord = () => {
+    setIsRecording(prevState => !prevState);
+  };
+
+
+  useEffect(() => {
+    const existingScript = document.querySelector('script[src="./src/pages/Exercises/libs/Exercise.js"]');
+    if (!existingScript) {
+      const script = document.createElement('script');
+      script.src = './src/pages/Exercises/libs/Exercise.js';
+      script.async = true;
+      document.body.appendChild(script);
+    }
+  }, []);
+
+  return (
+  <div className="d-flex align-items-center justify-content-center vh-100 bg-light">
+    {/* Page Start */}
+    <div id="page-start" className="text-center">
+      <div className="content">
+        <h1 id="power-by" className="mb-4">Test Exercise</h1>
+        <p className="description mb-3">Speech Recognition Speech Exercise using webkitspeech</p>
+        <div id="loading" className="loading mb-2">Loading...</div>
+        <div id="microphone" className="microphone mb-4">Allow access to microphone...</div>
+        <button id="button-start" className="btn btn-primary">Start</button>
+      </div>
+    </div>
+
+    {/* Page Main */}
+    <div id="page-main" className="page-center" style={{ display: 'none' }}>
+      <div className="button-container mb-4">
+        <button id="button-help" className="btn btn-outline-primary me-2">Help</button>
+        <button id="button-option" className="btn btn-outline-secondary">Option</button>
+      </div>
+
+      <div className="content">
+        {/* Panel Counter */}
+        <div id="panel-counter" className="panel-counter d-flex align-items-center justify-content-center mb-4r">
+          <div id="button-prev-phrase" className="btn btn-link text-decoration-none">&#9668;</div>
+          <input id="phrase-number-input" type="number" className="input-counter input-exer visually-hidden" />
+          <div id="phrase-number" className="fs-4 mx-3"></div>
+          <div id="button-next-phrase" className="btn btn-link text-decoration-none">&#9658;</div>
+        </div>
+        <div id="caption" className="text-muted text-center mb-4"></div>
+
+        {/* Panel Phrase */}
+          <div id="panel-phrase" className="panel-phrase d-flex align-items-center justify-content-center mb-4">
+            <div className="d-flex">
+              <button id="display_phoneme" className="btn btn-success me-3">Show</button>
+              <div id="phrase" className="phrase-box bg-white shadow-sm p-3 rounded"></div>
+            </div>
+            <div id="phonphrase" className="phrase-box hidden bg-light shadow-sm p-3 rounded mt-3"></div>
+          </div>
+
+        {/* Panel Recognition */}
+        <div id="panel-recognition" className="panel-recognition d-flex flex-column align-items-center mb-4">
+            <div id="recognition" className="recognition-text mb-2" title="Google Speech Recognition result and its confidence">&nbsp;</div>
+            <div id="compare" className="compare-text mb-2"></div>
+            <div id="phoneme" className="phoneme-output mb-2"></div>
+            <div id="phoneme-output" className="phoneme-output mb-4"></div>
+
+          {/* Panel Record */}
+          <div id="panel-record" className="d-flex justify-content-center w-100">
+              <button id="button-listen" className="btn btn-info me-3">Listen</button>
+              <button id="button-record" className={`btn btn-danger ${isRecording ? 'active' : ''}`} onClick={handleRecord}>Record</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Panel Option (Modal) */}
+        <div id="page-option" className="modal hidden">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Option</h5>
+                <button id="close-button" type="button" className="btn-close" aria-label="Close"></button>
+              </div>
+              <div className="modal-body">
+                <div className="content">
+                  <div id="speech-success-ring" className="selectors mb-3" title="Success ring enable">
+                    <div className="d-flex justify-content-around">
+                      <div className="btn success-ring-btn" value="no">No</div>
+                      <div className="btn success-ring-btn" value="yes">Yes</div>
+                    </div>
+                  </div>
+                  <div id="speech-voice" className="selector mb-3" title="Voice"></div>
+                  <div id="speech-voice-speed" className="selector mb-3" title="Voice speed" default="1"> 
+                        <div className="btn btn-light speed-btn" value="0.7">0.7</div>
+                        <div className="btn btn-light speed-btn" value="0.8">0.8</div>
+                        <div className="btn btn-light speed-btn" value="0.9">0.9</div>
+                        <div className="btn btn-light speed-btn" value="1">1</div>
+                        <div className="btn btn-light speed-btn" value="1.1">1.1</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+  );
+}
+

@@ -60,19 +60,84 @@ window.addEventListener('load', function() {
             if (speechSynthesis.onvoiceschanged !== undefined)
                 speechSynthesis.onvoiceschanged = () => loadVoices(initOptions);
 
+            var phonemeContainer = document.getElementById("phoneme-output");
             var loadingElement = document.querySelector('#page-start #loading');
             if (loadingElement) loadingElement.remove();
             setPhrase(current_phrase_no);
 
+
             document.querySelector('#page-main #panel-counter #button-prev-phrase').addEventListener('click', function() {
+                resetRecognitionStyles();
                 setPhrase(current_phrase_no - 1);
+                phonemeContainer.innerHTML = '';
+                
             });
             
             document.querySelector('#page-main #panel-counter #button-next-phrase').addEventListener('click', function() {
+                resetRecognitionStyles();
                 setPhrase(current_phrase_no + 1);
+                phonemeContainer.innerHTML = '';
+            });
+
+            document.querySelector('#page-option #speech-success-ring [value="yes"]').addEventListener('click', () => {
+                $success.play();
             });
 
         });
+
+        var DisplayPhoneme = document.getElementById('display_phoneme').addEventListener('click', function() {
+            var phonemeElement = document.getElementById('phonphrase');
+            phonemeElement.classList.toggle('hidden'); 
+        });
+
+        var $recognition = document.querySelector('#page-main #recognition');
+        function resetRecognitionStyles() {
+            if ($recognition) {
+                $recognition.removeAttribute('correct'); 
+                $recognition.style.color = ''; 
+            }
+        }
+
+        var optionButton = document.querySelector('#page-main #button-option');
+        if (optionButton) {
+            console.log("Option button found");
+            optionButton.addEventListener('click', function() {
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+        
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'none'; 
+                }
+        
+                var pageOption = document.querySelector('#page-option');
+                if (pageOption) {
+                    pageOption.style.display = 'block'; 
+                }
+            });
+        }
+
+        var closeButton = document.querySelector('#page-option #close-button');
+        if (closeButton) {
+            closeButton.addEventListener('click', function() {
+                var pageOption = document.querySelector('#page-option');
+                if (pageOption) {
+                    pageOption.style.display = 'none'; 
+                }
+
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'block'; 
+                }
+            });
+        }
 
         var startButton = document.querySelector('#page-start #button-start');
         if (startButton) {
@@ -83,13 +148,11 @@ window.addEventListener('load', function() {
                     pageStart.style.display = 'none'; 
                 }
         
-                // Show the page-main
                 var pageMain = document.querySelector('#page-main');
                 if (pageMain) {
                     pageMain.style.display = 'block'; 
                 }
 
-                // Ensure texts are loaded before proceeding
                 if (texts && Object.keys(texts).length > 0) {
                     var currentTextId = localStorage.getItem('speech-current-text');
                     console.log("Current text ID:", currentTextId); 
@@ -107,6 +170,30 @@ window.addEventListener('load', function() {
                     console.error("Texts not loaded or empty."); 
                 }
             });
+        }
+
+        function displayPhonemesForCurrentPhrase(phrase) {
+            var words = phrase.split(' '); // Split the phrase into words
+            var phonemeContainer = document.getElementById("phonphrase"); 
+            phonemeContainer.innerHTML = '';
+        
+            words.forEach(word => {
+                var cleanedWord = cleanWord(word);
+                var phonemeSequence = window.pronouncing.phonesForWord(cleanedWord);
+        
+                var phonemeElement = document.createElement("div");
+                if (phonemeSequence.length > 0) {
+                    var phonemeArray = phonemeSequence[0].split(" ");
+                    phonemeElement.innerText = cleanedWord + ": " + phonemeArray.join(", ");
+                } else {
+                    phonemeElement.innerText = cleanedWord + ": No phonemes found";
+                }
+                phonemeContainer.appendChild(phonemeElement);
+            });
+
+            function cleanWord(word) {
+                return word.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").toLowerCase();
+            }
         }
 
 
@@ -164,20 +251,6 @@ window.addEventListener('load', function() {
         }
 
 
-        function initOptions() {
-            var options = document.querySelectorAll('#page-option .content > div');
-            options.forEach($opt => {
-                var opt = $opt.id;
-                var $e = document.getElementById(opt);
-                if ($e) {
-                    for (var i = 0; i < $e.children.length; i++) {
-                        $e.children[i].addEventListener('click', (event) => setOption(opt, event.target.getAttribute('value')));
-                    }
-                    setOption(opt, localStorage.getItem(opt));
-                }
-            });
-        }
-
 
         function setPhrase(no) {
             clearTimeout(nextPhraseTimer);
@@ -215,17 +288,23 @@ window.addEventListener('load', function() {
             var phraseNumber = document.querySelector('#page-main #phrase-number');
             if (phraseNumber) phraseNumber.innerHTML = no + 1 + '/' + text.phrases.length;
             
-            var panelCounterCaption = document.querySelector('#page-main #panel-counter #caption');
+            var panelCounterCaption = document.querySelector('#caption');
             if (panelCounterCaption) panelCounterCaption.innerHTML = text.name;
         
             var phraseElement = document.querySelector('#page-main #phrase');
             if (phraseElement) {
+                var currentPhrase = text.phrases[no];
                 console.log("Current phrase:", text.phrases[no]); 
                 phraseElement.innerHTML = text.phrases[no].split(' ').map((e) => e.indexOf('<') == -1 ? '<span>' + e + '</span>' : e).join(' ');
                 phraseElement.querySelectorAll('*').forEach((e) => e.addEventListener('click', (event) => {
                     event.stopImmediatePropagation();
                     speakText(event.target.textContent);
                 }));
+
+                var phonemeContainer = document.getElementById("phonphrase");
+                phonemeContainer.innerHTML = '';
+
+                displayPhonemesForCurrentPhrase(currentPhrase);
             }
         
             var listenButton = document.querySelector('#page-main #button-listen');
@@ -247,46 +326,86 @@ window.addEventListener('load', function() {
             localStorage.setItem('speech-phrase', no); 
         }
 
-        var voices = [];
+        function initOptions() {
+            const options = document.querySelectorAll('#page-option .content > div');
+            
+            options.forEach(opt => {
+                const optId = opt.id;
+                const e = document.getElementById(optId);
+                
+                Array.from(e.children).forEach(child => {
+                    child.addEventListener('click', (event) => {
+                        setOption(optId, event.target.getAttribute('value'));
+                    });
+                });
+        
+                setOption(optId, localStorage.getItem(optId));
+            });
+        }
+        
+        function setOption(opt, value) {
+            const e = document.getElementById(opt);
+            const def = e.getAttribute('default');
+            localStorage.setItem(opt, value || def);
+        
+            Array.from(e.children).forEach(child => {
+                child.removeAttribute('current');
+            });
+        
+            const curr = e.querySelector(`[value="${value}"]`) || e.querySelector(`[value="${def}"]`);
+            if (curr) {
+                curr.setAttribute('current', true);
+            }
+        }
+        
+        function getOption(opt) {
+            const e = document.querySelector(`#${opt} [current]`);
+            return e ? e.getAttribute('value') : document.getElementById(opt).getAttribute('default');
+        }
+        
+        let voices = [];
         function speakText(text) {
-            var utterance = new SpeechSynthesisUtterance(text);
+            const utterance = new SpeechSynthesisUtterance(text);
             utterance.voice = voices[getOption('speech-voice')];
             utterance.rate = getOption('speech-voice-speed') || 1;
             speechSynthesis.speak(utterance);
         }
-
+        
         function loadVoices(cb) {
             voices = speechSynthesis.getVoices();
-            var $voices = document.querySelector('#page-option #speech-voice');
+            const voicesContainer = document.getElementById('speech-voice');
         
-            // Check if $voices exists and has children
-            if (!$voices || !$voices.innerHTML.trim()) return;
+            // If voices are already loaded, return
+            if (voicesContainer.innerHTML.trim()) return;
         
             function speakExample() {
-                setTimeout(() => speakText('Where is a cat?'), 200);
+                setTimeout(() => speakText('Reading your phrase'), 200);
             }
         
-            voices.forEach(function(e, i) {
-                if (e.lang.indexOf('en') === 0 && (e.lang.indexOf('US') !== -1 || e.lang.indexOf('UK') !== -1 || e.lang.indexOf('GB') !== -1)) {
-                    var $div = document.createElement('div');
-                    $div.setAttribute('value', i);
-                    $div.setAttribute('title', e.name);
-                    $div.innerHTML = $voices.children.length + 1; 
-                    $div.addEventListener('click', speakExample);
-                    $voices.appendChild($div);
-                    $voices.appendChild(document.createTextNode(' '));
+            voices.forEach((voice, index) => {
+                if (voice.lang.startsWith('en') && (voice.lang.includes('US') || voice.lang.includes('UK') || voice.lang.includes('GB'))) {
+                    const div = document.createElement('div');
+                    div.setAttribute('value', index);
+                    div.setAttribute('title', voice.name);
+                    div.textContent = voicesContainer.children.length + 1; 
+                    div.addEventListener('click', speakExample);
+                    voicesContainer.appendChild(div);
+                    voicesContainer.appendChild(document.createTextNode(' '));
                 }
             });
         
-            if (!$voices.children.length) return;
+            if (!voicesContainer.children.length) return;
         
-            var current = (document.querySelector('#page-option #speech-voice [value="' + localStorage.getItem('speech-voice') + '"]') || $voices.children[0]).getAttribute('value');
-            $voices.setAttribute('default', current);
-            $voices.classList.add('col' + $voices.children.length);
+            const current = (document.querySelector(`#speech-voice [value="${localStorage.getItem('speech-voice')}"]`) || voicesContainer.children[0]).getAttribute('value');
+            voicesContainer.setAttribute('default', current);
+            voicesContainer.classList.add('col' + voicesContainer.children.length);
             setOption('speech-voice', current);
         
-            var speedOptions = document.querySelectorAll('#page-option #speech-voice-speed > div');
-            speedOptions.forEach($e => $e.onclick = speakExample);
+            const speedOptions = document.querySelectorAll('#speech-voice-speed > div');
+            speedOptions.forEach(speedOption => {
+                speedOption.onclick = speakExample;
+            });
+        
             cb();
         }
 
@@ -313,12 +432,13 @@ window.addEventListener('load', function() {
             var $compare = document.querySelector('#page-main #compare');
     
             function startRecord(event) {
+                resetRecognitionStyles();
                 event.stopImmediatePropagation();
     
                 if (event.type !== 'touchstart' && event.type === 'mousedown' && event.which !== 1) return;
     
                 var recordButton = document.querySelector('#page-main #button-record');
-                if (recordButton && recordButton.hasAttribute('record')) return;  
+                if (recordButton && recordButton.hasAttribute('record')) return;            
 
                 var phonemeContainer = document.getElementById("phoneme-output");
                 phonemeContainer.innerHTML = '';
@@ -343,6 +463,8 @@ window.addEventListener('load', function() {
                 recognition.interimResults = false;
                 recognition.continuous = false;
 
+                let recognitionTimeout;
+
                 recognition.onstart = function () {
                     if ($panel_recognition) $panel_recognition.setAttribute('mode', 'recognition');
                     if ($recognition) {
@@ -350,38 +472,40 @@ window.addEventListener('load', function() {
                         $recognition.innerHTML = 'listening...';
                     }
                 };
+                
+                recognitionTimeout = setTimeout(() => {
+                    recognition.onspeechend();
+                }, 5000);
+                
             
                 recognition.onspeechend = function () {
+                    clearTimeout(recognitionTimeout);
                     if ($panel_recognition) $panel_recognition.setAttribute('mode', 'recognition');
                     if ($recognition) {
                         $recognition.removeAttribute('confidence');
-                        $recognition.innerHTML = 'stopped listening';
                     }
                     recognition.stop();
                 };
             
     
                 recognition.onresult = function(event) {
+                    clearTimeout(recognitionTimeout);
                     stopRecord(new MouseEvent('mouseup', { 'which': 1 }));
     
                     var res = event.results[0][0];
-
-    
                     var phrase = document.querySelector('#page-main #phrase').textContent.trim();
                     var transcript = (res.transcript || '').replace(/\d+/g, num2text);
                     transcript = replaceHomophones(phrase, transcript);
                     
-                    // Use the transcript from the recognition results
                     var fullTranscript = '';
                     for (var i = 0; i < event.results.length; i++) {
                         transcript = event.results[i][0].transcript;
                         fullTranscript += transcript + ' ';
                     }
                     var finalText = fullTranscript.trim();
-                    // Phoneme segmentation and output
                     var words = finalText.split(' ');
                     var phonemeContainer = document.getElementById("phoneme-output");
-                    phonemeContainer.innerHTML = ''; // Clear previous output
+                    phonemeContainer.innerHTML = ''; 
 
                     words.forEach(word => {
                         var cleanedWord = cleanWord(word);
@@ -429,13 +553,6 @@ window.addEventListener('load', function() {
     
                     if ($compare) $compare.innerHTML = compare;
                     if ($recognition) $recognition.setAttribute('correct', phrase === transcript);
-    
-                    if (phrase === transcript && getOption('speech-auto-next') === 'yes') {
-                        nextPhraseTimer = setTimeout(() => {
-                            if (typeof setPhrase === 'function') setPhrase(current_phrase_no + 1);
-                        }, 1500);
-                    }
-    
                     if (phrase === transcript && getOption('speech-success-ring') === 'yes') {
                         $success.play();
                     }
@@ -445,7 +562,7 @@ window.addEventListener('load', function() {
                     if ($panel_recognition) $panel_recognition.setAttribute('mode', 'recognition');
                     if ($recognition) {
                         $recognition.removeAttribute('confidence');
-                        $recognition.innerHTML = 'Error: ' + event.message;
+                        $recognition.innerHTML = 'Sorry! We did not hear that, try again! ' + event.message;
                     }
                     recognition.stop();
                 };
@@ -458,7 +575,6 @@ window.addEventListener('load', function() {
     
             function stopRecord(event) {
                 event.stopImmediatePropagation();
-    
                 if (event.type !== 'touchend' && event.type === 'mouseup' && event.which !== 1) return;
     
                 if (new Date().getTime() - time < 300) return;
@@ -508,27 +624,7 @@ window.addEventListener('load', function() {
             }
         }).catch((err) => alert(err.message));
 
-        function setOption(opt, value) {
-            var $e = document.getElementById(opt);
-            if ($e) {
-                var def = $e.getAttribute('default');
-                localStorage.setItem(opt, value || def);
-                for (var i = 0; i < $e.children.length; i++) {
-                    $e.children[i].removeAttribute('current');
-                }
-    
-                var $curr = $e.querySelector('[value="' + value + '"]') || $e.querySelector('[value="' + def + '"]');
-                if ($curr) $curr.setAttribute('current', true);
-            }
-        }
-    
-        function getOption(opt) {
-            var $e = document.getElementById(opt + ' [current]');
-            return $e ? $e.getAttribute('value') : document.getElementById(opt).getAttribute('default');
-        }
 
-
-        // Parsing Text to Homophones
         function parseTexts(data) {
             var texts = {};
             var deleted = (localStorage.getItem('speech-deleted-texts') || '').split(';');
