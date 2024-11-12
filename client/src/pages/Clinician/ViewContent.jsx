@@ -1,20 +1,28 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
+
 import { route } from "../../utils/route";
+import { useNavigate } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+
 export default function ViewContent() {
-  const { authState } = useContext(AuthContext);
+  const { authState, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [clinicianData, setClinicianData] = useState(null);
+  const [contentData, setContentData] = useState([]); // Store content data
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
+  const navigate = useNavigate();
 
+  // Fetch clinician data
   useEffect(() => {
     const fetchClinicianData = async () => {
       try {
@@ -22,7 +30,7 @@ export default function ViewContent() {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -40,7 +48,39 @@ export default function ViewContent() {
     };
 
     fetchClinicianData();
-  }, []);
+  }, [accessToken, appURL]);
+
+  // Fetch content data
+  useEffect(() => {
+    const fetchContentData = async () => {
+      try {
+        const response = await fetch(`${appURL}/api/contents`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch content data");
+        }
+
+        const data = await response.json();
+        setContentData(data); 
+        setLoading(false);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchContentData();
+  }, [accessToken, appURL]);
+
+  const handleCardClick = (id) => {
+    navigate(`/content/exercises/${id}`); 
+  };
 
   return (
     <>
@@ -53,7 +93,7 @@ export default function ViewContent() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-              {error ? (
+                {error ? (
                   <p>{error}</p>
                 ) : clinicianData ? (
                   <>
@@ -63,7 +103,7 @@ export default function ViewContent() {
                     </p>
                   </>
                 ) : (
-                  <p>Fetching data.</p>
+                  <p>Fetching data...</p>
                 )}
               </div>
 
@@ -85,19 +125,28 @@ export default function ViewContent() {
                     className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
                     style={{ minHeight: "85vh" }}
                   >
-                    <div className="card exercise-container" style={{ width: "18rem" }}>
-                      <img
-                        src="https://i.pinimg.com/control/564x/17/fc/ee/17fceea336518bcf86f94c1e56a05e4e.jpg"
-                        className="card-img-top"
-                        alt="..."
-                        style={{height: "16rem", objectFit:"cover"}}
-                      />
-                      <div className="card-body">
-                        <h5 className="card-title fw-bold mb-0 text-truncate">Example Long Title Here For Test</h5>
-                        <p className="">Category</p>
+                    {contentData.map((content) => (
+                      <div
+                        key={content._id} 
+                        className="card exercise-container"
+                        style={{ width: "18rem" }}
+                        onClick={() => handleCardClick(content._id)} 
+                      >
+                        <img
+                          src={content.image} 
+                          className="card-img-top"
+                          alt={content.name}
+                          style={{ height: "16rem", objectFit: "cover" }}
+                        />
+                        <div className="card-body">
+                          <h5 className="card-title fw-bold mb-0 text-truncate">
+                            {content.name} 
+                          </h5>
+                          <p>{content.category}</p> 
+                          <FontAwesomeIcon icon={faBookmark} />
+                        </div>
                       </div>
-                    </div>
-
+                    ))}
                   </div>
                 </div>
               </div>

@@ -48,7 +48,7 @@ import PatientContent from "./pages/Patient/ViewContent";
 import PatientBook from "./pages/Patient/BookSchedule";
 import PatientProfile from "./pages/Patient/Profile";
 import PatientFeedback from "./pages/Patient/FeedbackDiagnosis";
-import ExerciseContent from "./pages/Patient/ExerciseContent";
+import ExerciseContent from "./pages/Exercises/ExerciseContent";
 
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";

@@ -256,14 +256,20 @@ const handleEditContent = async (id, formData) => {
                             <div
                               className="fw-bold text-button border"
                               style={{ cursor: "pointer" }}
-                              onClick={() => handleEdit(content)} // Pass content to handleEdit
+                              onClick={(e) => {
+                                e.stopPropagation(); 
+                                handleEdit(content); 
+                              }} 
                             >
                               Edit
                             </div>
                             <div
                               className="fw-bold text-button border"
                               style={{ cursor: "pointer" }}
-                              onClick={() => handleDelete(content._id)}
+                              onClick={(e) => {
+                                e.stopPropagation(); 
+                                handleDelete(content._id); 
+                              }}
                             >
                               Delete
                             </div>

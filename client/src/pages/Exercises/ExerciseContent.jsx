@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, Suspense } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { useNavigate, useParams } from "react-router-dom"; 
 import { route } from "../../utils/route";
@@ -8,8 +8,13 @@ import DOMPurify from 'dompurify';
 import 'react-quill/dist/quill.snow.css';
 
 // Components
-import Sidebar from "../../components/Sidebar/SidebarPatient";
-import MenuDropdown from "../../components/Layout/PatientMenu";
+const SidebarPatient = React.lazy(() => import("../../components/Sidebar/SidebarPatient"));
+const SidebarAdmin = React.lazy(() => import("../../components/Sidebar/SidebarAdmin"));
+const SidebarClinician = React.lazy(() => import("../../components/Sidebar/SidebarClinician"));
+
+const MenuDropdownPatient = React.lazy(() => import("../../components/Layout/PatientMenu"));
+const MenuDropdownAdmin = React.lazy(() => import("../../components/Layout/AdminMenu"));
+const MenuDropdownClinician = React.lazy(() => import("../../components/Layout/ClinicianMenu"));
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
@@ -17,9 +22,12 @@ import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 export default function ExerciseContent() {
   const { authState, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
-  const { id } = useParams(); // Get the 'id' from the URL params
+  const { id } = useParams(); 
 
+  const [Sidebar, setSidebar] = useState(null);
+  const [MenuDropdown, setMenuDropdown] = useState(null);
 
+  const [clinicianData, setClinicianData] = useState(null);
   const [adminData, setAdminData] = useState(null);
   const [patientData, setPatientData] = useState(null);
   const [contentData, setContentData] = useState(null);
@@ -27,6 +35,20 @@ export default function ExerciseContent() {
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
+
+    // Update Sidebar when role changes
+    useEffect(() => {
+      if (authState?.userRole === "admin") {
+        setSidebar(SidebarAdmin);
+        setMenuDropdown(MenuDropdownAdmin);
+      } else if (authState?.userRole === "clinician") {
+        setSidebar(SidebarClinician); 
+        setMenuDropdown(MenuDropdownClinician); 
+      } else if (authState?.userRole === "patientslp") {
+        setSidebar(SidebarPatient);
+        setMenuDropdown(MenuDropdownPatient); 
+      }
+    }, [authState?.userRole]);
 
   const isYouTubeUrl = (url) => {
     return /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be)\//.test(url);
@@ -39,37 +61,39 @@ export default function ExerciseContent() {
     return match && match[1].length === 11 ? match[1] : null;
   };
 
-  // Fetch patient data (same as before)
+  // Fetch patient data
   useEffect(() => {
-    const fetchPatientData = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.patient.fetch}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+    if (authState?.userRole === "patientslp") {
+      const fetchPatientData = async () => {
+        try {
+          const response = await fetch(`${appURL}/${route.patient.fetch}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
 
-        if (!response.ok) {
-          console.error("Failed to fetch patient data");
+          if (!response.ok) {
+            console.error("Failed to fetch patient data");
+          }
+
+          const data = await response.json();
+          setPatientData(data.patient);
+          setLoading(false);
+        } catch (error) {
+          setError(error.message);
+          setLoading(false);
         }
+      };
 
-        const data = await response.json();
-        setPatientData(data.patient);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
+      fetchPatientData();
+    }
+  }, [accessToken, appURL, authState?.userRole]); 
 
-    fetchPatientData();
-  }, [accessToken, appURL]);
-
-
-   // Fetch admin data
-    useEffect(() => {
+  // Fetch admin data
+  useEffect(() => {
+    if (authState?.userRole === "admin") {
       const fetchAdminData = async () => {
         try {
           const response = await fetch(`${appURL}/${route.admin.fetch}`, {
@@ -94,14 +118,45 @@ export default function ExerciseContent() {
       };
 
       fetchAdminData();
-    }, [accessToken, appURL]);
+    }
+  }, [accessToken, appURL, authState?.userRole]); 
+
+  // Fetch clinician data
+  useEffect(() => {
+    if (authState?.userRole === "clinician") {
+      const fetchClinicianData = async () => {
+        try {
+          const response = await fetch(`${appURL}/${route.clinician.fetch}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.error("Failed to fetch clinician data");
+          }
+
+          const data = await response.json();
+          setClinicianData(data.clinician);
+          setLoading(false);
+        } catch (error) {
+          setError(error.message);
+          setLoading(false);
+        }
+      };
+
+      fetchClinicianData();
+    }
+  }, [accessToken, appURL, authState?.userRole]); 
 
 
   // Fetch content data based on the ID
   useEffect(() => {
     const fetchContentData = async () => {
       try {
-        const response = await fetch(`${appURL}/api/contents/${id}`, { // Fetch content by ID
+        const response = await fetch(`${appURL}/api/contents/${id}`, { 
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -114,7 +169,7 @@ export default function ExerciseContent() {
         }
 
         const data = await response.json();
-        setContentData(data); // Set the content data for the specific ID
+        setContentData(data); 
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -123,15 +178,17 @@ export default function ExerciseContent() {
     };
 
     if (id) {
-      fetchContentData(); // Only fetch when the ID is available
+      fetchContentData(); 
     }
-  }, [accessToken, appURL, id]); // Add 'id' to dependencies
+  }, [accessToken, appURL, id]); 
 
   return (
+    <Suspense fallback={<div>Loading...</div>}>
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
           {/* SIDEBAR */}
-          <Sidebar />
+          {Sidebar ? <Sidebar /> : null}
+
 
           {/* MAIN CONTENT */}
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
@@ -155,12 +212,18 @@ export default function ExerciseContent() {
                       {adminData?.firstName} {adminData?.lastName}
                     </p>
                   </>
+                ) : clinicianData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {clinicianData?.firstName} {clinicianData?.lastName}
+                    </p>
+                  </>
                 ) : (
-                  <p>No data available</p> // This is just a fallback in case neither data is available
+                  <p>No data available</p> // Fallback message
                 )}
               </div>
-
-              <MenuDropdown />
+              {MenuDropdown ? <MenuDropdown /> : null}
             </div>
 
             <div className="row h-100">
@@ -260,5 +323,6 @@ export default function ExerciseContent() {
           </div>
         </div>
       </div>
+    </Suspense>
   );
 }

@@ -28,7 +28,13 @@ export default function Sidebar() {
     navigate("/login");
   };
 
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    // Check if the current pathname matches the base of the route
+    if (path === page.clinician.exercise) {
+      return location.pathname.startsWith('/content/exercises');
+    }
+    return location.pathname === path;
+  };
 
   return (
     <div className="d-none d-md-flex flex-column gap-3 text-center h-100 bg-white p-3">
@@ -43,7 +49,7 @@ export default function Sidebar() {
         <Link to={page.clinician.home} className={`text-link ${isActive(page.clinician.home) ? 'active' : ''}`}>
           <FontAwesomeIcon icon={faHouse} size="xl" />
         </Link>
-        <Link to={page.clinician.content} className={`text-link ${isActive(page.clinician.content) ? 'active' : ''}`}>
+        <Link to={page.clinician.content} className={`text-link ${isActive(page.clinician.content) || isActive(page.clinician.exercise)? 'active' : ''}`}>
           <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
         </Link>
         <Link to={page.clinician.patients} className={`text-link ${isActive(page.clinician.patients) ? 'active' : ''}`}>
