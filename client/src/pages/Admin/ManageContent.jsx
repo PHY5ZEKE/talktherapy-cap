@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
+import { toast } from "react-toastify";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
@@ -103,7 +104,7 @@ const handleAddContent = async (formData) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to add content");
+      toast.error("Failed to add content");
     }
 
     fetchContentData();
@@ -120,7 +121,7 @@ const handleEditContent = async (id, formData) => {
   for (let [key, value] of formData.entries()) {
     console.log(`${key}:`, value);
   }
-  
+
   try {
     const response = await fetch(`${appURL}/api/contents/${id}`, {
       method: "PUT",

@@ -64,7 +64,7 @@ const updateContent = async (req, res) => {
 
     try {
       const contentId = req.params.id;
-      const { name, description, category, image } = req.body; 
+      const { name, description, category, image, videoUrl } = req.body; 
       let imageUrl = image || ""; 
 
       
@@ -85,7 +85,7 @@ const updateContent = async (req, res) => {
         imageUrl = content?.image || ""; 
       }
 
-      const updates = { name, description, category, image: imageUrl };
+      const updates = { name, description, category, videoUrl, image: imageUrl };
 
       const updatedContent = await Content.findByIdAndUpdate(contentId, updates, { new: true });
 

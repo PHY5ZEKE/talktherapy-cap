@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import "./modal.css";
 
 export default function AddContent({ closeModal, onSubmit }) {
@@ -14,16 +16,30 @@ export default function AddContent({ closeModal, onSubmit }) {
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null); // New state for image file
+  const [videoUrl, setVideoUrl] = useState("");
 
+
+
+  const handleChange = (value) => {
+    setDescription(value);
+  };
+  
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate that all fields are filled
+    if (!name || !description || !category || !image) {
+      toast.error("All fields are required");
+      return; // Prevent form submission if any field is missing
+    }
 
     // Prepare form data
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
+    formData.append("videoUrl", videoUrl);
     if (image) formData.append("image", image); // Add image file if available
 
     try {
@@ -31,6 +47,7 @@ export default function AddContent({ closeModal, onSubmit }) {
       setName("");
       setDescription("");
       setCategory("");
+      setVideoUrl("");
       setImage(null); // Reset image input
       closeModal();
       toast.success("Content added successfully!");
@@ -65,23 +82,62 @@ export default function AddContent({ closeModal, onSubmit }) {
 
             <div className="form-group">
               <label className="mb-0">Description</label>
-              <input
-                type="text"
-                className="form-control"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter content description"
-              />
+              <div className="quill-editor">
+                <ReactQuill
+                  value={description}
+                  onChange={handleChange}
+                  placeholder="Enter content description"
+                  theme="snow" // theme of the editor
+                  modules={{
+                    toolbar: [
+                      [{ header: "1" }, { header: "2" }, { font: [] }],
+                      [{ list: "ordered" }, { list: "bullet" }],
+                      ["bold", "italic", "underline"],
+                      ["link"],
+                      ["blockquote", "code-block"],
+                      [{ align: [] }],
+                      ["image"],
+                      ["clean"], // for clearing the formatting
+                    ],
+                  }}
+                  formats={[
+                    "header",
+                    "font",
+                    "list",
+                    "bold",
+                    "italic",
+                    "underline",
+                    "align",
+                    "link",
+                    "blockquote",
+                    "code-block",
+                    "image",
+                  ]}
+                />
+              </div>
             </div>
 
             <div className="form-group">
               <label className="mb-0">Category</label>
-              <input
-                type="text"
+              <select
                 className="form-control"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                placeholder="Enter content category"
+              >
+                <option value="">Select Category</option>
+                <option value="Children">Children</option>
+                <option value="Adult">Adult</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="mb-0">Video URL (Optional)</label>
+              <input
+                type="text"
+                className="form-control"
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                placeholder="Enter video URL (optional)"
               />
             </div>
 

@@ -18,12 +18,24 @@
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
+  max-height: 90vh; /* Set a maximum height based on the viewport height */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds max height */
+  margin-top: 30px;
+  box-sizing: border-box;
 }
 
 .scrollable-table {
   max-height:300px !important;
   overflow-y: auto;
 }
+
+.quill-editor {
+  max-height: 400px; /* Set a maximum height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  border: 1px solid #ccc; /* Optional: add a border for better visibility */
+  border-radius: 4px; /* Optional: add rounded corners */
+}
+
 
 /* Media query for 768 and below */
 @media (max-width: 768px) {
