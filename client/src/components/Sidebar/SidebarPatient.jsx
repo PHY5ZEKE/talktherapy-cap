@@ -29,7 +29,14 @@ export default function Sidebar() {
     navigate("/login");
   };
   
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => {
+    // Check if the current pathname matches the base of the route
+    if (path === page.patient.exercise) {
+      // Check if the current location is any `/patient/content/exercises/:id` page
+      return location.pathname.startsWith('/content/exercises');
+    }
+    return location.pathname === path;
+  };
 
   return (
     <div className="d-none d-md-flex flex-column gap-3 text-center h-100 bg-white p-3">

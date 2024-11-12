@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
@@ -21,6 +22,7 @@ export default function AdminContent() {
 
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
+  const navigate = useNavigate();
 
   // Fetch content data function
   const fetchContentData = async () => {
@@ -57,6 +59,10 @@ export default function AdminContent() {
   const handleEdit = (content) => {
     setEditingContent(content);  
     setIsEditModalOpen(true);    
+  };
+
+  const handleCardClick = (id) => {
+    navigate(`/content/exercises/${id}`); 
   };
 
   // Fetch admin data
@@ -232,6 +238,7 @@ const handleEditContent = async (id, formData) => {
                         key={content._id}
                         className="card exercise-container"
                         style={{ width: "18rem" }}
+                        onClick={() => handleCardClick(content._id)} 
                       >
                         <img
                           src={content.image}

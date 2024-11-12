@@ -93,6 +93,7 @@ const routes = (
       {/* Exercises */}
       <Route path="/exercise" element={<ExerciseStart />} />
       <Route path="/assist/speech" element={<AssistSpeech />} />
+      <Route path="/content/exercises/:id" element={<ExerciseContent /> }/>
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route
@@ -277,14 +278,15 @@ const routes = (
           </PrivateRoute>
         }
       />
-      <Route
+      {/* <Route
         path="/patient/content/exercises/:id"
         element={
           <PrivateRoute allowedRoles={["patientslp"]}>
             <ExerciseContent />
           </PrivateRoute>
         }
-      />
+      /> */}
+
     </Routes>
   </Router>
 );

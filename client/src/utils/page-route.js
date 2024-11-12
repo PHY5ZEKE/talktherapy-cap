@@ -9,13 +9,14 @@ export const page = {
         home: "/patient",
         feedback: "/patient/feedback",
         content: "/patient/content",
-        exercise: "/patient/content/exercises",
+        exercise: "/content/exercises/:id",
         book: "/patient/book",
         profile: "/patient/profile"
     },
     admin: {
         home: "/admin",
         content: "/admin/content",
+        exercise: "/content/exercises/:id",
         schedule: "/admin/schedule",
         profile: "/admin/profile",
         archival: "/admin/archival",
@@ -25,6 +26,7 @@ export const page = {
       home: "/clinician",
       patients: "/clinician/patients",
       content: "/clinician/content",
+      exercise: "/content/exercises/:id",
       profile: "/clinician/profile",
       schedule: "/clinician/schedule"
     }

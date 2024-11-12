@@ -2,6 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { useNavigate, useParams } from "react-router-dom"; 
 import { route } from "../../utils/route";
+import { toast } from "react-toastify";
+
 import DOMPurify from 'dompurify';
 import 'react-quill/dist/quill.snow.css';
 
@@ -17,6 +19,8 @@ export default function ExerciseContent() {
   const accessToken = authState.accessToken;
   const { id } = useParams(); // Get the 'id' from the URL params
 
+
+  const [adminData, setAdminData] = useState(null);
   const [patientData, setPatientData] = useState(null);
   const [contentData, setContentData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +52,7 @@ export default function ExerciseContent() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch patient data");
+          console.error("Failed to fetch patient data");
         }
 
         const data = await response.json();
@@ -62,6 +66,36 @@ export default function ExerciseContent() {
 
     fetchPatientData();
   }, [accessToken, appURL]);
+
+
+   // Fetch admin data
+    useEffect(() => {
+      const fetchAdminData = async () => {
+        try {
+          const response = await fetch(`${appURL}/${route.admin.fetch}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.error("Failed to fetch admin data");
+          }
+
+          const data = await response.json();
+          setAdminData(data.admin);
+          setLoading(false);
+        } catch (error) {
+          setError(error.message);
+          setLoading(false);
+        }
+      };
+
+      fetchAdminData();
+    }, [accessToken, appURL]);
+
 
   // Fetch content data based on the ID
   useEffect(() => {
@@ -103,17 +137,26 @@ export default function ExerciseContent() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-                {error ? (
-                  <p>{error}</p>
-                ) : contentData ? (
+                {loading ? (
+                  <p>Loading...</p> // Display loading message while fetching data
+                ) : error ? (
+                  <p>{error}</p> // Show the error message if there was an issue fetching data
+                ) : patientData ? (
                   <>
                     <p className="mb-0 mt-3">Hello,</p>
                     <p className="fw-bold">
                       {patientData?.firstName} {patientData?.lastName}
                     </p>
                   </>
+                ) : adminData ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {adminData?.firstName} {adminData?.lastName}
+                    </p>
+                  </>
                 ) : (
-                  <p>Fetching data...</p>
+                  <p>No data available</p> // This is just a fallback in case neither data is available
                 )}
               </div>
 

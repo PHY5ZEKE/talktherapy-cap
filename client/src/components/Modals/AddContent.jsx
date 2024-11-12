@@ -96,6 +96,8 @@ export default function AddContent({ closeModal, onSubmit }) {
                       ["link"],
                       ["blockquote", "code-block"],
                       [{ align: [] }],
+                      [{ size: ["small", "medium", "large", "huge"] }],
+                      [{ color: [] }, { background: [] }],
                       ["image"],
                       ["clean"], // for clearing the formatting
                     ],
@@ -112,6 +114,9 @@ export default function AddContent({ closeModal, onSubmit }) {
                     "blockquote",
                     "code-block",
                     "image",
+                    "size",
+                    "color",
+                    "background",
                   ]}
                 />
               </div>

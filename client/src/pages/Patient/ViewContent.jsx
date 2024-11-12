@@ -79,7 +79,7 @@ export default function ViewContent() {
   }, [accessToken, appURL]);
 
   const handleCardClick = (id) => {
-    navigate(`/patient/content/exercises/${id}`); 
+    navigate(`/content/exercises/${id}`); 
   };
 
   return (

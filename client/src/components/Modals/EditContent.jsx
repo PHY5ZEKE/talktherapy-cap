@@ -94,6 +94,8 @@ export default function EditContent({ closeModal, onSubmit, content }) {
                       ["link"],
                       ["blockquote", "code-block"],
                       [{ align: [] }],
+                      [{ size: ["small", "medium", "large", "huge"] }],
+                      [{ color: [] }, { background: [] }],
                       ["image"],
                       ["clean"], // for clearing the formatting
                     ],
@@ -110,6 +112,9 @@ export default function EditContent({ closeModal, onSubmit, content }) {
                     "blockquote",
                     "code-block",
                     "image",
+                    "size",
+                    "color",
+                    "background",
                   ]}
                 />
               </div>
