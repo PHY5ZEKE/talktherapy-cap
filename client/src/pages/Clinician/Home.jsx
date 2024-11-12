@@ -277,7 +277,6 @@ export default function Home() {
                     data-bs-toggle="offcanvas"
                     data-bs-target="#offcanvasWithBothOptions"
                     aria-controls="offcanvasWithBothOptions">
-                      sidebar
                     </button>
                   </>
                 ) : (

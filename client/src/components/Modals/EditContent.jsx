@@ -1,80 +1,109 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import "./modal.css";
 
 export default function EditContent({ closeModal, onSubmit, content }) {
-  // Form state initialization with the current content values
-  const [name, setName] = useState(content?.name || "");
-  const [description, setDescription] = useState(content?.description || "");
-  const [category, setCategory] = useState(content?.category || "");
-  const [image, setImage] = useState(content?.image || "");
-
-  // Reset the form when content changes
-  useEffect(() => {
-    setName(content?.name || "");
-    setDescription(content?.description || "");
-    setCategory(content?.category || "");
-    setImage(content?.image || "");
-  }, [content]);
+  // Initialize form state with existing content data
+  const [name, setName] = useState(content.name || "");
+  const [description, setDescription] = useState(content.description || "");
+  const [category, setCategory] = useState(content.category || "");
+  const [image, setImage] = useState(null); // Optional new image
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
+    // Prepare form data
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("description", description);
+    formData.append("category", category);
+    if (image) formData.append("image", image); // Add new image if uploaded
 
-    const updatedContent = {
-      name,
-      description,
-      category,
-      image, // Image can be updated too
-    };
-
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+    console.log("Submitting form data:", { name, description, category, image });
+  
     try {
-      await onSubmit(content._id, updatedContent); // Pass the content ID and updated data
+      await onSubmit(content._id, formData); // Pass formData to parent
       closeModal();
+      toast.success("Content updated successfully!");
     } catch (error) {
+      console.error("Failed to update content:", error);
       toast.error("Failed to update content");
     }
   };
 
+  // Handle file selection for new image
+  const handleImageChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  // Callback function to close modal
+  const handleClose = (e) => {
+    e.preventDefault();
+    closeModal();
+  };
+
   return (
     <div className="modal-background">
-      <div className="modal-container d-flex flex-column justify-content-center align-content-center">
+      <div className="modal-container d-flex flex-column justify-content-center align-items-center">
         <h3 className="fw-bold">Edit Content</h3>
-        <p>Edit the content details below:</p>
+        <p>Edit the fields below to update the content.</p>
 
         <div className="container row text-center">
           <div className="col">
-            <p className="mb-0">Name</p>
-            <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-            <p className="mb-0">Description</p>
-            <input
-              type="text"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-            <p className="mb-0">Category</p>
-            <input
-              type="text"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            />
-            <p className="mb-0">Image URL (optional)</p>
-            <input
-              type="text"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-            />
+            <div className="form-group">
+              <label className="mb-0">Name</label>
+              <input
+                type="text"
+                className="form-control"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter content name"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="mb-0">Description</label>
+              <input
+                type="text"
+                className="form-control"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Enter content description"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="mb-0">Category</label>
+              <input
+                type="text"
+                className="form-control"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                placeholder="Enter content category"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="mb-0">Upload New Image (Optional)</label>
+              <input
+                type="file"
+                className="form-control"
+                accept="image/*"
+                onChange={handleImageChange}
+              />
+            </div>
           </div>
         </div>
 
         <div className="d-flex justify-content-center mt-3 gap-3">
-          <button onClick={handleSubmit} className="text-button border">
+          <button onClick={handleSubmit} className="btn btn-primary">
             <p className="fw-bold my-0">UPDATE</p>
           </button>
-          <button onClick={closeModal} className="text-button border">
+          <button onClick={handleClose} className="btn btn-secondary">
             <p className="fw-bold my-0">CANCEL</p>
           </button>
         </div>

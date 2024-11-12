@@ -67,7 +67,7 @@ export default function ViewContent() {
         }
 
         const data = await response.json();
-        setContentData(data); // Set the content data for the cards
+        setContentData(data); 
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -79,7 +79,7 @@ export default function ViewContent() {
   }, [accessToken, appURL]);
 
   const handleCardClick = (id) => {
-    navigate(`/patient/content/exercises/${id}`); // Navigate to exercise content with the content ID
+    navigate(`/patient/content/exercises/${id}`); 
   };
 
   return (
@@ -127,22 +127,22 @@ export default function ViewContent() {
                   >
                     {contentData.map((content) => (
                       <div
-                        key={content._id} // Use content ID as key
+                        key={content._id} 
                         className="card exercise-container"
                         style={{ width: "18rem" }}
-                        onClick={() => handleCardClick(content._id)} // Pass the content ID
+                        onClick={() => handleCardClick(content._id)} 
                       >
                         <img
-                          src={content.image} // Dynamic image
+                          src={content.image} 
                           className="card-img-top"
                           alt={content.name}
                           style={{ height: "16rem", objectFit: "cover" }}
                         />
                         <div className="card-body">
                           <h5 className="card-title fw-bold mb-0 text-truncate">
-                            {content.name} {/* Dynamic title */}
+                            {content.name} 
                           </h5>
-                          <p>{content.category}</p> {/* Dynamic category */}
+                          <p>{content.category}</p> 
                           <FontAwesomeIcon icon={faBookmark} />
                         </div>
                       </div>

@@ -36,11 +36,13 @@ export default function AdminContent() {
         throw new Error("Failed to fetch content data");
       }
 
+
       const data = await response.json();
-      setContentData(data); // Set content data
+      setContentData(data); 
       setLoading(false);
     } catch (error) {
       setError(error.message);
+      //console.error("Error fetching content:", error);
       setLoading(false);
     }
   };
@@ -52,8 +54,8 @@ export default function AdminContent() {
 
   // Handle Edit Content Modal toggle
   const handleEdit = (content) => {
-    setEditingContent(content);  // Set the content that is being edited
-    setIsEditModalOpen(true);    // Open the edit modal
+    setEditingContent(content);  
+    setIsEditModalOpen(true);    
   };
 
   // Fetch admin data
@@ -84,60 +86,66 @@ export default function AdminContent() {
     fetchAdminData();
   }, [accessToken, appURL]);
 
-  // Fetch content data when component loads
   useEffect(() => {
     fetchContentData();
   }, [accessToken, appURL]);
 
-  // Handle Add Content submission
-  const handleAddContent = async (newContent) => {
-    try {
-      const response = await fetch(`${appURL}/api/contents`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(newContent), // Send the new content details
-      });
 
-      if (!response.ok) {
-        throw new Error("Failed to add content");
-      }
 
-      // Refetch the content data to show the new content
-      fetchContentData();
-      setIsAddModalOpen(false);
-    } catch (error) {
-      setError(error.message);
+const handleAddContent = async (formData) => {
+  try {
+    const response = await fetch(`${appURL}/api/contents`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: formData, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to add content");
     }
-  };
 
-  // Handle Edit Content submission
-  const handleEditContent = async (id, updatedContent) => {
-    try {
-      const response = await fetch(`${appURL}/api/contents/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(updatedContent), // Send the updated content details
-      });
+    fetchContentData();
+    setIsAddModalOpen(false);
+  } catch (error) {
+    setError(error.message);
+  }
+};
 
-      if (!response.ok) {
-        throw new Error("Failed to update content");
-      }
 
-      // Refetch the content data to show the updated content
-      fetchContentData();
-      setIsEditModalOpen(false);
-    } catch (error) {
-      setError(error.message);
+const handleEditContent = async (id, formData) => {
+  console.log("Updating content with ID:", id);
+
+  for (let [key, value] of formData.entries()) {
+    console.log(`${key}:`, value);
+  }
+  
+  try {
+    const response = await fetch(`${appURL}/api/contents/${id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: formData, 
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update content");
     }
-  };
 
-  // Handle Delete Content
+    const updatedContent = await response.json();
+    console.log("Updated content:", updatedContent);
+
+    fetchContentData(); 
+    setIsEditModalOpen(false);
+  } catch (error) {
+    console.error("Error updating content:", error);
+    setError(error.message);
+  }
+};
+
+
   const handleDelete = async (id) => {
     try {
       const response = await fetch(`${appURL}/api/contents/${id}`, {
@@ -152,7 +160,6 @@ export default function AdminContent() {
         throw new Error("Failed to delete content");
       }
 
-      // Remove the deleted content from the UI
       setContentData((prevData) => prevData.filter((content) => content._id !== id));
     } catch (error) {
       setError(error.message);
