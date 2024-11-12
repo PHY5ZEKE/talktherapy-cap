@@ -247,7 +247,7 @@ export default function ExerciseContent() {
                   >
                     {/* Image */}
                       <div
-                        className="w-100 bg-warning exercise-vid rounded-2"
+                        className="w-100 exercise-vid rounded-2"
                         style={{
                           display: contentData?.image ? "inline" : "none",
                         }}
@@ -257,6 +257,7 @@ export default function ExerciseContent() {
                             src={contentData?.image}
                             alt="Exercise Image"
                             style={{
+                              padding: "15px",
                               width: "100%",
                               height: "auto",
                               objectFit: "cover",
