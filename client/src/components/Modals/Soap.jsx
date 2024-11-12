@@ -100,33 +100,26 @@ export default function Soap({
   };
 
   const modules = {
-    toolbar: [
-      [{ list: "ordered" }, { list: "bullet" }],
-      ["bold", "italic"],
-    ],
+    toolbar: false,
   };
 
   return (
     <>
       <div className="modal-background">
-        <div className="modal-container d-flex flex-column justify-content-center align-content-center">
-          <div className="d-flex flex-column text-center">
-            <h3 className="fw-bold">Add SOAP to Patient</h3>
-            <p className="mb-0">Please verify your inputs before proceeding.</p>
-          </div>
+        <div className="modal-container d-flex flex-column justify-content-center align-content-center overflow-auto">
+          <h3 className="fw-bold text-center">Add SOAP to Patient</h3>
+          <p className="mb-0 text-center">
+            Please verify your inputs before proceeding.
+          </p>
+
+          <p className="my-3 text-center">
+            <span className="fw-bold">Patient Name: </span>
+            {patientName}
+          </p>
 
           <div className="container text-center">
             <div className="row">
-              <p className="my-3">
-                <span className="fw-bold">Patient Name: </span>
-                {patientName}
-              </p>
-            </div>
-          </div>
-
-          <div className="container text-center">
-            <div className="row">
-              <div className="col mb-3">
+              <div className="w-100 mb-3">
                 <p className="fw-bold mb-0">Session Date</p>
                 <input
                   type="date"
@@ -135,8 +128,12 @@ export default function Soap({
                   onChange={(e) => setDate(e.target.value)}
                 />
               </div>
+            </div>
+          </div>
 
-              <div className="col">
+          <div className="container text-center">
+            <div className="row">
+              <div className="w-100 mb-3">
                 <p className="fw-bold mb-0">Activity/Assessment Plan</p>
                 <input
                   type="text"
@@ -174,7 +171,7 @@ export default function Soap({
 
           <div
             className="col bg-white overflow-auto"
-            style={{ maxHeight: "75vh" }}
+            style={{ maxHeight: "350px" }}
           >
             <div className="container text-center">
               <div className="row">
@@ -185,14 +182,13 @@ export default function Soap({
                     onChange={setSubjective}
                     modules={modules}
                     className="overflow-auto"
-                    style={{ maxHeight: "90px" }}
                   />
                 </div>
               </div>
             </div>
 
             <div className="container text-center">
-              <div className="row overflow-auto" style={{ maxHeight: "130px" }}>
+              <div className="row overflow-auto">
                 <div className="col mb-3">
                   <p className="fw-bold mb-0">Objective/Goals</p>
                   <ReactQuill
@@ -201,7 +197,11 @@ export default function Soap({
                     modules={modules}
                   />
                 </div>
+              </div>
+            </div>
 
+            <div className="container text-center">
+              <div className="row overflow-auto">
                 <div className="col">
                   <p className="fw-bold mb-0">Assessment/Performance</p>
                   <ReactQuill
@@ -222,8 +222,6 @@ export default function Soap({
                     value={recommendation}
                     onChange={setRecommendation}
                     modules={modules}
-                    className="overflow-auto"
-                    style={{ maxHeight: "70px" }}
                   />
                 </div>
               </div>

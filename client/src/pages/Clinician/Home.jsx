@@ -271,6 +271,14 @@ export default function Home() {
                     <p className="fw-bold">
                       {clinicianData?.firstName} {clinicianData?.lastName}
                     </p>
+                    <button
+                    role="button"
+                    className="dropdown-item"
+                    data-bs-toggle="offcanvas"
+                    data-bs-target="#offcanvasWithBothOptions"
+                    aria-controls="offcanvasWithBothOptions">
+                      sidebar
+                    </button>
                   </>
                 ) : (
                   <p>Fetching data.</p>

@@ -322,6 +322,13 @@ class WebSocketServer {
     const { roomID } = data;
     const room = this.rooms[roomID];
 
+    //     const broadcastData = JSON.stringify(
+    //   {
+    //     type: "join-room",
+    //     user
+    //   }
+    // )
+    // this.broadcastToRoom(roomID, broadcastData);
     if (!room) return;
 
     room.users.forEach((user) => {
