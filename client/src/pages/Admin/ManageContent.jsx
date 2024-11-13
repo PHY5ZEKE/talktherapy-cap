@@ -13,11 +13,16 @@ import EditContent from "../../components/Modals/EditContent";
 export default function AdminContent() {
   const [adminData, setAdminData] = useState(null);
   const [contentData, setContentData] = useState([]);
+
+  const [filteredContent, setFilteredContent] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingContent, setEditingContent] = useState(null);
+  
   const appURL = import.meta.env.VITE_APP_URL;
 
   const { authState } = useContext(AuthContext);
@@ -42,13 +47,28 @@ export default function AdminContent() {
 
       const data = await response.json();
       setContentData(data); 
+      setFilteredContent(data);
       setLoading(false);
     } catch (error) {
       setError(error.message);
-      //console.error("Error fetching content:", error);
       setLoading(false);
     }
   };
+
+  //Search/Filter
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredContent(contentData); 
+    } else {
+      setFilteredContent(
+        contentData.filter((content) =>
+          content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          content.category.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [searchTerm, contentData]);
+
 
   // Handle Add Content Modal toggle
   const handleAdd = () => {
@@ -112,6 +132,9 @@ const handleAddContent = async (formData) => {
     if (!response.ok) {
       toast.error("Failed to add content");
     }
+    else {
+      toast.success("Content added successfully!");
+    }
 
     fetchContentData();
     setIsAddModalOpen(false);
@@ -122,12 +145,6 @@ const handleAddContent = async (formData) => {
 
 
 const handleEditContent = async (id, formData) => {
-  console.log("Updating content with ID:", id);
-
-  for (let [key, value] of formData.entries()) {
-    console.log(`${key}:`, value);
-  }
-
   try {
     const response = await fetch(`${appURL}/api/contents/${id}`, {
       method: "PUT",
@@ -138,16 +155,15 @@ const handleEditContent = async (id, formData) => {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update content");
+      toast.error("Failed to edit content");
     }
-
-    const updatedContent = await response.json();
-    console.log("Updated content:", updatedContent);
+    else {
+      toast.success("Content updated successfully!");
+    }
 
     fetchContentData(); 
     setIsEditModalOpen(false);
   } catch (error) {
-    console.error("Error updating content:", error);
     setError(error.message);
   }
 };
@@ -164,7 +180,10 @@ const handleEditContent = async (id, formData) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete content");
+        toast.error("Failed to delete");
+      }
+      else {
+        toast.success("Content deleted successfully!");
       }
 
       setContentData((prevData) => prevData.filter((content) => content._id !== id));
@@ -172,6 +191,7 @@ const handleEditContent = async (id, formData) => {
       setError(error.message);
     }
   };
+  
 
   return (
     <>
@@ -225,6 +245,16 @@ const handleEditContent = async (id, formData) => {
                         Add Content
                       </button>
                     </div>
+
+                    <input
+                      type="text"
+                      className="form-control mt-3"
+                      placeholder="Search by name or category"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+
+
                   </div>
                 </div>
 
@@ -233,7 +263,7 @@ const handleEditContent = async (id, formData) => {
                     className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
                     style={{ minHeight: "85vh" }}
                   >
-                    {contentData.map((content) => (
+                    {filteredContent.map((content) => (
                       <div
                         key={content._id}
                         className="card exercise-container border"
