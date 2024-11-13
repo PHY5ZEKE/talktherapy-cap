@@ -100,13 +100,22 @@ export default function ViewContent() {
 
   const handleBookmarkClick = async (content) => {
     try {
-      const updatedBookmarks = [...patientData.bookmarkedContent];
+      // Create a new array containing only the content IDs (ObjectIds)
+      const updatedBookmarks = patientData.bookmarkedContent.map((bookmarkId) => {
+        // Ensure we only return the ObjectId (not the full content object)
+        return bookmarkId;  // This is already the ObjectId
+      });
+  
+      // If the content is already bookmarked, remove it
       if (updatedBookmarks.includes(content._id)) {
-        updatedBookmarks.splice(updatedBookmarks.indexOf(content._id), 1); // Remove bookmark
+        updatedBookmarks.splice(updatedBookmarks.indexOf(content._id), 1);
       } else {
-        updatedBookmarks.push(content._id); // Add bookmark
+        // Otherwise, add the new content's ObjectId to the list of bookmarks
+        updatedBookmarks.push(content._id);
       }
-
+  
+      console.log('Updated Bookmarks to be sent:', updatedBookmarks);
+  
       // Update the patient bookmarks in the backend
       const response = await fetch(`${appURL}/${route.patient.updateBookmarks}`, {
         method: "PUT",
@@ -114,11 +123,14 @@ export default function ViewContent() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ bookmarkedContent: updatedBookmarks }),
+        body: JSON.stringify({ bookmarks: updatedBookmarks }),  // Send only the ObjectIds
       });
-
-      if (!response.ok) throw new Error("Failed to update bookmarks");
-
+  
+      if (!response.ok) {
+        console.error("Failed to update bookmarks:", response);
+        throw new Error("Failed to update bookmarks");
+      }
+  
       // Update local state
       setPatientData({ ...patientData, bookmarkedContent: updatedBookmarks });
     } catch (error) {

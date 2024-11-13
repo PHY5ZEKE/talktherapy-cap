@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const PatientSlp = require("../models/patientSlp.model");
 const Admin = require("../models/adminSLP.model");
 const jwt = require("jsonwebtoken");
@@ -70,8 +71,10 @@ const deactivatePatient = async (req, res) => {
 
 const updateBookmarks = async (req, res) => {
   try {
-    const { patientId } = req.user; // Extract patient ID from token (or request)
+    const { _id: patientId } = req.user; // Extract patient ID from token (or request)
     const { bookmarks } = req.body; // Assuming bookmarks are sent as an array of Content ObjectIds
+
+    console.log('Received patientId:', patientId);
 
     if (!Array.isArray(bookmarks)) {
       return res.status(400).json({ error: true, message: "Bookmarks must be an array of Content ObjectIds." });
@@ -91,6 +94,7 @@ const updateBookmarks = async (req, res) => {
     }
 
     // Initialize the bookmarks if it's empty or doesn't exist
+    patient.bookmarkedContent = bookmarks;
     if (!patient.bookmarkedContent) {
       patient.bookmarkedContent = [];
     }
@@ -521,7 +525,6 @@ module.exports = {
   deactivatePatient,
   activatePatient,
   signupPatient,
-
   getPatient,
   updateBookmarks,
   getPatient,

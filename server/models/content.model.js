@@ -17,8 +17,8 @@ const contentSchema = new mongoose.Schema(
     },
 
     videoUrl: {
-      type: String, // URL for the optional video
-      required: false, // Video URL is optional
+      type: String, 
+      required: false, 
     },
 
     category: { 
