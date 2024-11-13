@@ -17,6 +17,7 @@ export default function AddContent({ closeModal, onSubmit }) {
   const [category, setCategory] = useState("");
   const [image, setImage] = useState(null); // New state for image file
   const [videoUrl, setVideoUrl] = useState("");
+  const [error, setError] = useState(null);
 
 
 
@@ -50,8 +51,8 @@ export default function AddContent({ closeModal, onSubmit }) {
       setVideoUrl("");
       setImage(null); // Reset image input
       closeModal();
-      toast.success("Content added successfully!");
     } catch (error) {
+      setError(error.message);
       toast.error("Failed to add content");
     }
   };

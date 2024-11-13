@@ -31,8 +31,10 @@ export default function ExerciseContent() {
   const [adminData, setAdminData] = useState(null);
   const [patientData, setPatientData] = useState(null);
   const [contentData, setContentData] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
 
@@ -261,7 +263,7 @@ export default function ExerciseContent() {
                               width: "100%",
                               height: "auto",
                               objectFit: "cover",
-                              aspectRatio: "16 / 9", // Maintain aspect ratio
+                              aspectRatio: "16 / 10", // Maintain aspect ratio
                             }}
                           />
                         )}

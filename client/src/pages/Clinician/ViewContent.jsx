@@ -16,9 +16,13 @@ export default function ViewContent() {
   const accessToken = authState.accessToken;
 
   const [clinicianData, setClinicianData] = useState(null);
-  const [contentData, setContentData] = useState([]); // Store content data
+  const [contentData, setContentData] = useState([]); 
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filteredContent, setFilteredContent] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
 
@@ -68,6 +72,7 @@ export default function ViewContent() {
 
         const data = await response.json();
         setContentData(data); 
+        setFilteredContent(data);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -77,6 +82,20 @@ export default function ViewContent() {
 
     fetchContentData();
   }, [accessToken, appURL]);
+
+  //Search/Filter
+  useEffect(() => {
+    if (searchTerm === "") {
+      setFilteredContent(contentData); 
+    } else {
+      setFilteredContent(
+        contentData.filter((content) =>
+          content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          content.category.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+      );
+    }
+  }, [searchTerm, contentData]);
 
   const handleCardClick = (id) => {
     navigate(`/content/exercises/${id}`); 
@@ -117,6 +136,16 @@ export default function ViewContent() {
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Exercises</p>
                     <p className="mb-0">View exercises and follow along.</p>
+
+                    <input
+                      type="text"
+                      className="form-control mt-3"
+                      placeholder="Search by name or category"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+
+
                   </div>
                 </div>
 
@@ -125,7 +154,7 @@ export default function ViewContent() {
                     className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
                     style={{ minHeight: "85vh" }}
                   >
-                    {contentData.map((content) => (
+                    {filteredContent.map((content) => (
                       <div
                         key={content._id} 
                         className="card exercise-container"

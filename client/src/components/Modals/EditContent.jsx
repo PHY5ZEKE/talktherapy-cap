@@ -5,12 +5,14 @@ import "react-quill/dist/quill.snow.css";
 import "./modal.css";
 
 export default function EditContent({ closeModal, onSubmit, content }) {
+
   // Initialize form state with existing content data
   const [name, setName] = useState(content.name || "");
   const [description, setDescription] = useState(content.description || "");
   const [category, setCategory] = useState(content.category || "");
-  const [image, setImage] = useState(null); // Optional new image
-  const [videoUrl, setVideoUrl] = useState(content.videoUrl || ""); // Optional video URL
+  const [image, setImage] = useState(null); 
+  const [videoUrl, setVideoUrl] = useState(content.videoUrl || ""); 
+  const [error, setError] = useState(null);
 
   const handleChange = (value) => {
     setDescription(value);
@@ -25,35 +27,37 @@ export default function EditContent({ closeModal, onSubmit, content }) {
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
-    formData.append("videoUrl", videoUrl); // Add videoUrl if provided
-    if (image) formData.append("image", image); // Add new image if uploaded
+    formData.append("videoUrl", videoUrl); 
+    if (image) formData.append("image", image); 
 
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value);
-    }
-    console.log("Submitting form data:", { name, description, category, image, videoUrl });
+    //console logging
+    // for (let [key, value] of formData.entries()) {
+    //   console.log(`${key}:`, value);
+    // }
+    // console.log("Submitting form data:", { name, description, category, image, videoUrl });
+    
 
     try {
       await onSubmit(content._id, formData); // Pass formData to parent
       closeModal();
       toast.success("Content updated successfully!");
     } catch (error) {
-      console.error("Failed to update content:", error);
+      setError(error.message);
       toast.error("Failed to update content");
     }
   };
 
-  // Handle file selection for new image
+
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
 
-  // Handle video URL input
+
   const handleVideoUrlChange = (e) => {
     setVideoUrl(e.target.value);
   };
 
-  // Callback function to close modal
+
   const handleClose = (e) => {
     e.preventDefault();
     closeModal();
