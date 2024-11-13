@@ -325,6 +325,9 @@ export default function Room() {
       signal.type === "user-already-in-room"
     ) {
       handleCloseConnection();
+    } else if (signal.type === "stop-session") {
+      notify("Left the teleconference room.")
+      handleCloseConnection();
     }
   };
 
@@ -504,12 +507,6 @@ export default function Room() {
     }
   };
 
-  // Add SOAP Modal
-  const [soapModal, setSoapModal] = useState(false);
-  const handleSoapModal = () => {
-    setSoapModal((prevState) => !prevState);
-  };
-
   // Confirm Call
   const [confirmCall, setConfirmCall] = useState(true);
   const handleConfirmCall = () => {
@@ -521,28 +518,43 @@ export default function Room() {
     handleConfirmCall();
   };
 
+  const handleEndSession = async () => {
+    try {
+      const response = await fetch(
+        `${appURL}/${route.appointment.endSession}/${appointmentDetails._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to end session");
+      } else {
+        socket.current.send(
+          JSON.stringify({
+            type: "stop-session",
+            roomID: roomid,
+          })
+        );
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <>
       {/* STARTCALL.JSX MODAL */}
       {/* <StartCall/> */}
 
-      {/* Add SOAP Modal */}
-      {/* {soapModal && (
-        <Soap
-          openModal={handleSoapModal}
-          clinicianId={clinicianId}
-          clinicianName={clinicianName}
-          patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}
-          patientId={patientId}
-          onWebSocket={webSocketNotification}
-        />
-      )} */}
-
       {confirmCall && (
         <ConfirmVideoCall
           close={() => {
-            handleCloseConnection();
-            handleConfirmCall();
+            navigate("/")
           }}
           confirm={onConfirm}
         />
@@ -658,7 +670,12 @@ export default function Room() {
                           </a>
                         </li>
                         <li>
-                          <a role="button" className="dropdown-item" href="#">
+                          <a
+                            role="button"
+                            className="dropdown-item"
+                            href="#"
+                            onClick={handleEndSession}
+                          >
                             End Session
                           </a>
                         </li>
@@ -739,7 +756,6 @@ export default function Room() {
 
                 {/* CANVAS FOR SOAP */}
                 <SoapSidebar
-                  openModal={handleSoapModal}
                   clinicianId={clinicianId}
                   clinicianName={clinicianName}
                   patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}

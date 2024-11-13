@@ -730,3 +730,43 @@ exports.requestTemporaryReschedule = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.endSessionUpdateStatus = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    const appointment = await findAppointmentDetails(appointmentId);
+    if (!appointment) {
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    const clinician = await findClinicianDetails(appointment.selectedClinician);
+    if (!clinician) {
+      return res.status(404).json({ message: "Clinician not found" });
+    }
+
+    try {
+      appointment.status = "Completed";
+      await appointment.save();
+      try {
+        await createAuditLog(
+          "updateAppointmentStatus",
+          admin.email,
+          `Clinician ${clincian.firstName} ${clincian.lastName} has ended the session with ${decrypt(appointment.patientId.firstName)} ${decrypt(appointment.patientId.lastName)}`
+        );
+      } catch (auditLogError) {
+        console.error("Error creating audit log:", auditLogError);
+      }
+
+      res.status(200).json({
+        message: "Appointment status updated successfully.",
+        appointment,
+      });
+    } catch (error) {
+        return res.status(400).json({ message: error });
+    }
+  } catch (error) {
+    console.error("Error updating appointment status:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

@@ -195,16 +195,10 @@ export default function Archival() {
                   <div className="col bg-white border rounded-4 p-3">
                     <div className="d-flex flex-wrap gap-3 align-items-center justify-content-start">
                       <div>
-                        <p className="mb-0 fw-bold">System Activities</p>
-                        <p className="mb-0">Date Here</p>
+                        <p className="mb-0 fw-bold">Data Archival</p>
+                        <p className="mb-0">{new Date().toLocaleDateString()}</p>
                       </div>
 
-                      <input
-                        aria-label="Date"
-                        type="date"
-                        name="birthday"
-                        className="form-input rounded"
-                      />
                       <div className="d-flex gap-3">
                         <button
                           className="fw-bold text-button border"
@@ -246,7 +240,9 @@ export default function Archival() {
                       </thead>
                       <tbody>
                         {archivedUsers &&
-                          archivedUsers.map((user) => (
+                          archivedUsers
+                          .filter((user) => user.userRole !== "admin")
+                          .map((user) => (
                             <tr key={user._id}>
                               <th scope="row">
                                 {new Date(

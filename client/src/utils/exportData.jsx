@@ -17,8 +17,8 @@ export default function exportPatientData(patientData, soapRecords) {
 ========================
 PATIENT INFORMATION
 ========================
-Name:     ${patientData.firstName} ${patientData.middleName} ${patientData.lastName}
-Mobile:   ${patientData.mobile}
+Name:     ${patientData.firstName} ${patientData.middleName || ''} ${patientData.lastName}
+Mobile:   ${patientData.mobile || ''}
 Email:    ${patientData.email}
   `;
 
@@ -37,33 +37,32 @@ NO FOUND/EXISTING SOAP RECORDS
         record.date
       ).toLocaleDateString()})
     ========================
-    - Activity Plan    : ${record.activityPlan}
-    - Session Type     : ${record.sessionType}
-    - Session Recording: ${record.sessionRecording}
+    - Activity Plan    : ${record.activityPlan || ''}
+    - Session Type     : ${record.sessionType || ''}
+    - Session Recording: ${record.sessionRecording || ''}
     
     Subjective Notes:
     -----------------
-    ${convertHtmlToText(record.subjective)}
+    ${convertHtmlToText(record.subjective) || ''}
     Objective Notes:
     ----------------
-    ${convertHtmlToText(record.objective)}
+    ${convertHtmlToText(record.objective) || ''}
     Assessment Notes:
     -----------------
-    ${convertHtmlToText(record.assessment)}
+    ${convertHtmlToText(record.assessment) || ''}
     Recommendations:
     ----------------
-    ${convertHtmlToText(record.recommendation)}
+    ${convertHtmlToText(record.recommendation) || ''}
     ========================
     Clinician Information
     ========================
-    Clinician ID   : ${clinician._id}
-    Name           : ${clinician.firstName} ${clinician.middleName} ${
+    Name           : ${clinician.firstName} ${clinician.middleName || ''} ${
         clinician.lastName
       }
-    Email          : ${clinician.email}
-    Address        : ${clinician.address}
-    Mobile         : ${clinician.mobile}
-    Specialization : ${clinician.specialization}
+    Email          : ${clinician.email || ''}
+    Address        : ${clinician.address || ''}
+    Mobile         : ${clinician.mobile || ''}
+    Specialization : ${clinician.specialization || ''}
     `;
     });
   }

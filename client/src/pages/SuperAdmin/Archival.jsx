@@ -218,13 +218,6 @@ export default function Archival() {
                         </p>
                       </div>
 
-                      <input
-                        aria-label="Date"
-                        type="date"
-                        name="birthday"
-                        className="form-input rounded"
-                      />
-
                       <div className="d-flex gap-3">
                         <button
                           className="fw-bold text-button border"

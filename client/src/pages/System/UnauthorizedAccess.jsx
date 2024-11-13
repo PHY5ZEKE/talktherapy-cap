@@ -2,7 +2,6 @@ import { useNavigate } from "react-router-dom";
 
 export default function UnauthorizedAccess() {
   const navigate = useNavigate();
-  // TODO: Check user role and redirect back to their homepage
   const handleClose = () => {
     navigate("/");
   };

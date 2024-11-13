@@ -181,6 +181,9 @@ class WebSocketServer {
         case "ice-candidate":
           this.relaySignaling(ws, data);
           break;
+        case "stop-session":
+          this.stopSession(data.roomID);
+          break;
         default:
           console.error("Unknown message type:", data.type);
       }
@@ -321,14 +324,6 @@ class WebSocketServer {
   relaySignaling(ws, data) {
     const { roomID } = data;
     const room = this.rooms[roomID];
-
-    //     const broadcastData = JSON.stringify(
-    //   {
-    //     type: "join-room",
-    //     user
-    //   }
-    // )
-    // this.broadcastToRoom(roomID, broadcastData);
     if (!room) return;
 
     room.users.forEach((user) => {
@@ -339,6 +334,21 @@ class WebSocketServer {
         user.connection.send(JSON.stringify(data));
       }
     });
+  }
+
+  stopSession(roomID) {
+    const room = this.rooms[roomID];
+    if (!room) return;
+
+    room.users.forEach((user) => {
+      if (user.connection.readyState === WebSocket.OPEN) {
+        user.connection.send(JSON.stringify({ type: "stop-session" }));
+        user.connection.close();
+      }
+    });
+
+    delete this.rooms[roomID];
+    console.log(`Room ${roomID} and all its users have been removed.`);
   }
 
   handleClose(ws) {
