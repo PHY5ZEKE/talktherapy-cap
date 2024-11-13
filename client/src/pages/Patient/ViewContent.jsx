@@ -23,8 +23,18 @@ export default function ViewContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [staticContent, setStaticContent] = useState(null);
+  
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
+
+  // Static content data
+  const staticData = {
+    _id: "static1",
+    name: "Sample Exercise",
+    category: "Static Category",
+    image: "https://via.placeholder.com/150",
+  };
 
   // Fetch patient data
   useEffect(() => {
@@ -180,7 +190,7 @@ export default function ViewContent() {
                       <input
                         type="text"
                         className="form-control"
-                        placeholder="Search by name or category"
+                        placeholder="Search"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                       />

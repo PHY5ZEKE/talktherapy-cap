@@ -15,8 +15,10 @@ import {
   faMicrophoneSlash,
 } from "@fortawesome/free-solid-svg-icons";
 
-import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
-import { init } from "../../machinelearning/script.js";
+//import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
+import { startVoiceRecognitionHandler } from "../../machinelearning/DiagToolRoom.js";
+import { init } from "../../machinelearning/speech.js";
+
 import { route } from "../../utils/route";
 
 import ConfirmVideoCall from "../../components/Modals/ConfirmVideoCall.jsx";
@@ -90,6 +92,8 @@ export default function Room() {
   const userRole = authState.userRole;
   const currentUser = authState.userId;
 
+  const [recognitionResults, setRecognitionResults] = useState("");
+
   const appURL = import.meta.env.VITE_APP_URL;
   const accessToken = authState.accessToken;
 
@@ -112,11 +116,7 @@ export default function Room() {
 
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const [isMicEnabled, setIsMicEnabled] = useState(true);
-  const [speechScore, setSpeechScore] = useState({
-    pronunciationScore: 0,
-    fluencyScore: 0,
-  });
-
+  
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
   const peerConnection = useRef(null);
@@ -149,6 +149,7 @@ export default function Room() {
     };
     initializeModel();
   }, []);
+  
 
   useEffect(() => {
     if (
@@ -262,7 +263,18 @@ export default function Room() {
     processQueues();
   };
 
+  const displayRecognitionResults = (outputText) => {
+    const outputDiv = document.getElementById("output");
+    const commentDiv = document.getElementById("comment");
+    setRecognitionResults(outputText);
+
+    outputDiv.innerHTML = outputText;
+    commentDiv.innerHTML = "Results received from the patient.";
+    
+  };
+
   const gotMessageFromServer = (message) => {
+    console.log("Message received from server:", message.data);
     const signal = JSON.parse(message.data);
 
     if (signal.sdp) {
@@ -320,7 +332,12 @@ export default function Room() {
         }
         return prevMessages;
       });
-    } else if (
+    } else if (signal.type === "voice-recognition-result") {
+      const outputText = signal.outputText;
+      console.log("Received voice recognition from patient:", outputText);
+      displayRecognitionResults(outputText);
+  }
+    else if (
       signal.type === "leave-room" ||
       signal.type === "user-already-in-room"
     ) {
@@ -463,9 +480,12 @@ export default function Room() {
       : appointmentDetails?.selectedSchedule.clinicianName;
   };
 
-  const startVoiceRecognitionHandler = () => {
-    runSpeechRecognition(setSpeechScore);
-  };
+  useEffect(() => {
+    const initializeModel = async () => {
+      await init();
+    };
+    initializeModel();
+  }, []);
 
   const webSocketNotification = async (message) => {
     const response = JSON.stringify(message);
@@ -550,7 +570,7 @@ export default function Room() {
     <>
       {/* STARTCALL.JSX MODAL */}
       {/* <StartCall/> */}
-
+  
       {confirmCall && (
         <ConfirmVideoCall
           close={() => {
@@ -569,7 +589,7 @@ export default function Room() {
             {appointmentDetails?.patientId?.lastName || ""}
           </p>
         </div>
-
+  
         <div className="row justify-content-center-md mx-auto w-100 vh-100">
           <div className="col-sm">
             <video
@@ -579,7 +599,7 @@ export default function Room() {
               autoPlay
             />
           </div>
-
+  
           <div className="col-sm">
             <video
               className="bg-black video-remote mx-auto"
@@ -589,7 +609,7 @@ export default function Room() {
             />
           </div>
         </div>
-
+  
         <div className="row bg-white border border-start-0 border-[#B9B9B9] sticky-bottom">
           <div className="d-flex align-items-center justify-content-center p-3">
             <button
@@ -601,7 +621,7 @@ export default function Room() {
             >
               <p className="fw-bold my-0 status">Disconnect</p>
             </button>
-
+  
             {/* CAMERA AND MUTE */}
             <div className="d-flex align-items-center gap-2 mx-1">
               <div onClick={toggleCamera} style={{ cursor: "pointer" }}>
@@ -611,7 +631,7 @@ export default function Room() {
                   <FontAwesomeIcon size="lg" icon={faVideoSlash} />
                 )}
               </div>
-
+  
               <div onClick={toggleMic} style={{ cursor: "pointer" }}>
                 {isMicEnabled ? (
                   <FontAwesomeIcon size="lg" icon={faMicrophone} />
@@ -620,7 +640,7 @@ export default function Room() {
                 )}
               </div>
             </div>
-
+  
             {userRole === "clinician" || userRole === "patientslp" ? (
               <>
                 {/* ACTION BUTTONS */}
@@ -634,19 +654,22 @@ export default function Room() {
                     <p className="fw-bold my-0 status">Actions</p>
                   </button>
                   <ul className="dropdown-menu">
+                    {/* Message Button (Available for both clinician and patientslp) */}
+                    <li>
+                      <a
+                        role="button"
+                        className="dropdown-item"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#offcanvasWithBothOptions"
+                        aria-controls="offcanvasWithBothOptions"
+                      >
+                        Message
+                      </a>
+                    </li>
+  
+                    {/* Add Diagnostic and Diagnostic Tool (Available only for clinicians) */}
                     {userRole === "clinician" ? (
                       <>
-                        <li>
-                          <a
-                            role="button"
-                            className="dropdown-item"
-                            data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvasWithBothOptions"
-                            aria-controls="offcanvasWithBothOptions"
-                          >
-                            Message
-                          </a>
-                        </li>
                         <li>
                           <a
                             role="button"
@@ -682,22 +705,23 @@ export default function Room() {
                       </>
                     ) : (
                       <>
+                        {/* Diagnostic Tool Button for patientslp */}
                         <li>
                           <a
                             role="button"
                             className="dropdown-item"
                             data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvasWithBothOptions"
-                            aria-controls="offcanvasWithBothOptions"
+                            data-bs-target="#offcanvasDiagnosticTool"
+                            aria-controls="offcanvasDiagnosticTool"
                           >
-                            Message
+                            Diagnostic Tool
                           </a>
                         </li>
                       </>
                     )}
                   </ul>
                 </div>
-
+  
                 {/* CANVAS FOR MESSAGES */}
                 <div
                   className="offcanvas offcanvas-start"
@@ -731,7 +755,7 @@ export default function Room() {
                       ))}
                     </div>
                   </div>
-
+  
                   {/* INPUT CHAT */}
                   <form
                     className="input-group my-3 p-3"
@@ -753,7 +777,7 @@ export default function Room() {
                     </button>
                   </form>
                 </div>
-
+  
                 {/* CANVAS FOR SOAP */}
                 <SoapSidebar
                   clinicianId={clinicianId}
@@ -762,7 +786,7 @@ export default function Room() {
                   patientId={patientId}
                   onWebSocket={webSocketNotification}
                 />
-
+  
                 {/* CANVAS FOR DIAGNOSTIC TOOL */}
                 <div
                   className="offcanvas offcanvas-end"
@@ -775,7 +799,7 @@ export default function Room() {
                       className="offcanvas-title"
                       id="offcanvasDiagnosticToolLabel"
                     >
-                      Assistive Diagnostic Tool
+                      Assistive Diagnostic Tool Experimental
                     </h5>
                     <button
                       type="button"
@@ -787,41 +811,48 @@ export default function Room() {
                   <div className="offcanvas-body">
                     {/* Diagnostic Tool Content */}
                     <div className="button-container">
-                      <button
-                        className="text-button border"
-                        onClick={startVoiceRecognitionHandler}
-                      >
-                        Start Voice Recognition
-                      </button>
+                    {userRole === "patientslp" && (
+                        <button
+                          className="text-button border"
+                          onClick={() => startVoiceRecognitionHandler(userRole, socket.current)}
+                        >
+                          Start Voice Recognition
+                        </button>
+                      )}
                     </div>
-
+  
                     <div className="chart-container">
-                      <div id="chartContainer">
+                    <div
+                        id="chartContainer"
+                        className={userRole === "patientslp" ? "visually-hidden" : ""}
+                    >
                         <canvas id="outputChart"></canvas>
                       </div>
                     </div>
 
+                    <div>
+                      <div className={userRole === "patientslp" ? "visually-hidden" : ""}>
+                        If you are seeing this, the Diagnostic Tool is not working for now, try it on Exercise!
+                      </div>
+                    </div>
+  
                     <div className="controls-container">
                       <div className="cardbox">
-                        <div id="output"></div>
-                        <span id="action"></span>
+                      <div id="output" dangerouslySetInnerHTML={{ __html: recognitionResults }}></div>
+                        <span id="action" className={userRole === "patientslp" ? "visually-hidden" : ""}></span>
                       </div>
                     </div>
-
+  
                     <div id="phoneme-container">
-                      <div id="phoneme-output"></div>
+                      <div id="comment" className="text-muted"></div>
                     </div>
 
-                    <div id="score-container">
-                      <h6>Speech Assessment Scores:</h6>
-                      <div id="score-output">
-                        Pronunciation:{" "}
-                        {speechScore.pronunciationScore.toFixed(2)}%, Fluency:{" "}
-                        {speechScore.fluencyScore.toFixed(2)}%
-                      </div>
+  
+                    <div id="score-container" className={userRole === "patientslp" ? "visually-hidden" : ""}>
+                      <div id="score-output"></div>
                     </div>
-
-                    <div id="label-container"></div>
+  
+                    <div id="label-container" className="visually-hidden"></div>
                   </div>
                 </div>
               </>

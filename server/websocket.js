@@ -184,6 +184,9 @@ class WebSocketServer {
         case "stop-session":
           this.stopSession(data.roomID);
           break;
+        case "voice-recognition-result": 
+          this.broadcastToRoom(data.roomID, message, ws); 
+          break;
         default:
           console.error("Unknown message type:", data.type);
       }

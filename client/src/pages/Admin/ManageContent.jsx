@@ -249,7 +249,7 @@ const handleEditContent = async (id, formData) => {
                     <input
                       type="text"
                       className="form-control mt-3"
-                      placeholder="Search by name or category"
+                      placeholder="Search"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                     />
