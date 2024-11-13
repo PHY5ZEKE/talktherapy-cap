@@ -192,11 +192,17 @@ export default function Home() {
                         style={{ maxHeight: "75vh" }}
                       >
                         <div className="mb-3 border border-top-0 border-start-0 border-end-0">
-                          <h5 className="mb-0 fw-bold">
-                            {appointment.status === "Temporarily Rescheduled"
-                              ? appointment.temporaryReschedule.day
-                              : appointment.selectedSchedule.day}
-                          </h5>
+                          <div className="d-flex align-items-center gap-3">
+                            <h5 className="mb-0 fw-bold">
+                              {appointment.status === "Temporarily Rescheduled"
+                                ? appointment.temporaryReschedule.day
+                                : appointment.selectedSchedule.day}
+                            </h5>
+                            <div className="text-accepted">
+                              {appointment.status.toUpperCase()}
+                            </div>
+                          </div>
+
                           <p className="mb-0 fw-bold">
                             {appointment.status === "Temporarily Rescheduled"
                               ? appointment.temporaryReschedule.startTime
@@ -215,14 +221,10 @@ export default function Home() {
                           </p>
 
                           {appointment.status === "Accepted" ? (
-                            <div className="d-flex justify-content-between flex-wrap gap-3">
-                              <div className="mb-3 text-accepted">
-                                {appointment.status}
-                              </div>
-
+                            <div className="d-flex justify-content-between flex gap-3">
                               <div className="d-flex gap-3">
                                 <div
-                                  className="mb-3 fw-bold text-button border"
+                                  className="fw-bold text-button border"
                                   onClick={() =>
                                     joinMeeting(appointment.roomId, appointment)
                                   }

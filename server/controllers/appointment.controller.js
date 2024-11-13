@@ -573,7 +573,7 @@ exports.updateAppointmentStatus = async (req, res) => {
           await handleTemporaryRescheduleRequest(appointment, status);
           break;
         case "Temporarily Rescheduled":
-          if (status === "Revert") {
+          if (status === "Reverted") {
             await handleTemporarilyRescheduled(appointment);
           }
           break;

@@ -710,20 +710,16 @@ export default function BookSchedule() {
                           )}
                           {/* IF SCHEDULE CHANGE REQUEST */}
                           {appointment.status === "Schedule Change Request" && (
-                            <div className="row mt-2 gap-3">
-                              <div className="mb-3 text-pending">
+                              <div className="my-3 text-pending">
                                 FOR APPROVAL
                               </div>
-                            </div>
                           )}
                           {/* IF TEMPORARY RESCHEDULE REQUEST */}
                           {appointment.status ===
                             "Temporary Reschedule Request" && (
-                            <div className="row mt-2 gap-3">
-                              <div className="mb-3 text-pending">
+                              <div className="my-3 text-pending">
                                 FOR APPROVAL
                               </div>
-                            </div>
                           )}
                           {/* IF TEMPORARILY RESCHEDULED */}
                           {appointment.status === "Temporarily Rescheduled" && (
@@ -740,11 +736,9 @@ export default function BookSchedule() {
                           )}
                           {/* IF REJECTED */}
                           {appointment.status === "Rejected" && (
-                            <div className="row mt-2 gap-3">
-                              <div className="mb-3 text-cancelled">
+                              <div className="my-3 text-cancelled">
                                 Rejected
                               </div>
-                            </div>
                           )}
                         </div>
                       ))

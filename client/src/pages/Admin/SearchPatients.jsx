@@ -14,7 +14,6 @@ import MenuDropdown from "../../components/Layout/AdminMenu";
 import ViewProgress from "../../components/Modals/ViewProgress";
 import ViewRecord from "../../components/Modals/ViewRecord";
 
-
 const VIEW_MODES = {
   NONE: "NONE",
   RECORDS: "RECORDS",
@@ -203,6 +202,7 @@ export default function ManageSchedule() {
   const handleViewRecords = () => {
     if (selectedPatient) {
       fetchSoapRecords(selectedPatient._id);
+      console.log(soapRecords);
       setViewMode(VIEW_MODES.RECORDS);
     }
   };
@@ -364,18 +364,24 @@ export default function ManageSchedule() {
                     {viewMode === VIEW_MODES.RECORDS ? (
                       <div>
                         <h5 className="fw-bold text-center">SOAP Records</h5>
-                        {soapRecords.map((record) => (
-                          <ViewRecord
-                            key={record._id}
-                            header={`${new Date(
-                              record.date
-                            ).toLocaleDateString()} - Dr. ${
-                              record.clinician.firstName
-                            } ${record.clinician.lastName}`}
-                            details={record.diagnosis}
-                            role={userRole}
-                          />
-                        ))}
+                        {soapRecords.length > 0 ? (
+                          soapRecords.map((record) => (
+                            <ViewRecord
+                              key={record._id}
+                              header={`${new Date(
+                                record.date
+                              ).toLocaleDateString()} - Dr. ${
+                                record.clinician.firstName
+                              } ${record.clinician.lastName}`}
+                              details={record}
+                              role={userRole}
+                            />
+                          ))
+                        ) : (
+                          <h5 className="mb-0 fw-bold text-center">
+                            No SOAP records available.
+                          </h5>
+                        )}
                       </div>
                     ) : viewMode === VIEW_MODES.PROGRESS ? (
                       <>

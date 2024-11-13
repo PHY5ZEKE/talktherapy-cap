@@ -1,5 +1,5 @@
 import { useState, useContext } from "react";
-import { toast } from "react-toastify";
+import { toast, Slide } from "react-toastify";
 import { route } from "../../utils/route";
 import { AuthContext } from "../../utils/AuthContext";
 

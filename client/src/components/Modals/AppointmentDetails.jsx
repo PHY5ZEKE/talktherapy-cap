@@ -40,9 +40,7 @@ export default function AppointmentDetails({
     openModal();
   };
 
-  console.log(appointment);
-
-  const updateStatus = async (newStatus) => {
+  const updateStatus = async (newStatus, oldStatus) => {
     setLoading(true);
     try {
       const response = await axios.put(
@@ -54,17 +52,67 @@ export default function AppointmentDetails({
           },
         }
       );
-      const userUpdate = {
-        notif: "appointmentRequestStatus",
-        body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s appointment with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus}`,
-        show_to: [
-          appointment.patientId?._id,
-          appointment.selectedClinician
-        ],
-      };
+
+      let userUpdate = {};
+      switch (oldStatus) {
+        case "Pending":
+          userUpdate = {
+            notif: "appointmentRequestStatus",
+            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s pending appointment with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            show_to: [
+              appointment.patientId?._id,
+              appointment.selectedClinician,
+            ],
+          };
+          break;
+        case "Schedule Change Request":
+          userUpdate = {
+            notif: "appointmentRequestStatus",
+            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s request for permanent schedule change with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            show_to: [
+              appointment.patientId?._id,
+              appointment.selectedClinician,
+            ],
+          };
+          break;
+        case "Temporary Reschedule Request":
+          userUpdate = {
+            notif: "appointmentRequestStatus",
+            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s request for temporary schedule change with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            show_to: [
+              appointment.patientId?._id,
+              appointment.selectedClinician,
+            ],
+          };
+          break;
+        case "Temporarily Rescheduled":
+          userUpdate = {
+            notif: "appointmentRequestStatus",
+            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s temporary schedule with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            show_to: [
+              appointment.patientId?._id,
+              appointment.selectedClinician,
+            ],
+          };
+          break;
+        case "Accepted":
+          userUpdate = {
+            notif: "appointmentRequestStatus",
+            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s appointment schedule with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            show_to: [
+              appointment.patientId?._id,
+              appointment.selectedClinician,
+            ],
+          };
+          break;
+        default:
+          break;
+      }
+
       emailRequestStatus(appointment.patientId?.email, newStatus, appointment);
       onWebSocket(userUpdate);
       notify(toastMessage.success.statusBook);
+      openModal();
     } catch (error) {
       failNotify(toastMessage.fail.status);
     } finally {
@@ -84,14 +132,14 @@ export default function AppointmentDetails({
         return (
           <>
             <button
-              onClick={() => updateStatus("Accepted")}
+              onClick={() => updateStatus("Accepted", appointment.status)}
               className="text-button border"
               disabled={loading}
             >
               <p className="fw-bold my-0 status">Accept</p>
             </button>
             <button
-              onClick={() => updateStatus("Rejected")}
+              onClick={() => updateStatus("Rejected", appointment.status)}
               className="text-button border"
               disabled={loading}
             >
@@ -103,7 +151,7 @@ export default function AppointmentDetails({
         return (
           <>
             <button
-              onClick={() => updateStatus("Revert")}
+              onClick={() => updateStatus("Reverted", appointment.status)}
               className="text-button border"
               disabled={loading}
             >
@@ -115,7 +163,7 @@ export default function AppointmentDetails({
         return (
           <>
             <button
-              onClick={() => updateStatus("Completed")}
+              onClick={() => updateStatus("Completed", appointment.status)}
               className="text-button border"
               disabled={loading}
             >

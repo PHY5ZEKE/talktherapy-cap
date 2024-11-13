@@ -16,13 +16,12 @@ export default function ViewContent() {
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
-  const [contentData, setContentData] = useState([]); 
+  const [contentData, setContentData] = useState([]);
 
   const [filteredContent, setFilteredContent] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
@@ -72,7 +71,7 @@ export default function ViewContent() {
         }
 
         const data = await response.json();
-        setContentData(data); 
+        setContentData(data);
         setFilteredContent(data);
         setLoading(false);
       } catch (error) {
@@ -87,19 +86,20 @@ export default function ViewContent() {
   //Search/Filter
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredContent(contentData); 
+      setFilteredContent(contentData);
     } else {
       setFilteredContent(
-        contentData.filter((content) =>
-          content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          content.category.toLowerCase().includes(searchTerm.toLowerCase())
+        contentData.filter(
+          (content) =>
+            content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            content.category.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
   }, [searchTerm, contentData]);
 
   const handleCardClick = (id) => {
-    navigate(`/content/exercises/${id}`); 
+    navigate(`/content/exercises/${id}`);
   };
 
   return (
@@ -134,18 +134,21 @@ export default function ViewContent() {
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Exercises</p>
-                    <p className="mb-0">View exercises and follow along.</p>
+                  <div className="d-flex gap-3 align-items-center col bg-white border rounded-4 p-3">
+                    <div>
+                      <p className="mb-0 fw-bold">Exercises</p>
+                      <p className="mb-0">View exercises and follow along.</p>
+                    </div>
 
-                    <input
-                      type="text"
-                      className="form-control mt-3"
-                      placeholder="Search by name or category"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-
+                    <div>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search by name or category"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -156,22 +159,22 @@ export default function ViewContent() {
                   >
                     {filteredContent.map((content) => (
                       <div
-                        key={content._id} 
+                        key={content._id}
                         className="card exercise-container border"
                         style={{ width: "18rem" }}
-                        onClick={() => handleCardClick(content._id)} 
+                        onClick={() => handleCardClick(content._id)}
                       >
                         <img
-                          src={content.image} 
+                          src={content.image}
                           className="card-img-top"
                           alt={content.name}
                           style={{ height: "16rem", objectFit: "cover" }}
                         />
                         <div className="card-body">
                           <h5 className="card-title fw-bold mb-0 text-truncate">
-                            {content.name} 
+                            {content.name}
                           </h5>
-                          <p>{content.category}</p> 
+                          <p>{content.category}</p>
                           <FontAwesomeIcon icon={faBookmark} />
                         </div>
                       </div>

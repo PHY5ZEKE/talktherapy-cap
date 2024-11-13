@@ -188,7 +188,7 @@ export default function Home() {
       notification = {
         body: `${adminData?.firstName} ${adminData.lastName} edited ${parsed.user}'s profile information`,
         date: new Date(),
-        show_to: role !== "admin" ? "superadmin" : "admin",
+        show_to: parsed.id,
       };
     }
 

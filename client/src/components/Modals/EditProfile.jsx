@@ -241,9 +241,9 @@ export default function EditProfile({
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button className="text-button fw-bold" onClick={handleCloseModal}>
+        <button className="text-button fw-bold" onClick={handleCloseModal}>
           Close
-        </Button>
+        </button>
       </Modal.Footer>
     </Modal>
   );

@@ -70,7 +70,7 @@ export default function TemporaryReschedule({
 
       const userUpdate = {
         notif: "appointmentResched",
-        body: `${patientName} is request a permanent change in schedule with Dr. ${appointment?.selectedSchedule?.clinicianName} to be set at ${selectedSchedule.day} ${selectedSchedule.startTime} ${selectedSchedule.endTime}.`,
+        body: `${patientName} is requesting a temporary change in schedule with Dr. ${appointment?.selectedSchedule?.clinicianName} to be set at ${selectedSchedule.day} ${selectedSchedule.startTime} ${selectedSchedule.endTime}.`,
         show_to: ["admin"],
         reason: `${reason}`,
       };
@@ -112,11 +112,12 @@ export default function TemporaryReschedule({
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
             <h3 className="fw-bold">
-              Choose an available schedule for your next session. This is only
-              temporary and will revert to your original schedule
+              Choose an available schedule for your next session.
             </h3>
-            <p className="mb-0">The following are available schedules.</p>
-            <p>This will notify the admin</p>
+            <p>
+              This is only temporary and will revert to your original schedule.
+              The following are available schedules. This will notify the admin.
+            </p>
           </div>
 
           <div className="container text-center scrollable-table">
@@ -148,12 +149,12 @@ export default function TemporaryReschedule({
                           </td>
                           <td>
                             <button
-                              className="text-button-table border"
+                              className="text-button fw-bold border"
                               onClick={() => {
                                 setSelectedSchedule(schedule);
                               }} // Set selected schedule
                             >
-                              <p className="fw-bold my-0 status">Select</p>
+                              Select
                             </button>
                           </td>
                         </tr>

@@ -83,6 +83,23 @@ export default function FeedbackDiagnosis() {
     setSelectedDiagnosis(diagnosis);
   };
 
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredDiagnosis = diagnosisData.filter(
+    (diagnosis) =>
+      diagnosis.clinician.firstName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      diagnosis.clinician.lastName
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      diagnosis.clinician.email
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      diagnosis.date.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      diagnosis.recommendation.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
       <div className="container-fluid p-0 vh-100">
@@ -120,19 +137,25 @@ export default function FeedbackDiagnosis() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    {diagnosisData.map((diagnosis) => (
-                      <div
-                        key={diagnosis._id}
-                        className="mb-3 border border-top-0 border-start-0 border-end-0 hover-div"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => handleDateClick(diagnosis)}
-                      >
-                        <h5 className="mb-0 fw-bold">
-                          Diagnosis on{" "}
-                          {new Date(diagnosis.date).toLocaleDateString()}
-                        </h5>
-                      </div>
-                    ))}
+                    {filteredDiagnosis && filteredDiagnosis.length > 0 ? (
+                      filteredDiagnosis.map((diagnosis) => (
+                        <div
+                          key={diagnosis._id}
+                          className="mb-3 border border-top-0 border-start-0 border-end-0 hover-div"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => handleDateClick(diagnosis)}
+                        >
+                          <h5 className="mb-0 fw-bold">
+                            Diagnosis on{" "}
+                            {new Date(diagnosis.date).toLocaleDateString()}
+                          </h5>
+                        </div>
+                      ))
+                    ) : (
+                      <h5 className="mb-0 fw-bold text-center">
+                        No record found.
+                      </h5>
+                    )}
                   </div>
                 </div>
               </div>
@@ -144,6 +167,8 @@ export default function FeedbackDiagnosis() {
                       type="text "
                       placeholder="Search for your records"
                       className="search-input rounded-3 w-100"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                     />
                   </div>
                 </div>

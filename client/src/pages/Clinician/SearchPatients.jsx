@@ -81,7 +81,6 @@ export default function ManageSchedule() {
   const socket = useRef(null);
   useEffect(() => {
     // Fetch Patients
-    // Fetch Patients
     const fetchPatients = async () => {
       try {
         const response = await fetch(
