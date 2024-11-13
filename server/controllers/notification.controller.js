@@ -38,7 +38,7 @@ const createNotification = [
 // Get all notifications
 const getNotifications = async (req, res) => {
   try {
-    const notifications = await Notification.find();
+    const notifications = await Notification.find().sort({ date: -1 });
     const decryptedNotifications = notifications.map(notification => ({
       ...notification._doc,
       show_to: notification.show_to.map(user => decrypt(user)),

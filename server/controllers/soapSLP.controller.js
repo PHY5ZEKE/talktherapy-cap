@@ -69,7 +69,6 @@ exports.getSOAPDiagnosesByPatient = async (req, res) => {
         };
       })
     );
-    console.log(diagnosesWithClinicianDetails);
     res.status(200).json(diagnosesWithClinicianDetails);
   } catch (error) {
     console.error("Error fetching SOAP diagnoses:", error);

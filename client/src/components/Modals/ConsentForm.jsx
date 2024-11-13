@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import "./modal.css";
 import { Tooltip } from 'react-tooltip'
@@ -9,14 +9,25 @@ export default function ConsentForm({ handleModal }) {
 
   const handleScroll = () => {
     const { scrollTop, scrollHeight, clientHeight } = contentRef.current;
-    if (scrollTop + clientHeight >= scrollHeight) {
+    if (scrollTop + clientHeight >= scrollHeight - 1) {
       setIsScrolledToEnd(true);
+    } else {
+      setIsScrolledToEnd(false);
     }
   };
+
+  useEffect(() => {
+    const contentElement = contentRef.current;
+    contentElement.addEventListener('scroll', handleScroll);
+    return () => {
+      contentElement.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   const triggerModal = () => {
     handleModal();
   };
+
   return (
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-content-center">
@@ -24,7 +35,6 @@ export default function ConsentForm({ handleModal }) {
           ref={contentRef}
           className="col bg-white border rounded-4 p-3 overflow-auto"
           style={{ maxHeight: "75vh" }}
-          onScroll={handleScroll}
         >
           <h2>Evaluation & Therapy Sessions</h2>
           <h5>1. Patient Contact</h5>

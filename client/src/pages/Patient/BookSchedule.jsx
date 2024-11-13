@@ -510,6 +510,7 @@ export default function BookSchedule() {
                         onChange={handleDateChange}
                         inline
                         dayClassName={getDayClassName}
+                        minDate={new Date()}
                       />
                     </div>
                   </div>
