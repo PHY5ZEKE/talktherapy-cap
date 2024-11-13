@@ -268,7 +268,9 @@ export default function ClinicianRegister() {
                   value={formData.specialization}
                   onChange={handleChange}
                 >
-                  <option value="">Select Specialization</option>
+                  <option value="" disabled>
+                    Select Specialization
+                  </option>
                   <option value="Autism Spectrum Disorder">
                     Autism Spectrum Disorder
                   </option>

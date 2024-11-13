@@ -127,9 +127,7 @@ export default function ClinicianRegister() {
   return (
     <>
       {isViewConsentForm && (
-        <ConsentForm
-          handleModal={handleCViewConsentForm}
-        />
+        <ConsentForm handleModal={handleCViewConsentForm} />
       )}
       <div className="container-fluid d-flex flex-column justify-content-between vh-100 backgroundImg">
         <div className="row bg-white">
@@ -248,7 +246,7 @@ export default function ClinicianRegister() {
                     value={formData.diagnosis}
                     onChange={handleChange}
                   >
-                    <option value="Aphasia" selected disabled>
+                    <option value="" disabled>
                       Select Your Diagnosis
                     </option>
                     <option value="Autism Spectrum Disorder">
@@ -345,7 +343,12 @@ export default function ClinicianRegister() {
                 <div className="col-sm d-flex flex-column mb-3">
                   <p className="fw-bold mb-0">
                     Consent{" "}
-                    <span className="view-consent" onClick={handleCViewConsentForm}>View Consent Form</span>
+                    <span
+                      className="view-consent"
+                      onClick={handleCViewConsentForm}
+                    >
+                      View Consent Form
+                    </span>
                   </p>
                   <div className="d-flex">
                     <input
