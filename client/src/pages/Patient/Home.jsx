@@ -19,10 +19,10 @@ export default function Home() {
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
+  const [contentData, setContentData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [appointments, setAppointments] = useState([]);
-  const [bookmarkedContent, setBookmarkedContent] = useState([]);
 
   const navigate = useNavigate();
 
@@ -32,7 +32,8 @@ export default function Home() {
 
   useEffect(() => {
     fetchPatientData();
-    fetchBookmarkedContent();
+    fetchContentData();
+    
 
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
@@ -111,32 +112,31 @@ export default function Home() {
     }
   };
 
-  // Fetch Bookmarked Content (References from patient.bookmarkedContent)
-  const fetchBookmarkedContent = async () => {
+   // Fetch content data
+   const fetchContentData = async () => {
     try {
-      if (patientData && patientData.bookmarkedContent.length > 0) {
-        const bookmarkedContentRes = await fetch(`${appURL}/${route.content.getByIds}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            ids: patientData.bookmarkedContent,
-          }),
-        });
+      const response = await fetch(`${appURL}/api/contents`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
 
-        if (!bookmarkedContentRes.ok) {
-          throw new Error("Failed to fetch bookmarked content");
-        }
-
-        const contentData = await bookmarkedContentRes.json();
-        setBookmarkedContent(contentData.content); // Assuming the response contains the bookmarked content
+      if (!response.ok) {
+        throw new Error("Failed to fetch content data");
       }
+
+      const data = await response.json();
+      setContentData(data);
+      setLoading(false);
     } catch (error) {
-      console.error("Error fetching bookmarked content", error);
+      setError(error.message);
+      setLoading(false);
     }
   };
+  
+
 
   // Filter accepted appointments
   const acceptedAppointments = appointments.filter(
@@ -164,6 +164,11 @@ export default function Home() {
     };
     return date.toLocaleDateString(undefined, options);
   };
+
+  // Filter bookmarked content
+  const bookmarkedExercises = contentData.filter((content) =>
+    patientData?.bookmarkedContent.includes(content._id)
+  );
 
   return (
     <>
@@ -310,27 +315,25 @@ export default function Home() {
                 </div>
 
                 <div className="row p-3">
-                  <div
-                      className="col bg-white border rounded-4 p-3 overflow-auto"
-                      style={{ maxHeight: "75vh", minHeight: "60vh" }}
-                    >
-                      {bookmarkedContent && bookmarkedContent.length > 0 ? (
-                        bookmarkedContent.map((content) => (
-                          <div
-                            key={content._id}
-                            className="mb-3 border border-top-0 border-start-0 border-end-0"
-                          >
-                            <h5 className="mb-0 fw-bold">{content.name}</h5>
-                            <p>{content.category}</p>
-                          </div>
-                        ))
-                      ) : (
-                        <p className="fw-bold text-center mb-0">
-                          No bookmarked exercises available.
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                  {bookmarkedExercises.length > 0 ? (
+                    bookmarkedExercises.map((content) => (
+                      <div
+                        key={content._id}
+                        className="col bg-white border rounded-4 p-3 overflow-auto"
+                        style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                      >
+                        <div className="mb-3 border border-top-0 border-start-0 border-end-0">
+                          <h5 className="mb-0 fw-bold">{content.name}</h5>
+                          <p>{content.category}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="fw-bold text-center mb-0">
+                      No bookmarked exercises available.
+                    </p>
+                  )}
+                </div>
               </div>
 
               {/* THIRD COL */}

@@ -24,9 +24,9 @@ const patientSlpSchema = new Schema({
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
   bookmarkedContent: {
-    type: [mongoose.Schema.Types.ObjectId], // or Array, based on your use case
-    ref: 'Content', // if you're referencing a separate Content model
-    default: [] // Default to an empty array if the field is not found
+    type: [mongoose.Schema.Types.ObjectId], 
+    ref: 'Content', 
+    default: [] 
   },
 });
 

@@ -71,7 +71,8 @@ const deactivatePatient = async (req, res) => {
 
 const updateBookmarks = async (req, res) => {
   try {
-    const { _id: patientId } = req.user; // Extract patient ID from token (or request)
+    console.log('req.user:', req.user);
+    const { id: patientId } = req.user; // Extract patient ID from token (or request)
     const { bookmarks } = req.body; // Assuming bookmarks are sent as an array of Content ObjectIds
 
     console.log('Received patientId:', patientId);

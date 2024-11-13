@@ -100,17 +100,13 @@ export default function ViewContent() {
 
   const handleBookmarkClick = async (content) => {
     try {
-      // Create a new array containing only the content IDs (ObjectIds)
       const updatedBookmarks = patientData.bookmarkedContent.map((bookmarkId) => {
-        // Ensure we only return the ObjectId (not the full content object)
-        return bookmarkId;  // This is already the ObjectId
+        return bookmarkId;  
       });
   
-      // If the content is already bookmarked, remove it
       if (updatedBookmarks.includes(content._id)) {
         updatedBookmarks.splice(updatedBookmarks.indexOf(content._id), 1);
       } else {
-        // Otherwise, add the new content's ObjectId to the list of bookmarks
         updatedBookmarks.push(content._id);
       }
   
@@ -123,7 +119,7 @@ export default function ViewContent() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ bookmarks: updatedBookmarks }),  // Send only the ObjectIds
+        body: JSON.stringify({ bookmarks: updatedBookmarks }),  
       });
   
       if (!response.ok) {
