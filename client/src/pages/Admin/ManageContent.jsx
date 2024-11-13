@@ -236,7 +236,7 @@ const handleEditContent = async (id, formData) => {
                     {contentData.map((content) => (
                       <div
                         key={content._id}
-                        className="card exercise-container"
+                        className="card exercise-container border"
                         style={{ width: "18rem" }}
                         onClick={() => handleCardClick(content._id)} 
                       >

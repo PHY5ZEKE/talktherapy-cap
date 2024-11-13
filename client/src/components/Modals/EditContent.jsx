@@ -157,10 +157,10 @@ export default function EditContent({ closeModal, onSubmit, content }) {
         </div>
 
         <div className="d-flex justify-content-center mt-3 gap-3">
-          <button onClick={handleSubmit} className="btn btn-primary">
+          <button onClick={handleSubmit} className="text-button border">
             <p className="fw-bold my-0">UPDATE</p>
           </button>
-          <button onClick={handleClose} className="btn btn-secondary">
+          <button onClick={handleClose} className="text-button border">
             <p className="fw-bold my-0">CANCEL</p>
           </button>
         </div>

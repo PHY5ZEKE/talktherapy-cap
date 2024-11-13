@@ -78,7 +78,7 @@ export default function Profile() {
           closeModal={handleModal}
           isOwner={true}
           whatRole={role}
-          onProfileUpdate={fetchPatientData} // Pass the callback function
+          onFetch={fetchPatientData}
         />
       )}
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './libs/Exercises.css';
+import './libs/exercises.css';
 
 // PageStart Component
 export default function ExerciseStart() {

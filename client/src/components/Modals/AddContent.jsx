@@ -61,6 +61,10 @@ export default function AddContent({ closeModal, onSubmit }) {
     setImage(e.target.files[0]);
   };
 
+  const modules = {
+    toolbar: false,
+  };
+
   return (
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-items-center">
@@ -159,10 +163,10 @@ export default function AddContent({ closeModal, onSubmit }) {
         </div>
 
         <div className="d-flex justify-content-center mt-3 gap-3">
-          <button onClick={handleSubmit} className="btn btn-primary">
+          <button onClick={handleSubmit} className="text-button border">
             <p className="fw-bold my-0">SUBMIT</p>
           </button>
-          <button onClick={handleClose} className="btn btn-secondary">
+          <button onClick={handleClose} className="text-button border">
             <p className="fw-bold my-0">CANCEL</p>
           </button>
         </div>

@@ -241,8 +241,7 @@ export default function ExerciseContent() {
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto content-column"
                     style={{
-                      maxHeight: "500px", // Set max height for the scrollable area
-                      overflowY: "auto", // Enable vertical scrolling within this div
+                      maxHeight: "75vh", // Set max height for the scrollable area
                     }}
                   >
                     {/* Image */}
@@ -256,6 +255,7 @@ export default function ExerciseContent() {
                           <img
                             src={contentData?.image}
                             alt="Exercise Image"
+                            className="border rounded-3"
                             style={{
                               padding: "15px",
                               width: "100%",
@@ -267,7 +267,7 @@ export default function ExerciseContent() {
                         )}
                       </div>
                     <div
-                      className="ql-editor mb-0"
+                      className="ql-editor"
                       dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(contentData?.description || "Description here"),
                       }}
@@ -289,14 +289,14 @@ export default function ExerciseContent() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "85vh" }} // Larger height for video column
+                    style={{ maxHeight: "75vh" }} // Larger height for video column
                   >
                     <div className="mb-3">
                       {/* VIDEO CAM */}
                       {isYouTubeUrl(contentData.videoUrl) ? (
                         // Embed YouTube video using iframe
                         <iframe
-                          className="w-100"
+                          className="w-100 border rounded-3"
                           style={{
                             aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
                             height: "100%",
