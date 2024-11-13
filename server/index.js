@@ -1,5 +1,5 @@
 const path = require("path");
-const http = require("http");
+const https = require("https");
 const config = require("./config.json");
 const mongoose = require("mongoose");
 const express = require("express");
@@ -19,7 +19,7 @@ mongoose
 
 // Express App
 const app = express();
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 const patientSlpRoutes = require("./routes/patientSlp.route.js");
 const clinicianSLPRoutes = require("./routes/clinicianSLP.route.js");
