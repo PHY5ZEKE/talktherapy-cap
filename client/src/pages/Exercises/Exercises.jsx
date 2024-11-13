@@ -28,7 +28,7 @@ export default function ExerciseStart() {
     <div id="page-start" className="text-center">
       <div className="content">
         <h1 id="power-by" className="mb-4">Test Exercise</h1>
-        <p className="description mb-3">Speech Recognition Speech Exercise using webkitspeech</p>
+        <p className="description mb-3">Speech Recognition Speech Exercise</p>
         <div id="loading" className="loading mb-2">Loading...</div>
         <div id="microphone" className="microphone mb-4">Allow access to microphone...</div>
         <button id="button-start" className="btn btn-primary">Start</button>
@@ -45,10 +45,10 @@ export default function ExerciseStart() {
       <div className="content">
         {/* Panel Counter */}
         <div id="panel-counter" className="panel-counter d-flex align-items-center justify-content-center mb-4r">
-          <div id="button-prev-phrase" className="btn btn-link text-decoration-none">&#9668;</div>
+          <div id="button-prev-phrase" className="btn btn-link text-decoration-none">PREV</div>
           <input id="phrase-number-input" type="number" className="input-counter input-exer visually-hidden" />
           <div id="phrase-number" className="fs-4 mx-3"></div>
-          <div id="button-next-phrase" className="btn btn-link text-decoration-none">&#9658;</div>
+          <div id="button-next-phrase" className="btn btn-link text-decoration-none">NEXT</div>
         </div>
         <div id="caption" className="text-muted text-center mb-4"></div>
 
@@ -106,7 +106,49 @@ export default function ExerciseStart() {
               </div>
             </div>
           </div>
+
+
+      {/* Panel Option (Modal) */}
+        <div id="page-help" className="modal hidden">
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Help</h5>
+                <button id="close-button" type="button" className="btn-close" aria-label="Close"></button>
+              </div>
+
+              <div className="modal-body">
+                <div className="content">
+                  <div id="speech-success-ring" className="selectors mb-3" title="Success ring enable">
+                    {/* Success ring selector content goes here */}
+                  </div>
+                  <div className="instruction-content">
+                    <p>Hello! If this is your first time, allow your microphone access to the website.</p>
+                    <p>
+                      <span style={{ fontWeight: 'bold' }}>Hold </span> 
+                      <span style={{ color: 'red', fontWeight: 'bold', border: '1px solid red', padding: '0 4px', backgroundColor: '#ffe6e6' }}> Record </span> 
+                      <span> and release when done speaking!</span>
+                    </p>
+                    <p>To identify <br></br><br></br>
+                      <span style={{ color: '#ff4d4d', textDecoration: 'line-through', backgroundColor: '#ffe6e6', padding: '0 4px' }}> red text </span> 
+                      is the part you did not say,
+                      <span style={{ textDecoration: 'underline', padding: '0 4px' }}> underlined </span> 
+                      text is the one that was recognized,
+                      <span style={{ color: 'green', backgroundColor: '#e6ffe6', padding: '0 4px' }}> green text </span> 
+                      are the correct sound to the word! <br></br><br></br><br></br>
+                      <span>You can click the word to hear how it is pronounced! Click the white box to read the whole phrase</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+
+
+
+
+  </div>
   );
 }
 

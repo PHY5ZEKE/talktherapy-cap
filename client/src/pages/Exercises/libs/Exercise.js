@@ -119,10 +119,51 @@ window.addEventListener('load', function() {
             });
         }
 
+        var helpButton = document.querySelector('#page-main #button-help');
+        if (helpButton) {
+            console.log("Option button found");
+            helpButton.addEventListener('click', function() {
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+        
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'none'; 
+                }
+        
+                var pageOption = document.querySelector('#page-help');
+                if (pageOption) {
+                    pageOption.style.display = 'block'; 
+                }
+            });
+        }
+
         var closeButton = document.querySelector('#page-option #close-button');
         if (closeButton) {
             closeButton.addEventListener('click', function() {
                 var pageOption = document.querySelector('#page-option');
+                if (pageOption) {
+                    pageOption.style.display = 'none'; 
+                }
+
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'block'; 
+                }
+            });
+        }
+
+        var closeButtonHelp = document.querySelector('#page-help #close-button');
+        if (closeButtonHelp) {
+            closeButtonHelp.addEventListener('click', function() {
+                var pageOption = document.querySelector('#page-help');
                 if (pageOption) {
                     pageOption.style.display = 'none'; 
                 }

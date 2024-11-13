@@ -71,11 +71,9 @@ const deactivatePatient = async (req, res) => {
 
 const updateBookmarks = async (req, res) => {
   try {
-    console.log('req.user:', req.user);
     const { id: patientId } = req.user; // Extract patient ID from token (or request)
     const { bookmarks } = req.body; // Assuming bookmarks are sent as an array of Content ObjectIds
 
-    console.log('Received patientId:', patientId);
 
     if (!Array.isArray(bookmarks)) {
       return res.status(400).json({ error: true, message: "Bookmarks must be an array of Content ObjectIds." });

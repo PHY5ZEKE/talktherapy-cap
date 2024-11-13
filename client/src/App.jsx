@@ -48,7 +48,6 @@ import PatientContent from "./pages/Patient/ViewContent";
 import PatientBook from "./pages/Patient/BookSchedule";
 import PatientProfile from "./pages/Patient/Profile";
 import PatientFeedback from "./pages/Patient/FeedbackDiagnosis";
-import ExerciseContent from "./pages/Exercises/ExerciseContent";
 
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";
@@ -60,6 +59,10 @@ import Room from "./pages/System/Room";
 //Test Exercises
 import ExerciseStart from "./pages/Exercises/Exercises";
 import AssistSpeech from "./pages/Exercises/AssistSpeech";
+import ExerciseContent from "./pages/Exercises/ExerciseContent";
+import ExerRun from "./pages/Exercises/ExerRun"
+import ExerSpeech from "./pages/Exercises/ExerSpeech"
+import ExerFace from "./pages/Exercises/ExerFace"
 
 // Error Handlers
 import NotFound from "./pages/System/NotFound";
@@ -94,6 +97,9 @@ const routes = (
       <Route path="/exercise" element={<ExerciseStart />} />
       <Route path="/assist/speech" element={<AssistSpeech />} />
       <Route path="/content/exercises/:id" element={<ExerciseContent /> }/>
+      <Route path="/content/exercises/speech" element={<ExerRun /> }/>
+      <Route path="/content/exercises/assistspeech" element={<ExerSpeech /> }/>
+      <Route path="/content/exercises/facespeech" element={<ExerFace /> }/>
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route
@@ -278,14 +284,6 @@ const routes = (
           </PrivateRoute>
         }
       />
-      {/* <Route
-        path="/patient/content/exercises/:id"
-        element={
-          <PrivateRoute allowedRoles={["patientslp"]}>
-            <ExerciseContent />
-          </PrivateRoute>
-        }
-      /> */}
 
     </Routes>
   </Router>

@@ -1,9 +1,94 @@
 id: 1
-name: R Words
+name: Practice Words
 
 run
 related
-Sentence matching sentence
+reveal
+show the truth
+continue
+speak
+think
+expect clarity
+express
+understand
+question
+seek answers
+focus
+learn
+observe
+stay aware
+explore
+describe
+discuss
+share insights
+consider
+decide
+plan
+create pathways
+practice
+apply
+analyze
+dig deeper
+connect
+collaborate
+reflect
+find meaning
+create
+innovate
+discover
+uncover potential
+engage
+navigate
+lead
+take initiative
+guide
+mentor
+coach
+offer support
+challenge
+inspire
+encourage
+build confidence
+motivate
+achieve
+succeed
+reach goals
+realize
+accomplish
+celebrate
+honor progress
+investigate
+probe
+examine
+dig for details
+question
+probe
+study
+seek understanding
+test
+evaluate
+validate
+check accuracy
+design
+construct
+formulate
+create solutions
+explore
+grow
+learn
+expand knowledge
+observe
+assess
+judge
+make decisions
+trust
+believe
+commit
+find certainty
+analyze
+synthesize
+interpret
+draw insights
 ===
 id: 2
 name: Phoneme Breakdown

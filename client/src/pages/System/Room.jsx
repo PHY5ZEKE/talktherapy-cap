@@ -191,7 +191,7 @@ export default function Room() {
   const initiateConnection = async () => {
     try {
       await pageReady();
-      socket.current = new WebSocket(`ws://${import.meta.env.VITE_LOCALWS}`);
+      socket.current = new WebSocket(`wss://${import.meta.env.VITE_LOCALWS}`);
 
       socket.current.onopen = () => {
         isSocketOpen.current = true;

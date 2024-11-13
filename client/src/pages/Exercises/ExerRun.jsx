@@ -19,7 +19,7 @@ const MenuDropdownClinician = React.lazy(() => import("../../components/Layout/C
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 
-export default function ExerciseContent() {
+export default function ExerRun() {
   const { authState, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
   const { id } = useParams(); 
@@ -62,6 +62,7 @@ export default function ExerciseContent() {
     const match = url.match(regExp);
     return match && match[1].length === 11 ? match[1] : null;
   };
+  
 
   // Fetch patient data
   useEffect(() => {
@@ -184,6 +185,19 @@ export default function ExerciseContent() {
     }
   }, [accessToken, appURL, id]); 
 
+  const handleNavigateAndReload = () => {
+    // Navigate to the exercise page and reload
+    navigate('/exercise');
+    window.location.reload(); // Reload the page
+  };
+
+  // Define the YouTube video URL
+  const videoUrl = "https://www.youtube.com/watch?v=jkDQIcEMHC8"; // Example YouTube URL
+
+  // Extract the YouTube video ID and construct the embed URL
+  const videoID = extractYouTubeID(videoUrl);
+  const embedUrl = videoID ? `https://www.youtube.com/embed/${videoID}` : null;
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="container-fluid p-0 vh-100">
@@ -228,14 +242,14 @@ export default function ExerciseContent() {
               {MenuDropdown ? <MenuDropdown /> : null}
             </div>
 
-            <div className="row h-100">
+              <div className="row h-100">
               {/* FIRST COL */}
-              <div className={`col-sm bg-white ${!contentData?.videoUrl ? "col-12" : ""}`}>
+              <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     {/* TITLE */}
-                    <p className="mb-0 fw-bold">{contentData?.name || "Video Title"}</p>
-                    <p className="mb-0">{contentData?.category || "Category"}</p>
+                    <p className="mb-0 fw-bold">Word Exercises!</p>
+                    <p className="mb-0">Speech Therapy</p>
                   </div>
                 </div>
 
@@ -247,39 +261,43 @@ export default function ExerciseContent() {
                     }}
                   >
                     {/* Image */}
-                      <div
-                        className="w-100 exercise-vid rounded-2"
+                    <div
+                      className="w-100 exercise-vid rounded-2"
+                      style={{
+                        display: "inline",
+                      }}
+                    >
+                      <img
+                        src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
+                        alt="Exercise Image"
+                        className="border rounded-3"
                         style={{
-                          display: contentData?.image ? "inline" : "none",
+                          padding: "15px",
+                          width: "100%",
+                          height: "auto",
+                          objectFit: "cover",
+                          aspectRatio: "16 / 10", // Maintain aspect ratio
                         }}
-                      >
-                        {contentData?.image && (
-                          <img
-                            src={contentData?.image}
-                            alt="Exercise Image"
-                            className="border rounded-3"
-                            style={{
-                              padding: "15px",
-                              width: "100%",
-                              height: "auto",
-                              objectFit: "cover",
-                              aspectRatio: "16 / 10", // Maintain aspect ratio
-                            }}
-                          />
-                        )}
-                      </div>
+                      />
+                    </div>
                     <div
                       className="ql-editor"
                       dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize(contentData?.description || "Description here"),
+                        __html: DOMPurify.sanitize("This speech exercise uses a set scope of words that help you on pronunciation. It uses homophones differential mapping and phonemes recognition for words you utter."), // Static description
                       }}
                     />
                   </div>
                 </div>
+                  <div
+                    className="mb-3 fw-bold text-button border mx-auto"
+                    onClick={handleNavigateAndReload}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Perform
+                  </div>
               </div>
 
               {/* SECOND COL - Display only if videoUrl exists */}
-              {contentData?.videoUrl && (
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -294,40 +312,27 @@ export default function ExerciseContent() {
                     style={{ maxHeight: "75vh" }} // Larger height for video column
                   >
                     <div className="mb-3">
-                      {/* VIDEO CAM */}
-                      {isYouTubeUrl(contentData.videoUrl) ? (
-                        // Embed YouTube video using iframe
-                        <iframe
-                          className="w-100 border rounded-3"
-                          style={{
-                            aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
-                            height: "100%",
-                          }}
-                          src={`https://www.youtube.com/embed/${extractYouTubeID(contentData.videoUrl)}`}
-                          title="Video player"
-                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        ></iframe>
-                      ) : (
-                        // Embed direct video URL using video tag
-                        <video
-                          className="w-100"
-                          controls
-                          style={{
-                            aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
-                            width: "100%",
-                            objectFit: "cover", // Ensures the video covers the container without distortion
-                          }}
-                        >
-                          <source src={contentData?.videoUrl} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
-                      )}
+                      {/* Embed the YouTube video using an iframe */}
+                    {embedUrl ? (
+                      <iframe
+                        width="100%"
+                        height="315"
+                        src={embedUrl}
+                        title="YouTube Video"
+                        frameBorder="0"
+                        allowFullScreen
+                        style={{
+                          aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
+                          objectFit: "cover", // Ensures the video covers the container without distortion
+                        }}
+                      ></iframe>
+                    ) : (
+                      <p>Invalid YouTube URL</p> // Handle invalid URL
+                    )}
                     </div>
                   </div>
                 </div>
               </div>
-            )}
             </div>
           </div>
         </div>
