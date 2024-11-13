@@ -165,10 +165,13 @@ export default function Home() {
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Filter bookmarked content
   const bookmarkedExercises = contentData.filter((content) =>
     patientData?.bookmarkedContent.includes(content._id)
   );
+
+  const handleCardClick = (id) => {
+    navigate(`/content/exercises/${id}`);
+  };
 
   return (
     <>
@@ -303,7 +306,7 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* SECOND COL */}
+             {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
@@ -315,24 +318,30 @@ export default function Home() {
                 </div>
 
                 <div className="row p-3">
-                  {bookmarkedExercises.length > 0 ? (
-                    bookmarkedExercises.map((content) => (
-                      <div
-                        key={content._id}
-                        className="col bg-white border rounded-4 p-3 overflow-auto"
-                        style={{ maxHeight: "75vh", minHeight: "60vh" }}
-                      >
-                        <div className="mb-3 border border-top-0 border-start-0 border-end-0">
-                          <h5 className="mb-0 fw-bold">{content.name}</h5>
-                          <p>{content.category}</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    style={{
+                      maxHeight: "75vh",  // Card's maximum height
+                      overflowY: "auto",   // Enables vertical scrolling
+                    }}
+                  >
+                    {bookmarkedExercises.length > 0 ? (
+                      bookmarkedExercises.map((content) => (
+                        <div
+                          key={content._id}
+                          className="bookmark-item border rounded p-2 mb-3"
+                          onClick={() => handleCardClick(content._id)}
+                        >
+                          <h5 className="mb-1 fw-bold">{content.name}</h5>
+                          <p className="mb-0">{content.category}</p>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="fw-bold text-center mb-0">
-                      No bookmarked exercises available.
-                    </p>
-                  )}
+                      ))
+                    ) : (
+                      <p className="fw-bold text-center mb-0">
+                        No bookmarked exercises available.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
 
