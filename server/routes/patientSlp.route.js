@@ -9,6 +9,7 @@ const {
   changePassword,
   updateProfilePicture,
   editPatient,
+  updateBookmarks,
 } = require("../controllers/patientSLP.controller");
 
 const verifyToken = require("../middleware/verifyToken");
@@ -30,5 +31,8 @@ router.put("/change-password", verifyToken, changePassword);
 router.put("/update-profile-picture", verifyToken, updateProfilePicture);
 
 router.put("/edit-patient", verifyToken, editPatient);
+
+// New route to update bookmarks
+router.put("/update-bookmarks", verifyToken, updateBookmarks);
 
 module.exports = router;

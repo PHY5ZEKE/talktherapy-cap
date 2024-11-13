@@ -22,6 +22,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [appointments, setAppointments] = useState([]);
+  const [bookmarkedContent, setBookmarkedContent] = useState([]);
+
   const navigate = useNavigate();
 
   // WebSocket Notification
@@ -30,6 +32,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchPatientData();
+    fetchBookmarkedContent();
 
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
@@ -105,6 +108,33 @@ export default function Home() {
     } catch (error) {
       setError(error.message);
       setLoading(false);
+    }
+  };
+
+  // Fetch Bookmarked Content (References from patient.bookmarkedContent)
+  const fetchBookmarkedContent = async () => {
+    try {
+      if (patientData && patientData.bookmarkedContent.length > 0) {
+        const bookmarkedContentRes = await fetch(`${appURL}/${route.content.getByIds}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({
+            ids: patientData.bookmarkedContent,
+          }),
+        });
+
+        if (!bookmarkedContentRes.ok) {
+          throw new Error("Failed to fetch bookmarked content");
+        }
+
+        const contentData = await bookmarkedContentRes.json();
+        setBookmarkedContent(contentData.content); // Assuming the response contains the bookmarked content
+      }
+    } catch (error) {
+      console.error("Error fetching bookmarked content", error);
     }
   };
 
@@ -281,37 +311,26 @@ export default function Home() {
 
                 <div className="row p-3">
                   <div
-                    className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "75vh", minHeight: "60vh" }}
-                  >
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-pending">PENDING</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-accepted">ACCEPTED</div>
-                    </div>
-
-                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <h5 className="mb-0 fw-bold">Tuesday</h5>
-                      <p className="mb-0 fw-bold">05:00 PM - 06:00 PM</p>
-                      <p className="mb-3">
-                        Session of Rico Noapl Nieto with Ako.
-                      </p>
-                      <div className="mb-3 text-cancelled">CANCELLED</div>
+                      className="col bg-white border rounded-4 p-3 overflow-auto"
+                      style={{ maxHeight: "75vh", minHeight: "60vh" }}
+                    >
+                      {bookmarkedContent && bookmarkedContent.length > 0 ? (
+                        bookmarkedContent.map((content) => (
+                          <div
+                            key={content._id}
+                            className="mb-3 border border-top-0 border-start-0 border-end-0"
+                          >
+                            <h5 className="mb-0 fw-bold">{content.name}</h5>
+                            <p>{content.category}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="fw-bold text-center mb-0">
+                          No bookmarked exercises available.
+                        </p>
+                      )}
                     </div>
                   </div>
-                </div>
               </div>
 
               {/* THIRD COL */}
