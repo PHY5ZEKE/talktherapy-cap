@@ -12,6 +12,7 @@ import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import UnarchiveUser from "../../components/Modals/UnarchiveUser";
 import { emailAccountRestore } from "../../utils/emailAccountRestore";
+import { exportArchivedUsers } from "../../utils/exportData";
 
 // Calendar
 import "react-datepicker/dist/react-datepicker.css";
@@ -120,6 +121,34 @@ export default function Archival() {
     setUnarchive(!isUnarchive);
   };
 
+  const [tickBox, setTickBox] = useState([]);
+  const handleCheckboxChange = (user) => {
+    setTickBox((prevSelectedUsers) => {
+      if (prevSelectedUsers.includes(user)) {
+        return prevSelectedUsers.filter((u) => u !== user);
+      } else {
+        return [...prevSelectedUsers, user];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (tickBox.length === archivedUsers.length) {
+      setTickBox([]);
+    } else {
+      setTickBox(archivedUsers);
+    }
+  };
+
+  const handleExport = () => {
+    if (tickBox.length === 0) {
+      failNotify("Please select at least one user to export.");
+      return;
+    }
+    exportArchivedUsers(tickBox);
+    setTickBox([]);
+  };
+
   return (
     <>
       {/* Unarchive Modal */}
@@ -176,17 +205,11 @@ export default function Archival() {
                         name="birthday"
                         className="form-input rounded"
                       />
-
                       <div className="d-flex gap-3">
                         <button
                           className="fw-bold text-button border"
                           style={{ cursor: "pointer" }}
-                        >
-                          Import
-                        </button>
-                        <button
-                          className="fw-bold text-button border"
-                          style={{ cursor: "pointer" }}
+                          onClick={() => handleExport()}
                         >
                           Export
                         </button>
@@ -212,7 +235,10 @@ export default function Archival() {
                             <p className="text-center mb-0">Action</p>
                           </th>
                           <th scope="col" style={{ width: "70" }}>
-                            <button className="d-flex mx-auto action-btn btn-text-blue">
+                            <button
+                              className="d-flex mx-auto action-btn btn-text-blue"
+                              onClick={handleSelectAll}
+                            >
                               Select All
                             </button>
                           </th>
@@ -235,7 +261,7 @@ export default function Archival() {
                                 <button
                                   className="fw-bold text-button border"
                                   style={{ cursor: "pointer" }}
-                                  onClick={()=>handleModal(user)}
+                                  onClick={() => handleModal(user)}
                                 >
                                   Restore
                                 </button>
@@ -244,6 +270,8 @@ export default function Archival() {
                                 <input
                                   className="d-flex justify-content-center mx-auto"
                                   type="checkbox"
+                                  checked={tickBox.includes(user)}
+                                  onChange={() => handleCheckboxChange(user)}
                                 />
                               </td>
                             </tr>

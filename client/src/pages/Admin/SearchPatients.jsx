@@ -14,6 +14,8 @@ import MenuDropdown from "../../components/Layout/AdminMenu";
 import ViewProgress from "../../components/Modals/ViewProgress";
 import ViewRecord from "../../components/Modals/ViewRecord";
 
+import exportPatientData from "../../utils/exportData";
+
 const VIEW_MODES = {
   NONE: "NONE",
   RECORDS: "RECORDS",
@@ -193,8 +195,8 @@ export default function ManageSchedule() {
   };
 
   const handleClinicianClick = (patient) => {
-    setSelectedPatient(null);
-    setSoapRecords([]);
+    setSelectedPatient(patient);
+    setSoapRecords(fetchSoapRecords(patient._id));
     setViewMode(VIEW_MODES.NONE);
     fetchPatientDetails(patient._id);
   };
@@ -202,10 +204,17 @@ export default function ManageSchedule() {
   const handleViewRecords = () => {
     if (selectedPatient) {
       fetchSoapRecords(selectedPatient._id);
-      console.log(soapRecords);
       setViewMode(VIEW_MODES.RECORDS);
     }
   };
+
+  const handleExport = () => {
+    if (!selectedPatient) {
+      return;
+    }
+    fetchSoapRecords(selectedPatient._id);
+    exportPatientData(selectedPatient, soapRecords);
+  }
 
   return (
     <>
@@ -330,7 +339,9 @@ export default function ManageSchedule() {
                               >
                                 View SOAP Records
                               </button>
-                              <button className="text-button border w-100">
+                              <button className="text-button border w-100"
+                              onClick={handleExport}
+                              >
                                 Export Data
                               </button>
                             </>

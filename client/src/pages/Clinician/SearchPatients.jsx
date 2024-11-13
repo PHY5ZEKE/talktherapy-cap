@@ -20,6 +20,7 @@ import RequestAccess from "../../components/Modals/RequestAccess";
 import SocketFetch from "../../utils/SocketFetch";
 import { emailRequestAccess } from "../../utils/emailRequestAccess";
 import { emailSoap } from "../../utils/emailSoap";
+import exportPatientData from "../../utils/exportData";
 
 const VIEW_MODES = {
   NONE: "NONE",
@@ -48,8 +49,6 @@ export default function ManageSchedule() {
 
   const [viewMode, setViewMode] = useState(VIEW_MODES.NONE);
   const [soapRecords, setSoapRecords] = useState([]);
-  const [selectedSoapRecord, setSelectedSoapRecord] = useState(null);
-
   const [patientName, setPatientName] = useState("");
 
   const notify = (message) =>
@@ -301,8 +300,8 @@ export default function ManageSchedule() {
   };
 
   const handleClinicianClick = (patient) => {
-    setSelectedPatient(null);
-    setSoapRecords([]);
+    setSelectedPatient(patient);
+    setSoapRecords(fetchSoapRecords(patient._id));
     setViewMode(VIEW_MODES.NONE);
     fetchPatientDetails(patient._id);
   };
@@ -312,10 +311,6 @@ export default function ManageSchedule() {
       fetchSoapRecords(selectedPatient._id);
       setViewMode(VIEW_MODES.RECORDS);
     }
-  };
-
-  const handleSoapRecordClick = (record) => {
-    setSelectedSoapRecord(record);
   };
 
   const handleDeleteSoapRecord = async (id) => {
@@ -353,6 +348,14 @@ export default function ManageSchedule() {
 
   const sendEmail = (reason, token) => {
     emailRequestAccess(clinicianData, selectedPatient, reason, token);
+  };
+
+  const handleExport = () => {
+    if (!selectedPatient) {
+      return;
+    }
+    fetchSoapRecords(selectedPatient._id);
+    exportPatientData(selectedPatient, soapRecords);
   };
 
   return (
@@ -526,7 +529,10 @@ export default function ManageSchedule() {
                                 >
                                   View SOAP Records
                                 </button>
-                                <button className="text-button border w-100">
+                                <button
+                                  className="text-button border w-100"
+                                  onClick={handleExport}
+                                >
                                   Export Data
                                 </button>
                               </>
