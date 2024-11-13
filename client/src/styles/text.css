@@ -133,6 +133,11 @@
   font-size: 0.75em;
 }
 
+.ql-editor {
+  font-family: 'Inter', sans-serif;
+  font-size: 16px; /* Adjust the size as needed */
+}
+
 /* Media query for 768 and below */
 @media (max-width: 767px) {
   .text-overflow {

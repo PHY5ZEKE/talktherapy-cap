@@ -192,6 +192,7 @@ export default function Soap({
                 <div className="col mb-3">
                   <p className="fw-bold mb-0">Objective/Goals</p>
                   <ReactQuill
+                  className="h6"
                     value={objective}
                     onChange={setObjective}
                     modules={modules}
