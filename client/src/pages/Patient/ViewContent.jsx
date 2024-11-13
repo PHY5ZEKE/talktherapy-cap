@@ -98,6 +98,34 @@ export default function ViewContent() {
     }
   }, [searchTerm, contentData]);
 
+  const handleBookmarkClick = async (content) => {
+    try {
+      const updatedBookmarks = [...patientData.bookmarkedContent];
+      if (updatedBookmarks.includes(content._id)) {
+        updatedBookmarks.splice(updatedBookmarks.indexOf(content._id), 1); // Remove bookmark
+      } else {
+        updatedBookmarks.push(content._id); // Add bookmark
+      }
+
+      // Update the patient bookmarks in the backend
+      const response = await fetch(`${appURL}/${route.patient.updateBookmarks}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ bookmarkedContent: updatedBookmarks }),
+      });
+
+      if (!response.ok) throw new Error("Failed to update bookmarks");
+
+      // Update local state
+      setPatientData({ ...patientData, bookmarkedContent: updatedBookmarks });
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
   const handleCardClick = (id) => {
     navigate(`/content/exercises/${id}`);
   };
@@ -174,8 +202,20 @@ export default function ViewContent() {
                           <h5 className="card-title fw-bold mb-0 text-truncate">
                             {content.name}
                           </h5>
-                          <p>{content.category}</p>
-                          <FontAwesomeIcon icon={faBookmark} />
+                          <p>{content.category}</p> 
+                          <FontAwesomeIcon
+                          icon={faBookmark}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookmarkClick(content);
+                          }}
+                          style={{
+                            cursor: "pointer",
+                            color: patientData?.bookmarkedContent.includes(content._id)
+                              ? "blue"
+                              : "black",
+                          }}
+                        />
                         </div>
                       </div>
                     ))}

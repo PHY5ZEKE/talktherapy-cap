@@ -23,6 +23,7 @@ const patientSlpSchema = new Schema({
   },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
+  bookmarkedContent: [{ type: Schema.Types.ObjectId, ref: 'Content' }],
 });
 
 module.exports = mongoose.model("PatientSlp", patientSlpSchema);

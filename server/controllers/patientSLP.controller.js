@@ -68,6 +68,55 @@ const deactivatePatient = async (req, res) => {
     .json({ error: false, message: "Patient deactivated successfully." });
 };
 
+const updateBookmarks = async (req, res) => {
+  try {
+    const { patientId } = req.user; // Extract patient ID from token (or request)
+    const { bookmarks } = req.body; // Assuming bookmarks are sent as an array of Content ObjectIds
+
+    if (!Array.isArray(bookmarks)) {
+      return res.status(400).json({ error: true, message: "Bookmarks must be an array of Content ObjectIds." });
+    }
+
+    // Validate if each bookmark ID is a valid ObjectId
+    const isValidObjectIds = bookmarks.every(id => mongoose.Types.ObjectId.isValid(id));
+    if (!isValidObjectIds) {
+      return res.status(400).json({ error: true, message: "Invalid Content ObjectId(s)." });
+    }
+
+    // Find the patient by ID
+    const patient = await PatientSlp.findOne({ _id: patientId });
+
+    if (!patient) {
+      return res.status(404).json({ error: true, message: "Patient not found." });
+    }
+
+    // Initialize the bookmarks if it's empty or doesn't exist
+    if (!patient.bookmarkedContent) {
+      patient.bookmarkedContent = [];
+    }
+
+    // Add bookmarks or remove if already present
+    bookmarks.forEach(bookmarkId => {
+      // If it's not already bookmarked, add it
+      if (!patient.bookmarkedContent.includes(bookmarkId)) {
+        patient.bookmarkedContent.push(bookmarkId);
+      }
+    });
+
+    // Save the updated patient record
+    await patient.save();
+
+    return res.status(200).json({
+      error: false,
+      message: "Bookmarks updated successfully.",
+      bookmarkedContent: patient.bookmarkedContent,
+    });
+  } catch (error) {
+    console.error("Error updating bookmarks:", error);
+    return res.status(500).json({ error: true, message: "Internal server error." });
+  }
+};
+
 const activatePatient = async (req, res) => {
   const { email } = req.body;
 
@@ -474,7 +523,7 @@ module.exports = {
   signupPatient,
 
   getPatient,
-
+  updateBookmarks,
   getPatient,
   changePassword,
   updateProfilePicture,
