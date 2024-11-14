@@ -214,7 +214,7 @@ export default function Room() {
       };
 
       socket.current.onerror = (error) =>
-        failNotify("Server is having problems. Please wait or try again.");
+        //failNotify("Server is having problems. Please wait or try again.");
 
       socket.current.onclose = () => {
         notify("You have left the teleconference room.");
@@ -233,7 +233,7 @@ export default function Room() {
 
   const startConnection = (isCaller) => {
     if (!socket.current || socket.current.readyState !== WebSocket.OPEN) {
-      failNotify("Server is having problems. Please wait or try again.");
+      //failNotify("Server is having problems. Please wait or try again.");
       return;
     }
 
@@ -410,7 +410,7 @@ export default function Room() {
           })
         );
       } else {
-        failNotify("Server is having problems. Please wait or try again.");
+        //failNotify("Server is having problems. Please wait or try again.");
       }
     }
   };
@@ -427,7 +427,7 @@ export default function Room() {
           })
         );
       } else {
-        failNotify("Server is having problems. Please wait or try again.");
+        //failNotify("Server is having problems. Please wait or try again.");
       }
     });
   };

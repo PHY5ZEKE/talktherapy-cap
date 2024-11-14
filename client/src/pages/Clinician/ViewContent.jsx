@@ -176,6 +176,74 @@ export default function ViewContent() {
                         </div>
                       </div>
                     ))}
+
+                         {/* Static Exercise Card: Run*/}
+                  <div
+                    className="card exercise-container border"
+                    style={{ width: "18rem" }}
+                    onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
+                  >
+                    <img
+                      src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
+                      className="card-img-top"
+                      alt="Speech Exercise 1"
+                      style={{ height: "16rem", objectFit: "cover" }}
+                    />
+                    <div className="card-body">
+                      <h5 className="card-title fw-bold mb-0 text-truncate">
+                        Word Exercises!
+                      </h5>
+                      <p>Speech Therapy</p>
+                      {/* <FontAwesomeIcon
+                        icon={faBookmark}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
+                            ? "blue"
+                            : "black",
+                        }}
+                      /> */}
+                    </div>
+                  </div>
+
+                  {/* Static Exercise Card: Speech*/}
+                  <div
+                    className="card exercise-container border"
+                    style={{ width: "18rem" }}
+                    onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
+                  >
+                    <img
+                      src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
+                      className="card-img-top"
+                      alt="Speech Exercise 2"
+                      style={{ height: "16rem", objectFit: "cover" }}
+                    />
+                    <div className="card-body">
+                      <h5 className="card-title fw-bold mb-0 text-truncate">
+                        Machine Learning: Assistive Speech
+                      </h5>
+                      <p>Machine Learning</p>
+                      {/* <FontAwesomeIcon
+                        icon={faBookmark}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
+                            ? "blue"
+                            : "black",
+                        }}
+                      /> */}
+                    </div>
+                  </div>
+
+                  
                   </div>
                 </div>
               </div>
