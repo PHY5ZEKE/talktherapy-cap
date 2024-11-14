@@ -9,14 +9,13 @@ import Sidebar from "../../components/Sidebar/SidebarClinician";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
 
 export default function ViewContent() {
   const { authState, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [clinicianData, setClinicianData] = useState(null);
-  const [contentData, setContentData] = useState([]); 
+  const [contentData, setContentData] = useState([]);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -71,7 +70,7 @@ export default function ViewContent() {
         }
 
         const data = await response.json();
-        setContentData(data); 
+        setContentData(data);
         setFilteredContent(data);
         setLoading(false);
       } catch (error) {
@@ -86,19 +85,20 @@ export default function ViewContent() {
   //Search/Filter
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredContent(contentData); 
+      setFilteredContent(contentData);
     } else {
       setFilteredContent(
-        contentData.filter((content) =>
-          content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          content.category.toLowerCase().includes(searchTerm.toLowerCase())
+        contentData.filter(
+          (content) =>
+            content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            content.category.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
   }, [searchTerm, contentData]);
 
   const handleCardClick = (id) => {
-    navigate(`/content/exercises/${id}`); 
+    navigate(`/content/exercises/${id}`);
   };
 
   return (
@@ -133,119 +133,98 @@ export default function ViewContent() {
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Exercises</p>
-                    <p className="mb-0">View exercises and follow along.</p>
+                  <div className="col d-flex gap-3 align-items-center bg-white border rounded-4 p-3">
+                    <div>
+                      <p className="mb-0 fw-bold">Exercises</p>
+                      <p className="mb-0">View exercises and follow along.</p>
+                    </div>
 
-                    <input
-                      type="text"
-                      className="form-control mt-3"
-                      placeholder="Search"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-
-
+                    <div>
+                      <input
+                        type="text"
+                        className="form-control mt-3"
+                        placeholder="Search"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row bg-white p-3">
                   <div
-                    className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ minHeight: "85vh" }}
+                    className="col bg-white border rounded-4 overflow-auto"
+                    style={{ maxHeight: "85vh", minHeight: "85vh" }}
                   >
-                    {filteredContent.map((content) => (
+                    <div className="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-1 mx-auto my-3">
+                      {/* Static Exercise Card: Run*/}
                       <div
-                        key={content._id} 
-                        className="card exercise-container border"
-                        style={{ width: "18rem" }}
-                        onClick={() => handleCardClick(content._id)} 
+                        className="col"
+                        onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
                       >
-                        <img
-                          src={content.image} 
-                          className="card-img-top"
-                          alt={content.name}
-                          style={{ height: "16rem", objectFit: "cover" }}
-                        />
-                        <div className="card-body">
-                          <h5 className="card-title fw-bold mb-0 text-truncate">
-                            {content.name} 
-                          </h5>
-                          <p>{content.category}</p> 
-                          <FontAwesomeIcon icon={faBookmark} />
+                        <div className="mx-1 my-3 card exercise-container exercise-child border">
+                          <img
+                            src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
+                            className="card-img-top border-bottom"
+                            alt="Speech Exercise 1"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body p-3">
+                            <h5 className="card-title fw-bold mb-0 text-truncate">
+                              Word Exercises!
+                            </h5>
+                            <p>Speech Therapy</p>
+                          </div>
                         </div>
                       </div>
-                    ))}
 
-                         {/* Static Exercise Card: Run*/}
-                  <div
-                    className="card exercise-container border"
-                    style={{ width: "18rem" }}
-                    onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
-                  >
-                    <img
-                      src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
-                      className="card-img-top"
-                      alt="Speech Exercise 1"
-                      style={{ height: "16rem", objectFit: "cover" }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title fw-bold mb-0 text-truncate">
-                        Word Exercises!
-                      </h5>
-                      <p>Speech Therapy</p>
-                      {/* <FontAwesomeIcon
-                        icon={faBookmark}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
-                            ? "blue"
-                            : "black",
-                        }}
-                      /> */}
+                      {/* Static Exercise Card: Speech*/}
+                      <div
+                        className="col"
+                        onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
+                      >
+                        <div className="mx-1 my-3 card exercise-container exercise-child border">
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
+                            className="card-img-top border-bottom"
+                            alt="Speech Exercise 2"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body p-3">
+                            <h5 className="card-title fw-bold mb-0 text-truncate">
+                              Machine Learning: Assistive Speech
+                            </h5>
+                            <p>Machine Learning</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {filteredContent.map((content) => (
+                        <div
+                          key={content._id}
+                          className="col"
+                          onClick={() => handleCardClick(content._id)}
+                        >
+                          <div className="mx-1 my-3 card exercise-container exercise-child border">
+                            <img
+                              src={content.image}
+                              className="card-img-top border-bottom"
+                              alt={content.name}
+                              style={{ height: "200px", objectFit: "cover" }}
+                            />
+                            <div className="card-body p-3">
+                              <h5 className="card-title fw-bold mb-0 text-truncate">
+                                {content.name}
+                              </h5>
+                              <p>{content.category}</p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
-
-                  {/* Static Exercise Card: Speech*/}
-                  <div
-                    className="card exercise-container border"
-                    style={{ width: "18rem" }}
-                    onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
-                  >
-                    <img
-                      src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
-                      className="card-img-top"
-                      alt="Speech Exercise 2"
-                      style={{ height: "16rem", objectFit: "cover" }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title fw-bold mb-0 text-truncate">
-                        Machine Learning: Assistive Speech
-                      </h5>
-                      <p>Machine Learning</p>
-                      {/* <FontAwesomeIcon
-                        icon={faBookmark}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
-                            ? "blue"
-                            : "black",
-                        }}
-                      /> */}
-                    </div>
-                  </div>
-
-                  
                   </div>
                 </div>
+
               </div>
             </div>
           </div>

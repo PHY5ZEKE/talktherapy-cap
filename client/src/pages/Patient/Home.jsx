@@ -52,7 +52,7 @@ export default function Home() {
 
     fetchNotifications();
 
-    socket.current = new WebSocket(`wss://${import.meta.env.VITE_LOCALWS}`);
+    socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
       console.log("Connected to the server");
@@ -262,7 +262,7 @@ export default function Home() {
                             <div className="d-flex justify-content-between flex gap-3">
                               <div className="d-flex gap-3">
                                 <div
-                                  className="fw-bold text-button border"
+                                  className="fw-bold text-button mb-3 border"
                                   onClick={() =>
                                     joinMeeting(appointment.roomId, appointment)
                                   }

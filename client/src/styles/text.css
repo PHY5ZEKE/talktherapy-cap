@@ -67,6 +67,59 @@
   color: #fff;
 }
 
+.text-button:disabled {
+  background-color: #c1c1c1;
+  color: #ffffff;
+  cursor: default;
+}
+
+.text-button-red {
+  width: 120px;
+  padding: 0.4em;
+  text-align: center;
+  border-radius: 25px;
+  color: #f44336;
+  background-color: #ffdddd;
+  border-color: #c1c1c1!important;
+  cursor: pointer;
+}
+
+.text-button-red:hover {
+  background-color: #f44336;
+  color: #ffdddd;
+}
+
+.text-button-red:disabled {
+  background-color: #c1c1c1;
+  color: #ffffff;
+  cursor: default;
+}
+
+.icon-button {
+  background: none;
+  padding: 0.4em;
+  text-align: center;
+  color: #000;
+  border: none;
+}
+
+.icon-button:hover {
+  background: none;
+  border: none;
+  padding: 0.4em;
+  text-align: center;
+  color: #1c9dff;
+}
+
+.icon-button:disabled {
+  background: none;
+  border: none;
+  padding: 0.4em;
+  text-align: center;
+  color: #c1c1c1;
+  cursor: default;
+}
+
 .text-danger {
   color: #f44336;
   background-color: #ffdddd;

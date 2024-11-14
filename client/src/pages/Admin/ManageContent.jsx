@@ -22,7 +22,7 @@ export default function AdminContent() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingContent, setEditingContent] = useState(null);
-  
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   const { authState } = useContext(AuthContext);
@@ -44,9 +44,8 @@ export default function AdminContent() {
         throw new Error("Failed to fetch content data");
       }
 
-
       const data = await response.json();
-      setContentData(data); 
+      setContentData(data);
       setFilteredContent(data);
       setLoading(false);
     } catch (error) {
@@ -58,17 +57,17 @@ export default function AdminContent() {
   //Search/Filter
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredContent(contentData); 
+      setFilteredContent(contentData);
     } else {
       setFilteredContent(
-        contentData.filter((content) =>
-          content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          content.category.toLowerCase().includes(searchTerm.toLowerCase())
+        contentData.filter(
+          (content) =>
+            content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            content.category.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
   }, [searchTerm, contentData]);
-
 
   // Handle Add Content Modal toggle
   const handleAdd = () => {
@@ -77,12 +76,12 @@ export default function AdminContent() {
 
   // Handle Edit Content Modal toggle
   const handleEdit = (content) => {
-    setEditingContent(content);  
-    setIsEditModalOpen(true);    
+    setEditingContent(content);
+    setIsEditModalOpen(true);
   };
 
   const handleCardClick = (id) => {
-    navigate(`/content/exercises/${id}`); 
+    navigate(`/content/exercises/${id}`);
   };
 
   // Fetch admin data
@@ -117,57 +116,51 @@ export default function AdminContent() {
     fetchContentData();
   }, [accessToken, appURL]);
 
+  const handleAddContent = async (formData) => {
+    try {
+      const response = await fetch(`${appURL}/api/contents`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
 
+      if (!response.ok) {
+        toast.error("Failed to add content");
+      } else {
+        toast.success("Content added successfully!");
+      }
 
-const handleAddContent = async (formData) => {
-  try {
-    const response = await fetch(`${appURL}/api/contents`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: formData, 
-    });
-
-    if (!response.ok) {
-      toast.error("Failed to add content");
+      fetchContentData();
+      setIsAddModalOpen(false);
+    } catch (error) {
+      setError(error.message);
     }
-    else {
-      toast.success("Content added successfully!");
+  };
+
+  const handleEditContent = async (id, formData) => {
+    try {
+      const response = await fetch(`${appURL}/api/contents/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        toast.error("Failed to edit content");
+      } else {
+        toast.success("Content updated successfully!");
+      }
+
+      fetchContentData();
+      setIsEditModalOpen(false);
+    } catch (error) {
+      setError(error.message);
     }
-
-    fetchContentData();
-    setIsAddModalOpen(false);
-  } catch (error) {
-    setError(error.message);
-  }
-};
-
-
-const handleEditContent = async (id, formData) => {
-  try {
-    const response = await fetch(`${appURL}/api/contents/${id}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: formData, 
-    });
-
-    if (!response.ok) {
-      toast.error("Failed to edit content");
-    }
-    else {
-      toast.success("Content updated successfully!");
-    }
-
-    fetchContentData(); 
-    setIsEditModalOpen(false);
-  } catch (error) {
-    setError(error.message);
-  }
-};
-
+  };
 
   const handleDelete = async (id) => {
     try {
@@ -181,25 +174,33 @@ const handleEditContent = async (id, formData) => {
 
       if (!response.ok) {
         toast.error("Failed to delete");
-      }
-      else {
+      } else {
         toast.success("Content deleted successfully!");
       }
 
-      setContentData((prevData) => prevData.filter((content) => content._id !== id));
+      setContentData((prevData) =>
+        prevData.filter((content) => content._id !== id)
+      );
     } catch (error) {
       setError(error.message);
     }
   };
-  
 
   return (
     <>
       {/* ADD CONTENT MODAL */}
-      {isAddModalOpen && <AddContent closeModal={handleAdd} onSubmit={handleAddContent} />}
-      
+      {isAddModalOpen && (
+        <AddContent closeModal={handleAdd} onSubmit={handleAddContent} />
+      )}
+
       {/* EDIT CONTENT MODAL */}
-      {isEditModalOpen && <EditContent closeModal={() => setIsEditModalOpen(false)} onSubmit={handleEditContent} content={editingContent} />}
+      {isEditModalOpen && (
+        <EditContent
+          closeModal={() => setIsEditModalOpen(false)}
+          onSubmit={handleEditContent}
+          content={editingContent}
+        />
+      )}
 
       <div className="container-fluid p-0 vh-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
@@ -232,7 +233,7 @@ const handleEditContent = async (id, formData) => {
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
-                    <div className="d-flex gap-3">
+                    <div className="d-flex flex-wrap align-items-center gap-3">
                       <div>
                         <p className="mb-0 fw-bold">Exercises</p>
                         <p className="mb-0">View exercises and follow along.</p>
@@ -244,69 +245,72 @@ const handleEditContent = async (id, formData) => {
                       >
                         Add Content
                       </button>
+
+                      <div>
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Search"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                      </div>
                     </div>
-
-                    <input
-                      type="text"
-                      className="form-control mt-3"
-                      placeholder="Search"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-
-
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row bg-white p-3">
                   <div
-                    className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ minHeight: "85vh" }}
+                    className="col bg-white border rounded-4 overflow-auto"
+                    style={{ maxHeight: "85vh", minHeight: "85vh" }}
                   >
-                    {filteredContent.map((content) => (
-                      <div
-                        key={content._id}
-                        className="card exercise-container border"
-                        style={{ width: "18rem" }}
-                        onClick={() => handleCardClick(content._id)} 
-                      >
-                        <img
-                          src={content.image}
-                          className="card-img-top"
-                          alt={content.name}
-                          style={{ height: "16rem", objectFit: "cover" }}
-                        />
-                        <div className="card-body">
-                          <h5 className="card-title fw-bold mb-0 text-truncate">
-                            {content.name}
-                          </h5>
-                          <p>{content.category}</p>
+                    <div className="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-1 mx-auto my-3">
+                      {filteredContent.map((content) => (
+                        <div
+                          key={content._id}
+                          className="col"
+                          onClick={() => handleCardClick(content._id)}
+                        >
+                          <div className="mx-1 my-3 card exercise-container exercise-child border">
+                            <img
+                              src={content.image}
+                              className="card-img-top border-bottom"
+                              alt={content.name}
+                              style={{ height: "200px", objectFit: "cover" }}
+                            />
+                            <div className="card-body p-3">
+                              <h5 className="card-title fw-bold mb-0 text-truncate">
+                                {content.name}
+                              </h5>
+                              <p>{content.category}</p>
 
-                          <div className="d-flex gap-2">
-                            <div
-                              className="fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={(e) => {
-                                e.stopPropagation(); 
-                                handleEdit(content); 
-                              }} 
-                            >
-                              Edit
-                            </div>
-                            <div
-                              className="fw-bold text-button border"
-                              style={{ cursor: "pointer" }}
-                              onClick={(e) => {
-                                e.stopPropagation(); 
-                                handleDelete(content._id); 
-                              }}
-                            >
-                              Delete
+                              <div className="d-flex gap-2">
+                                <button
+                                  className="fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEdit(content);
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  className="fw-bold text-button border"
+                                  style={{ cursor: "pointer" }}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleDelete(content._id);
+                                  }}
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -99,13 +99,9 @@ export default function Room() {
 
   const location = useLocation();
   const { appointmentDetails } = location.state || {};
-  const [patientId, setPatientId] = useState(appointmentDetails?.patientId._id);
-  const [clinicianId, setClinicianId] = useState(
-    appointmentDetails?.selectedClinician
-  );
-  const [clinicianName, setClinicianName] = useState(
-    appointmentDetails?.selectedSchedule.clinicianName
-  );
+  const patientId = appointmentDetails?.patientId._id;
+  const clinicianId = appointmentDetails?.selectedClinician;
+  const clinicianName = appointmentDetails?.selectedSchedule.clinicianName;
 
   const { roomid } = useParams();
 
@@ -116,7 +112,7 @@ export default function Room() {
 
   const [isCameraEnabled, setIsCameraEnabled] = useState(true);
   const [isMicEnabled, setIsMicEnabled] = useState(true);
-  
+
   const localVideoRef = useRef();
   const remoteVideoRef = useRef();
   const peerConnection = useRef(null);
@@ -124,6 +120,7 @@ export default function Room() {
   const socket = useRef(null);
   const isSocketOpen = useRef(false);
   const hasJoinedRoom = useRef(false);
+  const [isActive, setIsActive] = useState(false);
 
   const sdpQueue = useRef([]);
   const iceQueue = useRef([]);
@@ -149,7 +146,6 @@ export default function Room() {
     };
     initializeModel();
   }, []);
-  
 
   useEffect(() => {
     if (
@@ -191,7 +187,7 @@ export default function Room() {
   const initiateConnection = async () => {
     try {
       await pageReady();
-      socket.current = new WebSocket(`wss://${import.meta.env.VITE_LOCALWS}`);
+      socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
       socket.current.onopen = () => {
         isSocketOpen.current = true;
@@ -204,6 +200,7 @@ export default function Room() {
             })
           );
           hasJoinedRoom.current = true;
+          setIsActive(true);
           startConnection(true);
         }
       };
@@ -216,11 +213,11 @@ export default function Room() {
       socket.current.onerror = (error) =>
         //failNotify("Server is having problems. Please wait or try again.");
 
-      socket.current.onclose = () => {
-        notify("You have left the teleconference room.");
-        isSocketOpen.current = false;
-        hasJoinedRoom.current = false;
-      };
+        (socket.current.onclose = () => {
+          notify("You have left the teleconference room.");
+          isSocketOpen.current = false;
+          hasJoinedRoom.current = false;
+        });
     } catch (error) {
       handleCloseConnection();
     }
@@ -270,11 +267,9 @@ export default function Room() {
 
     outputDiv.innerHTML = outputText;
     commentDiv.innerHTML = "Results received from the patient.";
-    
   };
 
   const gotMessageFromServer = (message) => {
-    console.log("Message received from server:", message.data);
     const signal = JSON.parse(message.data);
 
     if (signal.sdp) {
@@ -319,31 +314,21 @@ export default function Room() {
     } else if (signal.type === "room-full") {
       handleCloseConnection();
     } else if (signal.type === "chat-message") {
-      setMessages((prevMessages) => {
-        const messageExists = prevMessages.some(
-          (msg) =>
-            msg.message === signal.message && msg.sender === signal.sender
-        );
-        if (!messageExists) {
-          return [
-            ...prevMessages,
-            { message: signal.message, sender: signal.sender },
-          ];
-        }
-        return prevMessages;
-      });
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { message: signal.message, sender: signal.sender },
+      ]);
     } else if (signal.type === "voice-recognition-result") {
       const outputText = signal.outputText;
       console.log("Received voice recognition from patient:", outputText);
       displayRecognitionResults(outputText);
-  }
-    else if (
+    } else if (
       signal.type === "leave-room" ||
       signal.type === "user-already-in-room"
     ) {
       handleCloseConnection();
     } else if (signal.type === "stop-session") {
-      notify("Left the teleconference room.")
+      notify("Left the teleconference room.");
       handleCloseConnection();
     }
   };
@@ -538,43 +523,15 @@ export default function Room() {
     handleConfirmCall();
   };
 
-  const handleEndSession = async () => {
-    try {
-      const response = await fetch(
-        `${appURL}/${route.appointment.endSession}/${appointmentDetails._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to end session");
-      } else {
-        socket.current.send(
-          JSON.stringify({
-            type: "stop-session",
-            roomID: roomid,
-          })
-        );
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   return (
     <>
       {/* STARTCALL.JSX MODAL */}
       {/* <StartCall/> */}
-  
+
       {confirmCall && (
         <ConfirmVideoCall
           close={() => {
-            navigate("/")
+            navigate("/");
           }}
           confirm={onConfirm}
         />
@@ -589,7 +546,7 @@ export default function Room() {
             {appointmentDetails?.patientId?.lastName || ""}
           </p>
         </div>
-  
+
         <div className="row justify-content-center-md mx-auto w-100 vh-100">
           <div className="col-sm">
             <video
@@ -599,7 +556,7 @@ export default function Room() {
               autoPlay
             />
           </div>
-  
+
           <div className="col-sm">
             <video
               className="bg-black video-remote mx-auto"
@@ -609,254 +566,286 @@ export default function Room() {
             />
           </div>
         </div>
-  
+
         <div className="row bg-white border border-start-0 border-[#B9B9B9] sticky-bottom">
           <div className="d-flex align-items-center justify-content-center p-3">
-            <button
-              onClick={() => {
-                handleCloseConnection();
-              }}
-              type="submit"
-              className="text-button border"
-            >
-              <p className="fw-bold my-0 status">Disconnect</p>
-            </button>
-  
-            {/* CAMERA AND MUTE */}
-            <div className="d-flex align-items-center gap-2 mx-1">
-              <div onClick={toggleCamera} style={{ cursor: "pointer" }}>
-                {isCameraEnabled ? (
-                  <FontAwesomeIcon size="lg" icon={faVideo} />
-                ) : (
-                  <FontAwesomeIcon size="lg" icon={faVideoSlash} />
-                )}
-              </div>
-  
-              <div onClick={toggleMic} style={{ cursor: "pointer" }}>
-                {isMicEnabled ? (
-                  <FontAwesomeIcon size="lg" icon={faMicrophone} />
-                ) : (
-                  <FontAwesomeIcon size="lg" icon={faMicrophoneSlash} />
-                )}
-              </div>
-            </div>
-  
-            {userRole === "clinician" || userRole === "patientslp" ? (
-              <>
-                {/* ACTION BUTTONS */}
-                <div className="">
-                  <button
-                    className="text-button border"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    <p className="fw-bold my-0 status">Actions</p>
-                  </button>
-                  <ul className="dropdown-menu">
-                    {/* Message Button (Available for both clinician and patientslp) */}
-                    <li>
-                      <a
-                        role="button"
-                        className="dropdown-item"
-                        data-bs-toggle="offcanvas"
-                        data-bs-target="#offcanvasWithBothOptions"
-                        aria-controls="offcanvasWithBothOptions"
+            <div className="d-flex align-items-center  gap-2 mx-1">
+              <div className="d-flex align-items-center gap-2">
+                <button
+                  className="icon-button"
+                  onClick={toggleCamera}
+                  disabled={!isActive}
+                >
+                  {isCameraEnabled ? (
+                    <FontAwesomeIcon size="lg" icon={faVideo} />
+                  ) : (
+                    <FontAwesomeIcon size="lg" icon={faVideoSlash} />
+                  )}
+                </button>
+
+                <button
+                  className="icon-button"
+                  onClick={toggleMic}
+                  disabled={!isActive}
+                >
+                  {isMicEnabled ? (
+                    <FontAwesomeIcon size="lg" icon={faMicrophone} />
+                  ) : (
+                    <FontAwesomeIcon size="lg" icon={faMicrophoneSlash} />
+                  )}
+                </button>
+
+                {userRole === "clinician" || userRole === "patientslp" ? (
+                  <>
+                    {/* ACTION BUTTONS */}
+                    <div className="">
+                      <button
+                        className="fw-bold my-0 text-button border"
+                        type="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                        disabled={!hasJoinedRoom.current}
                       >
-                        Message
-                      </a>
-                    </li>
-  
-                    {/* Add Diagnostic and Diagnostic Tool (Available only for clinicians) */}
-                    {userRole === "clinician" ? (
-                      <>
+                        Actions
+                      </button>
+                      <ul className="dropdown-menu">
+                        {/* Message Button (Available for both clinician and patientslp) */}
                         <li>
                           <a
                             role="button"
                             className="dropdown-item"
                             data-bs-toggle="offcanvas"
-                            data-bs-target="#soapSidebar"
+                            data-bs-target="#offcanvasWithBothOptions"
                             aria-controls="offcanvasWithBothOptions"
                           >
-                            Add Diagnostic
+                            Message
                           </a>
                         </li>
-                        <li>
-                          <a
-                            role="button"
-                            className="dropdown-item"
-                            data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvasDiagnosticTool"
-                            aria-controls="offcanvasDiagnosticTool"
-                          >
-                            Diagnostic Tool
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            role="button"
-                            className="dropdown-item"
-                            href="#"
-                            onClick={handleEndSession}
-                          >
-                            End Session
-                          </a>
-                        </li>
-                      </>
-                    ) : (
-                      <>
-                        {/* Diagnostic Tool Button for patientslp */}
-                        <li>
-                          <a
-                            role="button"
-                            className="dropdown-item"
-                            data-bs-toggle="offcanvas"
-                            data-bs-target="#offcanvasDiagnosticTool"
-                            aria-controls="offcanvasDiagnosticTool"
-                          >
-                            Diagnostic Tool
-                          </a>
-                        </li>
-                      </>
-                    )}
-                  </ul>
-                </div>
-  
-                {/* CANVAS FOR MESSAGES */}
-                <div
-                  className="offcanvas offcanvas-start"
-                  data-bs-scroll="true"
-                  tabIndex="-1"
-                  id="offcanvasWithBothOptions"
-                  aria-labelledby="offcanvasWithBothOptionsLabel"
-                >
-                  <div className="offcanvas-header">
-                    <h5
-                      className="offcanvas-title"
-                      id="offcanvasWithBothOptionsLabel"
-                    >
-                      Messages
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="offcanvas"
-                      aria-label="Close"
-                    ></button>
-                  </div>
-                  <div className="offcanvas-body d-flex flex-column justify-content-between overflow-y-auto">
-                    {/* CHAT AREA */}
-                    <div>
-                      {messages.map((msg, index) => (
-                        <p key={index}>
-                          <span className="fw-bold">{msg.sender}</span>:{" "}
-                          {msg.message}
-                        </p>
-                      ))}
+
+                        {/* Add Diagnostic and Diagnostic Tool (Available only for clinicians) */}
+                        {userRole === "clinician" ? (
+                          <>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#soapSidebar"
+                                aria-controls="offcanvasWithBothOptions"
+                              >
+                                Add Diagnostic
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasDiagnosticTool"
+                                aria-controls="offcanvasDiagnosticTool"
+                              >
+                                Diagnostic Tool
+                              </a>
+                            </li>
+                          </>
+                        ) : (
+                          <>
+                            {/* Diagnostic Tool Button for patientslp */}
+                            <li>
+                              <a
+                                role="button"
+                                className="dropdown-item"
+                                data-bs-toggle="offcanvas"
+                                data-bs-target="#offcanvasDiagnosticTool"
+                                aria-controls="offcanvasDiagnosticTool"
+                              >
+                                Diagnostic Tool
+                              </a>
+                            </li>
+                          </>
+                        )}
+                      </ul>
                     </div>
-                  </div>
-  
-                  {/* INPUT CHAT */}
-                  <form
-                    className="input-group my-3 p-3"
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleSendMessage(type);
-                      setType("");
-                    }}
-                  >
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Type a message..."
-                      value={type}
-                      onChange={(e) => setType(e.target.value)}
-                    />
-                    <button type="submit" className="btn btn-primary">
-                      Send
-                    </button>
-                  </form>
-                </div>
-  
-                {/* CANVAS FOR SOAP */}
-                <SoapSidebar
-                  clinicianId={clinicianId}
-                  clinicianName={clinicianName}
-                  patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}
-                  patientId={patientId}
-                  onWebSocket={webSocketNotification}
-                />
-  
-                {/* CANVAS FOR DIAGNOSTIC TOOL */}
-                <div
-                  className="offcanvas offcanvas-end"
-                  tabIndex="-1"
-                  id="offcanvasDiagnosticTool"
-                  aria-labelledby="offcanvasDiagnosticToolLabel"
-                >
-                  <div className="offcanvas-header">
-                    <h5
-                      className="offcanvas-title"
-                      id="offcanvasDiagnosticToolLabel"
-                    >
-                      Assistive Diagnostic Tool Experimental
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="offcanvas"
-                      aria-label="Close"
-                    ></button>
-                  </div>
-                  <div className="offcanvas-body">
-                    {/* Diagnostic Tool Content */}
-                    <div className="button-container">
-                    {userRole === "patientslp" && (
-                        <button
-                          className="text-button border"
-                          onClick={() => startVoiceRecognitionHandler(userRole, socket.current)}
-                        >
-                          Start Voice Recognition
-                        </button>
-                      )}
-                    </div>
-  
-                    <div className="chart-container">
+
+                    {/* CANVAS FOR MESSAGES */}
                     <div
-                        id="chartContainer"
-                        className={userRole === "patientslp" ? "visually-hidden" : ""}
+                      className="offcanvas offcanvas-start"
+                      data-bs-scroll="true"
+                      tabIndex="-1"
+                      id="offcanvasWithBothOptions"
+                      aria-labelledby="offcanvasWithBothOptionsLabel"
                     >
-                        <canvas id="outputChart"></canvas>
+                      <div className="offcanvas-header">
+                        <h5
+                          className="offcanvas-title"
+                          id="offcanvasWithBothOptionsLabel"
+                        >
+                          Messages
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="offcanvas"
+                          aria-label="Close"
+                        ></button>
                       </div>
+                      <div className="offcanvas-body d-flex flex-column justify-content-between overflow-y-auto">
+                        {/* CHAT AREA */}
+                        <div>
+                          {messages.map((msg, index) => (
+                            <p key={index}>
+                              <span className="fw-bold">{msg.sender}</span>:{" "}
+                              {msg.message}
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* INPUT CHAT */}
+                      <form
+                        className="input-group my-3 p-3"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          handleSendMessage(type);
+                          setType("");
+                        }}
+                      >
+                        <input
+                          type="text"
+                          className="form-control"
+                          placeholder="Type a message..."
+                          value={type}
+                          onChange={(e) => setType(e.target.value)}
+                        />
+                        <button type="submit" className="btn btn-primary">
+                          Send
+                        </button>
+                      </form>
                     </div>
 
-                    <div>
-                      <div className={userRole === "patientslp" ? "visually-hidden" : ""}>
-                        If you are seeing this, the Diagnostic Tool is not working for now, try it on Exercise!
-                      </div>
-                    </div>
-  
-                    <div className="controls-container">
-                      <div className="cardbox">
-                      <div id="output" dangerouslySetInnerHTML={{ __html: recognitionResults }}></div>
-                        <span id="action" className={userRole === "patientslp" ? "visually-hidden" : ""}></span>
-                      </div>
-                    </div>
-  
-                    <div id="phoneme-container">
-                      <div id="comment" className="text-muted"></div>
-                    </div>
+                    {/* CANVAS FOR SOAP */}
+                    <SoapSidebar
+                      clinicianId={clinicianId}
+                      clinicianName={clinicianName}
+                      patientName={`${appointmentDetails?.patientId?.firstName} ${appointmentDetails?.patientId?.lastName}`}
+                      patientId={patientId}
+                      onWebSocket={webSocketNotification}
+                    />
 
-  
-                    <div id="score-container" className={userRole === "patientslp" ? "visually-hidden" : ""}>
-                      <div id="score-output"></div>
+                    {/* CANVAS FOR DIAGNOSTIC TOOL */}
+                    <div
+                      className="offcanvas offcanvas-end"
+                      tabIndex="-1"
+                      id="offcanvasDiagnosticTool"
+                      aria-labelledby="offcanvasDiagnosticToolLabel"
+                    >
+                      <div className="offcanvas-header">
+                        <h5
+                          className="offcanvas-title"
+                          id="offcanvasDiagnosticToolLabel"
+                        >
+                          Assistive Diagnostic Tool Experimental
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="offcanvas"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div className="offcanvas-body">
+                        {/* Diagnostic Tool Content */}
+                        <div className="button-container">
+                          {userRole === "patientslp" && (
+                            <button
+                              className="text-button border"
+                              onClick={() =>
+                                startVoiceRecognitionHandler(
+                                  userRole,
+                                  socket.current
+                                )
+                              }
+                            >
+                              Start Voice Recognition
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="chart-container">
+                          <div
+                            id="chartContainer"
+                            className={
+                              userRole === "patientslp" ? "visually-hidden" : ""
+                            }
+                          >
+                            <canvas id="outputChart"></canvas>
+                          </div>
+                        </div>
+
+                        <div>
+                          <div
+                            className={
+                              userRole === "patientslp" ? "visually-hidden" : ""
+                            }
+                          >
+                            If you are seeing this, the Diagnostic Tool is not
+                            working for now, try it on Exercise!
+                          </div>
+                        </div>
+
+                        <div className="controls-container">
+                          <div className="cardbox">
+                            <div
+                              id="output"
+                              dangerouslySetInnerHTML={{
+                                __html: recognitionResults,
+                              }}
+                            ></div>
+                            <span
+                              id="action"
+                              className={
+                                userRole === "patientslp"
+                                  ? "visually-hidden"
+                                  : ""
+                              }
+                            ></span>
+                          </div>
+                        </div>
+
+                        <div id="phoneme-container">
+                          <div id="comment" className="text-muted"></div>
+                        </div>
+
+                        <div
+                          id="score-container"
+                          className={
+                            userRole === "patientslp" ? "visually-hidden" : ""
+                          }
+                        >
+                          <div id="score-output"></div>
+                        </div>
+
+                        <div
+                          id="label-container"
+                          className="visually-hidden"
+                        ></div>
+                      </div>
                     </div>
-  
-                    <div id="label-container" className="visually-hidden"></div>
-                  </div>
-                </div>
-              </>
-            ) : null}
+                  </>
+                ) : null}
+              </div>
+
+              <button
+                onClick={() => {
+                  handleCloseConnection();
+                }}
+                type="submit"
+                className="fw-bold text-button-red border"
+                disabled={!isActive}
+              >
+                Disconnect
+              </button>
+            </div>
           </div>
         </div>
       </div>

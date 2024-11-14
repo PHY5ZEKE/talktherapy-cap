@@ -89,9 +89,25 @@ exports.getSchedules = async (req, res) => {
 
 // Get All Clinicain User Schedules
 exports.getClinicianSched = async (req, res) => {
+  const dayOrder = {
+    Monday: 1,
+    Tuesday: 2,
+    Wednesday: 3,
+    Thursday: 4,
+    Friday: 5,
+    Saturday: 6,
+    Sunday: 7,
+  };
+
   try {
     // Fetch all schedules
     const schedules = await Schedule.find();
+    schedules.sort((a, b) => {
+      if (dayOrder[a.day] === dayOrder[b.day]) {
+        return moment(a.startTime, "hh:mm A").diff(moment(b.startTime, "hh:mm A"));
+      }
+      return dayOrder[a.day] - dayOrder[b.day];
+    });
 
     // Fetch clinician details for each schedule
     const schedulesWithSpecialization = await Promise.all(

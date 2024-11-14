@@ -10,7 +10,7 @@ import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBookmark } from "@fortawesome/free-solid-svg-icons";
+import { faBookmark, faStar } from "@fortawesome/free-solid-svg-icons";
 
 export default function ViewContent() {
   const { authState, clearOnLogOut } = useContext(AuthContext);
@@ -101,31 +101,35 @@ export default function ViewContent() {
 
   const handleBookmarkClick = async (content) => {
     try {
-      const updatedBookmarks = patientData.bookmarkedContent.map((bookmarkId) => {
-        return bookmarkId;  
-      });
-  
+      const updatedBookmarks = patientData.bookmarkedContent.map(
+        (bookmarkId) => {
+          return bookmarkId;
+        }
+      );
+
       if (updatedBookmarks.includes(content._id)) {
         updatedBookmarks.splice(updatedBookmarks.indexOf(content._id), 1);
       } else {
         updatedBookmarks.push(content._id);
       }
-  
-  
+
       // Update the patient bookmarks in the backend
-      const response = await fetch(`${appURL}/${route.patient.updateBookmarks}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ bookmarks: updatedBookmarks }),  
-      });
-  
+      const response = await fetch(
+        `${appURL}/${route.patient.updateBookmarks}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ bookmarks: updatedBookmarks }),
+        }
+      );
+
       if (!response.ok) {
         toast.error("Failed to update bookmarks");
       }
-  
+
       // Update local state
       setPatientData({ ...patientData, bookmarkedContent: updatedBookmarks });
     } catch (error) {
@@ -187,116 +191,98 @@ export default function ViewContent() {
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row bg-white p-3">
                   <div
-                    className="d-flex flex-wrap gap-3 bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ minHeight: "85vh" }}
+                    className="col bg-white border rounded-4 overflow-auto"
+                    style={{ maxHeight: "85vh", minHeight: "85vh" }}
                   >
-                    
-                    {filteredContent.map((content) => (
+                    <div className="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-1 mx-auto my-3">
+                      {/* Static Exercise Card: Run*/}
                       <div
-                        key={content._id}
-                        className="card exercise-container border"
-                        style={{ width: "18rem" }}
-                        onClick={() => handleCardClick(content._id)}
+                        className="col"
+                        onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
                       >
-                        <img
-                          src={content.image}
-                          className="card-img-top"
-                          alt={content.name}
-                          style={{ height: "16rem", objectFit: "cover" }}
-                        />
-                        <div className="card-body">
-                          <h5 className="card-title fw-bold mb-0 text-truncate">
-                            {content.name}
-                          </h5>
-                          <p>{content.category}</p> 
-                          <FontAwesomeIcon
-                          icon={faBookmark}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookmarkClick(content);
-                          }}
-                          style={{
-                            cursor: "pointer",
-                            color: patientData?.bookmarkedContent.includes(content._id)
-                              ? "blue"
-                              : "black",
-                          }}
-                        />
+                        <div className="mx-1 my-3 card exercise-container exercise-child border">
+                          <img
+                            src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
+                            className="card-img-top border-bottom"
+                            alt="Speech Exercise 1"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body p-3">
+                            <h5 className="card-title fw-bold mb-0 text-truncate">
+                              Word Exercises!
+                            </h5>
+                            <p>Speech Therapy</p>
+                            <FontAwesomeIcon icon={faStar} />
+                          </div>
                         </div>
                       </div>
-                    ))}
 
+                      {/* Static Exercise Card: Speech*/}
+                      <div
+                        className="col"
+                        onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
+                      >
+                        <div className="mx-1 my-3 card exercise-container exercise-child border">
+                          <img
+                            src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
+                            className="card-img-top border-bottom"
+                            alt="Speech Exercise 2"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body p-3">
+                            <h5 className="card-title fw-bold mb-0 text-truncate">
+                              Machine Learning: Assistive Speech
+                            </h5>
+                            <p>Machine Learning</p>
+                            <FontAwesomeIcon icon={faStar} />
+                          </div>
+                        </div>
+                      </div>
 
-                    {/* Static Exercise Card: Run*/}
-                  <div
-                    className="card exercise-container border"
-                    style={{ width: "18rem" }}
-                    onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
-                  >
-                    <img
-                      src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
-                      className="card-img-top"
-                      alt="Speech Exercise 1"
-                      style={{ height: "16rem", objectFit: "cover" }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title fw-bold mb-0 text-truncate">
-                        Word Exercises!
-                      </h5>
-                      <p>Speech Therapy</p>
-                      {/* <FontAwesomeIcon
-                        icon={faBookmark}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
-                            ? "blue"
-                            : "black",
-                        }}
-                      /> */}
+                      {filteredContent.map((content) => (
+                        <div
+                          key={content._id}
+                          className="col"
+                          onClick={() => handleCardClick(content._id)}
+                        >
+                          <div className="mx-1 my-3 card exercise-container exercise-child border">
+                            <img
+                              src={content.image}
+                              className="card-img-top border-bottom"
+                              alt={content.name}
+                              style={{ height: "200px", objectFit: "cover" }}
+                            />
+                            <div className="card-body p-3">
+                              <h5 className="card-title fw-bold mb-0 text-truncate">
+                                {content.name}
+                              </h5>
+                              <p>{content.category}</p>
+                              <FontAwesomeIcon
+                                icon={faBookmark}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleBookmarkClick(content);
+                                }}
+                                style={{
+                                  cursor: "pointer",
+                                  color:
+                                    patientData?.bookmarkedContent.includes(
+                                      content._id
+                                    )
+                                      ? "blue"
+                                      : "black",
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </div>
 
-                  {/* Static Exercise Card: Speech*/}
-                  <div
-                    className="card exercise-container border"
-                    style={{ width: "18rem" }}
-                    onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
-                  >
-                    <img
-                      src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
-                      className="card-img-top"
-                      alt="Speech Exercise 2"
-                      style={{ height: "16rem", objectFit: "cover" }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title fw-bold mb-0 text-truncate">
-                        Machine Learning: Assistive Speech
-                      </h5>
-                      <p>Machine Learning</p>
-                      {/* <FontAwesomeIcon
-                        icon={faBookmark}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
-                            ? "blue"
-                            : "black",
-                        }}
-                      /> */}
-                    </div>
-                  </div>
-
-                  {/* Static Exercise Card: Face*/}
-                  {/* <div
+                    {/* Static Exercise Card: Face*/}
+                    {/* <div
                     className="card exercise-container border"
                     style={{ width: "18rem" }}
                     onClick={() => handleCardClick("facespeech")} // Replace with actual ID logic if needed
@@ -327,7 +313,6 @@ export default function ViewContent() {
                       />
                     </div>
                   </div> */}
-
                   </div>
                 </div>
               </div>

@@ -137,7 +137,7 @@ export default function ManageSchedule() {
 
     fetchAssignedPatients();
 
-    socket.current = new WebSocket(`wss://${import.meta.env.VITE_LOCALWS}`);
+    socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
       console.log("Connected to the server");
@@ -439,6 +439,11 @@ export default function ManageSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
+                    <div className="d-flex align-items-center justify-content-center gap-3 mb-3">
+                      <button className="text-button border">My Patients</button>
+                      <button className="text-button border">All Patients</button>
+                    </div>
+
                     {filteredPatients && filteredPatients.length > 0 ? (
                       filteredPatients.map((patient) => (
                         <div

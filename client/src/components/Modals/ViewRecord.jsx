@@ -86,7 +86,7 @@ export default function ViewRecord({
           </div>
         </div>
 
-        {role === "clinician" && (
+        {role != "admin" && (
           <div className="d-flex gap-3 m-3 border border-bottom-0 border-start-0 border-end-0">
             <p
               className="fw-bold mt-3 mb-0 text-button border"

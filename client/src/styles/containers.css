@@ -25,6 +25,10 @@
   height: 320px;
 }
 
+.exercise-child {
+  /* width: 300px; */
+}
+
 /* DATE PICKER CSS */
 .react-datepicker__month-container {
   width: 100%;

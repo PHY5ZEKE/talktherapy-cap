@@ -76,7 +76,7 @@ export default function Profile() {
 
     fetchUserDetails();
 
-    socket.current = new WebSocket(`wss://${import.meta.env.VITE_LOCALWS}`);
+    socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
       console.log("Connected to the server");

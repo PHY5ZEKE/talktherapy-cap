@@ -232,7 +232,7 @@ export default function BookSchedule() {
     fetchAppointments();
 
     // WebSocket
-    socket.current = new WebSocket(`wss://${import.meta.env.VITE_LOCALWS}`);
+    socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
       console.log("Connected to the server");
@@ -255,6 +255,7 @@ export default function BookSchedule() {
     };
   }, []);
 
+  console.log(allSched)
   const webSocketNotification = async (message) => {
     const response = JSON.stringify(message);
     const parsed = JSON.parse(response);
