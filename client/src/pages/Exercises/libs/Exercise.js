@@ -457,7 +457,15 @@ function initializeExercise() {
                 console.warn('webkitSpeechRecognition is not supported in this browser.');
                 return; 
             }
-            var recognition = new webkitSpeechRecognition();
+            var recognition;
+                if (typeof window.SpeechRecognition !== 'undefined') {
+                    recognition = new window.SpeechRecognition(); // Standard SpeechRecognition
+                } else if (typeof window.webkitSpeechRecognition !== 'undefined') {
+                    recognition = new window.webkitSpeechRecognition(); // WebKit-based SpeechRecognition
+                } else {
+                    $recognition.innerHTML('SpeechRecognition is not supported in this browser.');
+                    return; 
+                }
             var chunks, userAudio;
     
             var mediaRecorder = new MediaRecorder(stream);
