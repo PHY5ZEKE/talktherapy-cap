@@ -514,6 +514,7 @@ function initializeExercise() {
                 
                 recognitionTimeout = setTimeout(() => {
                     recognition.onspeechend();
+                    $recognition.innerHTML = 'Sorry! Voice unrecognized!';
                 }, 5000);
                 
             
@@ -601,7 +602,7 @@ function initializeExercise() {
                     if ($panel_recognition) $panel_recognition.setAttribute('mode', 'recognition');
                     if ($recognition) {
                         $recognition.removeAttribute('confidence');
-                        $recognition.innerHTML = 'Sorry! We did not hear that, try again! ' + event.message;
+                        $recognition.innerHTML = 'Sorry! Voice unrecognized! ' + event.message;
                     }
                     recognition.stop();
                 };
