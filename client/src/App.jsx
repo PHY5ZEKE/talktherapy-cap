@@ -57,7 +57,7 @@ import PublicRoute from "./pages/Authorization/PublicRoute";
 import Room from "./pages/System/Room";
 
 //Test Exercises
-import ExerciseStart from "./pages/Exercises/Exercises";
+import WordStart from "./pages/Exercises/WordStart";
 import AssistSpeech from "./pages/Exercises/AssistSpeech";
 import ExerciseContent from "./pages/Exercises/ExerciseContent";
 import ExerRun from "./pages/Exercises/ExerRun"
@@ -94,7 +94,7 @@ const routes = (
       />
 
       {/* Exercises */}
-      <Route path="/exercise" element={<ExerciseStart />} />
+      <Route path="/exercise" element={<WordStart />} />
       <Route path="/assist/speech" element={<AssistSpeech />} />
       <Route path="/content/exercises/:id" element={<ExerciseContent /> }/>
       <Route path="/content/exercises/speech" element={<ExerRun /> }/>

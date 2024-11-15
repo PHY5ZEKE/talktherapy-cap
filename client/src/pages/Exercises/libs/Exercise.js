@@ -1,5 +1,5 @@
-window.addEventListener('load', function() {
-     // Check for necessary APIs
+function initializeExercise() {
+    console.log('All resources finished loading!');
 	 if (typeof speechSynthesis === 'undefined') {
         console.warn('speechSynthesis API is not available.');
     }
@@ -121,7 +121,7 @@ window.addEventListener('load', function() {
 
         var helpButton = document.querySelector('#page-main #button-help');
         if (helpButton) {
-            console.log("Option button found");
+            console.log("Help button found");
             helpButton.addEventListener('click', function() {
                 var pageStart = document.querySelector('#page-start');
                 if (pageStart) {
@@ -180,38 +180,36 @@ window.addEventListener('load', function() {
             });
         }
 
-        var startButton = document.querySelector('#page-start #button-start');
-        if (startButton) {
-            console.log("Start button found");
-            startButton.addEventListener('click', function() {
-                var pageStart = document.querySelector('#page-start');
-                if (pageStart) {
-                    pageStart.style.display = 'none'; 
-                }
-        
-                var pageMain = document.querySelector('#page-main');
-                if (pageMain) {
-                    pageMain.style.display = 'block'; 
-                }
+        var startButton = document.querySelector('#page-start #button-start'); 
+        if (startButton) { 
+            console.log("Start button found"); 
+            startButton.addEventListener('click', function() { 
+                var pageStart = document.querySelector('#page-start'); 
+                if (pageStart) { pageStart.style.display = 'none'; }
+                        var pageMain = document.querySelector('#page-main');
+                            if (pageMain) {
+                                pageMain.style.display = 'block'; 
+                            }
 
-                if (texts && Object.keys(texts).length > 0) {
-                    var currentTextId = localStorage.getItem('speech-current-text');
-                    console.log("Current text ID:", currentTextId); 
+                            if (texts && Object.keys(texts).length > 0) {
+                                var currentTextId = localStorage.getItem('speech-current-text');
+                                console.log("Current text ID:", currentTextId); 
 
-                    if (texts[currentTextId]) {
-                        console.log("Current text:", texts[currentTextId]); 
-                        var $e = document.querySelector('#page-text-selector #texts div[id="' + currentTextId + '"]');
-                        if ($e) {
-                            $e.click(); 
-                        }
-                    } else {
-                        console.error("No text found for ID:", currentTextId); 
+                                if (texts[currentTextId]) {
+                                    console.log("Current text:", texts[currentTextId]); 
+                                    var $e = document.querySelector('#page-text-selector #texts div[id="' + currentTextId + '"]');
+                                    if ($e) {
+                                        $e.click(); 
+                                    }
+                                } else {
+                                    console.error("No text found for ID:", currentTextId); 
+                                }
+                            } else {
+                                console.error("Texts not loaded or empty."); 
+                            }
+                        });
                     }
-                } else {
-                    console.error("Texts not loaded or empty."); 
-                }
-            });
-        }
+
 
         function displayPhonemesForCurrentPhrase(phrase) {
             var words = phrase.split(' '); // Split the phrase into words
@@ -732,4 +730,10 @@ window.addEventListener('load', function() {
 
 
 
+}
+
+
+
+window.addEventListener('load', function() {
+    initializeExercise();
 });

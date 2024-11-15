@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './libs/exercises.css';
 
 // PageStart Component
-export default function ExerciseStart() {
+export default function WordStart() {
 
   const [isRecording, setIsRecording] = useState(false);
 
@@ -11,14 +11,25 @@ export default function ExerciseStart() {
     setIsRecording(prevState => !prevState);
   };
 
-
   useEffect(() => {
     const existingScript = document.querySelector('script[src="./src/pages/Exercises/libs/Exercise.js"]');
     if (!existingScript) {
       const script = document.createElement('script');
       script.src = './src/pages/Exercises/libs/Exercise.js';
       script.async = true;
+      script.onload = () => {
+        console.log('Exercise.js loaded');
+        // Call the initialize function after the script has loaded
+        if (typeof window.initializeExercise === 'function') {
+          window.initializeExercise();
+        }
+      };
       document.body.appendChild(script);
+    } else {
+      // If the script already exists, call the initialize function directly
+      if (typeof window.initializeExercise === 'function') {
+        window.initializeExercise();
+      }
     }
   }, []);
 
@@ -30,7 +41,7 @@ export default function ExerciseStart() {
         <h1 id="power-by" className="mb-4">Test Exercise</h1>
         <p className="description mb-3">Speech Recognition Speech Exercise</p>
         <div id="loading" className="loading mb-2">Loading...</div>
-        <div id="microphone" className="microphone mb-4">Allow access to microphone...</div>
+        <div id="microphone" className="microphone mb-4">Please allow access to microphone to start</div>
         <button id="button-start" className="btn btn-primary">Start</button>
       </div>
     </div>
@@ -108,7 +119,7 @@ export default function ExerciseStart() {
           </div>
 
 
-      {/* Panel Option (Modal) */}
+      {/* Panel Help (Modal) */}
         <div id="page-help" className="modal hidden">
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content">
