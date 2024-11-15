@@ -49,7 +49,6 @@ export default function BookSchedule() {
   const [error, setError] = useState(null);
 
   const [schedules, setSchedules] = useState([]);
-  const [clinicianData, setClinicianData] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 
   const [allSched, setAllSchedule] = useState([]);

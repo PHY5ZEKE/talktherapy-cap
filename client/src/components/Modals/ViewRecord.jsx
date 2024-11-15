@@ -49,9 +49,6 @@ export default function ViewRecord({
           <p>
             <strong>Session Type:</strong> {details.sessionType}
           </p>
-          <p>
-            <strong>Session Recording:</strong> {details.sessionRecording}
-          </p>
           <div>
             <strong>Subjective:</strong>
             <div

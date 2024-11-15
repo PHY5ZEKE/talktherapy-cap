@@ -14,7 +14,6 @@ import Sidebar from "../../components/Sidebar/SidebarSuper";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 import EditProfile from "../../components/Modals/EditProfile";
 import RegisterAdmin from "../../components/Modals/RegisterAdmin";
-import { emailAccountStatus } from "../../utils/emailAccountStatus";
 import { emailAccountArchive } from "../../utils/emailAccountArchive";
 import ArchiveUser from "../../components/Modals/ArchiveUser";
 
@@ -25,14 +24,12 @@ export default function Home() {
 
   // Get Super Admin and Admins
   const [admins, setAdmins] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [superAdmin, setSuperAdmin] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
   const [userDetails, setUserDetails] = useState(null);
   const [editProfileAPI, setEditProfileAPI] = useState("");
   const [updateProfilePictureAPI, setUpdateProfilePictureAPI] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const notify = (message) =>
     toast.success(message, {
@@ -93,8 +90,6 @@ export default function Home() {
         setAdmins(response.data.admins);
       } catch (error) {
         setError("An error occurred while retrieving admins.", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -223,54 +218,6 @@ export default function Home() {
 
     fetchSuperAdmin();
   }, []);
-
-  // Function to toggle activation status
-  const toggleAdminStatus = async (adminData) => {
-    if (!adminData) return;
-
-    setIsProcessing(true); // Start processing
-
-    try {
-      const url = adminData.active
-        ? `${appURL}/${route.admin.removeAdmin}`
-        : `${appURL}/${route.admin.activateAdmin}`;
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ email: adminData.email }), // Automatically pass the selected admin's email
-      });
-
-      const data = await response.json();
-
-      if (!data.error) {
-        // Optionally, update the admins list to reflect the change
-        setAdmins(
-          admins.map((admin) =>
-            admin._id === adminData._id
-              ? { ...admin, active: !adminData.active }
-              : admin
-          )
-        );
-
-        emailAccountStatus(
-          adminData.email,
-          adminData.active ? "deactivated" : "activated"
-        );
-        notify(toastMessage.success.status);
-      } else {
-        failNotify(toastMessage.fail.status);
-      }
-    } catch (error) {
-      failNotify(toastMessage.fail.error);
-      setError("An error occurred while updating admin status.", error);
-    } finally {
-      setIsProcessing(false); // Stop processing
-    }
-  };
 
   // Archive/Soft Deletion Modal
   const [isArchive, setArchive] = useState(false);
@@ -417,14 +364,7 @@ export default function Home() {
                                     ? "Restore"
                                     : "Archive"}
                                 </div>
-                                <div
-                                  className="mb-3 fw-bold text-button border"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() => toggleAdminStatus(admin)}
-                                  disabled={isProcessing}
-                                >
-                                  {admin.active ? "Deactivate" : "Activate"}
-                                </div>
+                                
                               </div>
                             </div>
                           ))}

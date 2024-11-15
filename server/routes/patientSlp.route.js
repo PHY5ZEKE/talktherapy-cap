@@ -2,8 +2,6 @@
 const express = require("express");
 const router = express.Router();
 const {
-  deactivatePatient,
-  activatePatient,
   signupPatient,
   getPatient,
   changePassword,
@@ -13,12 +11,6 @@ const {
 } = require("../controllers/patientSLP.controller");
 
 const verifyToken = require("../middleware/verifyToken");
-
-// Remove SLP Patient
-router.post("/remove-slp-patient", verifyToken, deactivatePatient);
-
-// Activate SLP Patient
-router.post("/activate-slp-patient", verifyToken, activatePatient);
 
 // Create SLP Patient Account
 router.post("/slp-patient-signup", signupPatient);

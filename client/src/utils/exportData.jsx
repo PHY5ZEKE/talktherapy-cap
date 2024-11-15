@@ -37,9 +37,8 @@ NO FOUND/EXISTING SOAP RECORDS
         record.date
       ).toLocaleDateString()})
     ========================
-    - Activity Plan    : ${record.activityPlan || ''}
+    - Session Plan    : ${record.activityPlan || ''}
     - Session Type     : ${record.sessionType || ''}
-    - Session Recording: ${record.sessionRecording || ''}
     
     Subjective Notes:
     -----------------

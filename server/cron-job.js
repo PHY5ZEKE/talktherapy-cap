@@ -21,4 +21,4 @@ cron.schedule("0 0 * * *", () => {
   archiveInactiveUsers();
 });
 
-console.log("Running schedules tasks...")
+console.log("Running scheduled tasks...")

@@ -20,55 +20,6 @@ const upload = require("../middleware/uploadProfilePicture");
 
 const { encrypt, decrypt } = require("../middleware/aesUtilities");
 
-const deactivatePatient = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: true, message: "Email is required." });
-  }
-
-  const patientSlp = await PatientSlp.findOne({ email });
-
-  if (!patientSlp) {
-    return res.status(400).json({ error: true, message: "Patient not found." });
-  }
-
-  if (patientSlp.active === false) {
-    return res.status(400).json({
-      error: true,
-      message: "Patient account is already deactivated.",
-    });
-  }
-
-  patientSlp.active = false;
-  await patientSlp.save();
-
-  try {
-    // Extract user ID from req.user
-    const userId = req.user.id;
-
-    // Find the admin using the extracted ID
-    const admin = await Admin.findOne({ _id: userId });
-
-    if (!admin) {
-      return res.status(404).json({ error: true, message: "Admin not found." });
-    }
-
-    // Create audit log with the admin's email
-    await createAuditLog(
-      "deactivatePatient",
-      admin.email, // Pass the admin's email
-      `Admin with  ${admin.email} deactivated the patient  ${email}`
-    );
-  } catch (error) {
-    console.error("Error creating audit log:", error); // Log the error details
-  }
-
-  return res
-    .status(200)
-    .json({ error: false, message: "Patient deactivated successfully." });
-};
-
 const updateBookmarks = async (req, res) => {
   try {
     const { id: patientId } = req.user; // Extract patient ID from token (or request)
@@ -118,54 +69,6 @@ const updateBookmarks = async (req, res) => {
     console.error("Error updating bookmarks:", error);
     return res.status(500).json({ error: true, message: "Internal server error." });
   }
-};
-
-const activatePatient = async (req, res) => {
-  const { email } = req.body;
-
-  if (!email) {
-    return res.status(400).json({ error: true, message: "Email is required." });
-  }
-
-  const patientSlp = await PatientSlp.findOne({ email });
-
-  if (!patientSlp) {
-    return res.status(400).json({ error: true, message: "Patient not found." });
-  }
-
-  if (patientSlp.active === true) {
-    return res
-      .status(400)
-      .json({ error: true, message: "Patient is already active." });
-  }
-
-  patientSlp.active = true;
-  await patientSlp.save();
-
-  try {
-    // Extract user ID from req.user
-    const userId = req.user.id;
-
-    // Find the admin using the extracted ID
-    const admin = await Admin.findOne({ _id: userId });
-
-    if (!admin) {
-      return res.status(404).json({ error: true, message: "Admin not found." });
-    }
-
-    // Create audit log with the admin's email
-    await createAuditLog(
-      "deactivatePatient",
-      admin.email, // Pass the admin's email
-      `Admin with ${admin.email} re-activated the patient  ${email}`
-    );
-  } catch (error) {
-    console.error("Error creating audit log:", error); // Log the error details
-  }
-
-  return res
-    .status(200)
-    .json({ error: false, message: "Patient deactivated successfully." });
 };
 
 const signupPatient = async (req, res) => {
@@ -521,8 +424,6 @@ const editPatient = [
 ];
 
 module.exports = {
-  deactivatePatient,
-  activatePatient,
   signupPatient,
   getPatient,
   updateBookmarks,

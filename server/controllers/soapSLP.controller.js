@@ -3,10 +3,10 @@ const Clinician = require("../models/clinicianSLP.model");
 
 exports.createSOAPDiagnosis = async (req, res) => {
   try {
-    const { patientId, clinicianId, date, activityPlan, sessionType, sessionRecording, subjective, objective, assessment, recommendation } = req.body;
+    const { patientId, clinicianId, date, activityPlan, sessionType, subjective, objective, assessment, recommendation } = req.body;
 
     // Validate input
-    if (!patientId || !clinicianId || !date || !activityPlan || !sessionType || !sessionRecording || !subjective || !objective || !assessment || !recommendation) {
+    if (!patientId || !clinicianId || !date || !activityPlan || !sessionType || !subjective || !objective || !assessment || !recommendation) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -25,7 +25,6 @@ exports.createSOAPDiagnosis = async (req, res) => {
       date,
       activityPlan,
       sessionType,
-      sessionRecording,
       subjective,
       objective,
       assessment,

@@ -858,12 +858,16 @@ exports.archiveUser = [
     const { id } = req.body;
 
     try {
-      const { userInfo } = await findUserById(id);
+      const { userInfo, userRole } = await findUserById(id);
 
       if (!userInfo) {
         return res
           .status(404)
           .json({ error: true, message: "User not found." });
+      }
+
+      if (userRole === "clinician") {
+        await Schedule.deleteMany({ clinicianId: id });
       }
 
       userInfo.active = false;
@@ -879,12 +883,12 @@ exports.archiveUser = [
       return res.json({
         error: false,
         userInfo,
-        message: "Admin status and activity updated successfully.",
+        message: "Account status and activity updated successfully.",
       });
     } catch (error) {
       return res.status(500).json({
         error: true,
-        message: "An error occurred while changing admin status and activity.",
+        message: "An error occurred while changing account status and activity.",
       });
     }
   },
@@ -917,13 +921,13 @@ exports.unarchiveUser = [
       return res.json({
         error: false,
         userInfo,
-        message: "Admin status and activity updated successfully.",
+        message: "Account status and activity updated successfully.",
       });
     } catch (error) {
       console.log(error);
       return res.status(500).json({
         error: true,
-        message: "An error occurred while changing admin status and activity.",
+        message: "An error occurred while changing account status and activity.",
       });
     }
   },

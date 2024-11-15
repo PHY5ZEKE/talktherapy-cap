@@ -20,7 +20,6 @@ import { toast, Slide } from "react-toastify";
 import { emailEditInfo } from "../../utils/emailEditInfo";
 import formatDate from "../../utils/formatDate";
 import SocketFetch from "../../utils/SocketFetch";
-import { emailAccountStatus } from "../../utils/emailAccountStatus";
 import { emailAccountArchive } from "../../utils/emailAccountArchive";
 
 const appURL = import.meta.env.VITE_APP_URL;
@@ -29,12 +28,10 @@ export default function Home() {
   const [patients, setPatients] = useState(null);
   const [clinicians, setClinicians] = useState(null);
   const [adminData, setAdminData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedUserType, setSelectedUserType] = useState("patients");
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const { authState } = useContext(AuthContext);
 
@@ -123,8 +120,6 @@ export default function Home() {
         failNotify(toastMessage.fail.fetch);
         setError(error.message);
         console.log("Error fetch appointments :", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -255,10 +250,8 @@ export default function Home() {
 
       const data = await response.json();
       setAdminData(data.admin);
-      setLoading(false);
     } catch (error) {
       setError(error.message);
-      setLoading(false);
     }
   };
 
@@ -321,93 +314,6 @@ export default function Home() {
   const acceptedAppointments = appointments.filter(
     (appointment) => appointment.status === "Accepted"
   ).length;
-
-  // Function to toggle activation status
-  const toggleClinicianStatus = async (userData) => {
-    if (!userData) return;
-
-    setIsProcessing(true); // Start processing
-
-    try {
-      const url = userData.active
-        ? `${appURL}/${route.clinician.removeClinician}`
-        : `${appURL}/${route.clinician.activateClinician}`;
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ email: userData.email }), // Automatically pass the selected clinician's email
-      });
-
-      const data = await response.json();
-
-      if (!data.error) {
-        emailAccountStatus(
-          userData.email,
-          userData.active ? "deactivated" : "activated"
-        );
-        notify(toastMessage.success.status);
-        // Optionally, update the clinicians list to reflect the change
-        setClinicians(
-          clinicians.map((clinician) =>
-            clinician._id === userData._id
-              ? { ...clinician, active: !userData.active }
-              : clinician
-          )
-        );
-      } else {
-        failNotify(toastMessage.fail.status);
-      }
-    } finally {
-      setIsProcessing(false); // Stop processing
-    }
-  };
-
-  const togglePatientStatus = async (userData) => {
-    if (!userData) return;
-
-    setIsProcessing(true); // Start processing
-
-    try {
-      const url = userData.active
-        ? `${appURL}/${route.patient.deactivate}`
-        : `${appURL}/${route.patient.activate}`;
-
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ email: userData.email }), // Automatically pass the selected patient's email
-      });
-
-      const data = await response.json();
-
-      if (!data.error) {
-        emailAccountStatus(
-          userData.email,
-          userData.active ? "deactivated" : "activated"
-        );
-        notify(toastMessage.success.status);
-        // Optionally, update the patients list to reflect the change
-        setPatients(
-          patients.map((patient) =>
-            patient._id === userData._id
-              ? { ...patient, active: !userData.active }
-              : patient
-          )
-        );
-      } else {
-        failNotify(toastMessage.fail.status);
-      }
-    } finally {
-      setIsProcessing(false); // Stop processing
-    }
-  };
 
   const sendEmail = (email) => {
     emailEditInfo(email);
@@ -827,14 +733,7 @@ export default function Home() {
                               >
                                 Archive
                               </div>
-                              <div
-                                className="mb-3 fw-bold text-button border"
-                                style={{ cursor: "pointer" }}
-                                onClick={() => togglePatientStatus(patient)}
-                                disabled={isProcessing}
-                              >
-                                {patient.active ? "Deactivate" : "Activate"}
-                              </div>
+                              
                             </div>
                           </div>
                         ))
@@ -880,16 +779,7 @@ export default function Home() {
                                 >
                                   Archive
                                 </div>
-                                <div
-                                  className="mb-3 fw-bold text-button border"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() =>
-                                    toggleClinicianStatus(clinician)
-                                  }
-                                  disabled={isProcessing}
-                                >
-                                  {clinician.active ? "Deactivate" : "Activate"}
-                                </div>
+                              
                               </div>
                             </div>
                           ))}

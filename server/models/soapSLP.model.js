@@ -11,7 +11,6 @@ const soapSchema = new Schema({
   date: { type: Date, required: true },
   activityPlan: { type: String, required: true },
   sessionType: { type: String, required: true },
-  sessionRecording: { type: String, required: true },
   subjective: { type: String, required: true },
   objective: { type: String, required: true },
   assessment: { type: String, required: true },

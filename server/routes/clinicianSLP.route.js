@@ -6,20 +6,6 @@ const verifyToken = require("../middleware/verifyToken");
 // Route to add a clinician
 router.post("/add-clinician", verifyToken, clinicianController.addClinician);
 
-// Route to remove a clinician
-router.post(
-  "/remove-clinician",
-  verifyToken,
-  clinicianController.removeClinician
-);
-
-// Route to activate a clinician
-router.post(
-  "/activate-clinician",
-  verifyToken,
-  clinicianController.activateClinician
-);
-
 // Route for clinician signup
 router.post("/signup", clinicianController.clinicianSignup);
 

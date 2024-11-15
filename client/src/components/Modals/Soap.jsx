@@ -7,7 +7,6 @@ import { AuthContext } from "../../utils/AuthContext";
 import "./modal.css";
 
 import { route } from "../../utils/route";
-import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
 export default function Soap({
@@ -24,7 +23,6 @@ export default function Soap({
   const [date, setDate] = useState("");
   const [activityPlan, setActivityPlan] = useState("");
   const [sessionType, setSessionType] = useState("");
-  const [sessionRecording, setSessionRecording] = useState("");
   const [subjective, setSubjective] = useState("");
   const [objective, setObjective] = useState("");
   const [assessment, setAssessment] = useState("");
@@ -58,7 +56,6 @@ export default function Soap({
       date,
       activityPlan,
       sessionType,
-      sessionRecording,
       subjective,
       objective,
       assessment,
@@ -107,7 +104,7 @@ export default function Soap({
     <>
       <div className="modal-background">
         <div className="modal-container d-flex flex-column justify-content-center align-content-center overflow-auto">
-          <h3 className="fw-bold text-center">Add SOAP to Patient</h3>
+          <h3 className="fw-bold text-center">Add SOAP</h3>
           <p className="mb-0 text-center">
             Please verify your inputs before proceeding.
           </p>
@@ -134,7 +131,7 @@ export default function Soap({
           <div className="container text-center">
             <div className="row">
               <div className="w-100 mb-3">
-                <p className="fw-bold mb-0">Activity/Assessment Plan</p>
+                <p className="fw-bold mb-0">Session Plan</p>
                 <input
                   type="text"
                   className="form-control"
@@ -154,16 +151,6 @@ export default function Soap({
                   className="form-control"
                   value={sessionType}
                   onChange={(e) => setSessionType(e.target.value)}
-                />
-              </div>
-
-              <div className="col">
-                <p className="fw-bold mb-0">Session Recording</p>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={sessionRecording}
-                  onChange={(e) => setSessionRecording(e.target.value)}
                 />
               </div>
             </div>

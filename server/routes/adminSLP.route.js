@@ -4,8 +4,7 @@ const adminController = require("../controllers/adminSLP.controller");
 const verifyToken = require("../middleware/verifyToken");
 
 router.post("/add-admin", adminController.addAdmin);
-router.post("/remove-admin", adminController.removeAdmin);
-router.post("/activate-admin", adminController.activateAdmin);
+
 router.post("/admin-signup", adminController.adminSignup);
 
 router.get("/get-admin", verifyToken, adminController.getAdmin);

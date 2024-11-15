@@ -22,7 +22,8 @@ export default function ConfirmVideoCall({
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
             <h3 className="fw-bold">Ready to join the call?</h3>
-            <p className="mb-0">To start sharing your video and join press confirm. To go back, press cancel.</p>
+            <p>Before joining the call please make sure to be in a well-lit environment. Make sure that your microphone is audible and clear.</p>
+            <p className="mb-0">To start sharing your video and join press <span className="fw-bold">confirm</span>. To go back, press <span className="fw-bold">cancel</span>.</p>
           </div>
 
           <div className="d-flex justify-content-center">

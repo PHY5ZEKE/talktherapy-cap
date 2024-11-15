@@ -23,7 +23,6 @@ export default function SoapSidebar({
   const [date, setDate] = useState("");
   const [activityPlan, setActivityPlan] = useState("");
   const [sessionType, setSessionType] = useState("");
-  const [sessionRecording, setSessionRecording] = useState("");
   const [subjective, setSubjective] = useState("");
   const [objective, setObjective] = useState("");
   const [assessment, setAssessment] = useState("");
@@ -52,7 +51,6 @@ export default function SoapSidebar({
       date,
       activityPlan,
       sessionType,
-      sessionRecording,
       subjective,
       objective,
       assessment,
@@ -79,7 +77,7 @@ export default function SoapSidebar({
 
       const userUpdate = {
         notif: "addSOAP",
-        body: `Dr. ${clinicianName} has added a SOAP/Diagnosis. Kindly check your feedbacks.`,
+        body: `Clinician ${clinicianName} has added a SOAP/Diagnosis. Kindly check your feedbacks.`,
         diagnosis: recommendation,
         show_to: [patientId],
       };
@@ -107,7 +105,7 @@ export default function SoapSidebar({
         aria-labelledby="offcanvasWithBothOptionsLabel"
       >
         <div className="d-flex flex-column text-center offcanvas-header">
-          <h3 className="fw-bold">Add SOAP to Patient</h3>
+          <h3 className="fw-bold">Add SOAP</h3>
           <p className="mb-0">Please verify your inputs before proceeding.</p>
         </div>
 
@@ -137,7 +135,7 @@ export default function SoapSidebar({
         <div className="container text-center">
           <div className="row">
             <div className="w-100 mb-3">
-              <p className="fw-bold mb-0">Activity/Assessment Plan</p>
+              <p className="fw-bold mb-0">Session Plan</p>
               <input
                 type="text"
                 className="form-control"
@@ -157,16 +155,6 @@ export default function SoapSidebar({
                 className="form-control"
                 value={sessionType}
                 onChange={(e) => setSessionType(e.target.value)}
-              />
-            </div>
-
-            <div className="col">
-              <p className="fw-bold mb-0">Session Recording</p>
-              <input
-                type="text"
-                className="form-control"
-                value={sessionRecording}
-                onChange={(e) => setSessionRecording(e.target.value)}
               />
             </div>
           </div>
