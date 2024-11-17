@@ -1,8 +1,9 @@
 import { useState, useContext } from "react";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css";
 import { AuthContext } from "../../utils/AuthContext";
 import "./modal.css";
 import { route } from "../../utils/route";
-
 import { toast, Slide } from "react-toastify";
 
 export default function EditSoap({ openModal, soapRecord, onFetch }) {
@@ -26,7 +27,16 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
     return date.toLocaleDateString("en-GB"); // Format as dd/mm/yyyy
   };
 
-  const [diagnosis, setDiagnosis] = useState(soapRecord.diagnosis);
+  const [date, setDate] = useState(soapRecord.date);
+  const [activityPlan, setActivityPlan] = useState(soapRecord.activityPlan);
+  const [sessionType, setSessionType] = useState(soapRecord.sessionType);
+  const [subjective, setSubjective] = useState(soapRecord.subjective);
+  const [objective, setObjective] = useState(soapRecord.objective);
+  const [assessment, setAssessment] = useState(soapRecord.assessment);
+  const [recommendation, setRecommendation] = useState(
+    soapRecord.recommendation
+  );
+
   const appURL = import.meta.env.VITE_APP_URL;
 
   const handleClose = (e) => {
@@ -38,8 +48,13 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
     e.preventDefault();
 
     const updatedSoapData = {
-      date: soapRecord.date, // Keep the original date
-      diagnosis,
+      date,
+      activityPlan,
+      sessionType,
+      subjective,
+      objective,
+      assessment,
+      recommendation,
     };
 
     try {
@@ -58,17 +73,21 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Server response:", errorData); // Log the server response
-        throw new Error("Failed to update SOAP diagnosis");
+        throw new Error("Failed to update SOAP record");
       }
 
       const data = await response.json();
       onFetch();
-      notify("Edited SOAP successfully.")
+      notify("Edited SOAP successfully.");
       openModal(); // Close the modal after successful submission
     } catch (error) {
-      failNotify("Failed to edit SOAP.")
-      console.log(error)
+      failNotify("Failed to edit SOAP.");
+      console.log(error);
     }
+  };
+
+  const modules = {
+    toolbar: false,
   };
 
   return (
@@ -100,13 +119,90 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
 
           <div className="d-flex justify-content-center">
             <form className="container w-100" onSubmit={handleSubmit}>
-              <p className="fw-bold text-center mb-1">Diagnosis</p>
-              <textarea
-                className="form-control"
-                aria-label="With textarea"
-                value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
-              ></textarea>
+              <div className="container text-center">
+                <div className="row">
+                  <div className="col mb-3">
+                    <p className="fw-bold mb-0">Activity Plan</p>
+                    <ReactQuill
+                      value={activityPlan}
+                      onChange={setActivityPlan}
+                      modules={modules}
+                      className="overflow-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="container text-center">
+                <div className="row">
+                  <div className="col mb-3">
+                    <p className="fw-bold mb-0">Session Type</p>
+                    <ReactQuill
+                      value={sessionType}
+                      onChange={setSessionType}
+                      modules={modules}
+                      className="overflow-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="container text-center">
+                <div className="row">
+                  <div className="col mb-3">
+                    <p className="fw-bold mb-0">Subjective</p>
+                    <ReactQuill
+                      value={subjective}
+                      onChange={setSubjective}
+                      modules={modules}
+                      className="overflow-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="container text-center">
+                <div className="row">
+                  <div className="col mb-3">
+                    <p className="fw-bold mb-0">Objective/Goals</p>
+                    <ReactQuill
+                      value={objective}
+                      onChange={setObjective}
+                      modules={modules}
+                      className="overflow-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="container text-center">
+                <div className="row">
+                  <div className="col mb-3">
+                    <p className="fw-bold mb-0">Assessment</p>
+                    <ReactQuill
+                      value={assessment}
+                      onChange={setAssessment}
+                      modules={modules}
+                      className="overflow-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="container text-center">
+                <div className="row">
+                  <div className="col mb-3">
+                    <p className="fw-bold mb-0">Recommendation</p>
+                    <ReactQuill
+                      value={recommendation}
+                      onChange={setRecommendation}
+                      modules={modules}
+                      className="overflow-auto"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="d-flex justify-content-center mt-3 gap-3">
                 <button type="submit" className="text-button border">
                   <p className="fw-bold my-0 status">SUBMIT</p>

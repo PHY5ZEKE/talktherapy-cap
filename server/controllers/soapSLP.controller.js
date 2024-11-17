@@ -3,10 +3,30 @@ const Clinician = require("../models/clinicianSLP.model");
 
 exports.createSOAPDiagnosis = async (req, res) => {
   try {
-    const { patientId, clinicianId, date, activityPlan, sessionType, subjective, objective, assessment, recommendation } = req.body;
+    const {
+      patientId,
+      clinicianId,
+      date,
+      activityPlan,
+      sessionType,
+      subjective,
+      objective,
+      assessment,
+      recommendation,
+    } = req.body;
 
     // Validate input
-    if (!patientId || !clinicianId || !date || !activityPlan || !sessionType || !subjective || !objective || !assessment || !recommendation) {
+    if (
+      !patientId ||
+      !clinicianId ||
+      !date ||
+      !activityPlan ||
+      !sessionType ||
+      !subjective ||
+      !objective ||
+      !assessment ||
+      !recommendation
+    ) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -104,17 +124,50 @@ exports.deleteSOAPDiagnosis = async (req, res) => {
 exports.updateSoap = async (req, res) => {
   try {
     const { id } = req.params;
-    const { diagnosis } = req.body;
+    const {
+      date,
+      activityPlan,
+      sessionType,
+      subjective,
+      objective,
+      assessment,
+      recommendation,
+    } = req.body;
+
+    // Validate input
+    if (
+      !date ||
+      !activityPlan ||
+      !sessionType ||
+      !subjective ||
+      !objective ||
+      !assessment ||
+      !recommendation
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
     const updatedSoap = await SOAP.findByIdAndUpdate(
       id,
-      { diagnosis },
+      {
+        date,
+        activityPlan,
+        sessionType,
+        subjective,
+        objective,
+        assessment,
+        recommendation,
+      },
       { new: true }
     );
+
     if (!updatedSoap) {
       return res.status(404).json({ message: "SOAP record not found" });
     }
+
     res.status(200).json(updatedSoap);
   } catch (error) {
+    console.error("Error updating SOAP record:", error);
     res.status(400).json({ message: error.message });
   }
 };

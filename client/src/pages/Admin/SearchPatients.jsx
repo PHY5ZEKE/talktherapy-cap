@@ -25,7 +25,7 @@ const VIEW_MODES = {
 export default function ManageSchedule() {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
-  const userRole = authState.role;
+  const userRole = authState.userRole;
 
   const appURL = import.meta.env.VITE_APP_URL;
 
