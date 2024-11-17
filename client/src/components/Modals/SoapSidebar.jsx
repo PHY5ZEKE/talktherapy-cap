@@ -45,6 +45,35 @@ export default function SoapSidebar({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!date) {
+      failNotify("Session Date is required");
+      return;
+    }
+    if (!activityPlan) {
+      failNotify("Activity Plan is required");
+      return;
+    }
+    if (!sessionType) {
+      failNotify("Session Type is required");
+      return;
+    }
+    if (!subjective) {
+      failNotify("Subjective is required");
+      return;
+    }
+    if (!objective) {
+      failNotify("Objective/Goals are required");
+      return;
+    }
+    if (!assessment) {
+      failNotify("Assessment is required");
+      return;
+    }
+    if (!recommendation) {
+      failNotify("Recommendation is required");
+      return;
+    }
+
     const soapData = {
       patientId,
       clinicianId,
@@ -160,9 +189,7 @@ export default function SoapSidebar({
           </div>
         </div>
 
-        <div
-          className="col bg-white overflow-auto"
-        >
+        <div className="col bg-white overflow-auto">
           <div className="container text-center">
             <div className="row">
               <div className="col mb-3">

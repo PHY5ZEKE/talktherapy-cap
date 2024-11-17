@@ -1,5 +1,6 @@
 import { useState, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
+import { validatePassword } from "../../../../shared/password"; // Adjust the import path
 
 import Modal from "react-bootstrap/Modal";
 import Button from "react-bootstrap/Button";
@@ -57,7 +58,14 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
 
     // Check if new password and confirm password match
     if (newPassword !== confirmPassword) {
-      notify("Password do not match.")
+      failNotify("New password and confirm password do not match.");
+      return;
+    }
+
+    // Validate new password format
+    const passwordValidationError = validatePassword(newPassword);
+    if (passwordValidationError) {
+      failNotify(passwordValidationError);
       return;
     }
 
@@ -84,27 +92,31 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
         notify(toastMessage.success.edit);
         handleCloseModal();
       } else {
-        failNotify(toastMessage.fail.edit);
+        if (data.message === "Current password is incorrect") {
+          failNotify("Current password is incorrect.");
+        } else {
+          failNotify(toastMessage.fail.edit);
+        }
       }
     } catch (error) {
       failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
 
       if (error.message === "Unexpected response format") {
-        failNotify(toastMessage.fail.server)
+        failNotify(toastMessage.fail.server);
       } else if (error.response) {
         // Server responded with a status other than 200 range
-        failNotify(toastMessage.fail.server)
+        failNotify(toastMessage.fail.server);
       } else if (error.request) {
         // Request was made but no response received
-        failNotify(toastMessage.fail.server)
- 
+        failNotify(toastMessage.fail.server);
       } else {
         // Something else happened while setting up the request
-        failNotify(toastMessage.fail.error)
+        failNotify(toastMessage.fail.error);
       }
     }
   };
+
   return (
     <Modal show={showPasswordModal} onHide={handleCloseModal} centered>
       <Modal.Header>

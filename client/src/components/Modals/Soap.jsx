@@ -50,6 +50,35 @@ export default function Soap({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!date) {
+      failNotify("Session Date is required");
+      return;
+    }
+    if (!activityPlan) {
+      failNotify("Session Plan is required");
+      return;
+    }
+    if (!sessionType) {
+      failNotify("Session Type is required");
+      return;
+    }
+    if (!subjective) {
+      failNotify("Subjective is required");
+      return;
+    }
+    if (!objective) {
+      failNotify("Objective/Goals are required");
+      return;
+    }
+    if (!assessment) {
+      failNotify("Assessment/Performance is required");
+      return;
+    }
+    if (!recommendation) {
+      failNotify("Plan/Recommendations are required");
+      return;
+    }
+
     const soapData = {
       patientId,
       clinicianId,

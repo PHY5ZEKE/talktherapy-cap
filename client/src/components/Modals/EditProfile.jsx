@@ -138,7 +138,9 @@ export default function EditProfile({
         notify(toastMessage.success.edit);
         onFetch();
       } else {
-        failNotify(toastMessage.fail.edit);
+        failNotify(
+          "Invalid Upload. File limit is 1MB and only JPEG, JPG, and PNG are allowed."
+        );
       }
     } catch (error) {
       failNotify(toastMessage.fail.error);
@@ -222,7 +224,7 @@ export default function EditProfile({
             </>
           )}
 
-          {(whatRole !== "patientslp") && (
+          {whatRole !== "patientslp" && (
             <div className="form-group">
               <p className="mb-0">Clinic Address</p>
               <input

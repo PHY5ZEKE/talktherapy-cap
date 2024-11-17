@@ -17,7 +17,8 @@ function validatePassword(password) {
     return "Password must include at least one number.";
   }
 
-  if (!/[@$!%*?&.]/.test(password)) {
+  // Updated regex to allow any symbol
+  if (!/[^a-zA-Z0-9]/.test(password)) {
     return "Password must include at least one special character.";
   }
 
