@@ -137,14 +137,29 @@ const handleTemporarilyRescheduled = async (appointment) => {
 const decryptPatientDetails = (appointment) => {
   if (appointment.patientId) {
     try {
-      if (appointment.patientId.firstName && appointment.patientId.firstName.includes(":")) {
-        appointment.patientId.firstName = decrypt(appointment.patientId.firstName);
+      if (
+        appointment.patientId.firstName &&
+        appointment.patientId.firstName.includes(":")
+      ) {
+        appointment.patientId.firstName = decrypt(
+          appointment.patientId.firstName
+        );
       }
-      if (appointment.patientId.middleName && appointment.patientId.middleName.includes(":")) {
-        appointment.patientId.middleName = decrypt(appointment.patientId.middleName);
+      if (
+        appointment.patientId.middleName &&
+        appointment.patientId.middleName.includes(":")
+      ) {
+        appointment.patientId.middleName = decrypt(
+          appointment.patientId.middleName
+        );
       }
-      if (appointment.patientId.lastName && appointment.patientId.lastName.includes(":")) {
-        appointment.patientId.lastName = decrypt(appointment.patientId.lastName);
+      if (
+        appointment.patientId.lastName &&
+        appointment.patientId.lastName.includes(":")
+      ) {
+        appointment.patientId.lastName = decrypt(
+          appointment.patientId.lastName
+        );
       }
     } catch (error) {
       console.error("Error decrypting patient details:", error);
@@ -202,7 +217,7 @@ exports.createAppointmentJSON = async (req, res) => {
     // Status gets all appointments that are not completed and rejected
     const existingAppointment = await Appointment.find({
       patientId: patientId,
-      status: { $nin: ["Completed", "Rejected"] } 
+      status: { $nin: ["Completed", "Rejected"] },
     });
 
     if (!existingAppointment) {
@@ -612,6 +627,7 @@ exports.updateAppointmentStatus = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 exports.getClinicianAppointments = async (req, res) => {
   try {
     const clinicianId = req.user.id; // Assuming the clinician ID is stored in req.user.id after token verification
@@ -752,7 +768,11 @@ exports.endSessionUpdateStatus = async (req, res) => {
         await createAuditLog(
           "updateAppointmentStatus",
           admin.email,
-          `Clinician ${clincian.firstName} ${clincian.lastName} has ended the session with ${decrypt(appointment.patientId.firstName)} ${decrypt(appointment.patientId.lastName)}`
+          `Clinician ${clincian.firstName} ${
+            clincian.lastName
+          } has ended the session with ${decrypt(
+            appointment.patientId.firstName
+          )} ${decrypt(appointment.patientId.lastName)}`
         );
       } catch (auditLogError) {
         console.error("Error creating audit log:", auditLogError);
@@ -763,7 +783,7 @@ exports.endSessionUpdateStatus = async (req, res) => {
         appointment,
       });
     } catch (error) {
-        return res.status(400).json({ message: error });
+      return res.status(400).json({ message: error });
     }
   } catch (error) {
     console.error("Error updating appointment status:", error);

@@ -51,6 +51,16 @@ export default function ManageSchedule() {
   const [soapRecords, setSoapRecords] = useState([]);
   const [patientName, setPatientName] = useState("");
 
+  const [showAllPatients, setShowAllPatients] = useState(true);
+
+  const handleShowAllPatients = () => {
+    setShowAllPatients(true);
+  };
+
+  const handleShowMyPatients = () => {
+    setShowAllPatients(false);
+  };
+
   const notify = (message) =>
     toast.success(message, {
       transition: Slide,
@@ -440,19 +450,48 @@ export default function ManageSchedule() {
                     style={{ maxHeight: "75vh" }}
                   >
                     <div className="d-flex align-items-center justify-content-center gap-3 mb-3">
-                      <button className="text-button border">My Patients</button>
-                      <button className="text-button border">All Patients</button>
+                      <button
+                        className="text-button border"
+                        onClick={handleShowMyPatients}
+                      >
+                        My Patients
+                      </button>
+                      <button
+                        className="text-button border"
+                        onClick={handleShowAllPatients}
+                      >
+                        All Patients
+                      </button>
                     </div>
 
-                    {filteredPatients && filteredPatients.length > 0 ? (
-                      filteredPatients.map((patient) => (
+                    {showAllPatients ? (
+                      filteredPatients && filteredPatients.length > 0 ? (
+                        filteredPatients.map((patient) => (
+                          <div
+                            key={patient._id}
+                            onClick={() => handleClinicianClick(patient)}
+                            className="mb-3 border border-top-0 border-start-0 border-end-0"
+                            style={{ cursor: "pointer" }}
+                          >
+                            <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.middleName} ${patient.lastName}`}</h5>
+                            <p className="mb-0 fw-bold">{patient.email}</p>
+                            <p className="mb-3">{patient.mobile}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <h5 className="mb-0 fw-bold text-center">
+                          No patients to show.
+                        </h5>
+                      )
+                    ) : assignedPatients && assignedPatients.length > 0 ? (
+                      assignedPatients.map((patient) => (
                         <div
                           key={patient._id}
                           onClick={() => handleClinicianClick(patient)}
                           className="mb-3 border border-top-0 border-start-0 border-end-0"
                           style={{ cursor: "pointer" }}
                         >
-                          <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.lastName}`}</h5>
+                          <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.middleName} ${patient.lastName}`}</h5>
                           <p className="mb-0 fw-bold">{patient.email}</p>
                           <p className="mb-3">{patient.mobile}</p>
                         </div>

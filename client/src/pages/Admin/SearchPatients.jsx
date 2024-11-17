@@ -214,7 +214,7 @@ export default function ManageSchedule() {
     }
     fetchSoapRecords(selectedPatient._id);
     exportPatientData(selectedPatient, soapRecords);
-  }
+  };
 
   return (
     <>
@@ -270,7 +270,7 @@ export default function ManageSchedule() {
                           className="mb-3 border border-top-0 border-start-0 border-end-0"
                           style={{ cursor: "pointer" }}
                         >
-                          <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.lastName}`}</h5>
+                          <h5 className="mb-0 fw-bold">{`${patient.firstName} ${patient.middleName} ${patient.lastName}`}</h5>
                           <p className="mb-0 fw-bold">{patient.email}</p>
                           <p className="mb-3">{patient.mobile}</p>
                         </div>
@@ -339,8 +339,9 @@ export default function ManageSchedule() {
                               >
                                 View SOAP Records
                               </button>
-                              <button className="text-button border w-100"
-                              onClick={handleExport}
+                              <button
+                                className="text-button border w-100"
+                                onClick={handleExport}
                               >
                                 Export Data
                               </button>

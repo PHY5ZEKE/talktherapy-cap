@@ -20,6 +20,15 @@ const upload = require("../middleware/uploadProfilePicture");
 
 const { decrypt } = require("../middleware/aesUtilities");
 
+const safeDecrypt = (text) => {
+  try {
+    return text && text.includes(":") ? decrypt(text) : text;
+  } catch (error) {
+    console.error("Error decrypting text:", error);
+    return text;
+  }
+};
+
 exports.addClinician = async (req, res) => {
   const { email } = req.body;
 
@@ -246,6 +255,7 @@ exports.getAllPatients = [
         patients: patients.map((patient) => ({
           _id: patient._id,
           firstName: decrypt(patient.firstName),
+          middleName: decrypt(patient.middleName),
           lastName: decrypt(patient.lastName),
           email: patient.email,
           mobile: decrypt(patient.mobile),
@@ -543,7 +553,17 @@ exports.getAssignedPatients = async (req, res) => {
       status: "Assigned",
     }).populate("patientId");
 
-    const patients = assignedPatients.map((assignment) => assignment.patientId);
+    const patients = assignedPatients.map((assignment) => {
+      const patient = assignment.patientId;
+      return {
+        _id: patient._id,
+        firstName: safeDecrypt(patient.firstName),
+        middleName: safeDecrypt(patient.middleName),
+        lastName: safeDecrypt(patient.lastName),
+        email: patient.email,
+        mobile: safeDecrypt(patient.mobile),
+      };
+    });
 
     res.status(200).json({ assignedPatients: patients });
   } catch (error) {
