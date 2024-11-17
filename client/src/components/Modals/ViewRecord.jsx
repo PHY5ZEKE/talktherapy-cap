@@ -1,5 +1,6 @@
 import { useState } from "react";
 import ConfirmationDialog from "./ConfirmationDialog";
+import AddComment from "./AddComment";
 
 export default function ViewRecord({
   header,
@@ -12,6 +13,12 @@ export default function ViewRecord({
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const handleConfirmationDialog = () => {
     setIsConfirmationOpen((prevState) => !prevState);
+  };
+
+  // Add Comment Modal
+  const [isCommentModalOpen, setIsCommentModalOpen] = useState(false);
+  const handleCommentModal = () => {
+    setIsCommentModalOpen((prevState) => !prevState);
   };
 
   const addClassToParagraphs = (htmlString) => {
@@ -35,10 +42,14 @@ export default function ViewRecord({
         />
       )}
 
+      {/* ADD COMMENT MODAL */}
+      {isCommentModalOpen && (
+        <AddComment handleModal={handleCommentModal} recordId={details._id} />
+      )}
+
       <details className="accordion mb-3 border border rounded-3">
         <summary className="open:bg-danger p-3 rounded-top-3">{header}</summary>
 
-        {/* <p className="px-3 mt-3">{details}</p> */}
         <div className="px-3 mt-3">
           <p>
             <strong>Date:</strong> {new Date(details.date).toLocaleDateString()}
@@ -81,9 +92,26 @@ export default function ViewRecord({
               }}
             />
           </div>
+          <div>
+            <strong>Comment From Admin:</strong>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: addClassToParagraphs(details.comment),
+              }}
+            />
+          </div>
         </div>
 
-        {role != "admin" && (
+        {role === "admin" ? (
+          <div className="d-flex gap-3 m-3 border border-bottom-0 border-start-0 border-end-0">
+            <p
+              className="fw-bold mt-3 mb-0 text-button border"
+              onClick={handleCommentModal}
+            >
+              Comment
+            </p>
+          </div>
+        ) : (
           <div className="d-flex gap-3 m-3 border border-bottom-0 border-start-0 border-end-0">
             <p
               className="fw-bold mt-3 mb-0 text-button border"

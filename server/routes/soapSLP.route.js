@@ -18,4 +18,10 @@ router.delete(
 
 router.put("/edit-soap/:id", verifyToken, soapSLPController.updateSoap);
 
+router.post(
+  "/comment-soap/:id",
+  verifyToken,
+  soapSLPController.addCommentToSoap
+);
+
 module.exports = router;

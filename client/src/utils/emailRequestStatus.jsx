@@ -14,7 +14,7 @@ export const emailRequestStatus = async (email, status, data) => {
       Appointment Details
       ========================
       Patient Name: ${data.patientId.firstName} ${data.patientId.lastName}
-      Clinician Name: Dr. ${data.selectedSchedule.clinicianName}
+      Clinician Name: Clinician ${data.selectedSchedule.clinicianName}
       Date: ${data.selectedSchedule.day} ${data.selectedSchedule.startTime} - ${data.selectedSchedule.endTime}
       `;
       break;
@@ -24,7 +24,7 @@ export const emailRequestStatus = async (email, status, data) => {
       Appointment Details
       ========================
       Patient Name: ${data.patientId.firstName} ${data.patientId.lastName}
-      Clinician Name: Dr. ${data.selectedSchedule.clinicianName}
+      Clinician Name: Clinician ${data.selectedSchedule.clinicianName}
       Date: ${data.selectedSchedule.day} ${data.selectedSchedule.startTime} - ${data.selectedSchedule.endTime}`;
       break;
     case "Revert":
@@ -33,7 +33,7 @@ export const emailRequestStatus = async (email, status, data) => {
       Appointment Details
       ========================
       Patient Name: ${data.patientId.firstName} ${data.patientId.lastName}
-      Clinician Name: Dr. ${data.selectedSchedule.clinicianName}
+      Clinician Name: Clinician ${data.selectedSchedule.clinicianName}
       Date: ${data.selectedSchedule.day} ${data.selectedSchedule.startTime} - ${data.selectedSchedule.endTime}
       `;
       break;
@@ -43,7 +43,7 @@ export const emailRequestStatus = async (email, status, data) => {
       Appointment Details
       ========================
       Patient Name: ${data.patientId.firstName} ${data.patientId.lastName}
-      Clinician Name: Dr. ${data.selectedSchedule.clinicianName}
+      Clinician Name: Clinician ${data.selectedSchedule.clinicianName}
       Date: ${data.selectedSchedule.day} ${data.selectedSchedule.startTime} - ${data.selectedSchedule.endTime}
       `;
       break;

@@ -71,7 +71,7 @@ export default function ChooseSchedule({
 
       const userUpdate = {
         notif: "appointmentChange",
-        body: `${patientName} is requesting a permanent change in schedule with Dr. ${appointment?.selectedSchedule?.clinicianName} to be set at ${selectedSchedule.day} ${selectedSchedule.startTime} ${selectedSchedule.endTime}.`,
+        body: `${patientName} is requesting a permanent change in schedule with Clinician ${appointment?.selectedSchedule?.clinicianName} to be set at ${selectedSchedule.day} ${selectedSchedule.startTime} ${selectedSchedule.endTime}.`,
         show_to: ["admin"],
         reason: `${reason}`,
       };

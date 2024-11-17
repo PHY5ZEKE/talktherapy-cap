@@ -15,6 +15,7 @@ const soapSchema = new Schema({
   objective: { type: String, required: true },
   assessment: { type: String, required: true },
   recommendation: { type: String, required: true },
+  comment: { type: String, required: false },
 });
 
 module.exports = mongoose.model("SOAP", soapSchema);

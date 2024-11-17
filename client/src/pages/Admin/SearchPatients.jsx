@@ -382,7 +382,7 @@ export default function ManageSchedule() {
                               key={record._id}
                               header={`${new Date(
                                 record.date
-                              ).toLocaleDateString()} - Dr. ${
+                              ).toLocaleDateString()} - Clinician ${
                                 record.clinician.firstName
                               } ${record.clinician.lastName}`}
                               details={record}

@@ -58,7 +58,11 @@ export default function AppointmentDetails({
         case "Pending":
           userUpdate = {
             notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s pending appointment with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            body: `${appointment.patientId?.firstName} ${
+              appointment.patientId?.lastName
+            }'s pending appointment with Clinician ${
+              appointment.selectedSchedule?.clinicianName
+            } has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
               appointment.selectedClinician,
@@ -68,7 +72,11 @@ export default function AppointmentDetails({
         case "Schedule Change Request":
           userUpdate = {
             notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s request for permanent schedule change with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            body: `${appointment.patientId?.firstName} ${
+              appointment.patientId?.lastName
+            }'s request for permanent schedule change with Clinician ${
+              appointment.selectedSchedule?.clinicianName
+            } has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
               appointment.selectedClinician,
@@ -78,7 +86,11 @@ export default function AppointmentDetails({
         case "Temporary Reschedule Request":
           userUpdate = {
             notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s request for temporary schedule change with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            body: `${appointment.patientId?.firstName} ${
+              appointment.patientId?.lastName
+            }'s request for temporary schedule change with Clinician ${
+              appointment.selectedSchedule?.clinicianName
+            } has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
               appointment.selectedClinician,
@@ -88,7 +100,11 @@ export default function AppointmentDetails({
         case "Temporarily Rescheduled":
           userUpdate = {
             notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s temporary schedule with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            body: `${appointment.patientId?.firstName} ${
+              appointment.patientId?.lastName
+            }'s temporary schedule with Clinician ${
+              appointment.selectedSchedule?.clinicianName
+            } has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
               appointment.selectedClinician,
@@ -98,7 +114,11 @@ export default function AppointmentDetails({
         case "Accepted":
           userUpdate = {
             notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${appointment.patientId?.lastName}'s appointment schedule with Dr. ${appointment.selectedSchedule?.clinicianName} has been ${newStatus.toLowerCase()}`,
+            body: `${appointment.patientId?.firstName} ${
+              appointment.patientId?.lastName
+            }'s appointment schedule with Clinician ${
+              appointment.selectedSchedule?.clinicianName
+            } has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
               appointment.selectedClinician,

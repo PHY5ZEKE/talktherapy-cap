@@ -139,7 +139,7 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="col">
                 <p className="fw-bold mb-0">Attending Clinician</p>
                 <p>
-                  Dr. {soapRecord.clinician.firstName}{" "}
+                  Clinician {soapRecord.clinician.firstName}{" "}
                   {soapRecord.clinician.lastName}
                 </p>
               </div>

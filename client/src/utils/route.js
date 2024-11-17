@@ -91,9 +91,10 @@ export const route = {
     delete: "api/soap-slp/delete-soap",
     getPatientSoap: "api/soap-slp/get-soap/",
     update: "api/soap-slp/edit-soap",
+    comment: "api/soap-slp/comment-soap",
   },
   notification: {
     create: "api/notification-slp/create-notifications",
-    get: "api/notification-slp/get-notifications"
-  }
+    get: "api/notification-slp/get-notifications",
+  },
 };

@@ -171,3 +171,31 @@ exports.updateSoap = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
+exports.addCommentToSoap = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comment } = req.body;
+
+    // Validate input
+    if (!comment) {
+      return res.status(400).json({ message: "Comment is required" });
+    }
+
+    const soap = await SOAP.findById(id);
+
+    if (!soap) {
+      return res.status(404).json({ message: "SOAP record not found" });
+    }
+
+    // Update the comment field of the SOAP record
+    soap.comment = comment;
+
+    await soap.save();
+
+    res.status(200).json({ message: "Comment added successfully", soap });
+  } catch (error) {
+    console.error("Error adding comment to SOAP record:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
