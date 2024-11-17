@@ -42,12 +42,6 @@ router.put(
   appointmentController.updateAppointmentStatus
 );
 
-router.put(
-  "/end-session-status/:appointmentId",
-  verifyToken,
-  appointmentController.endSessionUpdateStatus
-);
-
 router.get(
   "/get-appointment-by-clinician",
   verifyToken, // Ensure the user is authenticated

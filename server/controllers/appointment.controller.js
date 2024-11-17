@@ -549,61 +549,94 @@ exports.updateAppointmentStatus = async (req, res) => {
   try {
     const { appointmentId } = req.params;
     const { status } = req.body;
-    const adminId = req.user.id; // Assuming the token contains the admin ID
+    const userId = req.user.id; // Assuming the token contains the user ID
+    const userRole = req.user.role; // Assuming the token contains the user role
+
+    console.log("Updating appointment status");
+    console.log("Appointment ID:", appointmentId);
+    console.log("New Status:", status);
+    console.log("User ID:", userId);
+    console.log("User Role:", userRole);
 
     const appointment = await findAppointmentDetails(appointmentId);
     if (!appointment) {
+      console.log("Appointment not found");
       return res.status(404).json({ message: "Appointment not found" });
     }
 
-    const admin = await findAdminDetails(adminId);
-    if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
+    let user;
+    if (userRole === "admin") {
+      user = await findAdminDetails(userId);
+      if (!user) {
+        console.log("Admin not found");
+        return res.status(404).json({ message: "Admin not found" });
+      }
+    } else if (userRole === "clinician") {
+      user = await findClinicianDetails(userId);
+      if (!user) {
+        console.log("Clinician not found");
+        return res.status(404).json({ message: "Clinician not found" });
+      }
+    } else {
+      console.log("Invalid user role");
+      return res.status(400).json({ message: "Invalid user role" });
     }
 
     const patient = await findPatientDetails(appointment.patientId);
     if (!patient) {
+      console.log("Patient not found");
       return res.status(404).json({ message: "Patient not found" });
     }
 
     const clinician = await findClinicianDetails(appointment.selectedClinician);
     if (!clinician) {
+      console.log("Clinician not found");
       return res.status(404).json({ message: "Clinician not found" });
     }
+
+    console.log("Current Appointment Status:", appointment.status);
 
     try {
       switch (appointment.status) {
         case "Pending":
+          console.log("Handling Pending status");
           await handlePendingStatus(appointment, status);
           break;
         case "Accepted":
+          console.log("Handling Accepted status");
           if (status === "Completed") {
             await handleAcceptedStatus(appointment);
           }
           break;
         case "Schedule Change Request":
+          console.log("Handling Schedule Change Request status");
           await handleScheduleChangeRequest(appointment, status);
           break;
         case "Temporary Reschedule Request":
+          console.log("Handling Temporary Reschedule Request status");
           await handleTemporaryRescheduleRequest(appointment, status);
           break;
         case "Temporarily Rescheduled":
+          console.log("Handling Temporarily Rescheduled status");
           if (status === "Reverted") {
             await handleTemporarilyRescheduled(appointment);
           }
           break;
         default:
+          console.log("Invalid status transition");
           return res.status(400).json({ message: "Invalid status transition" });
       }
 
       await appointment.save();
+      console.log("Appointment saved successfully");
 
       try {
         await createAuditLog(
           "updateAppointmentStatus",
-          admin.email,
-          `Admin ${admin.email} ${status} the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
+          user.email,
+          `User ${user.email} ${status} the appointment request of patient email ${patient.email} with clinician email ${clinician.email}`
         );
+        console.log("Audit log created successfully");
       } catch (auditLogError) {
         console.error("Error creating audit log:", auditLogError);
       }
@@ -613,6 +646,7 @@ exports.updateAppointmentStatus = async (req, res) => {
         appointment,
       });
     } catch (error) {
+      console.error("Error during status handling:", error);
       if (
         error.message === "The selected schedule is no longer available." ||
         error.message === "The new schedule is no longer available." ||
@@ -743,50 +777,6 @@ exports.requestTemporaryReschedule = async (req, res) => {
     });
   } catch (error) {
     console.error("Error requesting temporary reschedule:", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-exports.endSessionUpdateStatus = async (req, res) => {
-  try {
-    const { appointmentId } = req.params;
-
-    const appointment = await findAppointmentDetails(appointmentId);
-    if (!appointment) {
-      return res.status(404).json({ message: "Appointment not found" });
-    }
-
-    const clinician = await findClinicianDetails(appointment.selectedClinician);
-    if (!clinician) {
-      return res.status(404).json({ message: "Clinician not found" });
-    }
-
-    try {
-      appointment.status = "Completed";
-      await appointment.save();
-      try {
-        await createAuditLog(
-          "updateAppointmentStatus",
-          admin.email,
-          `Clinician ${clincian.firstName} ${
-            clincian.lastName
-          } has ended the session with ${decrypt(
-            appointment.patientId.firstName
-          )} ${decrypt(appointment.patientId.lastName)}`
-        );
-      } catch (auditLogError) {
-        console.error("Error creating audit log:", auditLogError);
-      }
-
-      res.status(200).json({
-        message: "Appointment status updated successfully.",
-        appointment,
-      });
-    } catch (error) {
-      return res.status(400).json({ message: error });
-    }
-  } catch (error) {
-    console.error("Error updating appointment status:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
