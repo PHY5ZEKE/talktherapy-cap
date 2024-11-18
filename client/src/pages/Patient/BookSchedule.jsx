@@ -254,7 +254,6 @@ export default function BookSchedule() {
     };
   }, []);
 
-  console.log(allSched)
   const webSocketNotification = async (message) => {
     const response = JSON.stringify(message);
     const parsed = JSON.parse(response);
@@ -511,6 +510,7 @@ export default function BookSchedule() {
                         inline
                         dayClassName={getDayClassName}
                         minDate={new Date()}
+                        maxDate={new Date(new Date().setMonth(new Date().getMonth() + 6))}
                       />
                     </div>
                   </div>

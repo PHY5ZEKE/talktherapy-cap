@@ -21,12 +21,28 @@ export default function ViewRecord({
     setIsCommentModalOpen((prevState) => !prevState);
   };
 
+  // Add css to p tags
   const addClassToParagraphs = (htmlString) => {
     const div = document.createElement("div");
     div.innerHTML = htmlString;
     const paragraphs = div.querySelectorAll("p");
     paragraphs.forEach((p) => p.classList.add("mb-0"));
     return div.innerHTML;
+  };
+
+  // Check if data has html tag or not then render it properly
+  const renderContent = (content) => {
+    const hasHtmlTags = /<\/?[a-z][\s\S]*>/i.test(content);
+    if (hasHtmlTags) {
+      return (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: addClassToParagraphs(content),
+          }}
+        />
+      );
+    }
+    return <div>{content}</div>;
   };
 
   return (
@@ -54,51 +70,26 @@ export default function ViewRecord({
           <p>
             <strong>Date:</strong> {new Date(details.date).toLocaleDateString()}
           </p>
-          <p>
-            <strong>Activity Plan:</strong> {details.activityPlan}
-          </p>
-          <p>
-            <strong>Session Type:</strong> {details.sessionType}
-          </p>
           <div>
-            <strong>Subjective:</strong>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: addClassToParagraphs(details.subjective),
-              }}
-            />
+            <strong>Activity Plan:</strong> {renderContent(details.activityPlan)}
           </div>
           <div>
-            <strong>Objective:</strong>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: addClassToParagraphs(details.objective),
-              }}
-            />
+            <strong>Session Type:</strong> {renderContent(details.sessionType)}
           </div>
           <div>
-            <strong>Assessment:</strong>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: addClassToParagraphs(details.assessment),
-              }}
-            />
+            <strong>Subjective:</strong> {renderContent(details.subjective)}
           </div>
           <div>
-            <strong>Recommendation:</strong>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: addClassToParagraphs(details.recommendation),
-              }}
-            />
+            <strong>Objective:</strong> {renderContent(details.objective)}
           </div>
           <div>
-            <strong>Comment From Admin:</strong>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: addClassToParagraphs(details.comment),
-              }}
-            />
+            <strong>Assessment:</strong> {renderContent(details.assessment)}
+          </div>
+          <div>
+            <strong>Recommendation:</strong> {renderContent(details.recommendation)}
+          </div>
+          <div>
+            <strong>Comment From Admin:</strong> {renderContent(details.comment)}
           </div>
         </div>
 

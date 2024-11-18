@@ -68,6 +68,10 @@ import ExerFace from "./pages/Exercises/ExerFace"
 import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
+// Testing Pages
+import Landing from "./pages/System/Landing";
+
+
 const routes = (
   <Router>
     <Routes>
@@ -82,6 +86,8 @@ const routes = (
       <Route path="/register/clinician" element={<RegisterClinician />} />
       <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
       <Route path="/forgot" element={<ForgotPassword />} />
+
+      <Route path="/nitty" element={<Landing />} />
 
       {/* Teleconference */}
       <Route

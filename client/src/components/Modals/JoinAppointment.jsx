@@ -10,7 +10,6 @@ import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
 export default function JoinAppointment({
-  openModal,
   selectedClinician,
   selectedSchedule,
   patientId,
@@ -43,11 +42,18 @@ export default function JoinAppointment({
     closeModal();
   };
 
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsDisabled(true);
+    setIsSubmitting(true);
 
     if (!medicalDiagnosis || !sourceOfReferral || !chiefComplaint) {
       failNotify("All fields are required.");
+      setIsSubmitting(false);
+      setIsDisabled(false);
       return;
     }
 
@@ -117,6 +123,9 @@ export default function JoinAppointment({
     } catch (error) {
       console.error(error);
       failNotify(toastMessage.fail.error);
+    } finally {
+      setIsSubmitting(false);
+      setIsDisabled(false);
     }
   };
 
@@ -180,9 +189,9 @@ export default function JoinAppointment({
                 </Form.Group>
 
                 <div className="d-flex justify-content-center mt-3 gap-3">
-                  <button type="submit" className="text-button border">
-                    <p className="fw-bold my-0 status">BOOK</p>
-                  </button>
+                <button type="submit" className="text-button border" disabled={isDisabled || isSubmitting}>
+                {isSubmitting ? <p className="fw-bold my-0 status">Submitting...</p> : <p className="fw-bold my-0 status">BOOK</p>}
+                </button>
                   <button onClick={handleClose} className="text-button border">
                     <p className="fw-bold my-0 status">CANCEL</p>
                   </button>

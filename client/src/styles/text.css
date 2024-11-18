@@ -1,6 +1,6 @@
 .text-pending {
   width: max-content;
-  font-size: 0.75em!important;
+  font-size: 0.75em !important;
   padding: 3px;
   padding-left: 10px;
   padding-right: 10px;
@@ -13,7 +13,7 @@
 
 .text-accepted {
   width: max-content;
-  font-size: 0.75em!important;
+  font-size: 0.75em !important;
   padding: 3px;
   padding-left: 10px;
   padding-right: 10px;
@@ -26,7 +26,7 @@
 
 .text-cancelled {
   width: max-content;
-  font-size: 0.75em!important;
+  font-size: 0.75em !important;
   padding: 3px;
   padding-left: 10px;
   padding-right: 10px;
@@ -58,7 +58,7 @@
   border-radius: 25px;
   color: #1c9dff;
   background-color: #fff;
-  border-color: #c1c1c1!important;
+  border-color: #c1c1c1 !important;
   cursor: pointer;
 }
 
@@ -80,7 +80,7 @@
   border-radius: 25px;
   color: #f44336;
   background-color: #ffdddd;
-  border-color: #c1c1c1!important;
+  border-color: #c1c1c1 !important;
   cursor: pointer;
 }
 
@@ -140,7 +140,7 @@
   border-radius: 25px;
   color: #1c9dff;
   background-color: #fff;
-  border-color: #c1c1c1!important;
+  border-color: #c1c1c1 !important;
   cursor: pointer;
 }
 
@@ -170,7 +170,7 @@
 .status-booked {
   display: flex;
   align-items: center;
-  font-size: 0.5em!important;
+  font-size: 0.5em !important;
   background-color: #ececec;
   width: min-content;
   padding: 3px;
@@ -181,19 +181,55 @@
 }
 
 .view-consent {
-  color:#1c9dff;
+  color: #1c9dff;
   cursor: pointer;
   font-size: 0.75em;
 }
 
+.text-blue {
+  color: #1c9dff;
+}
+
+.text-landing {
+  background: linear-gradient(0deg, #225ef9 0%, #1c9dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-logo {
+  background: linear-gradient(0deg, #225ef9 0%, #1c9dff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 .ql-editor {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 16px; /* Adjust the size as needed */
 }
 
+.landing-subtext {
+  width: 40%;
+}
+
 /* Media query for 768 and below */
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .text-overflow {
     width: 200px;
+  }
+
+  .landing-subtext {
+    width: 80%;
+  }
+}
+
+@media (max-width: 576px) {
+  .text-landing {
+    font-size: 2rem;
+  }
+
+  .landing-paragraph {
+    text-align: center;
   }
 }
