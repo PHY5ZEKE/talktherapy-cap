@@ -116,7 +116,6 @@ exports.clinicianSignup = async (req, res) => {
     lastName,
     mobile,
     birthday,
-    gender,
     address,
     specialization,
     email,
@@ -129,7 +128,6 @@ exports.clinicianSignup = async (req, res) => {
     lastName: "Last name is required.",
     mobile: "Mobile number is required.",
     birthday: "Date of birth is required.",
-    gender: "Gender is required.",
     address: "Clinic address is required.",
     specialization: "Specialization is required.",
     email: "Email is required",
@@ -176,7 +174,6 @@ exports.clinicianSignup = async (req, res) => {
   existingClinician.lastName = lastName;
   existingClinician.mobile = mobile;
   existingClinician.birthday = birthday;
-  existingClinician.gender = gender;
   existingClinician.address = address;
   existingClinician.specialization = specialization;
   existingClinician.password = hashedPassword;

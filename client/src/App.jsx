@@ -15,7 +15,7 @@ import "./styles/images.css";
 import "react-toastify/dist/ReactToastify.css";
 
 // System
-import Login from "./pages/Login/Login";
+import Landing from "./pages/System/Landing";
 import RegisterAdmin from "./pages/Register/AdminRegister";
 import RegisterClinician from "./pages/Register/ClinicianRegister";
 import RegisterPatientSlp from "./pages/Register/PatientRegister";
@@ -69,7 +69,7 @@ import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
 // Testing Pages
-import Landing from "./pages/System/Landing";
+
 
 
 const routes = (
@@ -86,8 +86,6 @@ const routes = (
       <Route path="/register/clinician" element={<RegisterClinician />} />
       <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
       <Route path="/forgot" element={<ForgotPassword />} />
-
-      <Route path="/nitty" element={<Landing />} />
 
       {/* Teleconference */}
       <Route
@@ -112,7 +110,7 @@ const routes = (
         path="/"
         element={
           <PublicRoute>
-            <Login />
+            <Landing />
           </PublicRoute>
         }
       />
@@ -121,7 +119,7 @@ const routes = (
         path="/login"
         element={
           <PublicRoute>
-            <Login />
+            <Landing />
           </PublicRoute>
         }
       />
@@ -298,10 +296,8 @@ const routes = (
 const App = () => {
   return (
     <AuthProvider>
-      <div className="vw-100">
         {routes}
         <ToastContainer />
-      </div>
     </AuthProvider>
   );
 };

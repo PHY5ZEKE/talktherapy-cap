@@ -25,10 +25,6 @@
   height: 320px;
 }
 
-.exercise-child {
-  /* width: 300px; */
-}
-
 /* DATE PICKER CSS */
 .react-datepicker__month-container {
   width: 100%;
@@ -141,16 +137,16 @@
 
 /* LANDING */
 .landing-icon {
-  width: 5rem;
-  height: auto;
+  width: 3rem;
+  height: 3rem;
+  background-image: linear-gradient(0deg, #225ef9 0%, #1c9dff 100%);
+  /* color: #225ef9; */
+  color: #fff;
 }
 
 .blob-1 {
-  background-image: url('data:image/svg+xml;utf8,<svg width="1158" height="1155" viewBox="0 0 1158 1155" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M702.46 79.1771C814.834 104.519 924.825 131.244 1007.97 213.784C1093.24 298.43 1154.7 408.764 1157.88 531.262C1161.13 656.811 1099.57 767.572 1024.9 866.333C936.603 983.128 842.179 1102.32 702.46 1133.63C531.021 1172.05 337.94 1166.62 202.689 1050.6C58.5937 926.994 -4.52189 725.364 0.251114 531.262C4.91141 341.742 72.5084 137.646 227.594 37.8009C367.966 -52.5712 541.087 42.786 702.46 79.1771Z" fill="url(%23paint0_linear_792_372)" fill-opacity="0.5"/><defs><linearGradient id="paint0_linear_792_372" x1="579" y1="0" x2="579" y2="1155" gradientUnits="userSpaceOnUse"><stop stop-color="%2397C9EF"/><stop offset="1" stop-color="%23007AFF"/></linearGradient></defs></svg>');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: 50% 1%;
-  overflow: hidden;
+  background: rgb(255,255,255);
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgb(233, 244, 255) 41%, rgb(211, 223, 255) 100%);
 }
 
 .landing-accordion {
@@ -164,4 +160,9 @@
  .landing-accordion {
   width: 100%;
  }
+}
+
+body {
+  background: rgb(255,255,255);
+  background: linear-gradient(180deg, rgba(255,255,255,1) 0%, rgb(233, 244, 255) 41%, rgb(211, 223, 255) 100%);
 }

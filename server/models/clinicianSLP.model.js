@@ -7,7 +7,6 @@ const clinicianSLPSchema = new Schema({
   lastName: { type: String },
   mobile: { type: String },
   birthday: { type: Date },
-  gender: { type: String },
   address: { type: String },
   specialization: { type: String },
   email: { type: String },
