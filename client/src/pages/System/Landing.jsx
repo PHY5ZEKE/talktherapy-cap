@@ -6,13 +6,12 @@ import {
   faSquareFull,
 } from "@fortawesome/free-solid-svg-icons";
 
-import LoginModal from "./LoginModal";
+
+import { Link } from "react-router-dom";
 
 export default function Landing() {
   return (
     <>
-      <LoginModal />
-
       <div className="bg-white blob-1">
         <div className="d-flex flex-column">
           <nav className="navbar navbar-expand-lg">
@@ -62,22 +61,22 @@ export default function Landing() {
                     </a>
                     <ul class="dropdown-menu">
                       <li>
-                        <a class="dropdown-item" href="/register/patientslp">
+                        <Link class="dropdown-item" to="/register/patientslp">
                           Patient
-                        </a>
+                        </Link>
                       </li>
                       <li>
-                        <a class="dropdown-item" href="/register/clinician">
+                        <Link class="dropdown-item" to="/register/clinician">
                           Clinician
-                        </a>
+                        </Link>
                       </li>
                       <li>
                         <hr class="dropdown-divider" />
                       </li>
                       <li>
-                        <a class="dropdown-item" href="/register/admin">
+                        <Link class="dropdown-item" to="/register/admin">
                           Admin
-                        </a>
+                        </Link>
                       </li>
                     </ul>
                   </li>
@@ -101,14 +100,9 @@ export default function Landing() {
                 Skilled doctors, personalized exercises and feedback system.
               </p>
               <p>All-in-one go with TalkTherapy!</p>
-
-              <button
-                className="text-button shadow-sm fw-bold"
-                data-bs-toggle="modal"
-                data-bs-target="#loginModal"
-              >
-                Login
-              </button>
+              <Link to="/login">
+                <button className="text-button shadow-sm fw-bold">Login</button>
+              </Link>
             </div>
 
             <div className="my-3">

@@ -1,3 +1,5 @@
+const fs = require('fs');
+
 const SuperAdmin = require("../models/superAdminSLP.model");
 const Admin = require("../models/adminSLP.model");
 const Clinician = require("../models/clinicianSLP.model");
@@ -13,6 +15,7 @@ const {
   hashPassword,
   verifyPassword,
 } = require("../utilities/password");
+
 const verifyToken = require("../middleware/verifyToken");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const s3 = require("../config/aws");
@@ -261,25 +264,21 @@ exports.sendNotification = async (req, res) => {
 
 // Forgot Password Function
 exports.forgotPassword = async (req, res) => {
-  const { email } = req.body;
+  const { email, header } = req.body;
 
   if (!email) {
     return res.status(400).json({ error: true, message: "Email is required." });
   }
 
   let user = await SuperAdmin.findOne({ email });
-  let userRole = "superAdmin";
   if (!user) {
     user = await Admin.findOne({ email });
-    userRole = "admin";
   }
   if (!user) {
     user = await Clinician.findOne({ email });
-    userRole = "clinician";
   }
   if (!user) {
     user = await Patient.findOne({ email });
-    userRole = "patient";
   }
 
   if (!user) {
@@ -301,11 +300,14 @@ exports.forgotPassword = async (req, res) => {
     },
   });
 
+  const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/otp.html'), 'utf8');
+  const htmlContent = htmlTemplate.replace('${otp}', otp);
+
   const mailOptions = {
     to: user.email,
     from: process.env.EMAIL,
-    subject: "Password Reset",
-    text: `You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\nYour OTP for password reset is: ${otp}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+    subject: header,
+    html: htmlContent,
   };
 
   transporter.sendMail(mailOptions, async (err) => {
@@ -888,7 +890,8 @@ exports.archiveUser = [
     } catch (error) {
       return res.status(500).json({
         error: true,
-        message: "An error occurred while changing account status and activity.",
+        message:
+          "An error occurred while changing account status and activity.",
       });
     }
   },
@@ -927,7 +930,8 @@ exports.unarchiveUser = [
       console.log(error);
       return res.status(500).json({
         error: true,
-        message: "An error occurred while changing account status and activity.",
+        message:
+          "An error occurred while changing account status and activity.",
       });
     }
   },

@@ -16,10 +16,11 @@ import "react-toastify/dist/ReactToastify.css";
 
 // System
 import Landing from "./pages/System/Landing";
+import Login from './pages/System/Login'
 import RegisterAdmin from "./pages/Register/AdminRegister";
 import RegisterClinician from "./pages/Register/ClinicianRegister";
 import RegisterPatientSlp from "./pages/Register/PatientRegister";
-import ForgotPassword from "./pages/Forgot-Password/ForgotPassword";
+import ForgotPassword from "./pages/System/ForgotPassword";
 
 // Super Admin TalkTherapy
 import SuperAdminHome from "./pages/SuperAdmin/Home";
@@ -119,7 +120,7 @@ const routes = (
         path="/login"
         element={
           <PublicRoute>
-            <Landing />
+            <Login />
           </PublicRoute>
         }
       />

@@ -116,9 +116,9 @@ export default function AdminRegister() {
     <div className="mw-100">
       <nav className="navbar navbar-expand-lg">
         <div className="container-fluid">
-          <a className="navbar-brand text-logo fw-bold" href="/">
+          <Link className="navbar-brand text-logo fw-bold" to="/">
             TalkTherapy
-          </a>
+          </Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -133,18 +133,18 @@ export default function AdminRegister() {
           <div className="collapse navbar-collapse" id="navbarSupportedContent">
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a
+                <Link
                   className="nav-link fw-bold"
                   aria-current="page"
-                  href="/#services"
+                  to="/#services"
                 >
                   Services
-                </a>
+                </Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link fw-bold" href="/#faq">
+                <Link className="nav-link fw-bold" to="/#faq">
                   FAQ
-                </a>
+                </Link>
               </li>
               <li class="nav-item dropdown">
                 <a
@@ -158,22 +158,22 @@ export default function AdminRegister() {
                 </a>
                 <ul class="dropdown-menu">
                   <li>
-                    <a class="dropdown-item" href="/register/patientslp">
+                    <Link class="dropdown-item" to="/register/patientslp">
                       Patient
-                    </a>
+                    </Link>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="/register/clinician">
+                    <Link class="dropdown-item" to="/register/clinician">
                       Clinician
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <hr class="dropdown-divider" />
                   </li>
                   <li>
-                    <a class="dropdown-item" href="/register/admin">
+                    <Link class="dropdown-item" to="/register/admin">
                       Admin
-                    </a>
+                    </Link>
                   </li>
                 </ul>
               </li>
@@ -182,7 +182,10 @@ export default function AdminRegister() {
         </div>
       </nav>
 
-      <div className="row d-flex flex-wrap align-items-center">
+      <div
+        style={{ minHeight: "80vh", height: "100%" }}
+        className="row row-cols-sm-2 row-cols-1 d-flex flex-wrap align-items-center"
+      >
         <div className="col landing-paragraph my-3 p-3 text-center">
           <h2 className="fw-bold mb-0">Register to</h2>
           <h1 className="text-blue text-landing" style={{ fontWeight: "900" }}>
@@ -197,153 +200,209 @@ export default function AdminRegister() {
         </div>
 
         <form className="col p-4">
-          <div className="d-flex bg-white shadow rounded-4 mx-auto p-3 shadow flex-column">
+          <div
+            id="formTabContent"
+            className="tab-content d-flex bg-white shadow rounded-4 mx-auto p-3 shadow flex-column"
+          >
+            <h3 className="text-center fw-bold">Admin Registration</h3>
             {message && (
               <p className="text-danger text-center mb-2 p-2 rounded-3">
                 {message}
               </p>
             )}
-            <h5 className="fw-bold">Basic Information</h5>
 
-            <div className="">
-              <p className="mb-0">First Name</p>
-              <input
-                type="text"
-                className="form-control rounded-2"
-                aria-label="First name"
-                placeholder="First Name"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-              />
-            </div>
+            <div
+              className="tab-pane fade show active text-black"
+              id="basic-tab-pane"
+              role="tabpanel"
+              aria-labelledby="basic-tab"
+              tabIndex="0"
+            >
+              <h5 className="fw-bold">Basic Information</h5>
 
-            <div className="">
-              <p className="mb-0">Middle Name</p>
-              <input
-                type="text"
-                aria-label="Middle name"
-                placeholder="Middle Name"
-                className="form-control rounded-2"
-                name="middleName"
-                value={formData.middleName}
-                onChange={handleChange}
-              />
-            </div>
-            <div>
-              <p className="mb-0">Last Name</p>
-              <input
-                type="text"
-                aria-label="Last name"
-                placeholder="Last Name"
-                className="form-control rounded-2"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <p className="mb-0">Phone Number</p>
-              <input
-                type="text"
-                aria-label="Phone Number"
-                placeholder="Phone Number"
-                className="form-control rounded-2"
-                name="mobile"
-                value={formData.mobile}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <p className="mb-0">Clinic Address</p>
-              <input
-                type="text"
-                aria-label="Clinic address"
-                placeholder="Clinic Address"
-                className="form-control rounded-2"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="">
-              <p className="mb-0">Birthday</p>
-              <input
-                aria-label="Date"
-                type="date"
-                name="birthday"
-                value={formData.birthday}
-                onChange={handleChange}
-                className="form-control rounded"
-              />
-            </div>
-
-            <h5 className="mt-3 fw-bold">Credentials</h5>
-
-            <div className="">
-              <p className="mb-0 fw-bold">Valid Email</p>
-              <input
-                type="email"
-                className="form-control rounded-2"
-                placeholder="Valid email address"
-                aria-label="Valid email address"
-                aria-describedby="basic-addon2"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div>
-              <p className="fw-bold mb-0">Password</p>
-              <div className="d-flex">
+              <div className="">
+                <p className="mb-0">First Name</p>
                 <input
-                  aria-label="Password"
-                  placeholder="Password"
+                  type="text"
                   className="form-control rounded-2"
-                  type={showPassword ? "text" : "password"}
-                  name="password"
-                  value={formData.password}
+                  aria-label="First name"
+                  placeholder="First Name"
+                  name="firstName"
+                  value={formData.firstName}
                   onChange={handleChange}
                 />
+              </div>
 
-                <span
-                  className="input-group-text"
-                  id="basic-addon2"
-                  style={{ cursor: "pointer" }}
-                  onClick={togglePasswordVisibility}
-                >
-                  {showPassword ? <EyeSlashFill /> : <EyeFill />}
-                </span>
+              <div className="">
+                <p className="mb-0">Middle Name</p>
+                <input
+                  type="text"
+                  aria-label="Middle name"
+                  placeholder="Middle Name"
+                  className="form-control rounded-2"
+                  name="middleName"
+                  value={formData.middleName}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <p className="mb-0">Last Name</p>
+                <input
+                  type="text"
+                  aria-label="Last name"
+                  placeholder="Last Name"
+                  className="form-control rounded-2"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <p className="mb-0">Phone Number</p>
+                <input
+                  type="text"
+                  aria-label="Phone Number"
+                  placeholder="Phone Number"
+                  className="form-control rounded-2"
+                  name="mobile"
+                  value={formData.mobile}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div>
+                <p className="mb-0">Clinic Address</p>
+                <input
+                  type="text"
+                  aria-label="Clinic address"
+                  placeholder="Clinic Address"
+                  className="form-control rounded-2"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="">
+                <p className="mb-0">Birthday</p>
+                <input
+                  aria-label="Date"
+                  type="date"
+                  name="birthday"
+                  value={formData.birthday}
+                  onChange={handleChange}
+                  className="form-control rounded"
+                />
               </div>
             </div>
 
-            <div className="">
-              <p className="fw-bold mb-0">Confirm Password</p>
+            <div
+              className="tab-pane fade text-black"
+              id="credential-tab-pane"
+              role="tabpanel"
+              aria-labelledby="credential-tab"
+              tabIndex="0"
+            >
+              <h5 className="mt-3 fw-bold">Credentials</h5>
 
-              <div className="d-flex">
+              <div className="">
+                <p className="mb-0 fw-bold">Valid Email</p>
                 <input
-                  aria-label="Confirm password"
-                  placeholder="Passwords must match"
+                  type="email"
                   className="form-control rounded-2"
-                  type={showConfPassword ? "text" : "password"}
-                  name="confPassword"
-                  value={formData.confPassword}
+                  placeholder="Valid email address"
+                  aria-label="Valid email address"
+                  aria-describedby="basic-addon2"
+                  name="email"
+                  value={formData.email}
                   onChange={handleChange}
                 />
-                <span
-                  className="input-group-text"
-                  id="basic-addon2"
-                  style={{ cursor: "pointer" }}
-                  onClick={toggleConfPasswordVisibility}
-                >
-                  {showConfPassword ? <EyeSlashFill /> : <EyeFill />}
-                </span>
+              </div>
+
+              <div>
+                <p className="fw-bold mb-0">Password</p>
+                <div className="d-flex">
+                  <input
+                    aria-label="Password"
+                    placeholder="Password"
+                    className="form-control rounded-2"
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                  />
+
+                  <span
+                    className="input-group-text"
+                    id="basic-addon2"
+                    style={{ cursor: "pointer" }}
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? <EyeSlashFill /> : <EyeFill />}
+                  </span>
+                </div>
+              </div>
+
+              <div className="">
+                <p className="fw-bold mb-0">Confirm Password</p>
+
+                <div className="d-flex">
+                  <input
+                    aria-label="Confirm password"
+                    placeholder="Passwords must match"
+                    className="form-control rounded-2"
+                    type={showConfPassword ? "text" : "password"}
+                    name="confPassword"
+                    value={formData.confPassword}
+                    onChange={handleChange}
+                  />
+                  <span
+                    className="input-group-text"
+                    id="basic-addon2"
+                    style={{ cursor: "pointer" }}
+                    onClick={toggleConfPasswordVisibility}
+                  >
+                    {showConfPassword ? <EyeSlashFill /> : <EyeFill />}
+                  </span>
+                </div>
               </div>
             </div>
+
+            <ul
+              className="mt-3 d-flex justify-content-center gap-1 nav nav-pills h-auto border-0"
+              id="form-tab"
+              role="tablist"
+            >
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link border active"
+                  id="pills-basic-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#basic-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="basic-tab-pane"
+                  aria-selected="true"
+                >
+                  1
+                </button>
+              </li>
+              <li className="nav-item" role="presentation">
+                <button
+                  className="nav-link border"
+                  id="pills-credential-tab"
+                  data-bs-toggle="tab"
+                  data-bs-target="#credential-tab-pane"
+                  type="button"
+                  role="tab"
+                  aria-controls="credential-tab-pane"
+                  aria-selected="false"
+                >
+                  2
+                </button>
+              </li>
+            </ul>
 
             <div className="col-sm d-flex flex-column align-items-center justify-content-center">
               <button
@@ -353,7 +412,7 @@ export default function AdminRegister() {
               >
                 Submit
               </button>
-              <Link to="/login" className="loginLink">
+              <Link to="/login" className="fw-bold">
                 I want to login
               </Link>
             </div>
@@ -361,201 +420,5 @@ export default function AdminRegister() {
         </form>
       </div>
     </div>
-    // <div className="container-fluid d-flex flex-column justify-content-between vh-100 backgroundImg">
-    //   <div className="row bg-white">
-    //     <nav className="p-3 border border-top-0 border-start-0 border-end-0">
-    //       <p className="fw-bolder h5 mb-0">TalkTherapy</p>
-    //       <p className="mb-0">Rehabilitation in your hands.</p>
-    //     </nav>
-    //   </div>
-
-    //   <div className="row flex-grow-1">
-    //     <div className="col-sm d-none d-lg-block p-3">
-    //       <div className="mx-auto d-flex flex-column justify-content-center h-100 logoContainer">
-    //         <h1 className="fw-boldest">TalkTherapy</h1>
-    //         <h3 className="fw-boldest">Rehabilitation in your hands.</h3>
-    //         <p>
-    //           Skilled doctors, efficient scheduling, and telerehabilitation.
-    //           All-in-one go with TalkTherapy.
-    //         </p>
-    //       </div>
-    //     </div>
-
-    //     {/* Right section: Form */}
-    //     <div className="col-sm my-auto p-3">
-    //       {message && (
-    //         <div
-    //           className="d-flex mx-auto text-danger text-center mb-2 p-2 rounded-3 border"
-    //           style={{ minWidth: "300px", maxWidth: "70%" }}
-    //         >
-    //           {message}
-    //         </div>
-    //       )}
-
-    //       <form
-    //         className="bg-white container-fluid form-container rounded-4 mx-auto p-3 overflow-auto"
-    //         style={{ maxHeight: "75vh", minWidth: "300px", maxWidth: "70%" }}
-    //         onSubmit={handleSubmit}
-    //       >
-    //         <h4 className="fw-bold text-center mb-2">Register</h4>
-    //         <p className="text-center">Please fill out all fields.</p>
-    //         <h5>Basic Information</h5>
-
-    //         <div className="row">
-    //           <div className="col-sm d-flex flex-column mb-3">
-    //             <p className="mb-0 fw-bold">First Name</p>
-    //             <input
-    //               type="text"
-    //               className="form-input rounded-2"
-    //               aria-label="First name"
-    //               placeholder="First Name"
-    //               name="firstName"
-    //               value={formData.firstName}
-    //               onChange={handleChange}
-    //             />
-    //           </div>
-
-    //           <div className="col-sm d-flex flex-column mb-3">
-    //             <p className="mb-0 fw-bold">Middle Name</p>
-    //             <input
-    //               type="text"
-    //               aria-label="Middle name"
-    //               placeholder="Middle Name"
-    //               className="form-input rounded-2"
-    //               name="middleName"
-    //               value={formData.middleName}
-    //               onChange={handleChange}
-    //             />
-    //           </div>
-
-    //           <div className="col-sm d-flex flex-column mb-3">
-    //             <p className="mb-0 fw-bold">Last Name</p>
-    //             <input
-    //               type="text"
-    //               aria-label="Last name"
-    //               placeholder="Last Name"
-    //               className="form-input rounded-2"
-    //               name="lastName"
-    //               value={formData.lastName}
-    //               onChange={handleChange}
-    //             />
-    //           </div>
-    //         </div>
-
-    //         <div className="col-sm d-flex flex-column mb-3">
-    //           <p className="mb-0 fw-bold">Phone Number</p>
-    //           <input
-    //             type="text"
-    //             aria-label="Phone Number"
-    //             placeholder="Phone Number"
-    //             className="form-input rounded-2"
-    //             name="mobile"
-    //             value={formData.mobile}
-    //             onChange={handleChange}
-    //           />
-    //         </div>
-
-    //         <div className="col-sm d-flex flex-column mb-3">
-    //           <p className="mb-0 fw-bold">Clinic Address</p>
-    //           <input
-    //             type="text"
-    //             aria-label="Clinic address"
-    //             placeholder="Clinic Address"
-    //             className="form-input rounded-2"
-    //             name="address"
-    //             value={formData.address}
-    //             onChange={handleChange}
-    //           />
-    //         </div>
-
-    //         <h5>Credentials</h5>
-    //         <div className="row">
-    //           <div className="col-sm d-flex flex-column mb-3">
-    //             <p className="mb-0 fw-bold">Valid Email</p>
-    //             <input
-    //               type="email"
-    //               className="form-input rounded-2"
-    //               placeholder="Valid email address"
-    //               aria-label="Valid email address"
-    //               aria-describedby="basic-addon2"
-    //               name="email"
-    //               value={formData.email}
-    //               onChange={handleChange}
-    //             />
-    //           </div>
-    //         </div>
-
-    //         <div className="row">
-    //           <div className="col-sm d-flex flex-column mb-3">
-    //             <p className="fw-bold mb-0">Password</p>
-    //             <div className="d-flex">
-    //               <input
-    //                 aria-label="Password"
-    //                 placeholder="Password"
-    //                 className="form-input rounded-2 w-100"
-    //                 type={showPassword ? "text" : "password"}
-    //                 name="password"
-    //                 value={formData.password}
-    //                 onChange={handleChange}
-    //               />
-    //               <button
-    //                 onClick={togglePasswordVisibility}
-    //                 className="text-button form-show rounded-2"
-    //                 type="button"
-    //               >
-    //                 Show
-    //               </button>
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         <div className="row">
-    //           <div className="col-sm d-flex flex-column mb-3">
-    //             <p className="fw-bold mb-0">Confirm Password</p>
-
-    //             <div className="d-flex">
-    //               <input
-    //                 aria-label="Confirm password"
-    //                 placeholder="Passwords must match"
-    //                 className="form-input rounded-2 w-100"
-    //                 type={showConfPassword ? "text" : "password"}
-    //                 name="confPassword"
-    //                 value={formData.confPassword}
-    //                 onChange={handleChange}
-    //               />
-    //               <button
-    //                 onClick={toggleConfPasswordVisibility}
-    //                 className="text-button form-show rounded-2"
-    //                 type="button"
-    //               >
-    //                 Show
-    //               </button>
-    //             </div>
-    //           </div>
-    //         </div>
-
-    //         <div className="row">
-    //           <div className="col-sm d-flex flex-column align-items-center justify-content-center">
-    //             <button
-    //               className="text-button fw-bold border rounded-5 my-3"
-    //               type="submit"
-    //             >
-    //               Submit
-    //             </button>
-    //             <Link to="/login" className="loginLink">
-    //               I want to login
-    //             </Link>
-    //           </div>
-    //         </div>
-    //       </form>
-    //     </div>
-    //   </div>
-
-    //   <div className="row bg-white border border-bottom-0 border-start-0 border-end-0">
-    //     <div className="col text-center p-3">
-    //       <p className="fw-bold mb-0">TalkTherapy</p>
-    //     </div>
-    //   </div>
-    // </div>
   );
 }
