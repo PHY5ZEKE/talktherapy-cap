@@ -233,7 +233,7 @@ exports.getSuperAdmin = [
 
 // Email Notification
 exports.sendNotification = async (req, res) => {
-  const { email, header, content } = req.body;
+  const { email, header, type, whoEdited, details } = req.body;
 
   // Send to email and body WOW!
   const transporter = nodemailer.createTransport({
@@ -244,18 +244,76 @@ exports.sendNotification = async (req, res) => {
     },
   });
 
+  let htmlContent = '';
+
+  let statusEmail = [];
+
+  // Process Email Type
+  if (type === "account-archive") {
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-archive.html'), 'utf8');
+    htmlContent = htmlTemplate.replace('${email}', email);
+  }
+  else if (type === "account-restore") {
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-restore.html'), 'utf8');
+    htmlContent = htmlTemplate.replace('${email}', email);
+  }
+  else if (type === "account-edit") {
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-edit.html'), 'utf8');
+    htmlContent = htmlTemplate.replace('${adminName}', whoEdited);
+  }
+  else if (type === "account-register") {
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-register.html'), 'utf8');
+    htmlContent = htmlTemplate.replace('${email}', email);
+  }
+  else if (type === "request-records-access") {
+    const [clinicianFirstName, clinicianLastName, patientFirstName, patientLastName, reason] = details;
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/request-access.html'), 'utf8');
+    htmlContent = htmlTemplate
+      .replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`)
+      .replace('${patientName}', `${patientFirstName} ${patientLastName}`)
+      .replace('${reason}', reason);
+  }
+  else if (type === "request-content") {
+    const [clinicianFirstName, clinicianLastName, request] = details;
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/request-content.html'), 'utf8');
+    htmlContent = htmlTemplate.replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`).replace('${reason}', request);
+  }
+  else if (type === 'soap') {
+    const [clinicianFirstName, clinicianLastName, soapData] = details;
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-soap.html'), 'utf8');
+    htmlContent = htmlTemplate
+      .replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`)
+      .replace('${soap}', soapData);
+  }
+  else if (type === 'appointment-status') {
+    const [patientFirstName, patientLastName, clinicianName, day, startTime, endTime, content] = details;
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/appointment-status.html'), 'utf8');
+    htmlContent = htmlTemplate
+    .replace('${patientName}', `${patientFirstName} ${patientLastName}`)
+    .replace('${clinicianName}', clinicianName)
+    .replace('${date}', `${day} ${startTime} - ${endTime}`)
+    .replace('${status}', content);
+
+    // Get Email Address of Clinician using ID
+    const clinician = await Clinician.findById(email[0]);
+    const patient = await Patient.findById(email[1]);
+
+    statusEmail = [clinician.email, patient.email];
+  }
+
+
   const mailOptions = {
-    to: email,
+    to: statusEmail || email,
     from: process.env.EMAIL,
     subject: header,
-    text: content,
+    html: htmlContent,
   };
 
   transporter.sendMail(mailOptions, async (err) => {
     if (err) {
       return res.status(500).json({
         error: true,
-        message: "Email notification could not be sent.",
+        message: err,
       });
     }
     res.status(200).json({ error: false, message: "Email notification sent." });
@@ -306,7 +364,7 @@ exports.forgotPassword = async (req, res) => {
   const mailOptions = {
     to: user.email,
     from: process.env.EMAIL,
-    subject: header,
+    subject: "OTP Forgot Password | TalkTherapy",
     html: htmlContent,
   };
 

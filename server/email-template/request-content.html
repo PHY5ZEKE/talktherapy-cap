@@ -20,7 +20,7 @@
       crossorigin="anonymous"
     />
 
-    <title>OTP | TalkTherapy</title>
+    <title>Request Content | TalkTherapy</title>
   </head>
 
   <style>
@@ -95,25 +95,25 @@
         >
           TalkTherapy
         </h1>
-        <h4 style="margin-top: 0; margin-bottom: 1rem;">Speech service in your hands.</h4>
+        <h4 style="margin-top: 0; margin-bottom: 1rem">
+          Speech service in your hands.
+        </h4>
         <hr />
         <h5 style="text-align: center; margin-top: 1rem; margin-bottom: 1rem">
-          OTP Forgot Password
+          Request Content
         </h5>
         <hr />
       </div>
-      <div style="text-align: center;">
-        <h4 style="font-size: 2rem;">${otp}</h4>
-
+      <div style="text-align: center">
         <p>
-          You received this because you (or someone else) have requested the
-          reset of the password for your TalkTherapy account.
+          Clinician <span style="color: #1c9dff">${clinicianName}</span> is
+          requesting for content.
         </p>
 
-        <p>
-          If you did not request this, please ignore this email and your
-          password will remain unchanged.
-        </p>
+        <div>
+          <p style="font-weight: bold; margin-bottom: 0">Request Details</p>
+          <p>${reason}</p>
+        </div>
       </div>
       <div
         style="

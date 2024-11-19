@@ -20,15 +20,14 @@ export const emailRequestAccess = async (clinicianData, patientData, reason, acc
   const payload = {
     email: emails,
     header: 'Clinician Request Access | TalkTherapy',
-    content: `${clinicianData.firstName} ${clinicianData.middleName} ${clinicianData.lastName} is requesting for record access for the follow patient:
-    
-    =====================
-    PATIENT DETAILS
-    =====================
-    Name: ${patientData.firstName} ${patientData.lastName}
-
-    With the reason of: ${reason}
-    `,
+    type: "request-records-access",
+    details: [
+      clinicianData.firstName,
+      clinicianData.lastName,
+      patientData.firstName,
+      patientData.lastName,
+      reason
+    ],
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

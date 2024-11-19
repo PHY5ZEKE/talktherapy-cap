@@ -23,10 +23,12 @@ export default function ForgotPassword() {
     setShowConfPassword(!showConfPassword);
   };
 
+  const [isSending, setIsSending] = useState(false);
+
   const handleNext = async (e) => {
     e.preventDefault();
     if (step === 1) {
-      // // Handle forgot password
+      setIsSending(true);
       const response = await fetch(`${appURL}/${route.system.forgot}`, {
         method: "POST",
         headers: {
@@ -39,10 +41,12 @@ export default function ForgotPassword() {
         setMessage(data.message);
       } else {
         setMessage("OTP sent to your email.");
+        setIsSending(false);
         setStep(2);
       }
     } else if (step === 2) {
       // Handle verify OTP
+      setIsSending(true);
       const response = await fetch(`${appURL}/${route.system.otp}`, {
         method: "POST",
         headers: {
@@ -54,11 +58,13 @@ export default function ForgotPassword() {
       if (data.error) {
         setMessage(data.message);
       } else {
+        setIsSending(false);
         setMessage("OTP verified. Please enter your new password.");
         setStep(3);
       }
     } else if (step === 3) {
       // Handle reset password
+      setIsSending(true);
       const response = await fetch(`${appURL}/${route.system.reset}`, {
         method: "POST",
         headers: {
@@ -70,6 +76,7 @@ export default function ForgotPassword() {
       if (data.error) {
         setMessage(data.message);
       } else {
+        setIsSending(false);
         setMessage("Password has been reset successfully.");
       }
     }
@@ -200,8 +207,9 @@ export default function ForgotPassword() {
                   className="mx-auto text-button fw-bold border rounded-5 my-3"
                   type="submit"
                   onClick={handleNext}
+                  disabled={isSending}
                 >
-                  Submit
+                  {isSending ? "Sending..." : "Submit"}
                 </button>
               </form>
             )}
@@ -230,8 +238,9 @@ export default function ForgotPassword() {
                   className="mx-auto text-button fw-bold border rounded-5 my-3"
                   type="submit"
                   onClick={handleNext}
+                  disabled={isSending}
                 >
-                  Submit
+                  {isSending ? "Sending..." : "Submit"}
                 </button>
               </form>
             )}
@@ -291,8 +300,9 @@ export default function ForgotPassword() {
                   className="mx-auto text-button fw-bold border rounded-5 my-3"
                   type="submit"
                   onClick={handleNext}
+                  disabled={isSending}
                 >
-                  Submit
+                  {isSending ? "Sending..." : "Submit"}
                 </button>
               </form>
             )}

@@ -43,94 +43,94 @@ export default function AppointmentDetails({
   const updateStatus = async (newStatus, oldStatus) => {
     setLoading(true);
     try {
-      const response = await axios.put(
-        `${appURL}/${route.appointment.updateStatus}/${appointment._id}`,
-        { status: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+      // const response = await axios.put(
+      //   `${appURL}/${route.appointment.updateStatus}/${appointment._id}`,
+      //   { status: newStatus },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${accessToken}`,
+      //     },
+      //   }
+      // );
 
-      let userUpdate = {};
-      switch (oldStatus) {
-        case "Pending":
-          userUpdate = {
-            notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${
-              appointment.patientId?.lastName
-            }'s pending appointment with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
-            show_to: [
-              appointment.patientId?._id,
-              appointment.selectedClinician,
-            ],
-          };
-          break;
-        case "Schedule Change Request":
-          userUpdate = {
-            notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${
-              appointment.patientId?.lastName
-            }'s request for permanent schedule change with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
-            show_to: [
-              appointment.patientId?._id,
-              appointment.selectedClinician,
-            ],
-          };
-          break;
-        case "Temporary Reschedule Request":
-          userUpdate = {
-            notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${
-              appointment.patientId?.lastName
-            }'s request for temporary schedule change with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
-            show_to: [
-              appointment.patientId?._id,
-              appointment.selectedClinician,
-            ],
-          };
-          break;
-        case "Temporarily Rescheduled":
-          userUpdate = {
-            notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${
-              appointment.patientId?.lastName
-            }'s temporary schedule with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
-            show_to: [
-              appointment.patientId?._id,
-              appointment.selectedClinician,
-            ],
-          };
-          break;
-        case "Accepted":
-          userUpdate = {
-            notif: "appointmentRequestStatus",
-            body: `${appointment.patientId?.firstName} ${
-              appointment.patientId?.lastName
-            }'s appointment schedule with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
-            show_to: [
-              appointment.patientId?._id,
-              appointment.selectedClinician,
-            ],
-          };
-          break;
-        default:
-          break;
-      }
+      // let userUpdate = {};
+      // switch (oldStatus) {
+      //   case "Pending":
+      //     userUpdate = {
+      //       notif: "appointmentRequestStatus",
+      //       body: `${appointment.patientId?.firstName} ${
+      //         appointment.patientId?.lastName
+      //       }'s pending appointment with Clinician ${
+      //         appointment.selectedSchedule?.clinicianName
+      //       } has been ${newStatus.toLowerCase()}`,
+      //       show_to: [
+      //         appointment.patientId?._id,
+      //         appointment.selectedClinician,
+      //       ],
+      //     };
+      //     break;
+      //   case "Schedule Change Request":
+      //     userUpdate = {
+      //       notif: "appointmentRequestStatus",
+      //       body: `${appointment.patientId?.firstName} ${
+      //         appointment.patientId?.lastName
+      //       }'s request for permanent schedule change with Clinician ${
+      //         appointment.selectedSchedule?.clinicianName
+      //       } has been ${newStatus.toLowerCase()}`,
+      //       show_to: [
+      //         appointment.patientId?._id,
+      //         appointment.selectedClinician,
+      //       ],
+      //     };
+      //     break;
+      //   case "Temporary Reschedule Request":
+      //     userUpdate = {
+      //       notif: "appointmentRequestStatus",
+      //       body: `${appointment.patientId?.firstName} ${
+      //         appointment.patientId?.lastName
+      //       }'s request for temporary schedule change with Clinician ${
+      //         appointment.selectedSchedule?.clinicianName
+      //       } has been ${newStatus.toLowerCase()}`,
+      //       show_to: [
+      //         appointment.patientId?._id,
+      //         appointment.selectedClinician,
+      //       ],
+      //     };
+      //     break;
+      //   case "Temporarily Rescheduled":
+      //     userUpdate = {
+      //       notif: "appointmentRequestStatus",
+      //       body: `${appointment.patientId?.firstName} ${
+      //         appointment.patientId?.lastName
+      //       }'s temporary schedule with Clinician ${
+      //         appointment.selectedSchedule?.clinicianName
+      //       } has been ${newStatus.toLowerCase()}`,
+      //       show_to: [
+      //         appointment.patientId?._id,
+      //         appointment.selectedClinician,
+      //       ],
+      //     };
+      //     break;
+      //   case "Accepted":
+      //     userUpdate = {
+      //       notif: "appointmentRequestStatus",
+      //       body: `${appointment.patientId?.firstName} ${
+      //         appointment.patientId?.lastName
+      //       }'s appointment schedule with Clinician ${
+      //         appointment.selectedSchedule?.clinicianName
+      //       } has been ${newStatus.toLowerCase()}`,
+      //       show_to: [
+      //         appointment.patientId?._id,
+      //         appointment.selectedClinician,
+      //       ],
+      //     };
+      //     break;
+      //   default:
+      //     break;
+      // }
 
-      emailRequestStatus(appointment.patientId?.email, newStatus, appointment);
-      onWebSocket(userUpdate);
+      emailRequestStatus(appointment.selectedClinician, appointment.patientId._id, newStatus, appointment);
+      // onWebSocket(userUpdate);
       notify(toastMessage.success.statusBook);
       openModal();
     } catch (error) {

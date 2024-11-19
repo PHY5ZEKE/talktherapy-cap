@@ -25,13 +25,12 @@ export const emailRequestContent = async (
   const payload = {
     email: emails,
     header: "Clinician Request Access | TalkTherapy",
-    content: `${clinicianData.firstName} ${clinicianData.middleName} ${clinicianData.lastName} is requesting for content.
-    
-    =====================
-    REQUEST DETAILS
-    =====================
-    ${request}
-    `,
+    type: 'request-content',
+    details: [
+      clinicianData.firstName,
+      clinicianData.lastName,
+      request
+    ],
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

@@ -5,8 +5,8 @@ import { route } from "./route";
 export const emailRegister = async (email) => {
   const payload = {
     email: email,
-    header: "Email has been registered | TalkTherapy",
-    content: "Your email has been registered as an admin. You may now register at talktherapy.site and login."
+    header: "Email Registered | TalkTherapy",
+    type: "account-register",
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

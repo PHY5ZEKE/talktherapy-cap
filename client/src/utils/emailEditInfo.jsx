@@ -2,11 +2,12 @@ const appURL = import.meta.env.VITE_APP_URL;
 
 import { route } from "./route";
 
-export const emailEditInfo = async (email) => {
+export const emailEditInfo = async (email, whoEdited) => {
   const payload = {
     email: email,
     header: 'Profile Edit | TalkTherapy',
-    content: `Your profile has been edited.`,
+    type: 'account-edit',
+    whoEdited: whoEdited,
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

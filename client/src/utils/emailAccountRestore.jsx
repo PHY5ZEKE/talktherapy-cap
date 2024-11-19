@@ -6,8 +6,7 @@ export const emailAccountRestore= async (email) => {
   const payload = {
     email: email,
     header: "Account Restored | TalkTherapy",
-    content:
-    `Your account ${email} has been restored. You can now login and use your account again.`,
+    type: "account-restore",
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

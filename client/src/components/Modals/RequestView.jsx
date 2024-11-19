@@ -59,7 +59,6 @@ export default function RequestView({
       };
 
       onWebSocket(userUpdate);
-
       notify("Status updated successfully");
       onStatusChange(requestId, status);
     } catch (error) {

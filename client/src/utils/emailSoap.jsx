@@ -5,14 +5,13 @@ import { route } from "./route";
 export const emailSoap = async (email, soapData, clinicianData) => {
   const payload = {
     email: email,
-    header: 'New Diagnosis Added | TalkTherapy',
-    content: `
-    =====================
-    DIAGNOSIS DETAILS
-    =====================
-    Clinician: ${clinicianData.firstName} ${clinicianData.middleName} ${clinicianData.lastName}
-    Diagnosis: ${soapData}
-    `,
+    header: 'New SOAP Added | TalkTherapy',
+    type: 'soap',
+    details: [
+      clinicianData.firstName,
+      clinicianData.lastName,
+      soapData
+    ],
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

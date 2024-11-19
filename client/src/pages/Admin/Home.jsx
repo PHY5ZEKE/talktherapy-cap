@@ -393,7 +393,7 @@ export default function Home() {
   };
 
   const sendEmail = (email) => {
-    emailEditInfo(email);
+    emailEditInfo(email, `${adminData?.firstName} ${adminData?.lastName}`);
   };
 
   // Archive/Soft Deletion Modal

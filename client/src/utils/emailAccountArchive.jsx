@@ -1,13 +1,12 @@
 const appURL = import.meta.env.VITE_APP_URL;
 
 import { route } from "./route";
-import { AccountArchive } from "./templates/AccountArchive";
 
 export const emailAccountArchive = async (email) => {
   const payload = {
     email: email,
     header: "Account Archived | TalkTherapy",
-    content: AccountArchive(email)
+    type: "account-archive",
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {
