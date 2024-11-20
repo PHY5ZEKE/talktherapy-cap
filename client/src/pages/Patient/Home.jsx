@@ -329,7 +329,8 @@ export default function Home() {
                       bookmarkedExercises.map((content) => (
                         <div
                           key={content._id}
-                          className="bookmark-item border rounded p-2 mb-3"
+                          className="bookmark-item border rounded-3 p-2"
+                          style={{ cursor: "pointer" }}
                           onClick={() => handleCardClick(content._id)}
                         >
                           <h5 className="mb-1 fw-bold">{content.name}</h5>

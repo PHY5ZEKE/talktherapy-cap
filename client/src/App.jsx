@@ -16,7 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 // System
 import Landing from "./pages/System/Landing";
-import Login from './pages/System/Login'
+import Login from "./pages/System/Login";
 import RegisterAdmin from "./pages/Register/AdminRegister";
 import RegisterClinician from "./pages/Register/ClinicianRegister";
 import RegisterPatientSlp from "./pages/Register/PatientRegister";
@@ -61,17 +61,15 @@ import Room from "./pages/System/Room";
 import WordStart from "./pages/Exercises/WordStart";
 import AssistSpeech from "./pages/Exercises/AssistSpeech";
 import ExerciseContent from "./pages/Exercises/ExerciseContent";
-import ExerRun from "./pages/Exercises/ExerRun"
-import ExerSpeech from "./pages/Exercises/ExerSpeech"
-import ExerFace from "./pages/Exercises/ExerFace"
+import ExerRun from "./pages/Exercises/ExerRun";
+import ExerSpeech from "./pages/Exercises/ExerSpeech";
+import ExerFace from "./pages/Exercises/ExerFace";
 
 // Error Handlers
 import NotFound from "./pages/System/NotFound";
 import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
 
 // Testing Pages
-
-
 
 const routes = (
   <Router>
@@ -101,10 +99,10 @@ const routes = (
       {/* Exercises */}
       <Route path="/exercise" element={<WordStart />} />
       <Route path="/assist/speech" element={<AssistSpeech />} />
-      <Route path="/content/exercises/:id" element={<ExerciseContent /> }/>
-      <Route path="/content/exercises/speech" element={<ExerRun /> }/>
-      <Route path="/content/exercises/assistspeech" element={<ExerSpeech /> }/>
-      <Route path="/content/exercises/facespeech" element={<ExerFace /> }/>
+      <Route path="/content/exercises/:id" element={<ExerciseContent />} />
+      <Route path="/content/exercises/speech" element={<ExerRun />} />
+      <Route path="/content/exercises/assistspeech" element={<ExerSpeech />} />
+      <Route path="/content/exercises/facespeech" element={<ExerFace />} />
 
       {/* TO DO: Create a page for landing instead of login */}
       <Route
@@ -289,7 +287,6 @@ const routes = (
           </PrivateRoute>
         }
       />
-
     </Routes>
   </Router>
 );

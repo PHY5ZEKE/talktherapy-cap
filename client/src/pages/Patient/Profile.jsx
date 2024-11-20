@@ -128,7 +128,7 @@ export default function Profile() {
 
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3 overflow-auto">
-                    <div className="card">
+                    <div className="card border">
                       <img
                         src={patientData?.profilePicture}
                         className="card-img-top"
@@ -136,7 +136,7 @@ export default function Profile() {
                         style={{ maxHeight: "320px", objectFit: "cover" }}
                       />
                       <div className="card-body">
-                        <h5 className="">
+                        <h5 className="fw-bold">
                           {patientData?.firstName} {patientData?.middleName}{" "}
                           {patientData?.lastName}
                         </h5>

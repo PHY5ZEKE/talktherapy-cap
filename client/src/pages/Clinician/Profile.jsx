@@ -120,7 +120,10 @@ export default function Profile() {
       {/* Request Content */}
       {isRequestContent && (
         <>
-          <RequestContent handleModal={handleRequestContent} clinicianData={clinicianData} />
+          <RequestContent
+            handleModal={handleRequestContent}
+            clinicianData={clinicianData}
+          />
         </>
       )}
 
@@ -162,7 +165,7 @@ export default function Profile() {
 
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3 overflow-auto">
-                    <div className="card">
+                    <div className="card border">
                       <img
                         src={clinicianData?.profilePicture}
                         className="card-img-top"
@@ -170,17 +173,13 @@ export default function Profile() {
                         style={{ maxHeight: "320px", objectFit: "cover" }}
                       />
                       <div className="card-body">
-                        <h5 className="">
+                        <h5 className="fw-bold">
                           {`${clinicianData?.firstName} ${clinicianData?.middleName} ${clinicianData?.lastName}`}
                         </h5>
-                        <p className="mb-0">
-                          Specialization: {clinicianData?.specialization}
-                        </p>
-                        <p className="mb-0">
-                          Clinic Address: {clinicianData?.address}
-                        </p>
-                        <p className="mb-0">Contact: {clinicianData?.mobile}</p>
-                        <p className="mb-0">Email: {clinicianData?.email}</p>
+                        <p className="mb-0">{clinicianData?.specialization}</p>
+                        <p className="mb-0">{clinicianData?.address}</p>
+                        <p className="mb-0">{clinicianData?.mobile}</p>
+                        <p className="mb-0">{clinicianData?.email}</p>
                       </div>
                     </div>
                   </div>
@@ -202,8 +201,9 @@ export default function Profile() {
                     style={{ maxHeight: "75vh" }}
                   >
                     <Link to={page.clinician.profile}>
-                      <div className="mb-3 fw-bold text-button border w-100"
-                      onClick={handleRequestContent}
+                      <div
+                        className="mb-3 fw-bold text-button border w-100"
+                        onClick={handleRequestContent}
                       >
                         Request Content
                       </div>
