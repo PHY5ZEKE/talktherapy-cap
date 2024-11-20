@@ -4,7 +4,7 @@
 }
 
 .hidden {
-  display: none;
+  display: hidden;
 }
 
 .text-center {
@@ -78,6 +78,7 @@
 	border-radius: 8px;
 	margin-top: 10px; /* Space between phrase and phonphrase */
   }
+
 
 
 

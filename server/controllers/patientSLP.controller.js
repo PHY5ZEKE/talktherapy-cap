@@ -354,6 +354,31 @@ const updateProfilePicture = [
   },
 ];
 
+// Update patient progress
+const updateProgress = async (req, res) => {
+  const { currentPhraseNo } = req.body; 
+  console.log("Request Body:", req.body);
+  console.log("Received currentPhraseNo:", currentPhraseNo); // Expecting currentPhraseNo in the request body
+  const { id: patientId } = req.user;
+
+  try {
+    const patient = await PatientSlp.findById(patientId);
+    if (!patient) {
+      return res.status(404).json({ message: 'Patient not found' });
+    }
+
+    // Update the patient's progress
+    patient.currentPhraseNo = currentPhraseNo;
+    await patient.save();
+
+    res.status(200).json({ message: 'Progress updated successfully' });
+  } catch (error) {
+    console.error(error);
+    console.error("Error updating progress:", error);
+    res.status(500).json({ message: 'An error occurred while updating progress' });
+  }
+};
+
 const editPatient = [
   verifyToken,
   async (req, res) => {
@@ -430,5 +455,6 @@ module.exports = {
   getPatient,
   changePassword,
   updateProfilePicture,
+  updateProgress,
   editPatient,
 };

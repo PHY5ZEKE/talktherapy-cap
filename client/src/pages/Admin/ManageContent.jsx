@@ -9,6 +9,7 @@ import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import AddContent from "../../components/Modals/AddContent";
 import EditContent from "../../components/Modals/EditContent";
+import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
 
 export default function AdminContent() {
   const [adminData, setAdminData] = useState(null);
@@ -22,12 +23,30 @@ export default function AdminContent() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingContent, setEditingContent] = useState(null);
+  const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [contentToDelete, setContentToDelete] = useState(null);
 
   const appURL = import.meta.env.VITE_APP_URL;
 
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
   const navigate = useNavigate();
+
+
+  // Function to open the confirmation dialog
+  const handleDeleteClick = (content) => {
+    setContentToDelete(content);
+    setIsConfirmDeleteOpen(true);
+  };
+
+  // Function to handle deletion confirmation
+  const handleConfirmDelete = async () => {
+    if (contentToDelete) {
+      await handleDelete(contentToDelete._id);
+    }
+    setIsConfirmDeleteOpen(false);
+    setContentToDelete(null);
+  };
 
   // Fetch content data function
   const fetchContentData = async () => {
@@ -202,6 +221,16 @@ export default function AdminContent() {
         />
       )}
 
+      {/* CONFIRMATION DIALOG */}
+      {isConfirmDeleteOpen && (
+        <ConfirmationDialog
+          header="Confirm Deletion"
+          body={`Are you sure you want to delete "${contentToDelete ? contentToDelete.name : ""}"?`}
+          handleModal={() => setIsConfirmDeleteOpen(false)}
+          confirm={handleConfirmDelete}
+        />
+      )}
+
       <div className="container-fluid p-0 vh-100 vw-100">
         <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
           {/* SIDEBAR */}
@@ -300,7 +329,7 @@ export default function AdminContent() {
                                   style={{ cursor: "pointer" }}
                                   onClick={(e) => {
                                     e.stopPropagation();
-                                    handleDelete(content._id);
+                                    handleDeleteClick(content);
                                   }}
                                 >
                                   Delete

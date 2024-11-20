@@ -1,16 +1,64 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { route } from "../../utils/route";
+import { AuthContext } from "../../utils/AuthContext";
 import './libs/exercises.css';
 
 // PageStart Component
 export default function WordStart() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
 
   const [isRecording, setIsRecording] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [currentPhraseNo, setCurrentPhraseNo] = useState(0); 
+  const [error, setError] = useState(null);
+  const [texts, setTexts] = useState([]);
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const handleRecord = () => {
     setIsRecording(prevState => !prevState);
   };
 
+  // Fetch patient data
+  useEffect(() => {
+    if (authState?.userRole === "patientslp") {
+      const fetchPatientData = async () => {
+        try {
+          const response = await fetch(`${appURL}/${route.patient.fetch}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+
+          if (!response.ok) {
+            console.error("Failed to fetch patient data");
+            setLoading(false);
+            return;
+          }
+
+          const data = await response.json();
+          const lastCompletedPhrase = data.patient.lastCompletedPhrase || 1; // Default to 0 if not found
+          setCurrentPhraseNo(lastCompletedPhrase);
+          setLoading(false);
+
+          // Call the global setPhrase function to display the correct phrase
+          if (typeof window.setPhrase === 'function') {
+            window.setPhrase(lastCompletedPhrase);
+          }
+        } catch (error) {
+          setError(error.message);
+          setLoading(false);
+        }
+      };
+
+      fetchPatientData();
+    }
+  }, [accessToken, appURL, authState?.userRole]);
+
+  //load script
   useEffect(() => {
     const existingScript = document.querySelector('script[src="./src/pages/Exercises/libs/Exercise.js"]');
     if (!existingScript) {
@@ -19,22 +67,105 @@ export default function WordStart() {
       script.async = true;
       script.onload = () => {
         console.log('Exercise.js loaded');
-        // Call the initialize function after the script has loaded
         if (typeof window.initializeExercise === 'function') {
           window.initializeExercise();
+        }
+        // Assuming texts are loaded in the global scope after Exercise.js is initialized
+        if (typeof window.texts !== 'undefined') {
+          setTexts(window.texts); // Set the loaded texts
         }
       };
       document.body.appendChild(script);
     } else {
-      // If the script already exists, call the initialize function directly
       if (typeof window.initializeExercise === 'function') {
         window.initializeExercise();
       }
+      // Check if texts are already loaded
+      if (typeof window.texts !== 'undefined') {
+        setTexts(window.texts); // Set the loaded texts
+      }
     }
   }, []);
+  
 
+  // Function to save progress to the server
+  const saveProgress = async (phraseNo) => {
+    console.log("Saving progress for phrase number:", phraseNo);
+    try {
+      const response = await fetch(`${appURL}/update-progress`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ currentPhraseNo: phraseNo }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save progress');
+      }
+
+      const result = await response.json();
+      console.log(result.message); // Optionally handle success message
+    } catch (error) {
+      console.error(error.message);
+      console.error("Error saving progress:", error.message);
+    }
+  };
+
+
+  useEffect(() => {
+    // Add event listeners for buttons
+    const prevButton = document.querySelector('#page-main #panel-counter #button-prev-phrase');
+    const nextButton = document.querySelector('#page-main #panel-counter #button-next-phrase');
+
+    const handlePrevClick = () => {
+      console.log("Previous button clicked");
+      const newPhraseNo = currentPhraseNo - 1;
+      if (newPhraseNo >= 0) {
+        setCurrentPhraseNo(newPhraseNo);
+        saveProgress(newPhraseNo); // Save progress
+        if (typeof window.setPhrase === 'function') {
+          window.setPhrase(newPhraseNo);
+        }
+      }
+    };
+
+    const handleNextClick = () => {
+      console.log("Next button clicked");
+      const newPhraseNo = currentPhraseNo + 1;
+      const totalPhrases = texts.length; // Use the length of the loaded texts
+      if (newPhraseNo < totalPhrases) {
+        setCurrentPhraseNo(newPhraseNo);
+        saveProgress(newPhraseNo); // Save progress
+        if (typeof window.setPhrase === 'function') {
+          window.setPhrase(newPhraseNo);
+        }
+      }
+    };
+
+    if (prevButton) {
+      prevButton.addEventListener('click', handlePrevClick);
+    }
+
+    if (nextButton) {
+      nextButton.addEventListener('click', handleNextClick);
+    }
+
+    // Cleanup event listeners on component unmount
+    return () => {
+      if (prevButton) {
+        prevButton.removeEventListener('click', handlePrevClick);
+      }
+      if (nextButton) {
+        nextButton.removeEventListener('click', handleNextClick);
+      }
+    };
+  }, [currentPhraseNo, texts]);
+
+  
   return (
-  <div className="d-flex align-items-center justify-content-center vh-100 bg-light">
+  <div className="d-flex align-items-center justify-content-center vh-100">
     {/* Page Start */}
     <div id="page-start" className="text-center">
       <div className="content">
@@ -69,7 +200,7 @@ export default function WordStart() {
               <button id="display_phoneme" className="btn btn-success me-3">Show</button>
               <div id="phrase" className="phrase-box bg-white shadow-sm p-3 rounded"></div>
             </div>
-            <div id="phonphrase" className="phrase-box hidden bg-light shadow-sm p-3 rounded mt-3"></div>
+            <div id="phonphrase" className="phrase-box hidden shadow-sm p-3 rounded mt-3"></div>
           </div>
 
         {/* Panel Recognition */}
@@ -155,10 +286,6 @@ export default function WordStart() {
             </div>
           </div>
         </div>
-
-
-
-
   </div>
   );
 }

@@ -85,10 +85,6 @@ function initializeExercise() {
 
         });
 
-        var DisplayPhoneme = document.getElementById('display_phoneme').addEventListener('click', function() {
-            var phonemeElement = document.getElementById('phonphrase');
-            phonemeElement.classList.toggle('hidden'); 
-        });
 
         var $recognition = document.querySelector('#page-main #recognition');
         function resetRecognitionStyles() {
@@ -522,7 +518,6 @@ function initializeExercise() {
                 
                 recognitionTimeout = setTimeout(() => {
                     recognition.onspeechend();
-                    $recognition.innerHTML = 'Sorry! Voice unrecognized!';
                 }, 5000);
                 
             
