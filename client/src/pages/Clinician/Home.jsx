@@ -272,12 +272,12 @@ export default function Home() {
                       {clinicianData?.firstName} {clinicianData?.lastName}
                     </p>
                     <button
-                    role="button"
-                    className="dropdown-item"
-                    data-bs-toggle="offcanvas"
-                    data-bs-target="#offcanvasWithBothOptions"
-                    aria-controls="offcanvasWithBothOptions">
-                    </button>
+                      role="button"
+                      className="dropdown-item"
+                      data-bs-toggle="offcanvas"
+                      data-bs-target="#offcanvasWithBothOptions"
+                      aria-controls="offcanvasWithBothOptions"
+                    ></button>
                   </>
                 ) : (
                   <p>Fetching data.</p>
@@ -432,6 +432,17 @@ export default function Home() {
                           >
                             View Appointment Details
                           </a>
+
+                          <div className="mt-2">
+                            <button
+                              className="mb-3 text-button border"
+                              onClick={() =>
+                                joinMeeting(appointment.roomId, appointment)
+                              }
+                            >
+                              Join
+                            </button>
+                          </div>
                         </div>
                       ))}
                     {appointments
