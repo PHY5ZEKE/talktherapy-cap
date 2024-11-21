@@ -573,6 +573,20 @@ exports.requestAccess = async (req, res) => {
   try {
     const { clinicianId, patientId, reason, status } = req.body;
 
+    // get if existing then check status if pending
+    const existingAssignment = await AssignmentSLP.findOne({
+      clinicianId,
+      patientId,
+      status: "Pending",
+    });
+
+    if (existingAssignment) {
+      return res.status(400).json({
+        error: true,
+        message: "You already have a request.",
+      });
+    }
+
     const newAssignment = new AssignmentSLP({
       clinicianId,
       patientId,

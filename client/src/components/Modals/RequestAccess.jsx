@@ -65,6 +65,7 @@ export default function RequestAccess({
       };
       
       if (!response.ok) {
+        console.error(data.message || "Failed to request access");
         throw new Error(data.message || "Failed to request access");
       }
       notify("Access requested successfully");

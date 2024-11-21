@@ -298,12 +298,13 @@ exports.sendNotification = async (req, res) => {
     const clinician = await Clinician.findById(email[0]);
     const patient = await Patient.findById(email[1]);
 
-    statusEmail = [clinician.email, patient.email];
+    if (clinician && patient) {
+      statusEmail = [clinician.email, patient.email];
+    }
   }
 
-
   const mailOptions = {
-    to: statusEmail || email,
+    to: statusEmail.length > 0 ? statusEmail : email,
     from: process.env.EMAIL,
     subject: header,
     html: htmlContent,

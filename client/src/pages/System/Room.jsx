@@ -184,7 +184,11 @@ export default function Room() {
     };
   }, []);
 
-  const initiateConnection = async () => {
+  const initiateConnection = async (retryCount = 0) => {
+    // Reconnect
+    const maxRetries = 5;
+    const retryDelay = 3000;
+
     try {
       await pageReady();
       socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
@@ -210,14 +214,24 @@ export default function Room() {
         gotMessageFromServer(message);
       };
 
-      socket.current.onerror = (error) =>
-        //failNotify("Server is having problems. Please wait or try again.");
+      socket.current.onerror = (error) => {
+        console.log("WebSocket error:", error);
+      };
 
-        (socket.current.onclose = () => {
-          notify("You have left the teleconference room.");
-          isSocketOpen.current = false;
-          hasJoinedRoom.current = false;
-        });
+      socket.current.onclose = () => {
+        notify("You have left the teleconference room.");
+        isSocketOpen.current = false;
+        hasJoinedRoom.current = false;
+
+        if (retryCount < maxRetries) {
+          setTimeout(() => {
+            console.log(`Reconnecting... Attempt ${retryCount + 1}`);
+            initiateConnection(retryCount + 1);
+          }, retryDelay);
+        } else {
+          failNotify("Failed to reconnect after multiple attempts.");
+        }
+      };
     } catch (error) {
       handleCloseConnection();
     }
@@ -230,7 +244,7 @@ export default function Room() {
 
   const startConnection = (isCaller) => {
     if (!socket.current || socket.current.readyState !== WebSocket.OPEN) {
-      //failNotify("Server is having problems. Please wait or try again.");
+      console.warn("Cannot start connection. Check WebSocket connection.");
       return;
     }
 
@@ -253,7 +267,7 @@ export default function Room() {
         .createOffer()
         .then(createDescription)
         .catch(
-          failNotify("Server is having problems. Please wait or try again.")
+          console.warn("Trying to establish peer connection.")
         );
     }
 
@@ -281,9 +295,7 @@ export default function Room() {
               .createAnswer()
               .then(createDescription)
               .catch(
-                failNotify(
-                  "Server is having problems. Please wait or try again."
-                )
+                console.warn("Trying to set remote description for peer connection.")
               );
           }
           // Process queued ICE candidates
@@ -292,21 +304,19 @@ export default function Room() {
             peerConnection.current
               .addIceCandidate(new RTCIceCandidate(iceCandidate))
               .catch(
-                failNotify(
-                  "Server is having problems. Please wait or try again."
-                )
+                console.warn("Trying to add ICE candidate to peer connection.")
               );
           }
         })
         .catch(
-          failNotify("Server is having problems. Please wait or try again.")
+          console.warn("Trying to set remote description for peer connection.")
         );
     } else if (signal.ice) {
       if (peerConnection.current.remoteDescription) {
         peerConnection.current
           .addIceCandidate(new RTCIceCandidate(signal.ice))
           .catch(
-            failNotify("Server is having problems. Please wait or try again.")
+            console.warn("Trying to add ICE candidate to peer connection.")
           );
       } else {
         iceQueue.current.push(signal.ice);
@@ -347,9 +357,7 @@ export default function Room() {
               .createAnswer()
               .then(createDescription)
               .catch(
-                failNotify(
-                  "Server is having problems. Please wait or try again."
-                )
+                console.warn("Trying to create answer for peer connection.")
               );
           }
           // Process queued ICE candidates
@@ -358,14 +366,12 @@ export default function Room() {
             peerConnection.current
               .addIceCandidate(new RTCIceCandidate(iceCandidate))
               .catch(
-                failNotify(
-                  "Server is having problems. Please wait or try again."
-                )
+                console.warn("Trying to add ICE candidate to peer connection.")
               );
           }
         })
         .catch(
-          failNotify("Server is having problems. Please wait or try again.")
+          console.warn("Trying to set remote description for peer connection.")
         );
     }
 
@@ -378,7 +384,7 @@ export default function Room() {
       peerConnection.current
         .addIceCandidate(new RTCIceCandidate(iceCandidate))
         .catch(
-          failNotify("Server is having problems. Please wait or try again.")
+          console.warn("Trying to add ICE candidate to peer connection.")
         );
     }
   }
@@ -395,7 +401,7 @@ export default function Room() {
           })
         );
       } else {
-        //failNotify("Server is having problems. Please wait or try again.");
+        console.warn("Cannot get ICE candidate.");
       }
     }
   };
@@ -412,7 +418,7 @@ export default function Room() {
           })
         );
       } else {
-        //failNotify("Server is having problems. Please wait or try again.");
+        console.warn("Cannot create description for connection.")
       }
     });
   };
