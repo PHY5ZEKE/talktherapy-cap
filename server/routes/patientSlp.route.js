@@ -8,8 +8,12 @@ const {
   updateProfilePicture,
   editPatient,
   updateBookmarks,
-  updateProgress,
 } = require("../controllers/patientSLP.controller");
+
+const {
+  saveProgress,
+  loadProgress,
+} = require("../controllers/patientProgress.controller");
 
 const verifyToken = require("../middleware/verifyToken");
 
@@ -25,9 +29,13 @@ router.put("/update-profile-picture", verifyToken, updateProfilePicture);
 
 router.put("/edit-patient", verifyToken, editPatient);
 
-// New route to update bookmarks
 router.put("/update-bookmarks", verifyToken, updateBookmarks);
 
-router.put('/update-progress', verifyToken, updateProgress);
+// Save patient progress
+router.post("/save-progress", verifyToken, saveProgress);
+
+// Load patient progress
+router.get("/load-progress", verifyToken, loadProgress);
+
 
 module.exports = router;

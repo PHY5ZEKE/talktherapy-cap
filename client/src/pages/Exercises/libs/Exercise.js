@@ -1,5 +1,24 @@
-function initializeExercise() {
-    console.log('All resources finished loading!');
+var initialized;
+var initialLoad = true;
+
+
+function initializeExercise(loadedProgress = null) {
+
+    if (initialized) return; 
+    initialized = true;
+
+    var progress = {
+        textId: null,
+        currentPhrase: 0,
+        correctCount: 0,
+        totalPhrases: 0,
+        completed: false
+    };
+
+    console.log("Exercise initialized");
+
+    console.log("Loaded progress argument:", loadedProgress);
+
 	 if (typeof speechSynthesis === 'undefined') {
         console.warn('speechSynthesis API is not available.');
     }
@@ -43,6 +62,19 @@ function initializeExercise() {
                 addText(id, texts[id].name, texts[id].text);
             }
 
+            if (loadedProgress) {
+                console.log("Loaded progress found:", loadedProgress);
+                progress = loadedProgress; // Use loaded progress
+                setPhrase(progress.currentPhrase); // Set the phrase based on loaded progress
+                console.log("Setting phrase to:", progress.currentPhrase);
+            } else {
+                // Default to the first phrase if no progress is loaded
+                const currentTextId = localStorage.getItem('speech-current-text');
+                if (currentTextId && texts[currentTextId]) {
+                    setPhrase(0); // Start from the first phrase
+                }
+            }
+
             var currentTextId = localStorage.getItem('speech-current-text');
                 if (currentTextId && texts[currentTextId]) {
                     var currentText = texts[currentTextId];
@@ -68,15 +100,17 @@ function initializeExercise() {
 
             document.querySelector('#page-main #panel-counter #button-prev-phrase').addEventListener('click', function() {
                 resetRecognitionStyles();
-                setPhrase(current_phrase_no - 1);
+                setPhrase(progress.currentPhrase - 1);
                 phonemeContainer.innerHTML = '';
+                saveProgress();
                 
             });
             
             document.querySelector('#page-main #panel-counter #button-next-phrase').addEventListener('click', function() {
                 resetRecognitionStyles();
-                setPhrase(current_phrase_no + 1);
+                setPhrase(progress.currentPhrase + 1);
                 phonemeContainer.innerHTML = '';
+                saveProgress();
             });
 
             document.querySelector('#page-option #speech-success-ring [value="yes"]').addEventListener('click', () => {
@@ -109,6 +143,29 @@ function initializeExercise() {
                 }
         
                 var pageOption = document.querySelector('#page-option');
+                if (pageOption) {
+                    pageOption.style.display = 'block'; 
+                }
+            });
+        }
+
+        var selectButton = document.querySelector('#page-main #button-text-selector');
+        if (selectButton) {
+            console.log("More button found");
+            selectButton.addEventListener('click', function() {
+                var phonemeContainer = document.getElementById("phoneme-output");
+                    phonemeContainer.innerHTML = '';
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+        
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'none'; 
+                }
+        
+                var pageOption = document.querySelector('#page-text-selector');
                 if (pageOption) {
                     pageOption.style.display = 'block'; 
                 }
@@ -176,6 +233,26 @@ function initializeExercise() {
             });
         }
 
+        var closeButtonSelect = document.querySelector('#page-text-selector #close-button');
+        if (closeButtonSelect) {
+            closeButtonSelect.addEventListener('click', function() {
+                var pageOption = document.querySelector('#page-text-selector');
+                if (pageOption) {
+                    pageOption.style.display = 'none'; 
+                }
+
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'block'; 
+                }
+            });
+        }
+
         var startButton = document.querySelector('#page-start #button-start'); 
         if (startButton) { 
             console.log("Start button found"); 
@@ -187,22 +264,23 @@ function initializeExercise() {
                                 pageMain.style.display = 'block'; 
                             }
 
-                            if (texts && Object.keys(texts).length > 0) {
-                                var currentTextId = localStorage.getItem('speech-current-text');
-                                console.log("Current text ID:", currentTextId); 
 
-                                if (texts[currentTextId]) {
-                                    console.log("Current text:", texts[currentTextId]); 
-                                    var $e = document.querySelector('#page-text-selector #texts div[id="' + currentTextId + '"]');
-                                    if ($e) {
-                                        $e.click(); 
-                                    }
-                                } else {
-                                    console.error("No text found for ID:", currentTextId); 
-                                }
-                            } else {
-                                console.error("Texts not loaded or empty."); 
-                            }
+                            // if (texts && Object.keys(texts).length > 0) {
+                            //     var currentTextId = localStorage.getItem('speech-current-text');
+                            //     console.log("Current text ID:", currentTextId); 
+
+                            //     if (texts[currentTextId]) {
+                            //         console.log("Current text:", texts[currentTextId]); 
+                            //         var $e = document.querySelector('#page-text-selector #texts div[id="' + currentTextId + '"]');
+                            //         if ($e) {
+                            //             $e.click(); 
+                            //         }
+                            //     } else {
+                            //         console.error("No text found for ID:", currentTextId); 
+                            //     }
+                            // } else {
+                            //     console.error("Texts not loaded or empty."); 
+                            // }
                         });
                     }
 
@@ -242,11 +320,15 @@ function initializeExercise() {
                 var textsChildren = document.querySelectorAll('#texts div');
                 textsChildren.forEach(child => child.removeAttribute('current'));
                 this.setAttribute('current', true);
+
                 var textElement = document.querySelector('#text');
                 if (textElement) textElement.innerHTML = text;
+
                 localStorage.setItem('speech-current-text', this.id);
                 console.log("Current text from localStorage:", localStorage.getItem('speech-current-text'));
-                setPhrase(document.querySelector('.page[current]').id === 'page-text-selector' ? 0 : localStorage.getItem('speech-phrase'));
+
+                loadProgressForTextId(this.id);
+                // setPhrase(document.querySelector('.page[current]').id === 'page-text-selector' ? 0 : localStorage.getItem('speech-phrase'));
             });
     
             var $view = document.createElement('div');
@@ -265,24 +347,28 @@ function initializeExercise() {
             });
             $div.appendChild($view);
     
-            var $remove = document.createElement('div');
-            $remove.setAttribute('id', 'remove');
-            $remove.innerHTML = '&#10006;';
-            $remove.addEventListener('click', function(event) {
-                event.stopImmediatePropagation();
-    
-                if (!confirm('Are you sure you want to remove "' + name + '"?')) return;
-    
-                if ($div.hasAttribute('current')) ($div.previousSibling || $div.nextSibling).click();
-    
-                var deleted = localStorage.getItem('speech-deleted-texts') || '';
-                localStorage.setItem('speech-deleted-texts', deleted + ';' + id);
-                $div.remove();
-            });
-            $div.appendChild($remove);
     
             var textsContainer = document.querySelector('#texts');
             if (textsContainer) textsContainer.appendChild($div);
+        }
+
+        function loadProgressForTextId(textId) {
+            const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
+        
+            if (savedProgress[textId]) {
+                console.log("Loaded progress for text ID:", textId);
+                progress = savedProgress[textId]; // Use saved progress
+            } else {
+                console.log("No saved progress found for text ID:", textId);
+                progress = {
+                    textId: textId,
+                    currentPhrase:  0,
+                    correctCount: 0,
+                    totalPhrases: texts[textId]?.phrases.length || 0,
+                    completed: false,
+                };
+            }
+            setPhrase(progress.currentPhrase); // Set to the loaded or initialized current phrase
         }
 
 
@@ -290,76 +376,127 @@ function initializeExercise() {
         function setPhrase(no) {
             clearTimeout(nextPhraseTimer);
             no = parseInt(no) || 0; 
+        
             // Get the current text ID from localStorage
-            var id = localStorage.getItem('speech-current-text');
+            const id = localStorage.getItem('speech-current-text');
             
             if (!id) {
-                console.error("No current text ID found in localStorage");
+                console.error("No current text ID found");
                 return;
             }
-
-            console.log("Current text ID:", id);
-            console.log("All texts:", texts); 
         
-            var text = texts[id]; 
+            console.log("Current text ID:", id);
+            const text = texts[id]; 
             if (!text) {
                 console.error("Text not found for ID:", id); 
                 return; 
             }
             console.log("Current text:", text); 
+
+            if (no < 0) {
+                no = 0;
+            } else if (no >= text.phrases.length) {
+                no = text.phrases.length - 1; // Prevent overflow
+            }
         
-            if (no < 0) return setPhrase(0);
-            if (no > text.phrases.length - 1) return setPhrase(text.phrases.length - 1);
-        
+            // if (no < 0) return setPhrase(0);
+            // if (no > text.phrases.length - 1) return setPhrase(text.phrases.length - 1);
+            
             current_phrase_no = no; 
             console.log("Setting phrase number:", no, "for text ID:", id); 
         
-            var prevButton = document.querySelector('#page-main #panel-counter #button-prev-phrase');
-            if (prevButton) prevButton.style.visibility = no == 0 ? 'hidden' : 'visible';
-            
-            var nextButton = document.querySelector('#page-main #panel-counter #button-next-phrase');
-            if (nextButton) nextButton.style.visibility = no == text.phrases.length - 1 ? 'hidden' : 'visible';
+            // Update UI elements for previous and next buttons
+            const prevButton = document.querySelector('#page-main #panel-counter #button-prev-phrase');
+            const nextButton = document.querySelector('#page-main #panel-counter #button-next-phrase');
+            const phraseNumber = document.querySelector('#page-main #phrase-number');
+            const panelCounterCaption = document.querySelector('#caption');
+            const phraseElement = document.querySelector('#page-main #phrase');
         
-            var phraseNumber = document.querySelector('#page-main #phrase-number');
-            if (phraseNumber) phraseNumber.innerHTML = no + 1 + '/' + text.phrases.length;
-            
-            var panelCounterCaption = document.querySelector('#caption');
+            if (prevButton) prevButton.style.visibility = no === 0 ? 'hidden' : 'visible';
+            if (nextButton) nextButton.style.visibility = no === text.phrases.length - 1 ? 'hidden' : 'visible';
+            if (phraseNumber) phraseNumber.innerHTML = `${no + 1}/${text.phrases.length}`;
             if (panelCounterCaption) panelCounterCaption.innerHTML = text.name;
-        
-            var phraseElement = document.querySelector('#page-main #phrase');
+            
             if (phraseElement) {
-                var currentPhrase = text.phrases[no];
-                console.log("Current phrase:", text.phrases[no]); 
-                phraseElement.innerHTML = text.phrases[no].split(' ').map((e) => e.indexOf('<') == -1 ? '<span>' + e + '</span>' : e).join(' ');
+                const currentPhrase = text.phrases[no];
+                console.log("Current phrase:", currentPhrase); 
+                phraseElement.innerHTML = currentPhrase.split(' ').map((e) => e.indexOf('<') === -1 ? `<span>${e}</span>` : e).join(' ');
+        
+                // Add click event listeners for each word
                 phraseElement.querySelectorAll('*').forEach((e) => e.addEventListener('click', (event) => {
                     event.stopImmediatePropagation();
                     speakText(event.target.textContent);
                 }));
-
-                var phonemeContainer = document.getElementById("phonphrase");
+        
+                // Update phonemes for the current phrase
+                const phonemeContainer = document.getElementById("phonphrase");
                 phonemeContainer.innerHTML = '';
-
                 displayPhonemesForCurrentPhrase(currentPhrase);
             }
         
-            var listenButton = document.querySelector('#page-main #button-listen');
+            // Hide listen and recognition buttons
+            const listenButton = document.querySelector('#page-main #button-listen');
             if (listenButton) listenButton.setAttribute('hidden', true);
             
-            var recognitionElement = document.querySelector('#page-main #recognition');
+            const recognitionElement = document.querySelector('#page-main #recognition');
             if (recognitionElement) {
                 recognitionElement.innerHTML = '';
                 recognitionElement.removeAttribute('confidence');
             }
-            
-            var compareElement = document.querySelector('#page-main #compare');
-            if (compareElement) compareElement.innerHTML = '';
         
+            const compareElement = document.querySelector('#page-main #compare');
+            if (compareElement) compareElement.innerHTML = '';
+            
+            // Automatically speak the current phrase if required
             if (document.querySelector('#page-main').hasAttribute('current')) {
                 speakText(text.phrases[no]); 
             }
         
-            localStorage.setItem('speech-phrase', no); 
+            // Update progress object
+            if (progress.textId === id && progress.currentPhrase === no) {
+                return; // No need to update if the progress hasn't changed
+            }
+        
+            progress.currentPhrase = no;
+            current_phrase_no = no;
+            progress.textId = id;
+            progress.totalPhrases = text.phrases.length;
+        
+            // Increment correct count if recognition was correct
+            const recognition = document.querySelector('#page-main #recognition');
+            if (recognition && recognition.hasAttribute('correct')) {
+                progress.correctCount++;
+            }
+        
+            // Mark as completed if the last phrase is reached
+            progress.completed = progress.currentPhrase === text.phrases.length - 1;
+            
+                  
         }
+
+        function saveProgress() {
+            const textId = localStorage.getItem('speech-current-text');
+            const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
+        
+            // Update the progress for the current text ID
+            savedProgress[textId] = {
+                textId: textId,
+                currentPhrase: current_phrase_no,
+                correctCount: progress.correctCount,
+                totalPhrases: progress.totalPhrases,
+                completed: progress.completed,
+            };
+        
+            // Save the updated progress to local storage
+            localStorage.setItem('patient-progress', JSON.stringify(savedProgress));
+            console.log("Progress saved for text ID:", textId);
+        
+            // Save progress to the backend
+            if (window.saveProgressToBackend) {
+                window.saveProgressToBackend(savedProgress[textId]); // Pass the specific progress for the current text ID
+            }
+        }
+
 
         function initOptions() {
             const options = document.querySelectorAll('#page-option .content > div');
@@ -397,6 +534,8 @@ function initializeExercise() {
             const e = document.querySelector(`#${opt} [current]`);
             return e ? e.getAttribute('value') : document.getElementById(opt).getAttribute('default');
         }
+
+        
         
         let voices = [];
         function speakText(text) {
@@ -659,12 +798,7 @@ function initializeExercise() {
                 });
             }
     
-            if ($panel_recognition) {
-                $panel_recognition.addEventListener('click', function(event) {
-                    var mode = this.getAttribute('mode');
-                    this.setAttribute('mode', mode === 'recognition' && $compare.textContent.trim() ? 'compare' : 'recognition');
-                });
-            }
+            
         }).catch((err) => alert(err.message));
 
 
@@ -736,8 +870,17 @@ function initializeExercise() {
 
 }
 
+function resetExercise() {
+    // Reset state here, so it can be re-initialized
+    initialized = false;
+    initialLoad = true;
+    console.log("Exercise state reset.");
+  }
 
 
 window.addEventListener('load', function() {
     initializeExercise();
 });
+
+window.initializeExercise = initializeExercise;
+window.resetExercise = resetExercise;

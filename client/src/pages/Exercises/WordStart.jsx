@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { route } from "../../utils/route";
 import { AuthContext } from "../../utils/AuthContext";
@@ -10,11 +10,16 @@ export default function WordStart() {
   const accessToken = authState.accessToken;
 
   const [isRecording, setIsRecording] = useState(false);
+  const [isPhonemeVisible, setIsPhonemeVisible] = useState(false);
+  const [progress, setProgress] = useState(null);
+
+
   const [loading, setLoading] = useState(true);
-  const [currentPhraseNo, setCurrentPhraseNo] = useState(0); 
+  const navigate = useNavigate();
   const [error, setError] = useState(null);
-  const [texts, setTexts] = useState([]);
+
   const appURL = import.meta.env.VITE_APP_URL;
+
 
   const handleRecord = () => {
     setIsRecording(prevState => !prevState);
@@ -22,155 +27,219 @@ export default function WordStart() {
 
   // Fetch patient data
   useEffect(() => {
-    if (authState?.userRole === "patientslp") {
-      const fetchPatientData = async () => {
-        try {
-          const response = await fetch(`${appURL}/${route.patient.fetch}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
+  if (authState?.userRole === "patientslp") {
+    const fetchPatientData = async () => {
+      try {
+        const response = await fetch(`${appURL}/${route.patient.fetch}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
-          if (!response.ok) {
-            console.error("Failed to fetch patient data");
-            setLoading(false);
-            return;
-          }
-
-          const data = await response.json();
-          const lastCompletedPhrase = data.patient.lastCompletedPhrase || 1; // Default to 0 if not found
-          setCurrentPhraseNo(lastCompletedPhrase);
+        if (!response.ok) {
+          console.error("Failed to fetch patient data");
           setLoading(false);
-
-          // Call the global setPhrase function to display the correct phrase
-          if (typeof window.setPhrase === 'function') {
-            window.setPhrase(lastCompletedPhrase);
-          }
-        } catch (error) {
-          setError(error.message);
-          setLoading(false);
+          return;
         }
-      };
 
-      fetchPatientData();
-    }
-  }, [accessToken, appURL, authState?.userRole]);
+        //const data = await response.json();
+        setLoading(false);
 
-  //load script
-  useEffect(() => {
-    const existingScript = document.querySelector('script[src="./src/pages/Exercises/libs/Exercise.js"]');
-    if (!existingScript) {
-      const script = document.createElement('script');
-      script.src = './src/pages/Exercises/libs/Exercise.js';
-      script.async = true;
-      script.onload = () => {
-        console.log('Exercise.js loaded');
-        if (typeof window.initializeExercise === 'function') {
-          window.initializeExercise();
-        }
-        // Assuming texts are loaded in the global scope after Exercise.js is initialized
-        if (typeof window.texts !== 'undefined') {
-          setTexts(window.texts); // Set the loaded texts
-        }
-      };
-      document.body.appendChild(script);
-    } else {
-      if (typeof window.initializeExercise === 'function') {
-        window.initializeExercise();
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
       }
-      // Check if texts are already loaded
-      if (typeof window.texts !== 'undefined') {
-        setTexts(window.texts); // Set the loaded texts
-      }
-    }
-  }, []);
-  
+    };
 
-  // Function to save progress to the server
-  const saveProgress = async (phraseNo) => {
-    console.log("Saving progress for phrase number:", phraseNo);
-    try {
-      const response = await fetch(`${appURL}/update-progress`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ currentPhraseNo: phraseNo }),
-      });
+    fetchPatientData();
+  }
+}, [accessToken, appURL, authState?.userRole]);
 
+// Function to send progress to the backend
+function saveProgressToBackend(progress) {
+  const appURL = import.meta.env.VITE_APP_URL;
+  if (!accessToken) {
+    console.error("Access token is missing");
+    return;
+  }
+
+  console.log("Sending progress to backend:", progress);
+  fetch(`${appURL}/${route.patient.saveProgress}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + accessToken,
+    },
+    body: JSON.stringify(progress),
+  })
+    .then((response) => {
       if (!response.ok) {
         throw new Error('Failed to save progress');
       }
+      return response.json();
+    })
+    .then((data) => {
+      console.log('Progress saved successfully:', data);
+    })
+    .catch((error) => {
+      console.error('Error saving progress:', error);
+    });
+}
+useEffect(() => {
+  window.saveProgressToBackend = saveProgressToBackend;
 
-      const result = await response.json();
-      console.log(result.message); // Optionally handle success message
-    } catch (error) {
-      console.error(error.message);
-      console.error("Error saving progress:", error.message);
+  return () => {
+    delete window.saveProgressToBackend;
+  };
+}, [accessToken]);
+
+
+// Function to fetch the saved progress from the backend
+    const fetchProgressFromBackend = async () => {
+      try {
+        const textId = localStorage.getItem('speech-current-text');
+        if (!textId) return;
+
+        // Make the API call to fetch the saved progress
+        const response = await fetch(`${appURL}/${route.patient.loadProgress}?textId=${textId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setProgress(data); // Store progress in state
+          console.log("Loaded progress:", data);
+        } else {
+          console.log("No progress found, starting fresh.");
+          setProgress(null); // Set to null if no progress is found
+        }
+      } catch (error) {
+        console.error("Error loading progress:", error);
+      }
+    };
+
+    // Fetch progress when component mounts or accessToken changes
+    useEffect(() => {
+      if (accessToken) {
+        fetchProgressFromBackend(); // Fetch progress from backend
+      }
+    }, [accessToken]);
+
+    // Optionally, handle cases where progress is not loaded
+    useEffect(() => {
+      if (progress) {
+        console.log("Progress data available:", progress);
+        // You can perform any further UI updates or logic here
+      }
+    }, [progress]);
+
+
+
+  //load script
+  useEffect(() => {
+    const scriptId = "exercise-script";
+  
+    const initialize = () => {
+      if (typeof window.initializeExercise === "function") {
+        console.log("Initializing Exercise.js");
+        window.initializeExercise(progress);
+      } else {
+        console.error("initializeExercise is not defined");
+      }
+    };
+  
+    // Check if the script already exists
+    const existingScript = document.getElementById(scriptId);
+  
+    if (!existingScript) {
+      console.log("Adding Exercise.js");
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "./src/pages/Exercises/libs/Exercise.js";
+      script.type = "module";
+      script.async = true;
+  
+      script.onload = () => {
+        console.log("Exercise.js loaded");
+        initialize();
+      };
+  
+      script.onerror = () => {
+        console.error("Failed to load Exercise.js");
+      };
+  
+      document.body.appendChild(script);
+    } else {
+      console.log("Exercise.js already exists");
+      initialize(); // Reinitialize only if the script exists
+    }
+  
+    // Cleanup logic
+    return () => {
+      console.log("Exercise.js script retained, resetting state instead.");
+      if (typeof window.resetExercise === "function") {
+        console.log("Resetting Exercise state");
+        window.resetExercise(); // Reset state if such a function exists
+      }
+    };
+  }, [progress]);
+
+
+
+  // Toggle recognition and compare mode
+  const toggleRecognitionMode = () => {
+    const $panel_recognition = document.querySelector('#panel-recognition');
+    if ($panel_recognition) {
+      const mode = $panel_recognition.getAttribute('mode');
+      $panel_recognition.setAttribute('mode', mode === 'recognition' ? 'compare' : 'recognition');
     }
   };
 
-
   useEffect(() => {
-    // Add event listeners for buttons
-    const prevButton = document.querySelector('#page-main #panel-counter #button-prev-phrase');
-    const nextButton = document.querySelector('#page-main #panel-counter #button-next-phrase');
-
-    const handlePrevClick = () => {
-      console.log("Previous button clicked");
-      const newPhraseNo = currentPhraseNo - 1;
-      if (newPhraseNo >= 0) {
-        setCurrentPhraseNo(newPhraseNo);
-        saveProgress(newPhraseNo); // Save progress
-        if (typeof window.setPhrase === 'function') {
-          window.setPhrase(newPhraseNo);
-        }
-      }
-    };
-
-    const handleNextClick = () => {
-      console.log("Next button clicked");
-      const newPhraseNo = currentPhraseNo + 1;
-      const totalPhrases = texts.length; // Use the length of the loaded texts
-      if (newPhraseNo < totalPhrases) {
-        setCurrentPhraseNo(newPhraseNo);
-        saveProgress(newPhraseNo); // Save progress
-        if (typeof window.setPhrase === 'function') {
-          window.setPhrase(newPhraseNo);
-        }
-      }
-    };
-
-    if (prevButton) {
-      prevButton.addEventListener('click', handlePrevClick);
+    const $panel_recognition = document.querySelector('#panel-recognition');
+    if ($panel_recognition) {
+      $panel_recognition.addEventListener('click', toggleRecognitionMode);
     }
 
-    if (nextButton) {
-      nextButton.addEventListener('click', handleNextClick);
-    }
 
-    // Cleanup event listeners on component unmount
+
+    // Cleanup event listener on component unmount
     return () => {
-      if (prevButton) {
-        prevButton.removeEventListener('click', handlePrevClick);
-      }
-      if (nextButton) {
-        nextButton.removeEventListener('click', handleNextClick);
+      if ($panel_recognition) {
+        $panel_recognition.removeEventListener('click', toggleRecognitionMode);
       }
     };
-  }, [currentPhraseNo, texts]);
+  }, [progress]);
+  
 
   
   return (
   <div className="d-flex align-items-center justify-content-center vh-100">
+
+        <button 
+          onClick={() => navigate(-1)} 
+          className="btn btn-outline-secondary position-absolute top-0 start-0 m-3 d-flex align-items-center justify-content-center"
+          style={{
+            width: '50px',
+            height: '50px',
+            borderRadius: '50%',
+            fontSize: '20px',
+          }}
+        >
+          <i className="fas fa-arrow-left"></i>
+        </button>
+
     {/* Page Start */}
     <div id="page-start" className="text-center">
       <div className="content">
-        <h1 id="power-by" className="mb-4">Test Exercise</h1>
-        <p className="description mb-3">Speech Recognition Speech Exercise</p>
+        <h1 id="power-by" className="mb-4">Speech Exercises!</h1>
+        <p className="description mb-3">Practice your speaking with our voice recognition speech exercises</p>
         <div id="loading" className="loading mb-2">Loading...</div>
         <div id="microphone" className="microphone mb-4">Please allow access to microphone to start</div>
         <button id="button-start" className="btn btn-primary">Start</button>
@@ -180,6 +249,7 @@ export default function WordStart() {
     {/* Page Main */}
     <div id="page-main" className="page-center" style={{ display: 'none' }}>
       <div className="button-container mb-4">
+        <div id = "button-text-selector" className="btn btn-outline-primary me-2">More</div>
         <button id="button-help" className="btn btn-outline-primary me-2">Help</button>
         <button id="button-option" className="btn btn-outline-secondary">Option</button>
       </div>
@@ -187,20 +257,26 @@ export default function WordStart() {
       <div className="content">
         {/* Panel Counter */}
         <div id="panel-counter" className="panel-counter d-flex align-items-center justify-content-center mb-4r">
-          <div id="button-prev-phrase" className="btn btn-link text-decoration-none">PREV</div>
-          <input id="phrase-number-input" type="number" className="input-counter input-exer visually-hidden" />
-          <div id="phrase-number" className="fs-4 mx-3"></div>
-          <div id="button-next-phrase" className="btn btn-link text-decoration-none">NEXT</div>
+            <div id="button-prev-phrase" className="btn btn-link text-decoration-none">PREV</div>
+            <input id="phrase-number-input" type="number" className="input-counter input-exer visually-hidden"/>
+            <div id="phrase-number" className="fs-4 mx-3"></div>
+            <div id="button-next-phrase" className="btn btn-link text-decoration-none">NEXT</div>
         </div>
         <div id="caption" className="text-muted text-center mb-4"></div>
 
         {/* Panel Phrase */}
           <div id="panel-phrase" className="panel-phrase d-flex align-items-center justify-content-center mb-4">
             <div className="d-flex">
-              <button id="display_phoneme" className="btn btn-success me-3">Show</button>
+              <button
+                id="display_phoneme"
+                className="btn btn-success me-3"
+                onClick={() => setIsPhonemeVisible((prev) => !prev)} 
+              >
+                Show
+              </button>
               <div id="phrase" className="phrase-box bg-white shadow-sm p-3 rounded"></div>
             </div>
-            <div id="phonphrase" className="phrase-box hidden shadow-sm p-3 rounded mt-3"></div>
+            <div id="phonphrase" className={`phrase-box ${isPhonemeVisible ? '' : 'hidden'} shadow-sm p-3 rounded mt-3`}></div>
           </div>
 
         {/* Panel Recognition */}
@@ -286,6 +362,26 @@ export default function WordStart() {
             </div>
           </div>
         </div>
+
+        {/* Panel Page Selector (Modal) */}
+          <div id="page-text-selector" className="modal hidden">
+            <div className="modal-dialog modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="textSelectorModalLabel">Select Text</h5>
+                  <button id="close-button" type="button" className="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
+                </div>
+                <div className="modal-body">
+                  <div className="content d-flex">
+                    <div id="texts" className="me-3"></div>
+                    <div id="text-wrapper" className="flex-grow-1">
+                      <div id="text" autoComplete="off" className="border p-2" style={{ height: '100%', overflowY: 'auto' }}></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
   </div>
   );
 }

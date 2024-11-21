@@ -53,7 +53,8 @@ export const route = {
     picture: "api/patient-SLP/update-profile-picture",
     edit: "api/patient-SLP/edit-patient",
     updateBookmarks: "api/patient-SLP/update-bookmarks",
-    updateProgress: "api/patient-SLP/update-progress"
+    saveProgress: "api/patient-SLP/save-progress",
+    loadProgress: "api/patient-SLP/load-progress",
   },
   system: {
     login: "api/super-admin-slp/login",

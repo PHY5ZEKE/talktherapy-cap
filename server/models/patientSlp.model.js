@@ -28,7 +28,6 @@ const patientSlpSchema = new Schema({
     ref: 'Content', 
     default: [] 
   },
-  currentPhraseNo: { type: Number, default: 0 },
 });
 
 module.exports = mongoose.model("PatientSlp", patientSlpSchema);

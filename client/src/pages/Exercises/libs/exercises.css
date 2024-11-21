@@ -4,7 +4,7 @@
 }
 
 .hidden {
-  display: hidden;
+  display: none;
 }
 
 .text-center {
@@ -237,7 +237,54 @@
 
 
 
-
+/* page select */
+#page-text-selector #texts {
+	display: inline-block;
+	float: left;
+	width: 350px;
+	border-right: 1px solid #bbb;
+	max-height: 400px; /* Adjust as needed */
+	overflow-y: auto; /* Enable scrolling */
+  }
+  
+  #page-text-selector #texts > div {
+	padding: 10px;
+	border-bottom: 1px dashed #bbb;
+	cursor: pointer;
+	position: relative;
+  }
+  
+  #page-text-selector #texts > div[current] {
+	background: #eef;
+  }
+  
+  #page-text-selector #texts #view {
+	display: none;
+	color: #bbb;
+  }
+  
+  #page-text-selector #texts #remove {
+	position: absolute;
+	top: 5px;
+	right: 15px;
+	z-index: 2;
+	color: #bbb;
+  }
+  
+  #page-text-selector #text-wrapper {
+	width: auto;
+	display: block;
+	height: auto;
+	max-height: 400px; /* Adjust as needed */
+	min-height: 100%; /* Ensure it takes at least the full height */
+	overflow-y: auto; /* Enable scrolling */
+  }
+  
+  #page-text-selector #text {
+	white-space: pre;
+	height: 100%;
+	margin: 10px;
+  }
 
 
 
