@@ -433,6 +433,30 @@ function initializeExercise(loadedProgress = null) {
                 phonemeContainer.innerHTML = '';
                 displayPhonemesForCurrentPhrase(currentPhrase);
             }
+
+             // Automatically speak the current phrase if required
+             if (document.querySelector('#page-main').hasAttribute('current')) {
+                speakText(text.phrases[no]); 
+            }
+        
+            // Update progress object
+            if (progress.textId === id && progress.currentPhrase === no) {
+                return; // No need to update if the progress hasn't changed
+            }
+
+            progress.currentPhrase = no;
+            current_phrase_no = no;
+            progress.textId = id;
+            progress.totalPhrases = text.phrases.length;
+
+            // Increment correct count if recognition was correct
+            const recognition = document.querySelector('#page-main #recognition');
+            if (recognition && recognition.hasAttribute('correct')) {
+                progress.correctCount++;
+            }
+        
+            // Mark as completed if the last phrase is reached
+            progress.completed = progress.currentPhrase === text.phrases.length - 1;
         
             // Hide listen and recognition buttons
             const listenButton = document.querySelector('#page-main #button-listen');
@@ -447,30 +471,7 @@ function initializeExercise(loadedProgress = null) {
             const compareElement = document.querySelector('#page-main #compare');
             if (compareElement) compareElement.innerHTML = '';
             
-            // Automatically speak the current phrase if required
-            if (document.querySelector('#page-main').hasAttribute('current')) {
-                speakText(text.phrases[no]); 
-            }
-        
-            // Update progress object
-            if (progress.textId === id && progress.currentPhrase === no) {
-                return; // No need to update if the progress hasn't changed
-            }
-        
-            progress.currentPhrase = no;
-            current_phrase_no = no;
-            progress.textId = id;
-            progress.totalPhrases = text.phrases.length;
-        
-            // Increment correct count if recognition was correct
-            const recognition = document.querySelector('#page-main #recognition');
-            if (recognition && recognition.hasAttribute('correct')) {
-                progress.correctCount++;
-            }
-        
-            // Mark as completed if the last phrase is reached
-            progress.completed = progress.currentPhrase === text.phrases.length - 1;
-            
+
                   
         }
 
