@@ -98,26 +98,57 @@ function initializeExercise(loadedProgress = null) {
             setPhrase(current_phrase_no);
 
 
-            document.querySelector('#page-main #panel-counter #button-prev-phrase').addEventListener('click', function() {
-                resetRecognitionStyles();
-                setPhrase(progress.currentPhrase - 1);
-                phonemeContainer.innerHTML = '';
-                saveProgress();
+            // document.querySelector('#page-main #panel-counter #button-prev-phrase').addEventListener('click', function() {
+            //     resetRecognitionStyles();
+            //     setPhrase(progress.currentPhrase - 1);
+            //     phonemeContainer.innerHTML = '';
+            //     saveProgress();
                 
-            });
+            // });
             
-            document.querySelector('#page-main #panel-counter #button-next-phrase').addEventListener('click', function() {
-                resetRecognitionStyles();
-                setPhrase(progress.currentPhrase + 1);
-                phonemeContainer.innerHTML = '';
-                saveProgress();
-            });
+            // document.querySelector('#page-main #panel-counter #button-next-phrase').addEventListener('click', function() {
+            //     resetRecognitionStyles();
+            //     setPhrase(progress.currentPhrase + 1);
+            //     phonemeContainer.innerHTML = '';
+            //     saveProgress();
+            // });
+
+            setupNavigationListeners();
+            
 
             document.querySelector('#page-option #speech-success-ring [value="yes"]').addEventListener('click', () => {
                 $success.play();
             });
 
         });
+
+        function handlePrevPhrase() {
+            resetRecognitionStyles();
+            setPhrase(progress.currentPhrase - 1);
+            phonemeContainer.innerHTML = '';
+            saveProgress();
+        }
+        
+        function handleNextPhrase() {
+            resetRecognitionStyles();
+            setPhrase(progress.currentPhrase + 1);
+            phonemeContainer.innerHTML = '';
+            saveProgress();
+        }
+
+        var phonemeContainer = document.getElementById("phoneme-output");
+        function setupNavigationListeners() {
+            const prevButton = document.querySelector('#page-main #panel-counter #button-prev-phrase');
+            const nextButton = document.querySelector('#page-main #panel-counter #button-next-phrase');
+        
+            // Remove existing event listeners (if any)
+            prevButton.removeEventListener('click', handlePrevPhrase);
+            nextButton.removeEventListener('click', handleNextPhrase);
+        
+            // Add new event listeners
+            prevButton.addEventListener('click', handlePrevPhrase);
+            nextButton.addEventListener('click', handleNextPhrase);
+        }
 
 
         var $recognition = document.querySelector('#page-main #recognition');
@@ -328,6 +359,7 @@ function initializeExercise(loadedProgress = null) {
                 console.log("Current text from localStorage:", localStorage.getItem('speech-current-text'));
 
                 loadProgressForTextId(this.id);
+                setupNavigationListeners();
                 // setPhrase(document.querySelector('.page[current]').id === 'page-text-selector' ? 0 : localStorage.getItem('speech-phrase'));
             });
     
@@ -369,6 +401,7 @@ function initializeExercise(loadedProgress = null) {
                 };
             }
             setPhrase(progress.currentPhrase); // Set to the loaded or initialized current phrase
+            setupNavigationListeners();
         }
 
 
