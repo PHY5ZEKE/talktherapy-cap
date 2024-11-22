@@ -201,52 +201,59 @@ export default function WordStart() {
 
 
   //load script
-  
-useEffect(() => {
-  const scriptId = "exercise-script";
+  useEffect(() => {
+    const scriptId = "exercise-script";
 
-  const initialize = () => {
-    if (typeof window.initializeExercise === "function") {
-      console.log("Initializing Exercise.js");
-      window.initializeExercise(progress);
+    const initialize = () => {
+      if (typeof window.initializeExercise === "function") {
+        console.log("Initializing Exercise.js");
+        window.initializeExercise(progress);
+      } else {
+        console.error("initializeExercise is not defined");
+      }
+    };
+
+    // Function to remove script when component unmounts
+    const removeScript = () => {
+      const existingScript = document.getElementById(scriptId);
+      if (existingScript) {
+        existingScript.remove();
+        console.log("Exercise.js script removed");
+      }
+    };
+
+    if (!scriptInitialized.current) {
+      console.log("Adding Exercise.js");
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = "./src/pages/Exercises/libs/Exercise.js";
+      script.type = "module";
+      script.async = true;
+
+      script.onload = () => {
+        console.log("Exercise.js loaded");
+        initialize();
+      };
+
+      script.onerror = () => {
+        console.error("Failed to load Exercise.js");
+      };
+
+      document.body.appendChild(script);
+      scriptInitialized.current = true;
     } else {
-      console.error("initializeExercise is not defined");
+      console.log("Exercise.js already exists");
+      initialize(); // Only called if the script was already loaded
     }
-  };
 
-  if (!scriptInitialized.current) {
-    console.log("Adding Exercise.js");
-    const script = document.createElement("script");
-    script.id = scriptId;
-    script.src = "./src/pages/Exercises/libs/Exercise.js";
-    script.type = "module";
-    script.async = true;
-
-    script.onload = () => {
-      console.log("Exercise.js loaded");
-      initialize();
+    return () => {
+      removeScript();
+      if (typeof window.resetExercise === "function") {
+        console.log("Resetting Exercise state");
+        window.resetExercise();
+      }
     };
-
-    script.onerror = () => {
-      console.error("Failed to load Exercise.js");
-    };
-
-    document.body.appendChild(script);
-    scriptInitialized.current = true;
-  } else {
-    console.log("Exercise.js already exists");
-    initialize(); // Only called if the script was already loaded
-  }
-
-  return () => {
-    // Cleanup logic
-    if (typeof window.resetExercise === "function") {
-      console.log("Resetting Exercise state");
-      window.resetExercise();
-    }
-  };
-}, [progress]); // Dependency array controls when to run
-
+  }, [progress]);
 
   // Toggle recognition and compare mode
   const toggleRecognitionMode = () => {

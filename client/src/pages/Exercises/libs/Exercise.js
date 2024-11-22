@@ -522,7 +522,10 @@ function initializeExercise(loadedProgress = null) {
             // Increment correct count if recognition was correct
             const recognition = document.querySelector('#page-main #recognition');
             if (recognition && recognition.hasAttribute('correct')) {
-                progress.correctCount++;
+                if (recognition.getAttribute('correct') === 'true') {
+                    progress.correctCount++;
+                    saveProgress();
+                }
             }
         
             // Mark as completed if the last phrase is reached
@@ -541,7 +544,6 @@ function initializeExercise(loadedProgress = null) {
             const compareElement = document.querySelector('#page-main #compare');
             if (compareElement) compareElement.innerHTML = '';
             
-
                   
         }
 
@@ -941,11 +943,11 @@ function initializeExercise(loadedProgress = null) {
 
 }
 
-function resetExercise() {
-    // Reset state here, so it can be re-initialized
-    initialized = false;
-    console.log("Exercise state reset.");
-  }
+// function resetExercise() {
+//     // Reset state here, so it can be re-initialized
+//     initialized = false;
+//     console.log("Exercise state reset.");
+//   }
 
 
 window.addEventListener('load', function() {
@@ -953,4 +955,4 @@ window.addEventListener('load', function() {
 });
 
 window.initializeExercise = initializeExercise;
-window.resetExercise = resetExercise;
+// window.resetExercise = resetExercise;

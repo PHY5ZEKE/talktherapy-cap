@@ -1,7 +1,7 @@
 id: 1
 name: Practice Words
 
-run
+run faster CRACKER
 related
 reveal
 show the truth
