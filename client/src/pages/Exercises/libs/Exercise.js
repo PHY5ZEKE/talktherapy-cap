@@ -164,7 +164,6 @@ function initializeExercise(loadedProgress = null) {
 
         var optionButton = document.querySelector('#page-main #button-option');
         if (optionButton) {
-            console.log("Option button found");
             optionButton.addEventListener('click', function() {
                 var pageStart = document.querySelector('#page-start');
                 if (pageStart) {
@@ -183,10 +182,32 @@ function initializeExercise(loadedProgress = null) {
             });
         }
 
-        var selectButton = document.querySelector('#page-main #button-text-selector');
-        if (selectButton) {
-            console.log("More button found");
-            selectButton.addEventListener('click', function() {
+        var selectButtonStart = document.querySelector('#page-start #button-text-selector');
+        if (selectButtonStart) {
+            selectButtonStart.addEventListener('click', function() {
+                var phonemeContainer = document.getElementById("phoneme-output");
+                    phonemeContainer.innerHTML = '';
+
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+        
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'none'; 
+                }
+        
+                var pageOption = document.querySelector('#page-text-selector');
+                if (pageOption) {
+                    pageOption.style.display = 'block'; 
+                }
+            });
+        }
+
+        var selectButtonMain = document.querySelector('#page-main #button-text-selector');
+        if (selectButtonMain) {
+            selectButtonMain.addEventListener('click', function() {
                 var phonemeContainer = document.getElementById("phoneme-output");
                     phonemeContainer.innerHTML = '';
                 var pageStart = document.querySelector('#page-start');
@@ -208,7 +229,6 @@ function initializeExercise(loadedProgress = null) {
 
         var helpButton = document.querySelector('#page-main #button-help');
         if (helpButton) {
-            console.log("Help button found");
             helpButton.addEventListener('click', function() {
                 var pageStart = document.querySelector('#page-start');
                 if (pageStart) {
@@ -287,36 +307,17 @@ function initializeExercise(loadedProgress = null) {
             });
         }
 
-        var startButton = document.querySelector('#page-start #button-start'); 
-        if (startButton) { 
-            console.log("Start button found"); 
-            startButton.addEventListener('click', function() { 
-                var pageStart = document.querySelector('#page-start'); 
-                if (pageStart) { pageStart.style.display = 'none'; }
-                        var pageMain = document.querySelector('#page-main');
-                            if (pageMain) {
-                                pageMain.style.display = 'block'; 
-                            }
-
-
-                            // if (texts && Object.keys(texts).length > 0) {
-                            //     var currentTextId = localStorage.getItem('speech-current-text');
-                            //     console.log("Current text ID:", currentTextId); 
-
-                            //     if (texts[currentTextId]) {
-                            //         console.log("Current text:", texts[currentTextId]); 
-                            //         var $e = document.querySelector('#page-text-selector #texts div[id="' + currentTextId + '"]');
-                            //         if ($e) {
-                            //             $e.click(); 
-                            //         }
-                            //     } else {
-                            //         console.error("No text found for ID:", currentTextId); 
-                            //     }
-                            // } else {
-                            //     console.error("Texts not loaded or empty."); 
-                            // }
-                        });
-                    }
+        // var startButton = document.querySelector('#page-start #button-start'); 
+        // if (startButton) { 
+        //     startButton.addEventListener('click', function() { 
+        //         var pageStart = document.querySelector('#page-start'); 
+        //         if (pageStart) { pageStart.style.display = 'none'; }
+        //                 var pageMain = document.querySelector('#page-main');
+        //                     if (pageMain) {
+        //                         pageMain.style.display = 'block'; 
+        //                     }
+        //                 });
+        //             }
 
 
         function displayPhonemesForCurrentPhrase(phrase) {
@@ -524,7 +525,6 @@ function initializeExercise(loadedProgress = null) {
             if (recognition && recognition.hasAttribute('correct')) {
                 if (recognition.getAttribute('correct') === 'true') {
                     progress.correctCount++;
-                    saveProgress();
                 }
             }
         
