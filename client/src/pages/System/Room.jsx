@@ -23,21 +23,19 @@ import { route } from "../../utils/route";
 
 import ConfirmVideoCall from "../../components/Modals/ConfirmVideoCall.jsx";
 import SoapSidebar from "../../components/Modals/SoapSidebar.jsx";
-import ReactQuill from "react-quill";
 
 const useMediaStream = (localVideoRef) => {
   const localStream = useRef(null);
   const getMediaStream = useCallback(
-    async (constraints) => {
+    async (constraints = { video: true, audio: true }) => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  
         localStream.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       } catch (error) {
         localStream.current = new MediaStream();
-        failNotify(
-          "The teleconfenrence requires both camera and microphone. Please retry again."
-        );
+        console.warn("Failed to get user media:", error);
       }
     },
     [localVideoRef]
@@ -45,12 +43,13 @@ const useMediaStream = (localVideoRef) => {
 
   const stopVideoStream = useCallback(() => {
     const videoTrack = localStream.current.getVideoTracks()[0];
-    videoTrack.stop();
+    if (videoTrack) {
+      videoTrack.stop();
+      localStream.current.removeTrack(videoTrack);
+    }
 
     localStream.current?.getVideoTracks().forEach((track) => track.stop());
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
-
-    localStream.current.removeTrack(videoTrack);
   }, [localVideoRef]);
 
   const stopAudioStream = useCallback(() => {
@@ -77,12 +76,6 @@ const useMediaStream = (localVideoRef) => {
 
 const notify = (message) =>
   toast.success(message, {
-    transition: Slide,
-    autoClose: 2000,
-  });
-
-const failNotify = (message) =>
-  toast.error(message, {
     transition: Slide,
     autoClose: 2000,
   });
@@ -184,11 +177,7 @@ export default function Room() {
     };
   }, []);
 
-  const initiateConnection = async (retryCount = 0) => {
-    // Reconnect
-    const maxRetries = 5;
-    const retryDelay = 3000;
-
+  const initiateConnection = async () => {
     try {
       await pageReady();
       socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
@@ -210,7 +199,6 @@ export default function Room() {
       };
 
       socket.current.onmessage = (message) => {
-        const signal = JSON.parse(message.data);
         gotMessageFromServer(message);
       };
 
@@ -222,24 +210,15 @@ export default function Room() {
         notify("You have left the teleconference room.");
         isSocketOpen.current = false;
         hasJoinedRoom.current = false;
-
-        if (retryCount < maxRetries) {
-          setTimeout(() => {
-            console.log(`Reconnecting... Attempt ${retryCount + 1}`);
-            initiateConnection(retryCount + 1);
-          }, retryDelay);
-        } else {
-          failNotify("Failed to reconnect after multiple attempts.");
-        }
       };
     } catch (error) {
+      console.error("Failed to connect to WebSocket server:", error);
       handleCloseConnection();
     }
   };
 
   const pageReady = async () => {
-    // we get then turn it off
-    await getMediaStream({ video: true, audio: true });
+    await getMediaStream();
   };
 
   const startConnection = (isCaller) => {
@@ -468,7 +447,7 @@ export default function Room() {
   const getUserName = () => {
     return userRole === "patientslp"
       ? `${appointmentDetails?.patientId.firstName} ${appointmentDetails?.patientId.lastName}`
-      : appointmentDetails?.selectedSchedule.clinicianName;
+      : `${appointmentDetails?.selectedClinician.firstName} ${appointmentDetails?.selectedClinician.lastName}`;
   };
 
   useEffect(() => {
@@ -545,11 +524,7 @@ export default function Room() {
       <div className="container-fluid d-flex flex-column justify-content-between vh-100 vw-100">
         <div className="row text-center py-2 border border-start-0 border-[#B9B9B9] stick-top">
           <p className="mb-0">
-            Currently in session with:{" "}
-            {appointmentDetails?.selectedSchedule?.clinicianName ||
-              "Clinician not available"}{" "}
-            and {appointmentDetails?.patientId?.firstName || ""}{" "}
-            {appointmentDetails?.patientId?.lastName || ""}
+            {`Currently in session with ${appointmentDetails?.selectedClinician.firstName} ${appointmentDetails?.selectedClinician.lastName} and ${appointmentDetails?.patientId?.firstName || ""} ${appointmentDetails?.patientId?.lastName || ""}`}
           </p>
         </div>
 

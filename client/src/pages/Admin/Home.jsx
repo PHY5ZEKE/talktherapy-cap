@@ -106,7 +106,7 @@ export default function Home() {
     socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
-      console.log("Connected to the server");
+      console.log("ok ws");
     };
 
     socket.current.onmessage = (event) => {
@@ -123,7 +123,7 @@ export default function Home() {
     };
 
     socket.current.onclose = () => {
-      console.log("Disconnected from the server");
+      console.log("dc ws");
     };
 
     return () => {
@@ -345,11 +345,14 @@ export default function Home() {
             {appointment.patientId.lastName} has a session with{" "}
             {appointment.status === "Temporarily Rescheduled"
               ? appointment.temporaryReschedule?.clinicianName
-              : appointment.selectedSchedule?.clinicianName}
+              : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`}
           </p>
         </div>
       ));
   };
+
+  const [selectedUserRole, setSelectedUserRole] = useState("");
+  const [selectedUserId, setSelectedUserId] = useState(null);
 
   const renderUsers = (users, icon, role) => {
     if (users.length > 0) {
@@ -380,7 +383,11 @@ export default function Home() {
               <div
                 className="mb-3 fw-bold text-button border"
                 style={{ cursor: "pointer" }}
-                onClick={() => handleArchive(user)}
+                onClick={() => {
+                  handleArchive(user);
+                  setSelectedUserRole(role);
+                  setSelectedUserId(user._id)
+                }}
               >
                 Archive
               </div>
@@ -404,8 +411,9 @@ export default function Home() {
   };
 
   const archiveFetch = () => {
-    SocketFetch(socket);
-    emailAccountArchive(userDetails.email);
+    fetchClinicians();
+    fetchPatients();
+    emailAccountArchive(userDetails.email, selectedUserRole, accessToken, selectedUserId);
   };
 
   return (

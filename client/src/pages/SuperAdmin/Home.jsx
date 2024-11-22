@@ -114,7 +114,7 @@ export default function Home() {
     socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
-      console.log("Connected to the server");
+      console.log("ok ws");
     };
 
     socket.current.onmessage = (event) => {
@@ -129,7 +129,7 @@ export default function Home() {
     };
 
     socket.current.onclose = () => {
-      console.log("Disconnected from the server");
+      console.log("dc ws");
     };
 
     return () => {
@@ -228,7 +228,7 @@ export default function Home() {
 
   const archiveFetch = () => {
     SocketFetch(socket);
-    emailAccountArchive(userDetails.email);
+    emailAccountArchive(userDetails.email, "admin");
   };
 
   const filterNotifications = () => {

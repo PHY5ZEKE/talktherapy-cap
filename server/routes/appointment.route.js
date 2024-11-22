@@ -48,6 +48,12 @@ router.get(
   appointmentController.getClinicianAppointments
 );
 
+router.get(
+  "/get-affected-appointment/:clinicianId",
+  verifyToken,
+  appointmentController.getAffectedAppointments
+);
+
 router.post(
   "/request-schedule-change",
   verifyToken,

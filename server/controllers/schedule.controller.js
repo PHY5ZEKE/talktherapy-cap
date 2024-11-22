@@ -3,6 +3,13 @@ const ClinicianSLP = require("../models/clinicianSLP.model");
 const { createAuditLog } = require("../middleware/auditLog");
 const moment = require("moment");
 
+const { encrypt, decrypt } = require("../middleware/aesUtilities");
+
+// Helper function
+const isEncrypted = (text) => {
+  return text.includes(":");
+};
+
 exports.addSchedule = async (req, res) => {
   const { day, startTime, endTime } = req.body;
   const clinicianId = req.user.id; // Assuming the token contains the user ID
@@ -80,8 +87,38 @@ exports.addSchedule = async (req, res) => {
 exports.getSchedules = async (req, res) => {
   const clinicianId = req.user.id; // Assuming the token contains the user ID
   try {
-    const schedules = await Schedule.find({ clinicianId });
-    res.status(200).json(schedules);
+    const schedules = await Schedule.find({ clinicianId }).populate({
+      path: "clinicianId",
+      select: "firstName middleName lastName",
+    });
+
+    // Decrypt schedule clinician names
+    const decryptedSchedules = schedules.map((schedule) => {
+      if (schedule.clinicianId) {
+        try {
+          if (isEncrypted(schedule.clinicianId.firstName)) {
+            schedule.clinicianId.firstName = decrypt(
+              schedule.clinicianId.firstName
+            );
+          }
+          if (isEncrypted(schedule.clinicianId.middleName)) {
+            schedule.clinicianId.middleName = decrypt(
+              schedule.clinicianId.middleName
+            );
+          }
+          if (isEncrypted(schedule.clinicianId.lastName)) {
+            schedule.clinicianId.lastName = decrypt(
+              schedule.clinicianId.lastName
+            );
+          }
+        } catch (decryptError) {
+          console.error("Error decrypting patient details:", decryptError);
+        }
+      }
+      return schedule;
+    });
+
+    res.status(200).json(decryptedSchedules);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }
@@ -102,9 +139,12 @@ exports.getClinicianSched = async (req, res) => {
   try {
     // Fetch all schedules
     const schedules = await Schedule.find();
+
     schedules.sort((a, b) => {
       if (dayOrder[a.day] === dayOrder[b.day]) {
-        return moment(a.startTime, "hh:mm A").diff(moment(b.startTime, "hh:mm A"));
+        return moment(a.startTime, "hh:mm A").diff(
+          moment(b.startTime, "hh:mm A")
+        );
       }
       return dayOrder[a.day] - dayOrder[b.day];
     });
@@ -112,21 +152,53 @@ exports.getClinicianSched = async (req, res) => {
     // Fetch clinician details for each schedule
     const schedulesWithSpecialization = await Promise.all(
       schedules.map(async (schedule) => {
-        const clinician = await ClinicianSLP.findById(schedule.clinicianId);
-        if (clinician) {
-          return {
-            ...schedule.toObject(),
-            specialization: clinician.specialization,
-            contact: clinician.mobile,
-            email: clinician.email,
-            address: clinician.address,
-          };
+        try {
+          const clinician = await ClinicianSLP.findById(schedule.clinicianId);
+          if (clinician) {
+            // Decrypt clinician names
+            try {
+              if (isEncrypted(clinician.firstName)) {
+                clinician.firstName = decrypt(clinician.firstName);
+              }
+              if (isEncrypted(clinician.middleName)) {
+                clinician.middleName = decrypt(clinician.middleName);
+              }
+              if (isEncrypted(clinician.lastName)) {
+                clinician.lastName = decrypt(clinician.lastName);
+              }
+            } catch (decryptError) {
+              console.error("Error decrypting clinician details:", decryptError);
+            }
+
+            return {
+              ...schedule.toObject(),
+              clinicianId: {
+                ...clinician.toObject(),
+                firstName: clinician.firstName,
+                middleName: clinician.middleName,
+                lastName: clinician.lastName,
+              },
+              specialization: clinician.specialization,
+              contact: clinician.mobile,
+              email: clinician.email,
+              address: clinician.address,
+            };
+          } else {
+            console.warn(`Clinician with ID ${schedule.clinicianId} not found`);
+            return null; // Return null if clinician is not found
+          }
+        } catch (clinicianError) {
+          console.error("Error fetching clinician details:", clinicianError);
+          return null; // Return null if there is an error fetching clinician details
         }
         return schedule;
       })
     );
 
-    res.status(200).json(schedulesWithSpecialization);
+    const validSchedules = schedulesWithSpecialization.filter(schedule => schedule !== null);
+
+    console.log("Valid schedules with specialization:", validSchedules);
+    res.status(200).json(validSchedules);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
   }

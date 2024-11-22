@@ -40,6 +40,8 @@ export default function AppointmentDetails({
     openModal();
   };
 
+  const clinicianName = `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`;
+
   const updateStatus = async (newStatus, oldStatus) => {
     setLoading(true);
     try {
@@ -60,12 +62,10 @@ export default function AppointmentDetails({
             notif: "appointmentRequestStatus",
             body: `${appointment.patientId?.firstName} ${
               appointment.patientId?.lastName
-            }'s pending appointment with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
+            }'s pending appointment with Clinician ${clinicianName} has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
-              appointment.selectedClinician,
+              appointment.selectedClinician._id,
             ],
           };
           break;
@@ -74,12 +74,10 @@ export default function AppointmentDetails({
             notif: "appointmentRequestStatus",
             body: `${appointment.patientId?.firstName} ${
               appointment.patientId?.lastName
-            }'s request for permanent schedule change with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
+            }'s request for permanent schedule change with Clinician ${clinicianName} has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
-              appointment.selectedClinician,
+              appointment.selectedClinician?._id,
             ],
           };
           break;
@@ -88,12 +86,10 @@ export default function AppointmentDetails({
             notif: "appointmentRequestStatus",
             body: `${appointment.patientId?.firstName} ${
               appointment.patientId?.lastName
-            }'s request for temporary schedule change with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
+            }'s request for temporary schedule change with Clinician ${clinicianName} has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
-              appointment.selectedClinician,
+              appointment.selectedClinician?._id,
             ],
           };
           break;
@@ -102,12 +98,10 @@ export default function AppointmentDetails({
             notif: "appointmentRequestStatus",
             body: `${appointment.patientId?.firstName} ${
               appointment.patientId?.lastName
-            }'s temporary schedule with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
+            }'s temporary schedule with Clinician ${clinicianName} has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
-              appointment.selectedClinician,
+              appointment.selectedClinician?._id,
             ],
           };
           break;
@@ -116,12 +110,10 @@ export default function AppointmentDetails({
             notif: "appointmentRequestStatus",
             body: `${appointment.patientId?.firstName} ${
               appointment.patientId?.lastName
-            }'s appointment schedule with Clinician ${
-              appointment.selectedSchedule?.clinicianName
-            } has been ${newStatus.toLowerCase()}`,
+            }'s appointment schedule with Clinician ${clinicianName} has been ${newStatus.toLowerCase()}`,
             show_to: [
               appointment.patientId?._id,
-              appointment.selectedClinician,
+              appointment.selectedClinician?._id,
             ],
           };
           break;
@@ -129,7 +121,12 @@ export default function AppointmentDetails({
           break;
       }
 
-      emailRequestStatus(appointment.selectedClinician, appointment.patientId._id, newStatus, appointment);
+      emailRequestStatus(
+        clinicianName,
+        appointment.patientId._id,
+        newStatus,
+        appointment
+      );
       onWebSocket(userUpdate);
       notify(toastMessage.success.statusBook);
       openModal();
@@ -232,9 +229,7 @@ export default function AppointmentDetails({
               <div className="col">
                 <p className="fw-bold mb-0">Clinician</p>
                 <div>
-                  <p className="">
-                    {appointment.selectedSchedule?.clinicianName || "N/A"}
-                  </p>
+                  <p className="">{`${clinicianName}` || "N/A"}</p>
                 </div>
 
                 <div>

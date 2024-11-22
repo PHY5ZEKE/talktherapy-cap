@@ -96,7 +96,9 @@ export default function ManageSchedule() {
   const fetchClinicianSchedule = async (clinicianId) => {
     try {
       const response = await fetch(`${appURL}/${route.schedule.clinician}`, {
+        method: "GET",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
         },
       });
@@ -104,18 +106,20 @@ export default function ManageSchedule() {
 
       if (!data.error) {
         const clinicianSchedule = data.filter(
-          (schedule) => schedule.clinicianId === clinicianId
+          (schedule) => schedule.clinicianId._id === clinicianId
         );
         setSelectedClinicianSchedule(clinicianSchedule);
       } else {
+        console.error(data)
         failNotify(toastMessage.fail.fetch);
       }
     } catch (error) {
+      console.error(error)
       failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
     }
   };
-
+  
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">

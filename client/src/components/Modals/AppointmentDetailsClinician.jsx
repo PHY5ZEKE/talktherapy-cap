@@ -35,6 +35,8 @@ export default function AppointmentDetailsClinician({
     openModal();
   };
 
+  const clinicianName = `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`;
+
   const updateStatus = async (newStatus) => {
     setLoading(true);
     try {
@@ -135,7 +137,7 @@ export default function AppointmentDetailsClinician({
                 <p className="fw-bold mb-0">Clinician</p>
                 <div>
                   <p className="">
-                    {appointment.selectedSchedule?.clinicianName || "N/A"}
+                  {`${clinicianName}`|| "N/A"}
                   </p>
                 </div>
 

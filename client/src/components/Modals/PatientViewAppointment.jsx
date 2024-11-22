@@ -18,6 +18,8 @@ export default function PatientViewAppointment({
     return null; // Return null if no appointment details are available
   }
 
+  const clinicianName = `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`;
+
   return (
     <>
       <div className="modal-background">
@@ -46,7 +48,7 @@ export default function PatientViewAppointment({
                 </label>
                 <div>
                   <p className="">
-                    {appointment.selectedSchedule?.clinicianName || "N/A"}
+                    {clinicianName || "N/A"}
                   </p>
                 </div>
 

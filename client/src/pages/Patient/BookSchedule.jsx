@@ -556,7 +556,7 @@ export default function BookSchedule() {
                             </p>
                             <p className="mb-0">
                               <FontAwesomeIcon icon={faStethoscope} size="xs" />{" "}
-                              {schedule.clinicianName}
+                              {`${schedule.clinicianId.firstName} ${schedule.clinicianId.middleName} ${schedule.clinicianId.lastName}`}
                             </p>
                             <p className="">
                               <FontAwesomeIcon icon={faUserDoctor} />{" "}
@@ -645,7 +645,7 @@ export default function BookSchedule() {
                                   appointment.status ===
                                     "Temporarily Rescheduled"
                                 ? appointment.temporaryReschedule.clinicianName
-                                : appointment.selectedSchedule.clinicianName}
+                                : `${appointment.selectedClinician.firstName} ${appointment.selectedClinician.middleName} ${appointment.selectedClinician.lastName}`}
                             </span>
                           </h6>
                           <a

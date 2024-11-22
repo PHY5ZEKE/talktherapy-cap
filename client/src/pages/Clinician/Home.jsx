@@ -173,7 +173,7 @@ export default function Home() {
     socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
-      console.log("Connected to the server");
+      console.log("ok ws");
     };
 
     socket.current.onmessage = (event) => {
@@ -185,7 +185,7 @@ export default function Home() {
     };
 
     socket.current.onclose = () => {
-      console.log("Disconnected from the server");
+      console.log("dc ws");
     };
 
     return () => {
@@ -229,6 +229,17 @@ export default function Home() {
     } catch (error) {
       console.error("Error sending notification:", error);
     }
+  };
+
+  const getCurrentDate = () => {
+    const date = new Date();
+    const options = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    return date.toLocaleDateString(undefined, options);
   };
 
   return (
@@ -292,7 +303,7 @@ export default function Home() {
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Today is </p>
+                    <p className="mb-0 fw-bold">Today is {getCurrentDate()}</p>
                     <p className="mb-0">Your Appointments</p>
                   </div>
                 </div>

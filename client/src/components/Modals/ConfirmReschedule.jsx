@@ -10,6 +10,8 @@ export default function ConfirmReschedule({
     openResched();
   };
 
+  const clinicianName = `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`;
+
   return (
     <>
       <div className="modal-background">
@@ -41,7 +43,7 @@ export default function ConfirmReschedule({
 
               <div className="col">
                 <p className="fw-bold mb-0">Clinician</p>
-                <p>{appointment?.selectedSchedule?.clinicianName}</p>
+                <p>{clinicianName || "NA"}</p>
               </div>
             </div>
           </div>

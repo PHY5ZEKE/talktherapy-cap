@@ -78,6 +78,7 @@ export const route = {
     requestTemporaryReschedule:
       "api/appointments-slp/request-temporary-reschedule",
     endSession: "api/appointments-slp/end-session-status",
+    affectedAppointment: "api/appointments-slp/get-affected-appointment"
   },
   schedule: {
     create: "api/schedule-slp/add-schedule",

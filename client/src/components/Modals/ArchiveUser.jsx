@@ -51,6 +51,8 @@ export default function ArchiveUser({ handleModal, userDetails, onFetch }) {
       failNotify("Failed to archive and disable account.");
       console.error("Error sending notification:", data.message);
     }
+    onFetch();
+    handleModal();
   };
 
   const handleClose = (e) => {

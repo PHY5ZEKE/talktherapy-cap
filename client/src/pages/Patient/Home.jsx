@@ -34,7 +34,6 @@ export default function Home() {
     fetchPatientData();
     fetchContentData();
     
-
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
       try {
@@ -55,7 +54,7 @@ export default function Home() {
     socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
     socket.current.onopen = () => {
-      console.log("Connected to the server");
+      console.log("ok ws");
     };
 
     socket.current.onmessage = (event) => {
@@ -67,7 +66,7 @@ export default function Home() {
     };
 
     socket.current.onclose = () => {
-      console.log("Disconnected from the server");
+      console.log("dc ws");
     };
 
     return () => {
@@ -135,8 +134,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-  
-
 
   // Filter accepted appointments
   const acceptedAppointments = appointments.filter(
@@ -254,8 +251,8 @@ export default function Home() {
                             Session of{" "}
                             {appointment.status === "Temporarily Rescheduled"
                               ? appointment.temporaryReschedule.clinicianName
-                              : appointment.selectedSchedule.clinicianName}{" "}
-                            with {patientData?.firstName}.
+                              : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}
+                            with ${patientData?.firstName}`}.
                           </p>
 
                           {appointment.status === "Accepted" ? (

@@ -5,6 +5,9 @@ const Admin = require("../models/adminSLP.model");
 const Clinician = require("../models/clinicianSLP.model");
 const Patient = require("../models/patientSlp.model");
 const AuditLog = require("../models/auditLogSLP.model");
+const Appointment = require("../models/appointment.model.js");
+const Assignment = require("../models/assignmentSLP.model.js");
+const Schedule = require("../models/schedule.model.js")
 
 const { createAuditLog } = require("../middleware/auditLog.js");
 const jwt = require("jsonwebtoken");
@@ -284,6 +287,12 @@ exports.sendNotification = async (req, res) => {
     htmlContent = htmlTemplate
       .replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`)
       .replace('${soap}', soapData);
+  }
+  else if (type === 'appointment-delete') {
+    const [clinicianFirstName, clinicianMiddleName, clinicianLastName,] = details;
+    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/appointment-affected.html'), 'utf8');
+    htmlContent = htmlTemplate
+      .replace('${clinicianName}', `${clinicianFirstName} ${clinicianMiddleName} ${clinicianLastName}`)
   }
   else if (type === 'appointment-status') {
     const [patientFirstName, patientLastName, clinicianName, day, startTime, endTime, content] = details;
@@ -928,7 +937,10 @@ exports.archiveUser = [
       }
 
       if (userRole === "clinician") {
+        // If clinician, delete all schedule, appointments, and assignments
         await Schedule.deleteMany({ clinicianId: id });
+        await Appointment.deleteMany({ selectedClinician: id})
+        await Assignment.deleteMany({ clinicianId: id })
       }
 
       userInfo.active = false;
@@ -950,7 +962,7 @@ exports.archiveUser = [
       return res.status(500).json({
         error: true,
         message:
-          "An error occurred while changing account status and activity.",
+          `${error}`,
       });
     }
   },
