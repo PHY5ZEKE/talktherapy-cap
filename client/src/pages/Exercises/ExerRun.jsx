@@ -186,8 +186,8 @@ export default function ExerRun() {
   }, [accessToken, appURL, id]); 
 
   const handleNavigateAndReload = () => {
-    // Navigate to the exercise page and reload
-    window.location.href = '/exercise';
+    navigate('/exercise', { replace: true });
+    window.location.reload(); // Optional: Reload if absolutely necessary
   };
 
   // Define the YouTube video URL

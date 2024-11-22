@@ -1,13 +1,17 @@
-var initialized;
-var initialLoad = true;
-
+let initialized = false;
 
 function initializeExercise(loadedProgress = null) {
 
-    if (initialized) return; 
-    initialized = true;
+    localStorage.removeItem('speech-current-text');
+    localStorage.removeItem('patient-progress');
 
-    var progress = {
+    if (initialized) {
+        console.log("Exercise already initialized");
+        return;
+      }
+    initialized = true;
+   
+    var progress = loadedProgress || {
         textId: null,
         currentPhrase: 0,
         correctCount: 0,
@@ -55,7 +59,7 @@ function initializeExercise(loadedProgress = null) {
             console.log("Loaded Homophones:", homophones);
 
             if (!localStorage.getItem('speech-current-text')) {
-                localStorage.setItem('speech-current-text', Object.keys(texts)[0]); // Set to the first text ID as default
+                localStorage.setItem('speech-current-text', Object.keys(texts)[0]); 
             }
 
 			for (var id in texts) {
@@ -64,14 +68,13 @@ function initializeExercise(loadedProgress = null) {
 
             if (loadedProgress) {
                 console.log("Loaded progress found:", loadedProgress);
-                progress = loadedProgress; // Use loaded progress
-                setPhrase(progress.currentPhrase); // Set the phrase based on loaded progress
+                progress = loadedProgress; 
+                setPhrase(progress.currentPhrase); 
                 console.log("Setting phrase to:", progress.currentPhrase);
             } else {
-                // Default to the first phrase if no progress is loaded
                 const currentTextId = localStorage.getItem('speech-current-text');
                 if (currentTextId && texts[currentTextId]) {
-                    setPhrase(0); // Start from the first phrase
+                    setPhrase(0); 
                 }
             }
 
@@ -92,7 +95,7 @@ function initializeExercise(loadedProgress = null) {
             if (speechSynthesis.onvoiceschanged !== undefined)
                 speechSynthesis.onvoiceschanged = () => loadVoices(initOptions);
 
-            var phonemeContainer = document.getElementById("phoneme-output");
+            
             var loadingElement = document.querySelector('#page-start #loading');
             if (loadingElement) loadingElement.remove();
             setPhrase(current_phrase_no);
@@ -384,26 +387,60 @@ function initializeExercise(loadedProgress = null) {
             if (textsContainer) textsContainer.appendChild($div);
         }
 
-        function loadProgressForTextId(textId) {
-            const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
+        async function loadProgressForTextId(textId) {
+            try {
+                console.log("Requesting progress for text ID:", textId);
         
-            if (savedProgress[textId]) {
-                console.log("Loaded progress for text ID:", textId);
-                progress = savedProgress[textId]; // Use saved progress
-            } else {
-                console.log("No saved progress found for text ID:", textId);
-                progress = {
+                // Call the function exposed by WordStart to fetch progress
+                if (typeof window.fetchProgressForTextId === 'function') {
+                    const backendProgress = await window.fetchProgressForTextId(textId);
+        
+                    if (backendProgress) {
+                        console.log("Using backend progress for text ID:", textId, backendProgress);
+                        progress = backendProgress; // Use the progress from backend
+                    } else {
+                        console.log("No backend progress found, falling back to local storage.");
+                        const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
+                        progress = savedProgress[textId] || {
+                            textId: textId,
+                            currentPhrase: 0,
+                            correctCount: 0,
+                            totalPhrases: texts[textId]?.phrases.length || 0,
+                            completed: false,
+                        };
+                    }
+                } else {
+                    console.warn("fetchProgressForTextId is not defined. Falling back to local storage.");
+                    const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
+                    progress = savedProgress[textId] || {
+                        textId: textId,
+                        currentPhrase: 0,
+                        correctCount: 0,
+                        totalPhrases: texts[textId]?.phrases.length || 0,
+                        completed: false,
+                    };
+                }
+        
+                // Update UI or state with loaded progress
+                setPhrase(progress.currentPhrase);
+                setupNavigationListeners();
+            } catch (error) {
+                console.error("Error loading progress:", error);
+        
+                // Handle fallback case
+                const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
+                progress = savedProgress[textId] || {
                     textId: textId,
-                    currentPhrase:  0,
+                    currentPhrase: 0,
                     correctCount: 0,
                     totalPhrases: texts[textId]?.phrases.length || 0,
                     completed: false,
                 };
+        
+                setPhrase(progress.currentPhrase);
+                setupNavigationListeners();
             }
-            setPhrase(progress.currentPhrase); // Set to the loaded or initialized current phrase
-            setupNavigationListeners();
         }
-
 
 
         function setPhrase(no) {
@@ -907,7 +944,6 @@ function initializeExercise(loadedProgress = null) {
 function resetExercise() {
     // Reset state here, so it can be re-initialized
     initialized = false;
-    initialLoad = true;
     console.log("Exercise state reset.");
   }
 

@@ -6,10 +6,8 @@ const PatientProgress = require("../models/patientProgress.model.js");
 saveProgress = async (req, res) => {
   try {
     const { textId, currentPhrase, correctCount, totalPhrases, completed } = req.body;
-    console.log("Received progress data:", { textId, currentPhrase, correctCount, totalPhrases, completed });
     const patientId = req.user.id; 
-    console.log("Patient ID from token:", patientId);
-
+  
     // Check if progress already exists for the patient and text
     let progress = await PatientProgress.findOne({ patient: patientId, textId });
 

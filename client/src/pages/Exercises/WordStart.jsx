@@ -17,6 +17,7 @@ export default function WordStart() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [error, setError] = useState(null);
+  const scriptInitialized = useRef(false);
 
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -57,49 +58,49 @@ export default function WordStart() {
   }
 }, [accessToken, appURL, authState?.userRole]);
 
-// Function to send progress to the backend
-function saveProgressToBackend(progress) {
-  const appURL = import.meta.env.VITE_APP_URL;
-  if (!accessToken) {
-    console.error("Access token is missing");
-    return;
+  // Function to send progress to the backend
+  function saveProgressToBackend(progress) {
+    const appURL = import.meta.env.VITE_APP_URL;
+    if (!accessToken) {
+      console.error("Access token is missing");
+      return;
+    }
+
+    console.log("Sending progress to backend:", progress);
+    fetch(`${appURL}/${route.patient.saveProgress}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken,
+      },
+      body: JSON.stringify(progress),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to save progress');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Progress saved successfully:', data);
+      })
+      .catch((error) => {
+        console.error('Error saving progress:', error);
+      });
   }
+  useEffect(() => {
+    window.saveProgressToBackend = saveProgressToBackend;
 
-  console.log("Sending progress to backend:", progress);
-  fetch(`${appURL}/${route.patient.saveProgress}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + accessToken,
-    },
-    body: JSON.stringify(progress),
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error('Failed to save progress');
-      }
-      return response.json();
-    })
-    .then((data) => {
-      console.log('Progress saved successfully:', data);
-    })
-    .catch((error) => {
-      console.error('Error saving progress:', error);
-    });
-}
-useEffect(() => {
-  window.saveProgressToBackend = saveProgressToBackend;
-
-  return () => {
-    delete window.saveProgressToBackend;
-  };
-}, [accessToken]);
+    return () => {
+      delete window.saveProgressToBackend;
+    };
+  }, [accessToken]);
 
 
 // Function to fetch the saved progress from the backend
-    const fetchProgressFromBackend = async () => {
+    const fetchProgressFromBackend = async (textId) => {
       try {
-        const textId = localStorage.getItem('speech-current-text');
+        // const textId = localStorage.getItem('speech-current-text');
         if (!textId) return;
 
         // Make the API call to fetch the saved progress
@@ -113,83 +114,138 @@ useEffect(() => {
 
         if (response.ok) {
           const data = await response.json();
-          setProgress(data); // Store progress in state
+          setProgress(data); 
           console.log("Loaded progress:", data);
         } else {
-          console.log("No progress found, starting fresh.");
-          setProgress(null); // Set to null if no progress is found
+          console.log("No progress found in database, starting fresh.");
+          setProgress(null); 
         }
       } catch (error) {
         console.error("Error loading progress:", error);
       }
     };
 
-    // Fetch progress when component mounts or accessToken changes
+  // // Fetch progress when component mounts or textId changes
+  // useEffect(() => {
+  //   const textId = localStorage.getItem('speech-current-text'); 
+  //   fetchProgressFromBackend(textId); 
+  // }, [accessToken]);
+
+    // // Fetch progress when component mounts or accessToken changes
+    // useEffect(() => {
+    //   if (accessToken) {
+    //     fetchProgressFromBackend(); 
+    //   }
+    // }, [accessToken]);
+
     useEffect(() => {
-      if (accessToken) {
-        fetchProgressFromBackend(); // Fetch progress from backend
-      }
+      const fetchProgress = async () => {
+        const textId = localStorage.getItem('speech-current-text');
+        if (accessToken && textId) {
+          await fetchProgressFromBackend(textId);
+        }
+      };
+    
+      fetchProgress();
     }, [accessToken]);
+  
 
     // Optionally, handle cases where progress is not loaded
+    // useEffect(() => {
+    //   if (progress) {
+    //     console.log("Progress data available:", progress);
+    //     // optional ui change
+    //   }
+    // }, [progress]);
+
+
+    // for LoadTextID
     useEffect(() => {
-      if (progress) {
-        console.log("Progress data available:", progress);
-        // You can perform any further UI updates or logic here
-      }
-    }, [progress]);
+      window.fetchProgressForTextId = async (textId) => {
+          try {
+              if (!textId || !accessToken) {
+                  console.warn("Text ID or access token is missing");
+                  return null;
+              }
+  
+              console.log("Fetching progress for textId:", textId);
+  
+              const response = await fetch(`${appURL}/${route.patient.loadProgress}?textId=${textId}`, {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${accessToken}`,
+                  },
+              });
+  
+              if (response.ok) {
+                  const data = await response.json();
+                  console.log("Progress fetched successfully:", data);
+                  return data; // Return progress data
+              } else {
+                  console.log("No progress found for textId:", textId);
+                  return null; // No progress found
+              }
+          } catch (error) {
+              console.error("Error fetching progress:", error);
+              return null; // Handle error case
+          }
+      };
+  
+      return () => {
+          // Cleanup exposed function when component unmounts
+          delete window.fetchProgressForTextId;
+      };
+  }, [accessToken, appURL, route]);
 
 
 
   //load script
-  useEffect(() => {
-    const scriptId = "exercise-script";
   
-    const initialize = () => {
-      if (typeof window.initializeExercise === "function") {
-        console.log("Initializing Exercise.js");
-        window.initializeExercise(progress);
-      } else {
-        console.error("initializeExercise is not defined");
-      }
-    };
-  
-    // Check if the script already exists
-    const existingScript = document.getElementById(scriptId);
-  
-    if (!existingScript) {
-      console.log("Adding Exercise.js");
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = "./src/pages/Exercises/libs/Exercise.js";
-      script.type = "module";
-      script.async = true;
-  
-      script.onload = () => {
-        console.log("Exercise.js loaded");
-        initialize();
-      };
-  
-      script.onerror = () => {
-        console.error("Failed to load Exercise.js");
-      };
-  
-      document.body.appendChild(script);
-    } else {
-      console.log("Exercise.js already exists");
-      initialize(); // Reinitialize only if the script exists
-    }
-  
-    // Cleanup logic
-    return () => {
-      console.log("Exercise.js script retained, resetting state instead.");
-      if (typeof window.resetExercise === "function") {
-        console.log("Resetting Exercise state");
-        window.resetExercise(); // Reset state if such a function exists
-      }
-    };
-  }, [progress]);
+useEffect(() => {
+  const scriptId = "exercise-script";
 
+  const initialize = () => {
+    if (typeof window.initializeExercise === "function") {
+      console.log("Initializing Exercise.js");
+      window.initializeExercise(progress);
+    } else {
+      console.error("initializeExercise is not defined");
+    }
+  };
+
+  if (!scriptInitialized.current) {
+    console.log("Adding Exercise.js");
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "./src/pages/Exercises/libs/Exercise.js";
+    script.type = "module";
+    script.async = true;
+
+    script.onload = () => {
+      console.log("Exercise.js loaded");
+      initialize();
+    };
+
+    script.onerror = () => {
+      console.error("Failed to load Exercise.js");
+    };
+
+    document.body.appendChild(script);
+    scriptInitialized.current = true;
+  } else {
+    console.log("Exercise.js already exists");
+    initialize(); // Only called if the script was already loaded
+  }
+
+  return () => {
+    // Cleanup logic
+    if (typeof window.resetExercise === "function") {
+      console.log("Resetting Exercise state");
+      window.resetExercise();
+    }
+  };
+}, [progress]); // Dependency array controls when to run
 
 
   // Toggle recognition and compare mode
