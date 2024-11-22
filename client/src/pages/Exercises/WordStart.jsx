@@ -305,7 +305,8 @@ export default function WordStart() {
         <p className="description mb-3">Practice your speaking with our voice recognition speech exercises</p>
         <div id="loading" className="loading mb-2">Loading...</div>
         <div id="microphone" className="microphone mb-4">Please allow access to microphone to start</div>
-        <button id="button-start" className="btn btn-primary">Start</button>
+        {/* <button id="button-start" className="btn btn-primary">Start</button> */}
+        <div id = "button-text-selector" className="btn btn-primary">Start</div>
       </div>
     </div>
 
@@ -428,18 +429,18 @@ export default function WordStart() {
 
         {/* Panel Page Selector (Modal) */}
           <div id="page-text-selector" className="modal hidden">
-            <div className="modal-dialog modal-lg">
+            <div className="modal-dialog modal-dialog-centered">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title" id="textSelectorModalLabel">Select Text</h5>
+                  <h5 className="modal-title" id="textSelectorModalLabel">Select Type of Exercise</h5>
                   <button id="close-button" type="button" className="btn-close" aria-label="Close" data-bs-dismiss="modal"></button>
                 </div>
                 <div className="modal-body">
                   <div className="content d-flex">
                     <div id="texts" className="me-3"></div>
-                    <div id="text-wrapper" className="flex-grow-1">
+                    {/* <div id="text-wrapper" className="flex-grow-1">
                       <div id="text" autoComplete="off" className="border p-2" style={{ height: '100%', overflowY: 'auto' }}></div>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>
