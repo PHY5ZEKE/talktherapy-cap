@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import { route } from "../../utils/route";
@@ -30,6 +30,8 @@ export default function ManageSchedule() {
 
   const accessToken = authState.accessToken;
 
+  const scheduleRef = useRef(null);
+
   const failNotify = (message) =>
     toast.error(message, {
       transition: Slide,
@@ -39,7 +41,6 @@ export default function ManageSchedule() {
   // Fetch admin data from the backend
   useEffect(() => {
     const fetchAdminData = async () => {
-
       try {
         const response = await fetch(`${appURL}/${route.admin.fetch}`, {
           method: "GET",
@@ -109,17 +110,18 @@ export default function ManageSchedule() {
           (schedule) => schedule.clinicianId._id === clinicianId
         );
         setSelectedClinicianSchedule(clinicianSchedule);
+        scheduleRef.current.scrollIntoView({ behavior: "smooth" });
       } else {
-        console.error(data)
+        console.error(data);
         failNotify(toastMessage.fail.fetch);
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
     }
   };
-  
+
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">
@@ -179,7 +181,7 @@ export default function ManageSchedule() {
                               {clinician.lastName}
                             </h5>
                             <h6 className="mb-2">
-                              <FontAwesomeIcon icon={faStethoscope} size="sm" /> {" "}
+                              <FontAwesomeIcon icon={faStethoscope} size="sm" />{" "}
                               {clinician.specialization}
                             </h6>
 
@@ -210,6 +212,7 @@ export default function ManageSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
+                    <span ref={scheduleRef}></span>
                     {selectedClinicianSchedule.length > 0 ? (
                       selectedClinicianSchedule.map((schedule) => (
                         <div

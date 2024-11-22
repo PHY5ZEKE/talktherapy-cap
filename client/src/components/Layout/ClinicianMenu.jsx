@@ -3,7 +3,7 @@ import { AuthContext } from "../../utils/AuthContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { page } from "../../utils/page-route";
 
 export default function ClinicianMenu() {
@@ -24,38 +24,38 @@ export default function ClinicianMenu() {
             <FontAwesomeIcon icon={faBars} size="xl" />
           </div>
           <ul className="dropdown-menu">
-            <li>
-              <a className="dropdown-item" href={page.clinician.home}>
+          <li>
+              <Link className="dropdown-item" to={page.clinician.home}>
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.clinician.content}>
+              <Link className="dropdown-item" to={page.clinician.content}>
                 Exercises
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.clinician.patients}>
+              <Link className="dropdown-item" to={page.clinician.patients}>
                 Patients
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.clinician.schedule}>
+              <Link className="dropdown-item" to={page.clinician.schedule}>
                 Appointments
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.clinician.profile}>
+              <Link className="dropdown-item" to={page.clinician.profile}>
                 Profile
-              </a>
+              </Link>
             </li>
             <li>
               <hr className="dropdown-divider" />
             </li>
             <li>
-              <a className="dropdown-item" href="#" onClick={handleLogout}>
+              <Link className="dropdown-item" to="#" onClick={handleLogout}>
                 Logout
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

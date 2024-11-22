@@ -103,7 +103,7 @@ export default function FeedbackDiagnosis() {
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           <Sidebar />
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
@@ -125,7 +125,7 @@ export default function FeedbackDiagnosis() {
             </div>
 
             <div className="row h-100">
-              <div className="col-sm-4 bg-white">
+              <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">
                     <p className="mb-0 fw-bold">Feedback and Diagnosis</p>
@@ -159,7 +159,8 @@ export default function FeedbackDiagnosis() {
                   </div>
                 </div>
               </div>
-              <div className="col-sm-8 bg-white">
+
+              <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col d-flex align-items-center gap-3 bg-white border rounded-4 p-3">
                     <FontAwesomeIcon icon={faMagnifyingGlass} />
@@ -200,6 +201,7 @@ export default function FeedbackDiagnosis() {
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>

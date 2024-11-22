@@ -75,7 +75,7 @@ export default function AddContent({ closeModal, onSubmit }) {
         <div className="container row text-center">
           <div className="col">
             <div className="form-group">
-              <label className="mb-0">Name</label>
+              <label className="mb-0 fw-bold">Name</label>
               <input
                 type="text"
                 className="form-control"
@@ -86,8 +86,9 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0">Description</label>
-              <div className="quill-editor">
+              <label className="mb-0 fw-bold">Description</label>
+              <div className="quill-editor"
+              style={{maxHeight: "300px"}}>
                 <ReactQuill
                   value={description}
                   onChange={handleChange}
@@ -128,7 +129,7 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0">Category</label>
+              <label className="mb-0 fw-bold">Category</label>
               <select
                 className="form-control"
                 value={category}
@@ -141,7 +142,7 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0">Video URL (Optional)</label>
+              <label className="mb-0 fw-bold">Video URL (Optional)</label>
               <input
                 type="text"
                 className="form-control"
@@ -152,7 +153,7 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0">Upload Image</label>
+              <label className="mb-0 fw-bold">Upload Image</label>
               <input
                 type="file"
                 className="form-control"

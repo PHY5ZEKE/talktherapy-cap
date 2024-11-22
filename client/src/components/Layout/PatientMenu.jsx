@@ -3,7 +3,7 @@ import { AuthContext } from "../../utils/AuthContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function PatientMenu() {
   const { clearOnLogOut } = useContext(AuthContext);
@@ -24,37 +24,37 @@ export default function PatientMenu() {
           </div>
           <ul className="dropdown-menu">
             <li>
-              <a className="dropdown-item" href="/patient">
+              <Link className="dropdown-item" to="/patient">
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href="/patient/feedback">
+              <Link className="dropdown-item" to="/patient/feedback">
                 Feedbacks
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href="/patient/content">
+              <Link className="dropdown-item" to="/patient/content">
                 Exercises
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href="/patient/book">
+              <Link className="dropdown-item" to="/patient/book">
                 Appointments
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href="/patient/profile">
+              <Link className="dropdown-item" to="/patient/profile">
                 Profile
-              </a>
+              </Link>
             </li>
             <li>
               <hr className="dropdown-divider" />
             </li>
             <li>
-              <a className="dropdown-item" href="#" onClick={handleLogout}>
+              <Link className="dropdown-item" to="#" onClick={handleLogout}>
                 Logout
-              </a>
+              </Link>
             </li>
           </ul>
         </div>

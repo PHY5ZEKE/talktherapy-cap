@@ -12,6 +12,7 @@ import ArchiveUser from "../../components/Modals/ArchiveUser";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
+import { Tooltip } from "react-tooltip";
 
 // Utils
 import { route } from "../../utils/route";
@@ -30,8 +31,11 @@ export default function Home() {
   const [adminData, setAdminData] = useState(null);
   const [error, setError] = useState(null);
   const [selectedUserType, setSelectedUserType] = useState("patients");
+
   const [appointments, setAppointments] = useState([]);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+
+  const [selectedStatus, setSelectedStatus] = useState("All");
 
   const { authState } = useContext(AuthContext);
 
@@ -229,7 +233,6 @@ export default function Home() {
     }
   };
 
-
   const fetchAdminData = async () => {
     try {
       const response = await fetch(`${appURL}/${route.admin.fetch}`, {
@@ -386,7 +389,7 @@ export default function Home() {
                 onClick={() => {
                   handleArchive(user);
                   setSelectedUserRole(role);
-                  setSelectedUserId(user._id)
+                  setSelectedUserId(user._id);
                 }}
               >
                 Archive
@@ -413,7 +416,12 @@ export default function Home() {
   const archiveFetch = () => {
     fetchClinicians();
     fetchPatients();
-    emailAccountArchive(userDetails.email, selectedUserRole, accessToken, selectedUserId);
+    emailAccountArchive(
+      userDetails.email,
+      selectedUserRole,
+      accessToken,
+      selectedUserId
+    );
   };
 
   return (
@@ -502,26 +510,67 @@ export default function Home() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <h6 className="text-center fw-bold">Total Appointments</h6>
-
                     <div className="text-center border border-top-0 border-start-0 border-end-0 pb-3 mb-3 d-flex justify-content-center align-content-center gap-4">
-                      <div className="status-pending status-size">
+                      <div
+                        className="status-pending status-size"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setSelectedStatus("All")}
+                      >
+                        <h4 className="mb-0">{appointments.length}</h4>
+                        <button className="mb-0 fw-bold text-accepted all-btn">
+                          All
+                        </button>
+                      </div>
+
+                      <div
+                        className="status-pending status-size"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setSelectedStatus("Pending")}
+                      >
                         <h4 className="mb-0">{pendingAppointments}</h4>
-                        <p className="mb-0 fw-bold p-2 border rounded-3 text-warning">
+                        <Tooltip id="pending-btn" />
+                        <button
+                          data-tooltip-id="pending-btn"
+                          data-tooltip-content="Pending, Schedule Change Request, and Temporary Reschedule Request"
+                          className="mb-0 fw-bold text-pending"
+                        >
                           Pending
-                        </p>
+                        </button>
                       </div>
-                      <div className="status-cancelled status-size">
+                      <div
+                        className="status-cancelled status-size"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setSelectedStatus("Rejected")}
+                      >
                         <h4 className="mb-0">{rejectedAppointments}</h4>
-                        <p className="mb-0 fw-bold p-2 border rounded-3 text-danger">
+
+                        <button className="mb-0 fw-bold text-cancelled">
                           Rejected
-                        </p>
+                        </button>
                       </div>
-                      <div className="status-accepted status-size">
-                        <h4 className="mb-0">{acceptedAppointments}</h4>
-                        <p className="mb-0 fw-bold p-2 border rounded-3 text-success">
+                      <div
+                        className="status-accepted status-size"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setSelectedStatus("Accepted")}
+                      >
+                        <h4 className="mb-0">
+                          {
+                            appointments.filter(
+                              (appointment) =>
+                                appointment.status === "Accepted" ||
+                                appointment.status === "Temporarily Rescheduled"
+                            ).length
+                          }
+                        </h4>
+                        <Tooltip id="accepted-btn" />
+
+                        <button
+                          data-tooltip-id="accepted-btn"
+                          data-tooltip-content="Accepted and Temporarily Rescheduled"
+                          className="mb-0 fw-bold text-accepted"
+                        >
                           Accepted
-                        </p>
+                        </button>
                       </div>
                     </div>
 
@@ -529,27 +578,55 @@ export default function Home() {
                       <p>{error}</p>
                     ) : appointments.length > 0 ? (
                       <>
-                        {renderAppointments("Pending", "text-pending")}
-                        {renderAppointments(
-                          "Schedule Change Request",
-                          "text-pending"
+                        {selectedStatus === "All" && (
+                          <>
+                            {renderAppointments("Pending", "text-pending")}
+                            {renderAppointments(
+                              "Schedule Change Request",
+                              "text-pending"
+                            )}
+                            {renderAppointments(
+                              "Temporary Reschedule Request",
+                              "text-pending"
+                            )}
+                            {renderAppointments("Accepted", "text-accepted")}
+                            {renderAppointments(
+                              "Temporarily Rescheduled",
+                              "text-accepted"
+                            )}
+                            {renderAppointments("Rejected", "text-cancelled")}
+                            {renderAppointments("Completed", "text-accepted")}
+                          </>
                         )}
-                        {renderAppointments(
-                          "Temporary Reschedule Request",
-                          "text-pending"
+                        {selectedStatus === "Pending" && (
+                          <>
+                            {renderAppointments("Pending", "text-pending")}
+                            {renderAppointments(
+                              "Schedule Change Request",
+                              "text-pending"
+                            )}
+                            {renderAppointments(
+                              "Temporary Reschedule Request",
+                              "text-pending"
+                            )}
+                          </>
                         )}
-                        {renderAppointments("Accepted", "text-accepted")}
-                        {renderAppointments(
-                          "Temporarily Rescheduled",
-                          "text-accepted"
+
+                        {selectedStatus === "Rejected" &&
+                          renderAppointments("Rejected", "text-cancelled")}
+                        {selectedStatus === "Accepted" && (
+                          <>
+                            {renderAppointments("Accepted", "text-accepted")}
+                            {renderAppointments(
+                              "Temporarily Rescheduled",
+                              "text-accepted"
+                            )}
+                          </>
                         )}
-                        {renderAppointments("Rejected", "text-cancelled")}
-                        {renderAppointments("Completed", "text-accepted")}
                       </>
                     ) : (
                       <p className="fw-bold mb-0">No appointments as of now.</p>
                     )}
-                    
                   </div>
                 </div>
               </div>
@@ -571,7 +648,7 @@ export default function Home() {
                     style={{ maxHeight: "75vh" }}
                   >
                     <div className="d-flex justify-content-center gap-3 border border-top-0 border-start-0 border-end-0 mb-3 pb-3">
-                    <button
+                      <button
                         className={`text-button border ${
                           selectedUserType === "patients" ? "active" : ""
                         }`}
@@ -654,10 +731,6 @@ export default function Home() {
                         No notifications available
                       </p>
                     )}
-                    {/* <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
-                      <p className="mb-0 fw-bold">Date and Time</p>
-                      <p className="mb-3">System activity.</p>
-                    </div> */}
                   </div>
                 </div>
               </div>

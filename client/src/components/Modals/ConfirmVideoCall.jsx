@@ -18,7 +18,9 @@ export default function ConfirmVideoCall({
 
   return (
     <>
-      <div className="modal-background">
+      <div className="modal-background sticky-top z-1"
+      style={{minHeight: "100%", maxHeight: "100vh"}}
+      >
         <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <div className="d-flex flex-column text-center">
             <h3 className="fw-bold">Ready to join the call?</h3>

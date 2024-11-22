@@ -619,15 +619,9 @@ exports.updateAppointmentStatus = async (req, res) => {
     const userId = req.user.id; // Assuming the token contains the user ID
     const userRole = req.user.role; // Assuming the token contains the user role
 
-    console.log("Updating appointment status");
-    console.log("Appointment ID:", appointmentId);
-    console.log("New Status:", status);
-    console.log("User ID:", userId);
-    console.log("User Role:", userRole);
-
     const appointment = await findAppointmentDetails(appointmentId);
     if (!appointment) {
-      console.log("Appointment not found");
+      console.error("Appointment not found");
       return res.status(404).json({ message: "Appointment not found" });
     }
 
@@ -732,7 +726,6 @@ exports.updateAppointmentStatus = async (req, res) => {
 exports.getClinicianAppointments = async (req, res) => {
   try {
     const clinicianId = req.user.id; // Assuming the clinician ID is stored in req.user.id after token verification
-    console.log(clinicianId);
     // Find appointments for the logged-in clinician with status "Accepted" or "Completed"
     const appointments = await Appointment.find({
       selectedClinician: clinicianId,
@@ -755,6 +748,10 @@ exports.getClinicianAppointments = async (req, res) => {
         select: "firstName middleName lastName", // Select the patient details
       })
       .populate({
+        path: "selectedClinician",
+        select: "firstName middleName lastName",
+      })
+      .populate({
         path: "temporaryReschedule",
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
       })
@@ -763,10 +760,55 @@ exports.getClinicianAppointments = async (req, res) => {
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
 
-    const decryptedAppointments = appointments.map(decryptPatientDetails);
+        // Decrypt patient and clinician details
+        const decryptedAppointments = appointments.map((appointment) => {
+          if (appointment.patientId) {
+            try {
+              if (isEncrypted(appointment.patientId.firstName)) {
+                appointment.patientId.firstName = decrypt(
+                  appointment.patientId.firstName
+                );
+              }
+              if (isEncrypted(appointment.patientId.middleName)) {
+                appointment.patientId.middleName = decrypt(
+                  appointment.patientId.middleName
+                );
+              }
+              if (isEncrypted(appointment.patientId.lastName)) {
+                appointment.patientId.lastName = decrypt(
+                  appointment.patientId.lastName
+                );
+              }
+            } catch (decryptError) {
+              console.error("Error decrypting patient details:", decryptError);
+            }
+          }
+          if (appointment.selectedClinician) {
+            try {
+              if (isEncrypted(appointment.selectedClinician.firstName)) {
+                appointment.selectedClinician.firstName = decrypt(
+                  appointment.selectedClinician.firstName
+                );
+              }
+              if (isEncrypted(appointment.selectedClinician.middleName)) {
+                appointment.selectedClinician.middleName = decrypt(
+                  appointment.selectedClinician.middleName
+                );
+              }
+              if (isEncrypted(appointment.selectedClinician.lastName)) {
+                appointment.selectedClinician.lastName = decrypt(
+                  appointment.selectedClinician.lastName
+                );
+              }
+            } catch (error) {
+              console.error("Error decrypting clinician details:", error);
+            }
+          }
+          return appointment;
+        });
+    
 
     res.status(200).json(decryptedAppointments);
-    console.log(decryptedAppointments);
   } catch (error) {
     console.error("Error fetching clinician appointments:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -890,7 +932,6 @@ exports.getAffectedAppointments = async (req, res) => {
       });
 
     res.status(200).json(decryptedAppointments);
-    console.log(decryptedAppointments);
   } catch (error) {
     console.error("Error fetching clinician appointments:", error);
     res.status(500).json({ message: "Internal server error" });

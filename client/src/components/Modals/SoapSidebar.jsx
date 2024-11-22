@@ -133,10 +133,19 @@ export default function SoapSidebar({
         id="soapSidebar"
         aria-labelledby="offcanvasWithBothOptionsLabel"
       >
-        <div className="d-flex flex-column text-center offcanvas-header">
-          <h3 className="fw-bold">Add SOAP</h3>
-          <p className="mb-0">Please verify your inputs before proceeding.</p>
+        <div className="offcanvas-header">
+          <h5 className="offcanvas-title" id="offcanvasWithBothOptionsLabel">
+            Add Soap
+          </h5>
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="offcanvas"
+            aria-label="Close"
+          ></button>
         </div>
+
+        <p className="text-center mb-0">Please verify your inputs before proceeding.</p>
 
         <div className="container text-center">
           <div className="row">

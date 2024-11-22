@@ -3,7 +3,7 @@ import { AuthContext } from "../../utils/AuthContext";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { page } from "../../utils/page-route";
 export default function AdminMenu() {
   const { clearOnLogOut } = useContext(AuthContext);
@@ -24,37 +24,37 @@ export default function AdminMenu() {
           </div>
           <ul className="dropdown-menu">
             <li>
-              <a className="dropdown-item" href={page.admin.home}>
+              <Link className="dropdown-item" to={page.admin.home}>
                 Home
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.admin.content}>
+              <Link className="dropdown-item" to={page.admin.content}>
                 Manage Content
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.admin.schedule}>
+              <Link className="dropdown-item" to={page.admin.schedule}>
                 Manage Schedules
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.admin.archival}>
+              <Link className="dropdown-item" to={page.admin.archival}>
                 Data Archival
-              </a>
+              </Link>
             </li>
             <li>
-              <a className="dropdown-item" href={page.admin.profile}>
+              <Link className="dropdown-item" to={page.admin.profile}>
                 Profile
-              </a>
+              </Link>
             </li>
             <li>
               <hr className="dropdown-divider" />
             </li>
             <li>
-              <a className="dropdown-item" href="#" onClick={handleLogout}>
+              <Link className="dropdown-item" to="#" onClick={handleLogout}>
                 Logout
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
