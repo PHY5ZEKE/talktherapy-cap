@@ -124,7 +124,7 @@ export default function FeedbackDiagnosis() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">

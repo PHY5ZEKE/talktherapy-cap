@@ -430,7 +430,7 @@ export default function BookSchedule() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -455,7 +455,7 @@ export default function BookSchedule() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
@@ -510,7 +510,11 @@ export default function BookSchedule() {
                         inline
                         dayClassName={getDayClassName}
                         minDate={new Date()}
-                        maxDate={new Date(new Date().setMonth(new Date().getMonth() + 6))}
+                        maxDate={
+                          new Date(
+                            new Date().setMonth(new Date().getMonth() + 6)
+                          )
+                        }
                       />
                     </div>
                   </div>
@@ -575,17 +579,21 @@ export default function BookSchedule() {
                               <FontAwesomeIcon icon={faEnvelope} />{" "}
                               {schedule.email}
                             </p>
+
+                            {schedule.status !== "Booked" && !hasBooked && (
+                              <button
+                                className="mt-3 fw-bold text-button border"
+                                onClick={() =>
+                                  handleModal(
+                                    schedule.clinicianId,
+                                    schedule._id
+                                  )
+                                }
+                              >
+                                Book
+                              </button>
+                            )}
                           </div>
-                          {schedule.status !== "Booked" && !hasBooked && (
-                            <div
-                              className="mb-3 fw-bold text-button border"
-                              onClick={() =>
-                                handleModal(schedule.clinicianId, schedule._id)
-                              }
-                            >
-                              Book
-                            </div>
-                          )}
                         </div>
                       ))
                     )}
@@ -711,16 +719,16 @@ export default function BookSchedule() {
                           )}
                           {/* IF SCHEDULE CHANGE REQUEST */}
                           {appointment.status === "Schedule Change Request" && (
-                              <div className="my-3 text-pending">
-                                FOR APPROVAL
-                              </div>
+                            <div className="my-3 text-pending">
+                              FOR APPROVAL
+                            </div>
                           )}
                           {/* IF TEMPORARY RESCHEDULE REQUEST */}
                           {appointment.status ===
                             "Temporary Reschedule Request" && (
-                              <div className="my-3 text-pending">
-                                FOR APPROVAL
-                              </div>
+                            <div className="my-3 text-pending">
+                              FOR APPROVAL
+                            </div>
                           )}
                           {/* IF TEMPORARILY RESCHEDULED */}
                           {appointment.status === "Temporarily Rescheduled" && (
@@ -737,9 +745,7 @@ export default function BookSchedule() {
                           )}
                           {/* IF REJECTED */}
                           {appointment.status === "Rejected" && (
-                              <div className="my-3 text-cancelled">
-                                Rejected
-                              </div>
+                            <div className="my-3 text-cancelled">Rejected</div>
                           )}
                         </div>
                       ))

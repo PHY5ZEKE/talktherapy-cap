@@ -18,6 +18,8 @@ import AppointmentDetailsClinician from "../../components/Modals/AppointmentDeta
 import { useState, useRef, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
 const appURL = import.meta.env.VITE_APP_URL;
 
@@ -242,6 +244,10 @@ export default function Home() {
     return date.toLocaleDateString(undefined, options);
   };
 
+  // Collapsible Icons
+  const [firstCollapse, setFirstCollapse] = useState(false);
+  const [secondCollapse, setSecondCollapse] = useState(false);
+
   return (
     <>
       {/* CONFIRM RESCHEDULE MODAL */}
@@ -266,7 +272,7 @@ export default function Home() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -298,17 +304,34 @@ export default function Home() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Today is {getCurrentDate()}</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#first-collapse"
+                    onClick={() => {
+                      setFirstCollapse(!firstCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      <span>
+                        {!firstCollapse ? (
+                          <FontAwesomeIcon icon={faCaretUp} />
+                        ) : (
+                          <FontAwesomeIcon icon={faCaretDown} />
+                        )}{" "}
+                      </span>
+                      Today is {getCurrentDate()}
+                    </p>
                     <p className="mb-0">Your Appointments</p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="first-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
@@ -543,15 +566,32 @@ export default function Home() {
               {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Notifications</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#second-collapse"
+                    style={{ cursor: "pointer" }}
+                    onClick={() => {
+                      setSecondCollapse(!secondCollapse);
+                    }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      <span>
+                        {!secondCollapse ? (
+                          <FontAwesomeIcon icon={faCaretUp} />
+                        ) : (
+                          <FontAwesomeIcon icon={faCaretDown} />
+                        )}{" "}
+                      </span>
+                      Notifications
+                    </p>
                     <p className="mb-0">
                       Account related notifications will appear here.
                     </p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="second-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
@@ -581,9 +621,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-
-              {/* THIRD COL */}
-              <div className="col-sm bg-white"></div>
             </div>
           </div>
         </div>

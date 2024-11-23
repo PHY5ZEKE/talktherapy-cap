@@ -11,7 +11,12 @@ import RegisterClinician from "../../components/Modals/RegisterClinician";
 import ArchiveUser from "../../components/Modals/ArchiveUser";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserDoctor, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faUserDoctor,
+  faUser,
+  faCaretUp,
+  faCaretDown,
+} from "@fortawesome/free-solid-svg-icons";
 import { Tooltip } from "react-tooltip";
 
 // Utils
@@ -312,46 +317,48 @@ export default function Home() {
     (appointment) => appointment.status === "Rejected"
   ).length;
 
-  const acceptedAppointments = appointments.filter(
-    (appointment) => appointment.status === "Accepted"
-  ).length;
-
   const renderAppointments = (status, textClass) => {
-    return appointments
-      .filter((appointment) => appointment.status === status)
-      .map((appointment, index) => (
-        <div
-          key={index}
-          className="mb-3 border border-top-0 border-start-0 border-end-0"
-          style={{ cursor: "pointer" }}
-          onClick={() => openModal(appointment._id)}
-        >
-          <div className="d-flex align-items-center gap-3 mb-3">
-            <h5 className="mb-0 fw-bold">
+    if (
+      appointments.filter((appointment) => appointment.status === status)
+        .length > 0
+    ) {
+      return appointments
+        .filter((appointment) => appointment.status === status)
+        .map((appointment, index) => (
+          <div
+            key={index}
+            className="mb-3 border border-top-0 border-start-0 border-end-0"
+            style={{ cursor: "pointer" }}
+            onClick={() => openModal(appointment._id)}
+          >
+            <div className="d-flex align-items-center gap-3 mb-3">
+              <h5 className="mb-0 fw-bold">
+                {appointment.status === "Temporarily Rescheduled"
+                  ? appointment.temporaryReschedule?.day
+                  : appointment.selectedSchedule?.day}
+              </h5>
+              <div className={`mb-0 ${textClass}`}>{appointment.status}</div>
+            </div>
+            <p className="mb-0">
               {appointment.status === "Temporarily Rescheduled"
-                ? appointment.temporaryReschedule?.day
-                : appointment.selectedSchedule?.day}
-            </h5>
-            <div className={`mb-0 ${textClass}`}>{appointment.status}</div>
+                ? appointment.temporaryReschedule?.startTime
+                : appointment.selectedSchedule?.startTime}{" "}
+              to{" "}
+              {appointment.status === "Temporarily Rescheduled"
+                ? appointment.temporaryReschedule?.endTime
+                : appointment.selectedSchedule?.endTime}
+            </p>
+            <p className="mb-3">
+              {appointment.patientId.firstName}{" "}
+              {appointment.patientId.middleName}{" "}
+              {appointment.patientId.lastName} has a session with{" "}
+              {appointment.status === "Temporarily Rescheduled"
+                ? appointment.temporaryReschedule?.clinicianName
+                : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`}
+            </p>
           </div>
-          <p className="mb-0">
-            {appointment.status === "Temporarily Rescheduled"
-              ? appointment.temporaryReschedule?.startTime
-              : appointment.selectedSchedule?.startTime}{" "}
-            to{" "}
-            {appointment.status === "Temporarily Rescheduled"
-              ? appointment.temporaryReschedule?.endTime
-              : appointment.selectedSchedule?.endTime}
-          </p>
-          <p className="mb-3">
-            {appointment.patientId.firstName} {appointment.patientId.middleName}{" "}
-            {appointment.patientId.lastName} has a session with{" "}
-            {appointment.status === "Temporarily Rescheduled"
-              ? appointment.temporaryReschedule?.clinicianName
-              : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}`}
-          </p>
-        </div>
-      ));
+        ));
+    }
   };
 
   const [selectedUserRole, setSelectedUserRole] = useState("");
@@ -397,9 +404,8 @@ export default function Home() {
             </div>
           </div>
         ));
-    } else {
-      return <p className="fw-bold text-center mb-0">No users available</p>;
     }
+    return <p className="fw-bold text-center mb-0">No users available.</p>;
   };
 
   const sendEmail = (email) => {
@@ -421,6 +427,27 @@ export default function Home() {
       selectedUserRole,
       accessToken,
       selectedUserId
+    );
+  };
+
+  // Collapse
+  const [firstCollapse, setFirstCollapse] = useState(false);
+  const [secondCollapse, setSecondCollapse] = useState(false);
+  const [thirdCollapse, setThirdCollapse] = useState(false);
+
+  // Search
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const filterUsers = (users) => {
+    if (!searchQuery) return users;
+    return users.filter((user) =>
+      `${user.firstName} ${user.middleName} ${user.lastName}`
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase())
     );
   };
 
@@ -470,7 +497,7 @@ export default function Home() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -495,22 +522,37 @@ export default function Home() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Appointments</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#first-collapse"
+                    onClick={() => {
+                      setFirstCollapse(!firstCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      {firstCollapse ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}{" "}
+                      Appointments
+                    </p>
                     <p className="mb-0">See appointments</p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="first-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
-                    <div className="text-center border border-top-0 border-start-0 border-end-0 pb-3 mb-3 d-flex justify-content-center align-content-center gap-4">
+                    <div className="text-center border border-top-0 border-start-0 border-end-0 pb-3 mb-3 d-flex flex-wrap justify-content-center align-content-center gap-4">
                       <div
                         className="status-pending status-size"
                         style={{ cursor: "pointer" }}
@@ -580,49 +622,101 @@ export default function Home() {
                       <>
                         {selectedStatus === "All" && (
                           <>
-                            {renderAppointments("Pending", "text-pending")}
-                            {renderAppointments(
-                              "Schedule Change Request",
-                              "text-pending"
+                            {appointments.length > 0 ? (
+                              <>
+                                {renderAppointments("Pending", "text-pending")}
+                                {renderAppointments(
+                                  "Schedule Change Request",
+                                  "text-pending"
+                                )}
+                                {renderAppointments(
+                                  "Temporary Reschedule Request",
+                                  "text-pending"
+                                )}
+                                {renderAppointments(
+                                  "Accepted",
+                                  "text-accepted"
+                                )}
+                                {renderAppointments(
+                                  "Temporarily Rescheduled",
+                                  "text-accepted"
+                                )}
+                                {renderAppointments(
+                                  "Rejected",
+                                  "text-cancelled"
+                                )}
+                                {renderAppointments(
+                                  "Completed",
+                                  "text-accepted"
+                                )}
+                              </>
+                            ) : (
+                              <p className="fw-bold mb-0">
+                                No appointments to show.
+                              </p>
                             )}
-                            {renderAppointments(
-                              "Temporary Reschedule Request",
-                              "text-pending"
-                            )}
-                            {renderAppointments("Accepted", "text-accepted")}
-                            {renderAppointments(
-                              "Temporarily Rescheduled",
-                              "text-accepted"
-                            )}
-                            {renderAppointments("Rejected", "text-cancelled")}
-                            {renderAppointments("Completed", "text-accepted")}
                           </>
                         )}
                         {selectedStatus === "Pending" && (
                           <>
-                            {renderAppointments("Pending", "text-pending")}
-                            {renderAppointments(
-                              "Schedule Change Request",
-                              "text-pending"
-                            )}
-                            {renderAppointments(
-                              "Temporary Reschedule Request",
-                              "text-pending"
+                            {appointments.filter(
+                              (appointment) =>
+                                appointment.status === "Pending" ||
+                                appointment.status ===
+                                  "Schedule Change Request" ||
+                                appointments.status ===
+                                  "Temporary Reschedule Request"
+                            ).length > 0 ? (
+                              <>
+                                {renderAppointments("Pending", "text-pending")}
+                                {renderAppointments(
+                                  "Schedule Change Request",
+                                  "text-pending"
+                                )}
+                                {renderAppointments(
+                                  "Temporary Reschedule Request",
+                                  "text-pending"
+                                )}
+                              </>
+                            ) : (
+                              <p className="fw-bold text-center mb-0">
+                                No appointments to show.
+                              </p>
                             )}
                           </>
                         )}
 
                         {selectedStatus === "Rejected" &&
-                          renderAppointments("Rejected", "text-cancelled")}
-                        {selectedStatus === "Accepted" && (
-                          <>
-                            {renderAppointments("Accepted", "text-accepted")}
-                            {renderAppointments(
-                              "Temporarily Rescheduled",
-                              "text-accepted"
-                            )}
-                          </>
-                        )}
+                          (appointments.filter(
+                            (appointment) => appointment.status === "Rejected"
+                          ).length > 0 ? (
+                            <>
+                              {renderAppointments("Rejected", "text-cancelled")}
+                            </>
+                          ) : (
+                            <p className="fw-bold text-center mb-0">
+                              No appointments to show.
+                            </p>
+                          ))}
+
+                        {selectedStatus === "Accepted" &&
+                          (appointments.filter(
+                            (appointment) =>
+                              appointment.status === "Accepted" ||
+                              appointment.status === "Temporarily Rescheduled"
+                          ).length > 0 ? (
+                            <>
+                              {renderAppointments("Accepted", "text-accepted")}
+                              {renderAppointments(
+                                "Temporarily Rescheduled",
+                                "text-accepted"
+                              )}
+                            </>
+                          ) : (
+                            <p className="fw-bold text-center mb-0">
+                              No appointments to show.
+                            </p>
+                          ))}
                       </>
                     ) : (
                       <p className="fw-bold mb-0">No appointments as of now.</p>
@@ -634,15 +728,30 @@ export default function Home() {
               {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Users</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#second-collapse"
+                    onClick={() => {
+                      setSecondCollapse(!secondCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      {secondCollapse ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}{" "}
+                      Users
+                    </p>
                     <p className="mb-0">
                       View all users registered in the system.
                     </p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="second-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
@@ -674,10 +783,24 @@ export default function Home() {
                       )}
                     </div>
 
+                    <div className="mb-3">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Search users..."
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                      />
+                    </div>
+
                     {selectedUserType === "patients" && patients ? (
-                      renderUsers(patients, faUser, "patientslp")
+                      renderUsers(filterUsers(patients), faUser, "patientslp")
                     ) : selectedUserType === "clinicians" && clinicians ? (
-                      renderUsers(clinicians, faUserDoctor, "clinician")
+                      renderUsers(
+                        filterUsers(clinicians),
+                        faUserDoctor,
+                        "clinician"
+                      )
                     ) : (
                       <h5 className="mb-0 fw-bold text-center">
                         Loading users.
@@ -690,15 +813,30 @@ export default function Home() {
               {/* THIRD COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Notifications</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#third-collapse"
+                    onClick={() => {
+                      setThirdCollapse(!thirdCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      {thirdCollapse ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}{" "}
+                      Notifications
+                    </p>
                     <p className="mb-0">
                       Account and system related activities will be shown here.
                     </p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="third-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}

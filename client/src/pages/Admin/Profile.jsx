@@ -192,7 +192,7 @@ export default function Profile() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           <Sidebar />
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
@@ -212,7 +212,7 @@ export default function Profile() {
               </div>
               <MenuDropdown />
             </div>
-            <div className="row h-100">
+            <div className="row">
               <div className="col-sm bg-white">
                 <div className="row p-3">
                   <div className="col bg-white border rounded-4 p-3">

@@ -133,7 +133,7 @@ export default function AuditLogs() {
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -166,9 +166,7 @@ export default function AuditLogs() {
                     <div className="d-flex flex-wrap gap-3 justify-content-start">
                       <div>
                         <p className="mb-0 fw-bold">System Activities</p>
-                        <p className="mb-0">
-                          {selectedDate.toLocaleDateString()}
-                        </p>
+                        <p className="mb-0">Select a date</p>
                       </div>
 
                       <input
@@ -180,7 +178,6 @@ export default function AuditLogs() {
                         onChange={handleDateChange}
                         className="form-input rounded"
                       />
-
                     </div>
                   </div>
                 </div>

@@ -309,10 +309,14 @@ export default function ManageSchedule() {
     }
   };
 
+  const patientRef = useRef(null);
+
   const handleClinicianClick = (patient) => {
     setSelectedPatient(patient);
     setSoapRecords(fetchSoapRecords(patient._id));
     setViewMode(VIEW_MODES.NONE);
+    patientRef.current.scrollIntoView({ behavior: "smooth" });
+
     fetchPatientDetails(patient._id);
   };
 
@@ -406,7 +410,7 @@ export default function ManageSchedule() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           <Sidebar />
 
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
@@ -525,7 +529,7 @@ export default function ManageSchedule() {
                         Loading data.
                       </h5>
                     ) : selectedPatient ? (
-                      <div className="card">
+                      <div className="card" ref={patientRef}>
                         <img
                           src={selectedPatient?.profilePicture}
                           className="card-img-top"
@@ -622,20 +626,28 @@ export default function ManageSchedule() {
                     {viewMode === VIEW_MODES.RECORDS ? (
                       <div>
                         <h5 className="text-center fw-bold">SOAP Records</h5>
-                        {soapRecords.map((record) => (
-                          <ViewRecord
-                            key={record._id}
-                            header={`${new Date(
-                              record.date
-                            ).toLocaleDateString()} - Clinician ${
-                              record.clinician.firstName
-                            } ${record.clinician.lastName}`}
-                            details={record}
-                            onDelete={() => handleDeleteSoapRecord(record._id)}
-                            onEdit={() => setEditSoapRecord(record)}
-                            role={userRole}
-                          />
-                        ))}
+                        {soapRecords.length === 0 ? (
+                          <p className="mb-0 fw-bold text-center">
+                            No SOAP records to show.
+                          </p>
+                        ) : (
+                          soapRecords.map((record) => (
+                            <ViewRecord
+                              key={record._id}
+                              header={`${new Date(
+                                record.date
+                              ).toLocaleDateString()} - Clinician ${
+                                record.clinician.firstName
+                              } ${record.clinician.lastName}`}
+                              details={record}
+                              onDelete={() =>
+                                handleDeleteSoapRecord(record._id)
+                              }
+                              onEdit={() => setEditSoapRecord(record)}
+                              role={userRole}
+                            />
+                          ))
+                        )}
                       </div>
                     ) : viewMode === VIEW_MODES.PROGRESS ? (
                       <>

@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { Suspense, lazy } from "react";
 
 // Context
 import { AuthProvider } from "./utils/AuthContext";
@@ -15,287 +16,300 @@ import "./styles/images.css";
 import "react-toastify/dist/ReactToastify.css";
 
 // System
-import Landing from "./pages/System/Landing";
-import Login from "./pages/System/Login";
-import RegisterAdmin from "./pages/Register/AdminRegister";
-import RegisterClinician from "./pages/Register/ClinicianRegister";
-import RegisterPatientSlp from "./pages/Register/PatientRegister";
-import ForgotPassword from "./pages/System/ForgotPassword";
+const Landing = lazy(() => import("./pages/System/Landing"));
+const Login = lazy(() => import("./pages/System/Login"));
+const RegisterAdmin = lazy(() => import("./pages/Register/AdminRegister"));
+const RegisterClinician = lazy(() =>
+  import("./pages/Register/ClinicianRegister")
+);
+const RegisterPatientSlp = lazy(() =>
+  import("./pages/Register/PatientRegister")
+);
+const ForgotPassword = lazy(() => import("./pages/System/ForgotPassword"));
 
 // Super Admin TalkTherapy
-import SuperAdminHome from "./pages/SuperAdmin/Home";
-import SuperAdminProfile from "./pages/SuperAdmin/Profile";
-import SuperAdminArchival from "./pages/SuperAdmin/Archival";
-import SuperAdminAudit from "./pages/SuperAdmin/AuditLogs";
+const SuperAdminHome = lazy(() => import("./pages/SuperAdmin/Home"));
+const SuperAdminProfile = lazy(() => import("./pages/SuperAdmin/Profile"));
+const SuperAdminArchival = lazy(() => import("./pages/SuperAdmin/Archival"));
+const SuperAdminAudit = lazy(() => import("./pages/SuperAdmin/AuditLogs"));
 
 // Admin TalkTherapy
-import AdminHome from "./pages/Admin/Home";
-import AdminContent from "./pages/Admin/ManageContent";
-import AdminSchedule from "./pages/Admin/ManageSchedule";
-import AdminArchival from "./pages/Admin/Archival";
-import AdminProfile from "./pages/Admin/Profile";
-import AdminPatients from "./pages/Admin/SearchPatients";
+const AdminHome = lazy(() => import("./pages/Admin/Home"));
+const AdminContent = lazy(() => import("./pages/Admin/ManageContent"));
+const AdminSchedule = lazy(() => import("./pages/Admin/ManageSchedule"));
+const AdminArchival = lazy(() => import("./pages/Admin/Archival"));
+const AdminProfile = lazy(() => import("./pages/Admin/Profile"));
+const AdminPatients = lazy(() => import("./pages/Admin/SearchPatients"));
 
 // Clinician TalkTherapy
-import ClinicianHome from "./pages/Clinician/Home";
-import ClinicianPatient from "./pages/Clinician/SearchPatients";
-import ClinicianContent from "./pages/Clinician/ViewContent";
-import ClinicianProfile from "./pages/Clinician/Profile";
-import ClinicianSchedule from "./pages/Clinician/ManageSchedule";
+const ClinicianHome = lazy(() => import("./pages/Clinician/Home"));
+const ClinicianPatient = lazy(() => import("./pages/Clinician/SearchPatients"));
+const ClinicianContent = lazy(() => import("./pages/Clinician/ViewContent"));
+const ClinicianProfile = lazy(() => import("./pages/Clinician/Profile"));
+const ClinicianSchedule = lazy(() =>
+  import("./pages/Clinician/ManageSchedule")
+);
 
 // Patient TalkTherapy
-import PatientHome from "./pages/Patient/Home";
-import PatientContent from "./pages/Patient/ViewContent";
-import PatientBook from "./pages/Patient/BookSchedule";
-import PatientProfile from "./pages/Patient/Profile";
-import PatientFeedback from "./pages/Patient/FeedbackDiagnosis";
+const PatientHome = lazy(() => import("./pages/Patient/Home"));
+const PatientContent = lazy(() => import("./pages/Patient/ViewContent"));
+const PatientBook = lazy(() => import("./pages/Patient/BookSchedule"));
+const PatientProfile = lazy(() => import("./pages/Patient/Profile"));
+const PatientFeedback = lazy(() => import("./pages/Patient/FeedbackDiagnosis"));
 
 //Auth
 import PrivateRoute from "./pages/Authorization/PrivateRoute";
 import PublicRoute from "./pages/Authorization/PublicRoute";
 
 // Teleconference
-import Room from "./pages/System/Room";
+const Room = lazy(() => import("./pages/System/Room"));
 
 //Test Exercises
-import WordStart from "./pages/Exercises/WordStart";
-import AssistSpeech from "./pages/Exercises/AssistSpeech";
-import ExerciseContent from "./pages/Exercises/ExerciseContent";
-import ExerRun from "./pages/Exercises/ExerRun";
-import ExerSpeech from "./pages/Exercises/ExerSpeech";
-import ExerFace from "./pages/Exercises/ExerFace";
+const WordStart = lazy(() => import("./pages/Exercises/WordStart"));
+const AssistSpeech = lazy(() => import("./pages/Exercises/AssistSpeech"));
+const ExerciseContent = lazy(() => import("./pages/Exercises/ExerciseContent"));
+const ExerRun = lazy(() => import("./pages/Exercises/ExerRun"));
+const ExerSpeech = lazy(() => import("./pages/Exercises/ExerSpeech"));
+const ExerFace = lazy(() => import("./pages/Exercises/ExerFace"));
 
 // Error Handlers
-import NotFound from "./pages/System/NotFound";
-import UnauthorizedAccess from "./pages/System/UnauthorizedAccess";
+const NotFound = lazy(() => import("./pages/System/NotFound"));
+const UnauthorizedAccess = lazy(() =>
+  import("./pages/System/UnauthorizedAccess")
+);
 
 // Testing Pages
 
 const routes = (
   <Router>
-    <Routes>
-      {/* Error Page for No-Match Paths */}
-      <Route path="*" element={<NotFound />} />
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        {/* Error Page for No-Match Paths */}
+        <Route path="*" element={<NotFound />} />
 
-      {/* Unauthorized Access Page */}
-      <Route path="/unauthorized" element={<UnauthorizedAccess />} />
+        {/* Unauthorized Access Page */}
+        <Route path="/unauthorized" element={<UnauthorizedAccess />} />
 
-      {/* Auth */}
-      <Route path="/register/admin" element={<RegisterAdmin />} />
-      <Route path="/register/clinician" element={<RegisterClinician />} />
-      <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
-      <Route path="/forgot" element={<ForgotPassword />} />
+        {/* Auth */}
+        <Route path="/register/admin" element={<RegisterAdmin />} />
+        <Route path="/register/clinician" element={<RegisterClinician />} />
+        <Route path="/register/patientslp" element={<RegisterPatientSlp />} />
+        <Route path="/forgot" element={<ForgotPassword />} />
 
-      {/* Teleconference */}
-      <Route
-        path="/room/:roomid"
-        element={
-          <PrivateRoute allowedRoles={["patientslp", "clinician"]}>
-            <Room />
-          </PrivateRoute>
-        }
-      />
+        {/* Teleconference */}
+        <Route
+          path="/room/:roomid"
+          element={
+            <PrivateRoute allowedRoles={["patientslp", "clinician"]}>
+              <Room />
+            </PrivateRoute>
+          }
+        />
 
-      {/* Exercises */}
-      <Route path="/exercise" element={<WordStart />} />
-      <Route path="/assist/speech" element={<AssistSpeech />} />
-      <Route path="/content/exercises/:id" element={<ExerciseContent />} />
-      <Route path="/content/exercises/speech" element={<ExerRun />} />
-      <Route path="/content/exercises/assistspeech" element={<ExerSpeech />} />
-      <Route path="/content/exercises/facespeech" element={<ExerFace />} />
+        {/* Exercises */}
+        <Route path="/exercise" element={<WordStart />} />
+        <Route path="/assist/speech" element={<AssistSpeech />} />
+        <Route path="/content/exercises/:id" element={<ExerciseContent />} />
+        <Route path="/content/exercises/speech" element={<ExerRun />} />
+        <Route
+          path="/content/exercises/assistspeech"
+          element={<ExerSpeech />}
+        />
+        <Route path="/content/exercises/facespeech" element={<ExerFace />} />
 
-      {/* TO DO: Create a page for landing instead of login */}
-      <Route
-        path="/"
-        element={
-          <PublicRoute>
-            <Landing />
-          </PublicRoute>
-        }
-      />
+        {/* TO DO: Create a page for landing instead of login */}
+        <Route
+          path="/"
+          element={
+            <PublicRoute>
+              <Landing />
+            </PublicRoute>
+          }
+        />
 
-      <Route
-        path="/login"
-        element={
-          <PublicRoute>
-            <Login />
-          </PublicRoute>
-        }
-      />
-      <Route
-        path="/sudo"
-        element={
-          <PrivateRoute allowedRoles={["superAdmin"]}>
-            <SuperAdminHome />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/sudo/profile"
-        element={
-          <PrivateRoute allowedRoles={["superAdmin"]}>
-            <SuperAdminProfile />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/sudo/archival"
-        element={
-          <PrivateRoute allowedRoles={["superAdmin"]}>
-            <SuperAdminArchival />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/sudo/audit"
-        element={
-          <PrivateRoute allowedRoles={["superAdmin"]}>
-            <SuperAdminAudit />
-          </PrivateRoute>
-        }
-      />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/sudo"
+          element={
+            <PrivateRoute allowedRoles={["superAdmin"]}>
+              <SuperAdminHome />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/sudo/profile"
+          element={
+            <PrivateRoute allowedRoles={["superAdmin"]}>
+              <SuperAdminProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/sudo/archival"
+          element={
+            <PrivateRoute allowedRoles={["superAdmin"]}>
+              <SuperAdminArchival />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/sudo/audit"
+          element={
+            <PrivateRoute allowedRoles={["superAdmin"]}>
+              <SuperAdminAudit />
+            </PrivateRoute>
+          }
+        />
 
-      {/*Admin */}
-      <Route
-        path="/admin"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminHome />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/admin/content"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminContent />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/admin/schedule"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminSchedule />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/admin/archival"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminArchival />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/admin/patients"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminPatients />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/admin/profile"
-        element={
-          <PrivateRoute allowedRoles={["admin"]}>
-            <AdminProfile />
-          </PrivateRoute>
-        }
-      />
-      {/*Clinician */}
+        {/*Admin */}
+        <Route
+          path="/admin"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminHome />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/content"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminContent />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/schedule"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminSchedule />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/archival"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminArchival />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/patients"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminPatients />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/admin/profile"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <AdminProfile />
+            </PrivateRoute>
+          }
+        />
+        {/*Clinician */}
 
-      <Route
-        path="/clinician"
-        element={
-          <PrivateRoute allowedRoles={["clinician"]}>
-            <ClinicianHome />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/clinician/patients"
-        element={
-          <PrivateRoute allowedRoles={["clinician"]}>
-            <ClinicianPatient />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/clinician/content"
-        element={
-          <PrivateRoute allowedRoles={["clinician"]}>
-            <ClinicianContent />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/clinician/profile"
-        element={
-          <PrivateRoute allowedRoles={["clinician"]}>
-            <ClinicianProfile />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/clinician/schedule"
-        element={
-          <PrivateRoute allowedRoles={["clinician"]}>
-            <ClinicianSchedule />
-          </PrivateRoute>
-        }
-      />
-      {/*Patient */}
-      <Route
-        path="/patient"
-        element={
-          <PrivateRoute allowedRoles={["patientslp"]}>
-            <PatientHome />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/patient/content"
-        element={
-          <PrivateRoute allowedRoles={["patientslp"]}>
-            <PatientContent />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/patient/book"
-        element={
-          <PrivateRoute allowedRoles={["patientslp"]}>
-            <PatientBook />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/patient/profile"
-        element={
-          <PrivateRoute allowedRoles={["patientslp"]}>
-            <PatientProfile />
-          </PrivateRoute>
-        }
-      />
-      <Route
-        path="/patient/feedback"
-        element={
-          <PrivateRoute allowedRoles={["patientslp"]}>
-            <PatientFeedback />
-          </PrivateRoute>
-        }
-      />
-    </Routes>
+        <Route
+          path="/clinician"
+          element={
+            <PrivateRoute allowedRoles={["clinician"]}>
+              <ClinicianHome />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/clinician/patients"
+          element={
+            <PrivateRoute allowedRoles={["clinician"]}>
+              <ClinicianPatient />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/clinician/content"
+          element={
+            <PrivateRoute allowedRoles={["clinician"]}>
+              <ClinicianContent />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/clinician/profile"
+          element={
+            <PrivateRoute allowedRoles={["clinician"]}>
+              <ClinicianProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/clinician/schedule"
+          element={
+            <PrivateRoute allowedRoles={["clinician"]}>
+              <ClinicianSchedule />
+            </PrivateRoute>
+          }
+        />
+        {/*Patient */}
+        <Route
+          path="/patient"
+          element={
+            <PrivateRoute allowedRoles={["patientslp"]}>
+              <PatientHome />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/patient/content"
+          element={
+            <PrivateRoute allowedRoles={["patientslp"]}>
+              <PatientContent />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/patient/book"
+          element={
+            <PrivateRoute allowedRoles={["patientslp"]}>
+              <PatientBook />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/patient/profile"
+          element={
+            <PrivateRoute allowedRoles={["patientslp"]}>
+              <PatientProfile />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/patient/feedback"
+          element={
+            <PrivateRoute allowedRoles={["patientslp"]}>
+              <PatientFeedback />
+            </PrivateRoute>
+          }
+        />
+      </Routes>
+    </Suspense>
   </Router>
 );
 
 const App = () => {
   return (
     <AuthProvider>
-        {routes}
-        <ToastContainer />
+      {routes}
+      <ToastContainer />
     </AuthProvider>
   );
 };

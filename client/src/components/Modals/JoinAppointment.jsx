@@ -61,7 +61,7 @@ export default function JoinAppointment({
     formData.append("patientId", patientId);
     formData.append("sourceOfReferral", sourceOfReferral);
     formData.append("chiefComplaint", chiefComplaint);
-    formData.append("selectedClinician", selectedClinician);
+    formData.append("selectedClinician", selectedClinician._id);
     formData.append("selectedSchedule", selectedSchedule);
     formData.append("file", referralUpload);
 
@@ -69,7 +69,7 @@ export default function JoinAppointment({
       patientId: patientId,
       sourceOfReferral: sourceOfReferral,
       chiefComplaint: chiefComplaint,
-      selectedClinician: selectedClinician,
+      selectedClinician: selectedClinician._id,
       selectedSchedule: selectedSchedule,
     };
 
@@ -197,17 +197,6 @@ export default function JoinAppointment({
                   </button>
                 </div>
               </Form>
-            </div>
-          </div>
-
-          <div className="row text-center" hidden>
-            <div className="col">
-              <p className="fw-bold">Selected Clinician</p>
-              <p>{selectedClinician}</p>
-            </div>
-            <div className="col">
-              <p className="fw-bold">Selected Schedule</p>
-              <p>{selectedSchedule}</p>
             </div>
           </div>
         </div>

@@ -11,6 +11,8 @@ import MenuDropdown from "../../components/Layout/PatientMenu";
 
 // CSS
 import "../../styles/text.css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home() {
   const appURL = import.meta.env.VITE_APP_URL;
@@ -33,7 +35,7 @@ export default function Home() {
   useEffect(() => {
     fetchPatientData();
     fetchContentData();
-    
+
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
       try {
@@ -111,8 +113,8 @@ export default function Home() {
     }
   };
 
-   // Fetch content data
-   const fetchContentData = async () => {
+  // Fetch content data
+  const fetchContentData = async () => {
     try {
       const response = await fetch(`${appURL}/api/contents`, {
         method: "GET",
@@ -170,10 +172,15 @@ export default function Home() {
     navigate(`/content/exercises/${id}`);
   };
 
+  // Collapse
+  const [firstCollapse, setFirstCollapse] = useState(false);
+  const [secondCollapse, setSecondCollapse] = useState(false);
+  const [thirdCollapse, setThirdCollapse] = useState(false);
+
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -198,17 +205,32 @@ export default function Home() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Today is {getCurrentDate()} </p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#first-collapse"
+                    onClick={() => {
+                      setFirstCollapse(!firstCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      {firstCollapse ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}{" "}
+                      Today is {getCurrentDate()}{" "}
+                    </p>
                     <p className="mb-0">Your Appointment</p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="first-collapse">
                   {loading ? (
                     <div className="col bg-white border rounded-4 p-3 overflow-auto">
                       <h5 className="mb-0 fw-bold text-center">
@@ -252,7 +274,8 @@ export default function Home() {
                             {appointment.status === "Temporarily Rescheduled"
                               ? appointment.temporaryReschedule.clinicianName
                               : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}
-                            with ${patientData?.firstName}`}.
+                            with ${patientData?.firstName}`}
+                            .
                           </p>
 
                           {appointment.status === "Accepted" ? (
@@ -294,32 +317,47 @@ export default function Home() {
                     ))
                   ) : (
                     <div className="col bg-white border rounded-4 p-3 overflow-auto">
-                      <h5 className="mb-0 fw-bold text-center">
+                      <p className="mb-0 fw-bold text-center">
                         You currently don't have an accepted appointment. Check
                         the Scheduling Page to book an appointment.
-                      </h5>
+                      </p>
                     </div>
                   )}
                 </div>
               </div>
 
-             {/* SECOND COL */}
+              {/* SECOND COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Favorite Exercises</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#second-collapse"
+                    onClick={() => {
+                      setSecondCollapse(!secondCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      {secondCollapse ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}{" "}
+                      Favorite Exercises
+                    </p>
                     <p className="mb-0">
                       Your bookmarked exercises will appear here.
                     </p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="second-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3"
                     style={{
-                      maxHeight: "75vh",  // Card's maximum height
-                      overflowY: "auto",   // Enables vertical scrolling
+                      maxHeight: "75vh", // Card's maximum height
+                      overflowY: "auto", // Enables vertical scrolling
                     }}
                   >
                     {bookmarkedExercises.length > 0 ? (
@@ -346,15 +384,30 @@ export default function Home() {
               {/* THIRD COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
-                  <div className="col bg-white border rounded-4 p-3">
-                    <p className="mb-0 fw-bold">Notifications</p>
+                  <div
+                    className="col bg-white border rounded-4 p-3"
+                    data-bs-toggle="collapse"
+                    href="#third-collapse"
+                    onClick={() => {
+                      setThirdCollapse(!thirdCollapse);
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <p className="mb-0 fw-bold">
+                      {thirdCollapse ? (
+                        <FontAwesomeIcon icon={faCaretUp} />
+                      ) : (
+                        <FontAwesomeIcon icon={faCaretDown} />
+                      )}{" "}
+                      Notifications
+                    </p>
                     <p className="mb-0">
                       Account related notifications will appear here.
                     </p>
                   </div>
                 </div>
 
-                <div className="row p-3">
+                <div className="row p-3" id="third-collapse">
                   <div
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}

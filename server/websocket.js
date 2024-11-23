@@ -54,8 +54,11 @@ class WebSocketServer {
         case "stop-session":
           this.stopSession(data.roomID);
           break;
-        case "voice-recognition-result": 
-          this.broadcastToRoom(data.roomID, message, ws); 
+        case "voice-recognition-result":
+          this.broadcastToRoom(data.roomID, message, ws);
+          break;
+        case "camera-status":
+          this.cameraStatus(data.roomID, data.enabled);
           break;
         default:
           console.error("Unknown message type:", data.type);
@@ -76,14 +79,11 @@ class WebSocketServer {
     }
 
     const room = this.rooms[roomID];
-    if (room.users.some((u) => u.name === user)) {
-      ws.send(
-        JSON.stringify({
-          type: "user-already-in-room",
-          message: "User is already in the room.",
-          redirectURL: "/",
-        })
-      );
+    const existingUserIndex = room.users.findIndex((u) => u.name === user);
+
+    if (existingUserIndex !== -1) {
+      room.users[existingUserIndex].connection = ws;
+      console.log(`User ${user} rejoined room ${roomID}.`);
       return;
     }
     if (room.users.length >= this.MAX_CAPACITY) {
@@ -103,12 +103,10 @@ class WebSocketServer {
       room.users.map((u) => u.name)
     );
 
-    const broadcastData = JSON.stringify(
-      {
-        type: "join-room",
-        user
-      }
-    )
+    const broadcastData = JSON.stringify({
+      type: "join-room",
+      user,
+    });
     this.broadcastToRoom(roomID, broadcastData);
   }
 
@@ -224,9 +222,43 @@ class WebSocketServer {
     console.log(`Room ${roomID} and all its users have been removed.`);
   }
 
+  cameraStatus(roomID, enabled) {
+    const room = this.rooms[roomID];
+    if (!room) return;
+
+    const message = JSON.stringify({
+      type: "camera-status",
+      enabled,
+    });
+
+    room.users.forEach((user) => {
+      if (user.connection.readyState === WebSocket.OPEN) {
+        user.connection.send(message);
+      }
+    });
+  }
+
   handleClose(ws) {
     this.clients.delete(ws);
     console.log("Client disconnected");
+
+    for (const roomID in this.rooms) {
+      const room = this.rooms[roomID];
+      const userIndex = room.users.findIndex((user) => user.connection === ws);
+
+      if (userIndex !== -1) {
+        const user = room.users[userIndex];
+        room.users.splice(userIndex, 1);
+        console.log(`User ${user.name} removed from room ${roomID}.`);
+
+        // If the room is empty, delete it
+        if (room.users.length === 0) {
+          delete this.rooms[roomID];
+          console.log(`Room ${roomID} has been removed.`);
+        }
+        break;
+      }
+    }
   }
 }
 

@@ -31,7 +31,6 @@ const useMediaStream = (localVideoRef) => {
     async (constraints = { video: true, audio: true }) => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
         localStream.current = stream;
         if (localVideoRef.current) localVideoRef.current.srcObject = stream;
       } catch (error) {
@@ -48,7 +47,6 @@ const useMediaStream = (localVideoRef) => {
       videoTrack.stop();
       localStream.current.removeTrack(videoTrack);
     }
-
     localStream.current?.getVideoTracks().forEach((track) => track.stop());
     if (localVideoRef.current) localVideoRef.current.srcObject = null;
   }, [localVideoRef]);
@@ -178,9 +176,9 @@ export default function Room() {
     };
   }, []);
 
-  const initiateConnection = async () => {
+  const initiateConnection = async (videoDeviceId, audioDeviceId) => {
     try {
-      await pageReady();
+      await pageReady(videoDeviceId, audioDeviceId);
       socket.current = new WebSocket(`${import.meta.env.VITE_LOCALWS}`);
 
       socket.current.onopen = () => {
@@ -218,8 +216,11 @@ export default function Room() {
     }
   };
 
-  const pageReady = async () => {
-    await getMediaStream();
+  const pageReady = async (videoDeviceId, audioDeviceId) => {
+    await getMediaStream({
+      video: { deviceId: videoDeviceId ? { exact: videoDeviceId } : undefined },
+      audio: { deviceId: audioDeviceId ? { exact: audioDeviceId } : undefined },
+    });
   };
 
   const startConnection = (isCaller) => {
@@ -232,7 +233,13 @@ export default function Room() {
     peerConnection.current.onicecandidate = gotIceCandidate;
     peerConnection.current.ontrack = (event) => {
       if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = event.streams[0];
+        const [remoteStream] = event.streams;
+        const videoTrack = remoteStream.getVideoTracks()[0];
+        if (videoTrack && videoTrack.enabled) {
+          remoteVideoRef.current.srcObject = remoteStream;
+        } else {
+          remoteVideoRef.current.srcObject = null;
+        }
       }
     };
 
@@ -312,14 +319,19 @@ export default function Room() {
       const outputText = signal.outputText;
       console.log("Received voice recognition from patient:", outputText);
       displayRecognitionResults(outputText);
-    } else if (
-      signal.type === "leave-room" ||
-      signal.type === "user-already-in-room"
-    ) {
+    } else if (signal.type === "leave-room") {
       handleCloseConnection();
     } else if (signal.type === "stop-session") {
       notify("Left the teleconference room.");
       handleCloseConnection();
+    } else if (signal.type === "camera-status") {
+      if (remoteVideoRef.current) {
+        if (signal.enabled) {
+          remoteVideoRef.current.srcObject = localStream.current;
+        } else {
+          remoteVideoRef.current.srcObject = null;
+        }
+      }
     }
   };
 
@@ -411,10 +423,28 @@ export default function Room() {
       ? stopVideoStream()
       : await getMediaStream({ video: true, audio: true });
     setIsCameraEnabled(!isCameraEnabled);
+
+    if (socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(
+        JSON.stringify({
+          type: "camera-status",
+          enabled: !isCameraEnabled,
+          roomID: roomid,
+        })
+      );
+    }
   };
 
   const handleCloseConnection = () => {
     stopMediaStream();
+
+    socket.current.send(
+      JSON.stringify({
+        type: "camera-status",
+        enabled: !isCameraEnabled,
+        roomID: roomid,
+      })
+    );
 
     socket.current.send(
       JSON.stringify({
@@ -502,8 +532,8 @@ export default function Room() {
     setConfirmCall((prevState) => !prevState);
   };
 
-  const onConfirm = async () => {
-    initiateConnection();
+  const onConfirm = async (videoDeviceId, audioDeviceId) => {
+    initiateConnection(videoDeviceId, audioDeviceId);
     handleConfirmCall();
   };
 

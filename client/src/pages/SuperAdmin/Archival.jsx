@@ -180,7 +180,7 @@ export default function Archival() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -279,7 +279,7 @@ export default function Archival() {
                                   Restore
                                 </button>
                               </td>
-                              <td className="">
+                              <td>
                                 <input
                                   className="mx-auto w-100"
                                   type="checkbox"

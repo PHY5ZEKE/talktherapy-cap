@@ -125,7 +125,7 @@ export default function ManageSchedule() {
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -150,7 +150,7 @@ export default function ManageSchedule() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">

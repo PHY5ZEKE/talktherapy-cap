@@ -163,7 +163,7 @@ export default function Archival() {
       )}
 
       <div className="container-fluid p-0 vh-100 vw-100">
-        <div className="d-flex flex-md-row flex-column flex-nowrap vh-100">
+        <div className="d-flex flex-md-row flex-nowrap vh-100">
           {/* SIDEBAR */}
           <Sidebar />
 
@@ -188,7 +188,7 @@ export default function Archival() {
               <MenuDropdown />
             </div>
 
-            <div className="row h-100">
+            <div className="row">
               {/* FIRST COL */}
               <div className="col-sm bg-white">
                 <div className="row p-3">
@@ -196,7 +196,9 @@ export default function Archival() {
                     <div className="d-flex flex-wrap gap-3 align-items-center justify-content-start">
                       <div>
                         <p className="mb-0 fw-bold">Data Archival</p>
-                        <p className="mb-0">{new Date().toLocaleDateString()}</p>
+                        <p className="mb-0">
+                          {new Date().toLocaleDateString()}
+                        </p>
                       </div>
 
                       <div className="d-flex gap-3">
@@ -222,15 +224,21 @@ export default function Archival() {
                         <tr>
                           <th scope="col">Last Active</th>
                           <th scope="col">Email Address</th>
-                          <th scope="col">First Name</th>
-                          <th scope="col">Last Name</th>
-                          <th scope="col">Role</th>
+                          <th scope="col" className="d-none d-md-table-cell">
+                            First Name
+                          </th>
+                          <th scope="col" className="d-none d-md-table-cell">
+                            Last Name
+                          </th>
+                          <th scope="col" className="d-none d-md-table-cell">
+                            Role
+                          </th>
                           <th scope="col">
                             <p className="text-center mb-0">Action</p>
                           </th>
                           <th scope="col" style={{ width: "70" }}>
                             <button
-                              className="d-flex mx-auto action-btn btn-text-blue"
+                              className="d-flex justify-content-center fw-bold text-center mx-auto text-button"
                               onClick={handleSelectAll}
                             >
                               Select All
@@ -241,37 +249,43 @@ export default function Archival() {
                       <tbody>
                         {archivedUsers &&
                           archivedUsers
-                          .filter((user) => user.userRole !== "admin")
-                          .map((user) => (
-                            <tr key={user._id}>
-                              <th scope="row">
-                                {new Date(
-                                  user.lastActivity
-                                ).toLocaleDateString()}
-                              </th>
-                              <td>{user.email}</td>
-                              <td>{user.firstName}</td>
-                              <td>{user.lastName}</td>
-                              <td>{user.userRole}</td>
-                              <td className="d-flex justify-content-center mx-auto">
-                                <button
-                                  className="fw-bold text-button border"
-                                  style={{ cursor: "pointer" }}
-                                  onClick={() => handleModal(user)}
-                                >
-                                  Restore
-                                </button>
-                              </td>
-                              <td className="">
+                            .filter((user) => user.userRole !== "admin")
+                            .map((user) => (
+                              <tr key={user._id}>
+                                <th scope="row">
+                                  {new Date(
+                                    user.lastActivity
+                                  ).toLocaleDateString()}
+                                </th>
+                                <td>{user.email}</td>
+                                <td className="d-none d-md-table-cell">
+                                  {user.firstName || "NA"}
+                                </td>
+                                <td className="d-none d-md-table-cell">
+                                  {user.lastName || "NA"}
+                                </td>
+                                <td className="d-none d-md-table-cell">
+                                  {user.userRole || "NA"}
+                                </td>
+                                <td className="mx-auto">
+                                  <button
+                                    className="fw-bold mx-auto w-100 text-button px-3 border"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => handleModal(user)}
+                                  >
+                                    Restore
+                                  </button>
+                                </td>
+                                <td>
                                 <input
-                                  className="d-flex justify-content-center mx-auto"
+                                  className="mx-auto w-100"
                                   type="checkbox"
                                   checked={tickBox.includes(user)}
                                   onChange={() => handleCheckboxChange(user)}
                                 />
                               </td>
-                            </tr>
-                          ))}
+                              </tr>
+                            ))}
                       </tbody>
                     </table>
                   </div>
