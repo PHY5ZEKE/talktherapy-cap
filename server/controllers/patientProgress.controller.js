@@ -5,7 +5,7 @@ const PatientProgress = require("../models/patientProgress.model.js");
 // Save or update patient progress
 saveProgress = async (req, res) => {
   try {
-    const { textId, currentPhrase, correctCount, totalPhrases, completed } = req.body;
+    const { textId, textName, currentPhrase, correctCount, totalPhrases, completed, completedPhrases } = req.body;
     const patientId = req.user.id; 
   
     // Check if progress already exists for the patient and text
@@ -17,16 +17,20 @@ saveProgress = async (req, res) => {
       progress.correctCount = correctCount;
       progress.totalPhrases = totalPhrases;
       progress.completed = completed;
+      progress.textName = textName;
+      progress.completedPhrases = completedPhrases;
       await progress.save();
     } else {
       // Create new progress record
       progress = new PatientProgress({
         patient: patientId,
         textId,
+        textName,
         currentPhrase,
         correctCount,
         totalPhrases,
         completed,
+        completedPhrases,
       });
       await progress.save();
     }
@@ -48,7 +52,6 @@ loadProgress = async (req, res) => {
       return res.status(400).json({ message: 'Text ID is required' });
     }
 
-    console.log("Fetching progress for patient:", patientId, "textId:", textId);
 
     const progress = await PatientProgress.findOne({ patient: patientId, textId });
 

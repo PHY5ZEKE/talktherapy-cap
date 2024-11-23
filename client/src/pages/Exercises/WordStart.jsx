@@ -255,6 +255,8 @@ export default function WordStart() {
     };
   }, [progress]);
 
+
+
   // Toggle recognition and compare mode
   const toggleRecognitionMode = () => {
     const $panel_recognition = document.querySelector('#panel-recognition');
@@ -287,12 +289,15 @@ export default function WordStart() {
 
         <button 
           onClick={() => navigate(-1)} 
-          className="btn btn-outline-secondary position-absolute top-0 start-0 m-3 d-flex align-items-center justify-content-center"
+          className="btn btn-primary position-absolute top-0 start-0 m-3 d-flex align-items-center justify-content-center"
           style={{
             width: '50px',
             height: '50px',
             borderRadius: '50%',
             fontSize: '20px',
+            backgroundColor: '#007bff', 
+            color: 'white', 
+            borderColor: '#007bff',
           }}
         >
           <i className="fas fa-arrow-left"></i>
@@ -305,7 +310,6 @@ export default function WordStart() {
         <p className="description mb-3">Practice your speaking with our voice recognition speech exercises</p>
         <div id="loading" className="loading mb-2">Loading...</div>
         <div id="microphone" className="microphone mb-4">Please allow access to microphone to start</div>
-        {/* <button id="button-start" className="btn btn-primary">Start</button> */}
         <div id = "button-text-selector" className="btn btn-primary">Start</div>
       </div>
     </div>
@@ -339,6 +343,7 @@ export default function WordStart() {
                 Show
               </button>
               <div id="phrase" className="phrase-box bg-white shadow-sm p-3 rounded"></div>
+              <span id="check" className="checkmark" style={{ display: 'none' }}>✔️</span>
             </div>
             <div id="phonphrase" className={`phrase-box ${isPhonemeVisible ? '' : 'hidden'} shadow-sm p-3 rounded mt-3`}></div>
           </div>
@@ -408,15 +413,15 @@ export default function WordStart() {
                     <p>Hello! If this is your first time, allow your microphone access to the website.</p>
                     <p>
                       <span style={{ fontWeight: 'bold' }}>Hold </span> 
-                      <span style={{ color: 'red', fontWeight: 'bold', border: '1px solid red', padding: '0 4px', backgroundColor: '#ffe6e6' }}> Record </span> 
+                      <span style={{ color: 'red', fontWeight: 'bold', border: '1px solid red', padding: '0 4px', backgroundColor: '#ffe6e6' }}> Record</span> 
                       <span> and release when done speaking!</span>
                     </p>
-                    <p>To identify <br></br><br></br>
-                      <span style={{ color: '#ff4d4d', textDecoration: 'line-through', backgroundColor: '#ffe6e6', padding: '0 4px' }}> red text </span> 
-                      is the part you did not say,
-                      <span style={{ textDecoration: 'underline', padding: '0 4px' }}> underlined </span> 
+                    <p>To identify: <br></br>
+                      <span style={{ color: '#ff4d4d', textDecoration: 'line-through', backgroundColor: '#ffe6e6', padding: '0 4px' }}> red text</span> 
+                      <span> is the part you did not say,</span>
+                      <span style={{ textDecoration: 'underline', padding: '0 4px' }}> underlined</span> 
                       text is the one that was recognized,
-                      <span style={{ color: 'green', backgroundColor: '#e6ffe6', padding: '0 4px' }}> green text </span> 
+                      <span style={{ color: 'green', backgroundColor: '#e6ffe6', padding: '0 4px' }}> green text</span> 
                       are the correct sound to the word! <br></br><br></br><br></br>
                       <span>You can click the word to hear how it is pronounced! Click the white box to read the whole phrase</span>
                     </p>

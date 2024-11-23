@@ -13,15 +13,14 @@ function initializeExercise(loadedProgress = null) {
    
     var progress = loadedProgress || {
         textId: null,
+        textName: "",
         currentPhrase: 0,
         correctCount: 0,
         totalPhrases: 0,
-        completed: false
+        completed: false,
+        completedPhrases: [],
     };
 
-    console.log("Exercise initialized");
-
-    console.log("Loaded progress argument:", loadedProgress);
 
 	 if (typeof speechSynthesis === 'undefined') {
         console.warn('speechSynthesis API is not available.');
@@ -55,8 +54,6 @@ function initializeExercise(loadedProgress = null) {
             texts = parseTexts(res[0]);
             homophones = parseHomophones(res[1]);
 
-            console.log("Loaded texts:", texts);
-            console.log("Loaded Homophones:", homophones);
 
             if (!localStorage.getItem('speech-current-text')) {
                 localStorage.setItem('speech-current-text', Object.keys(texts)[0]); 
@@ -101,21 +98,6 @@ function initializeExercise(loadedProgress = null) {
             setPhrase(current_phrase_no);
 
 
-            // document.querySelector('#page-main #panel-counter #button-prev-phrase').addEventListener('click', function() {
-            //     resetRecognitionStyles();
-            //     setPhrase(progress.currentPhrase - 1);
-            //     phonemeContainer.innerHTML = '';
-            //     saveProgress();
-                
-            // });
-            
-            // document.querySelector('#page-main #panel-counter #button-next-phrase').addEventListener('click', function() {
-            //     resetRecognitionStyles();
-            //     setPhrase(progress.currentPhrase + 1);
-            //     phonemeContainer.innerHTML = '';
-            //     saveProgress();
-            // });
-
             setupNavigationListeners();
             
 
@@ -144,7 +126,7 @@ function initializeExercise(loadedProgress = null) {
             const prevButton = document.querySelector('#page-main #panel-counter #button-prev-phrase');
             const nextButton = document.querySelector('#page-main #panel-counter #button-next-phrase');
         
-            // Remove existing event listeners (if any)
+            // Remove existing event listeners
             prevButton.removeEventListener('click', handlePrevPhrase);
             nextButton.removeEventListener('click', handleNextPhrase);
         
@@ -307,18 +289,6 @@ function initializeExercise(loadedProgress = null) {
             });
         }
 
-        // var startButton = document.querySelector('#page-start #button-start'); 
-        // if (startButton) { 
-        //     startButton.addEventListener('click', function() { 
-        //         var pageStart = document.querySelector('#page-start'); 
-        //         if (pageStart) { pageStart.style.display = 'none'; }
-        //                 var pageMain = document.querySelector('#page-main');
-        //                     if (pageMain) {
-        //                         pageMain.style.display = 'block'; 
-        //                     }
-        //                 });
-        //             }
-
 
         function displayPhonemesForCurrentPhrase(phrase) {
             var words = phrase.split(' '); // Split the phrase into words
@@ -364,7 +334,6 @@ function initializeExercise(loadedProgress = null) {
 
                 loadProgressForTextId(this.id);
                 setupNavigationListeners();
-                // setPhrase(document.querySelector('.page[current]').id === 'page-text-selector' ? 0 : localStorage.getItem('speech-phrase'));
             });
     
             var $view = document.createElement('div');
@@ -398,16 +367,18 @@ function initializeExercise(loadedProgress = null) {
         
                     if (backendProgress) {
                         console.log("Using backend progress for text ID:", textId, backendProgress);
-                        progress = backendProgress; // Use the progress from backend
+                        progress = backendProgress; 
                     } else {
                         console.log("No backend progress found, falling back to local storage.");
                         const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
                         progress = savedProgress[textId] || {
                             textId: textId,
+                            textName: texts[textId]?.name || "",
                             currentPhrase: 0,
                             correctCount: 0,
                             totalPhrases: texts[textId]?.phrases.length || 0,
                             completed: false,
+                            completedPhrases: [],
                         };
                     }
                 } else {
@@ -415,10 +386,12 @@ function initializeExercise(loadedProgress = null) {
                     const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
                     progress = savedProgress[textId] || {
                         textId: textId,
+                        textName: texts[textId]?.name || "",
                         currentPhrase: 0,
                         correctCount: 0,
                         totalPhrases: texts[textId]?.phrases.length || 0,
                         completed: false,
+                        completedPhrases: [],
                     };
                 }
         
@@ -432,10 +405,12 @@ function initializeExercise(loadedProgress = null) {
                 const savedProgress = JSON.parse(localStorage.getItem('patient-progress')) || {};
                 progress = savedProgress[textId] || {
                     textId: textId,
+                    textName: texts[textId]?.name || "",
                     currentPhrase: 0,
                     correctCount: 0,
                     totalPhrases: texts[textId]?.phrases.length || 0,
                     completed: false,
+                    completedPhrases: [],
                 };
         
                 setPhrase(progress.currentPhrase);
@@ -443,12 +418,20 @@ function initializeExercise(loadedProgress = null) {
             }
         }
 
+        // Function to clean up the phrase
+        function cleanUpPhrase(phrase) {
+            return phrase
+                .replace(/[^\w\s]|_/g, "") // Remove punctuation
+                .replace(/\s+/g, " ") // Replace multiple spaces with a single space
+                .trim() // Trim leading and trailing spaces
+                .toLowerCase(); // Convert to lowercase
+        }
+
 
         function setPhrase(no) {
             clearTimeout(nextPhraseTimer);
             no = parseInt(no) || 0; 
         
-            // Get the current text ID from localStorage
             const id = localStorage.getItem('speech-current-text');
             
             if (!id) {
@@ -470,8 +453,6 @@ function initializeExercise(loadedProgress = null) {
                 no = text.phrases.length - 1; // Prevent overflow
             }
         
-            // if (no < 0) return setPhrase(0);
-            // if (no > text.phrases.length - 1) return setPhrase(text.phrases.length - 1);
             
             current_phrase_no = no; 
             console.log("Setting phrase number:", no, "for text ID:", id); 
@@ -491,6 +472,7 @@ function initializeExercise(loadedProgress = null) {
             if (phraseElement) {
                 const currentPhrase = text.phrases[no];
                 console.log("Current phrase:", currentPhrase); 
+                console.log("Completed phrases:", progress.completedPhrases);
                 phraseElement.innerHTML = currentPhrase.split(' ').map((e) => e.indexOf('<') === -1 ? `<span>${e}</span>` : e).join(' ');
         
                 // Add click event listeners for each word
@@ -503,34 +485,31 @@ function initializeExercise(loadedProgress = null) {
                 const phonemeContainer = document.getElementById("phonphrase");
                 phonemeContainer.innerHTML = '';
                 displayPhonemesForCurrentPhrase(currentPhrase);
+
+                // Check if the current phrase is in completedPhrases
+                const cleanedCurrentPhrase = cleanUpPhrase(currentPhrase);
+                const checkMark = document.querySelector('#panel-phrase #check');
+                if (progress.completedPhrases.includes(cleanedCurrentPhrase)) {
+                    checkMark.style.display = 'inline'; // Show the check mark
+                } else {
+                    checkMark.style.display = 'none'; // Hide the check mark
+                }
             }
 
-             // Automatically speak the current phrase if required
              if (document.querySelector('#page-main').hasAttribute('current')) {
                 speakText(text.phrases[no]); 
             }
         
             // Update progress object
             if (progress.textId === id && progress.currentPhrase === no) {
-                return; // No need to update if the progress hasn't changed
+                return; 
             }
 
             progress.currentPhrase = no;
             current_phrase_no = no;
             progress.textId = id;
             progress.totalPhrases = text.phrases.length;
-
-            // Increment correct count if recognition was correct
-            const recognition = document.querySelector('#page-main #recognition');
-            if (recognition && recognition.hasAttribute('correct')) {
-                if (recognition.getAttribute('correct') === 'true') {
-                    progress.correctCount++;
-                }
-            }
-        
-            // Mark as completed if the last phrase is reached
-            progress.completed = progress.currentPhrase === text.phrases.length - 1;
-        
+  
             // Hide listen and recognition buttons
             const listenButton = document.querySelector('#page-main #button-listen');
             if (listenButton) listenButton.setAttribute('hidden', true);
@@ -554,10 +533,12 @@ function initializeExercise(loadedProgress = null) {
             // Update the progress for the current text ID
             savedProgress[textId] = {
                 textId: textId,
-                currentPhrase: current_phrase_no,
+                textName: texts[textId]?.name || "", 
+                currentPhrase: progress.currentPhrase,
                 correctCount: progress.correctCount,
                 totalPhrases: progress.totalPhrases,
-                completed: progress.completed,
+                completed: progress.correctCount === progress.totalPhrases,
+                completedPhrases: progress.completedPhrases 
             };
         
             // Save the updated progress to local storage
@@ -794,6 +775,17 @@ function initializeExercise(loadedProgress = null) {
                     phrase = clear(phrase);
                     transcript = clear(transcript);
 
+                     // Check if the phrase is already completed
+                     const isCompleted = progress.completedPhrases.includes(phrase);
+
+                     // Increment correct count and mark as completed if the phrase matches
+                    if (!isCompleted && phrase === transcript) {
+                        progress.correctCount++;
+                        progress.completedPhrases.push(phrase); // Add to completed phrases
+                        console.log(`Phrase completed: ${phrase}`); // Log completion
+                        saveProgress(); // Save progress if needed
+                    }
+
     
                     if ($panel_recognition) {
                         $panel_recognition.setAttribute('mode', (transcript.length || 0) < phrase.length * 0.7 || phrase === transcript ? 'recognition' : 'compare');
@@ -943,11 +935,6 @@ function initializeExercise(loadedProgress = null) {
 
 }
 
-// function resetExercise() {
-//     // Reset state here, so it can be re-initialized
-//     initialized = false;
-//     console.log("Exercise state reset.");
-//   }
 
 
 window.addEventListener('load', function() {
@@ -955,4 +942,3 @@ window.addEventListener('load', function() {
 });
 
 window.initializeExercise = initializeExercise;
-// window.resetExercise = resetExercise;

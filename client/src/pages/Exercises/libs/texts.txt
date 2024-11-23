@@ -1,98 +1,323 @@
-id: 1
-name: Practice Words
+id: 1  
+name: R-Focused Words  
 
-run faster CRACKER
-related
-reveal
-show the truth
-continue
-speak
-think
-expect clarity
-express
-understand
-question
-seek answers
-focus
-learn
-observe
-stay aware
-explore
-describe
-discuss
-share insights
-consider
-decide
-plan
-create pathways
-practice
-apply
-analyze
-dig deeper
-connect
-collaborate
-reflect
-find meaning
-create
-innovate
-discover
-uncover potential
-engage
-navigate
-lead
-take initiative
-guide
-mentor
-coach
-offer support
-challenge
-inspire
-encourage
-build confidence
-motivate
-achieve
-succeed
-reach goals
-realize
-accomplish
-celebrate
-honor progress
-investigate
-probe
-examine
-dig for details
-question
-probe
-study
-seek understanding
-test
-evaluate
-validate
-check accuracy
-design
-construct
-formulate
-create solutions
-explore
-grow
-learn
-expand knowledge
-observe
-assess
-judge
-make decisions
-trust
-believe
-commit
-find certainty
-analyze
-synthesize
-interpret
-draw insights
-===
-id: 2
-name: Phoneme Breakdown
+Red Red Red  
+Run Run Run  
+Rabbit Rabbit Rabbit  
+River River River  
+Rolling rocks race rapidly  
+Round ripe raspberries  
 
-What what What
-Up up up
-hello Hello Hello
+===  
+id: 2  
+name: S-Focused Words  
+
+Sun Sun Sun  
+Sit Sit Sit  
+Snake Snake Snake  
+Soft Soft Soft  
+Seven silly snakes slide slowly  
+The sunshine sparkles on the sea  
+===  
+id: 3  
+name: L-Focused Words  
+
+Light  
+Lake  
+Lucky  
+Little  
+Love  
+The little lamb leaps lightly  
+Long lanes lead to lovely landscapes  
+===  
+id: 4  
+name: F-Focused Words  
+
+Fast  
+Fun  
+Flower  
+Fox  
+Friend  
+Five friendly frogs found fresh fruit  
+Flying feathers fell from the fence  
+===  
+id: 5  
+name: T-Focused Words  
+
+Tall  
+Tree  
+Tiger  
+Toy  
+Train  
+Ten tiny turtles took turns tapping  
+The tired traveler took a taxi to town  
+===  
+id: 6  
+name: K-Focused Words  
+
+Cat  
+Car  
+Kite  
+Koala  
+Cup  
+The kangaroo kicks the kite kindly  
+Cold cookies crunch crisply  
+===  
+id: 7  
+name: B-Focused Words  
+
+Ball  
+Boy  
+Baby  
+Bubble  
+Book  
+Big bright balloons bounce beautifully  
+Bobby bought a blue box  
+===  
+id: 8  
+name: P-Focused Words  
+
+Pop  
+Pen  
+Pig  
+Pumpkin  
+Pineapple  
+Please pass the purple paint  
+The panda plays peacefully  
+===  
+id: 9  
+name: M-Focused Words  
+
+Mom  
+Milk  
+Moon  
+Mountain  
+Mango  
+Many mice move mountains magically  
+Mark makes marvelous music  
+===  
+id: 10  
+name: SH-Focused Words  
+
+Shark  
+Shoe  
+Shop  
+Ship  
+Sheep  
+Shelly shares shiny shells  
+The ship sails smoothly on the sea  
+===  
+id: 11  
+name: K-Focused Words  
+
+King  
+Kick  
+Kind  
+Key  
+Kangaroo  
+The cat climbed kindly onto the couch  
+Kevin’s kite flew across the sky  
+===  
+id: 12  
+name: O-Focused Words  
+
+Orange  
+Owl  
+Ocean  
+Octopus  
+Oven  
+Oliver opened the old oak door  
+The owl observes over the open fields  
+===  
+id: 13  
+name: Vowel Practice  
+
+A apple, E eagle, I ice, O orange, U umbrella  
+An ant ate eight apples  
+Each eel enjoys eating earplugs  
+I ignite ideas in icy igloos  
+Otters offer olives often  
+===  
+id: 14  
+name: Everyday Objects  
+
+Chair  
+Table  
+Laptop  
+Pen  
+Notebook  
+Backpack  
+Phone  
+Bottle  
+Lamp  
+Clock  
+===  
+id: 15  
+name: Nature Words  
+
+Tree  
+River  
+Mountain  
+Sky  
+Ocean  
+Flower  
+Forest  
+Cloud  
+Sunset  
+Raindrop  
+===  
+id: 16  
+name: Common Phrases  
+
+Hello, how are you?  
+Good morning, everyone.  
+See you later!  
+Thank you very much.  
+What time is it?  
+===  
+id: 17  
+name: Fun Phrases  
+
+The cat in the hat knows a lot about that  
+Jumping jellybeans!  
+Let’s go to the park and play  
+I really love ice cream, do you?  
+Can we build a sandcastle by the sea?  
+===  
+id: 18  
+name: Sentences for Practice  
+
+I see a big red truck driving fast.  
+The little dog ran around the tree.  
+Can you hear the sound of the wind?  
+She found a shiny shell on the beach.  
+He likes to read books in the quiet library.  
+===  
+id: 19  
+name: Tongue Twisters  
+
+She sells sea shells by the sea shore  
+Peter Piper picked a peck of pickled peppers  
+Betty bought a bit of butter, but the butter Betty bought was bitter  
+How much wood would a woodchuck chuck if a woodchuck could chuck wood?  
+The big black bug bit the big black bear, but the big black bear bit the big black bug back  
+===  
+id: 20  
+name: H-Focused Words  
+
+House  
+Horse  
+Happy  
+Hat  
+Hug  
+Henry has a huge, happy hamster  
+The hot air balloon hovers high  
+===  
+id: 21  
+name: N-Focused Words  
+
+Nest  
+Net  
+Night  
+Noise  
+Number  
+Nine naughty ninjas knocked noisily  
+Nancy noticed a new necklace  
+===  
+id: 22  
+name: W-Focused Words  
+
+Water  
+Whale  
+Window  
+Wonder  
+Wing  
+Walter washes windows with warm water  
+Whispering winds weave through the woods  
+===  
+id: 23  
+name: V-Focused Words  
+
+Van  
+Violet  
+Violin  
+Vacation  
+Voice  
+The violin’s vibrant voice is very vivid  
+Victor visits villages in his van  
+===  
+id: 24  
+name: D-Focused Words  
+
+Dog  
+Duck  
+Door  
+Desk  
+Dance  
+David’s dog dug a deep ditch  
+The duck dove directly into the water  
+===  
+id: 25  
+name: TH-Focused Words  
+
+Thick  
+Thin  
+This  
+That  
+Thumb  
+The thick thumb pressed the thin thread  
+Three thirsty thieves stole thirty things  
+===  
+id: 26  
+name: G-Focused Words  
+
+Goat  
+Green  
+Garden  
+Gift  
+Game  
+The goat galloped through the green grass  
+Gina’s garden grows gorgeous geraniums  
+===  
+id: 27  
+name: Z-Focused Words  
+
+Zoo  
+Zebra  
+Zipper  
+Zone  
+Zoom  
+The zebra zoomed past the zigzagging path  
+Zoe zipped up her jacket  
+===  
+id: 28  
+name: Short Sentences  
+
+I like pizza.  
+The sun is bright.  
+My cat sleeps a lot.  
+It’s a rainy day.  
+He plays the guitar.  
+===  
+id: 29  
+name: Practice Questions  
+
+Where is the library?  
+What is your favorite color?  
+Can you help me?  
+Do you like to read books?  
+When does the train arrive?  
+===  
+id: 30  
+name: Action Verbs  
+
+Run  
+Jump  
+Clap  
+Dance  
+Write  
+Sing  
+Swim  
+Cook  
+Play  
+Walk  
