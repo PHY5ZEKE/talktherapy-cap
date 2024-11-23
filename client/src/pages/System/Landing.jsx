@@ -6,7 +6,6 @@ import {
   faSquareFull,
 } from "@fortawesome/free-solid-svg-icons";
 
-
 import { Link } from "react-router-dom";
 
 export default function Landing() {
@@ -129,7 +128,20 @@ export default function Landing() {
                   className="landing-icon"
                 />
                 <h5>Speech Therapy</h5>
-                <p>A long ass paragraph para cool hehehehe</p>
+                <p>
+                  TalkTherapy is an innovative web application designed to make
+                  speech therapy accessible and affordable for individuals with
+                  speech and communication challenges, especially in underserved
+                  areas of the Philippines. By connecting patients with licensed
+                  therapists through online consultations, the platform
+                  eliminates the need for travel and physical resources. It also
+                  uses advanced technologies like facial, lip, and voice
+                  recognition to provide personalized feedback and progress
+                  tracking. Developed for the University of Santo Tomas -
+                  College of Rehabilitation Sciences, TalkTherapy aims to bridge
+                  the gap in speech therapy services, empowering more Filipinos
+                  to improve their communication and quality of life.
+                </p>
               </div>
 
               <div className="bg-white shadow p-4 rounded-3">
@@ -139,7 +151,16 @@ export default function Landing() {
                   className="landing-icon"
                 />
                 <h5>Appointment</h5>
-                <p>A long ass paragraph para cool hehehehe</p>
+                <p>
+                  Scheduling speech therapy appointments has never been easier.
+                  With TalkTherapy, you can book sessions with speech-language
+                  pathologists at your convenience, all from the comfort of your
+                  home. Our user-friendly platform lets you select preferred day
+                  and time, and view therapist availability.TalkTherapy ensures
+                  a hassle-free process, so you can focus on improving your
+                  communication skills. Start your journey to better speech
+                  today with just a few clicks!
+                </p>
               </div>
 
               <div className="bg-white shadow p-4 rounded-3">
@@ -149,7 +170,17 @@ export default function Landing() {
                   className="landing-icon"
                 />
                 <h5>Teleconference</h5>
-                <p>A long ass paragraph para cool hehehehe</p>
+                <p>
+                  TalkTherapy brings speech therapy right to your fingertips
+                  through secure and reliable teleconferencing. Our platform
+                  connects you with speech-language pathologists for live,
+                  one-on-one sessions, eliminating the need for long commutes or
+                  physical visits. Whether you're at home or on the go, you can
+                  access professional guidance and personalized exercises
+                  designed to meet your communication needs. With TalkTherapy,
+                  expert care is always just a video call away, making speech
+                  therapy more accessible and convenient than ever before.
+                </p>
               </div>
             </div>
 

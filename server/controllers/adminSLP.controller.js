@@ -104,6 +104,40 @@ exports.adminSignup = async (req, res) => {
     }
   }
 
+  // Validate firstName, middleName, and lastName
+  const nameRegex = /^[A-Za-z\s]{1,35}$/;
+  if (!nameRegex.test(firstName)) {
+    return res.status(400).json({
+      error: true,
+      message:
+        "First name must be a string of letters and not exceed 35 characters.",
+    });
+  }
+  if (!nameRegex.test(middleName)) {
+    return res.status(400).json({
+      error: true,
+      message:
+        "Middle name must be a string of letters and not exceed 35 characters.",
+    });
+  }
+  if (!nameRegex.test(lastName)) {
+    return res.status(400).json({
+      error: true,
+      message:
+        "Last name must be a string of letters and not exceed 35 characters.",
+    });
+  }
+
+  // Validate mobile number (Philippine 11-digit format)
+  const mobileRegex = /^09\d{9}$/;
+  if (!mobileRegex.test(mobile)) {
+    return res.status(400).json({
+      error: true,
+      message: "Mobile number must be a valid Philippine 11-digit format.",
+    });
+  }
+
+  // Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res
@@ -111,6 +145,7 @@ exports.adminSignup = async (req, res) => {
       .json({ error: true, message: "Invalid email format" });
   }
 
+  // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
     return res.status(400).json({ error: true, message: passwordError });

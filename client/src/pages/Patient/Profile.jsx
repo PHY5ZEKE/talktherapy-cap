@@ -1,11 +1,11 @@
 import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
-
 // Components
 import Sidebar from "../../components/Sidebar/SidebarPatient";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
+import ChangeProfilePicture from "../../components/Modals/ChangeProfilePicture";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
 // Utils
@@ -31,13 +31,19 @@ export default function Profile() {
     setIsPasswordModalOpen(!isPasswordModalOpen);
   };
 
+  const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] =
+    useState(false);
+  const handleProfilePictureModal = () => {
+    setIsProfilePictureModalOpen(!isProfilePictureModalOpen);
+  };
+
   const fetchPatientData = async () => {
     try {
       const response = await fetch(`${appURL}/${route.patient.fetch}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -60,10 +66,10 @@ export default function Profile() {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -78,6 +84,15 @@ export default function Profile() {
           closeModal={handleModal}
           isOwner={true}
           whatRole={role}
+          onFetch={fetchPatientData}
+        />
+      )}
+
+      {/* CHANGE PROFILE PICTURE MODAL */}
+      {isProfilePictureModalOpen && (
+        <ChangeProfilePicture
+          editPictureAPI={route.patient.picture}
+          closeModal={handleProfilePictureModal}
           onFetch={fetchPatientData}
         />
       )}
@@ -141,7 +156,9 @@ export default function Profile() {
                           {patientData?.lastName}
                         </h5>
                         <p className="mb-0">{patientData?.diagnosis} Patient</p>
-                        <p className="mb-0">{formatDate(patientData?.birthday)}</p>
+                        <p className="mb-0">
+                          {formatDate(patientData?.birthday)}
+                        </p>
                         <p className="mb-0">{patientData?.mobile}</p>
                         <p className="mb-0">{patientData?.email}</p>
                       </div>
@@ -170,6 +187,15 @@ export default function Profile() {
                         onClick={handleModal}
                       >
                         Edit Profile
+                      </div>
+                    </div>
+
+                    <div className="mb-3 border border border-top-0 border-start-0 border-end-0">
+                      <div
+                        className="mb-3 fw-bold text-button border w-100"
+                        onClick={handleProfilePictureModal}
+                      >
+                        Change Profile Picture
                       </div>
                     </div>
 

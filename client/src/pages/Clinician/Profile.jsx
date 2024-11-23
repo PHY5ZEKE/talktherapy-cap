@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/SidebarClinician";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
+import ChangeProfilePicture from "../../components/Modals/ChangeProfilePicture";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
 import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
 import RequestContent from "../../components/Modals/RequestContent";
@@ -33,6 +34,12 @@ export default function Profile() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
+  };
+
+  const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] =
+    useState(false);
+  const handleProfilePictureModal = () => {
+    setIsProfilePictureModalOpen(!isProfilePictureModalOpen);
   };
 
   // WebSocket Notification
@@ -101,10 +108,18 @@ export default function Profile() {
       {isOpen && (
         <EditProfile
           editProfileAPI={route.clinician.edit}
-          editPictureAPI={route.clinician.picture}
           userDetails={clinicianData}
           closeModal={handleModal}
           isOwner={true}
+          onFetch={webSocketFetch}
+        />
+      )}
+
+      {/* CHANGE PROFILE PICTURE MODAL */}
+      {isProfilePictureModalOpen && (
+        <ChangeProfilePicture
+          editPictureAPI={route.clinician.picture}
+          closeModal={handleProfilePictureModal}
           onFetch={webSocketFetch}
         />
       )}
@@ -214,6 +229,12 @@ export default function Profile() {
                       onClick={handleModal}
                     >
                       Edit Profile
+                    </div>
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handleProfilePictureModal}
+                    >
+                      Change Profile Picture
                     </div>
 
                     <div

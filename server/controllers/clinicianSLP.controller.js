@@ -108,8 +108,6 @@ exports.addClinician = async (req, res) => {
 };
 
 exports.clinicianSignup = async (req, res) => {
-  console.log("Request Body:", req.body); // Add this line to debug the request body
-
   const {
     firstName,
     middleName,
@@ -120,7 +118,7 @@ exports.clinicianSignup = async (req, res) => {
     specialization,
     email,
     password,
-  } = req.body.submissionData; // Adjusted to handle nested structure
+  } = req.body;
 
   const requiredFields = {
     firstName: "First name is required.",
@@ -135,12 +133,45 @@ exports.clinicianSignup = async (req, res) => {
   };
 
   for (const [field, message] of Object.entries(requiredFields)) {
-    if (!req.body.submissionData[field]) {
-      // Adjusted to handle nested structure
+    if (!req.body[field]) {
       return res.status(400).json({ error: true, message });
     }
   }
 
+  // Validate firstName, middleName, and lastName
+  const nameRegex = /^[A-Za-z\s]{1,35}$/;
+  if (!nameRegex.test(firstName)) {
+    return res.status(400).json({
+      error: true,
+      message:
+        "First name must be a string of letters and not exceed 35 characters.",
+    });
+  }
+  if (!nameRegex.test(middleName)) {
+    return res.status(400).json({
+      error: true,
+      message:
+        "Middle name must be a string of letters and not exceed 35 characters.",
+    });
+  }
+  if (!nameRegex.test(lastName)) {
+    return res.status(400).json({
+      error: true,
+      message:
+        "Last name must be a string of letters and not exceed 35 characters.",
+    });
+  }
+
+  // Validate mobile number (Philippine 11-digit format)
+  const mobileRegex = /^09\d{9}$/;
+  if (!mobileRegex.test(mobile)) {
+    return res.status(400).json({
+      error: true,
+      message: "Mobile number must be a valid Philippine 11-digit format.",
+    });
+  }
+
+  // Validate email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res
@@ -148,6 +179,7 @@ exports.clinicianSignup = async (req, res) => {
       .json({ error: true, message: "Invalid email format" });
   }
 
+  // Validate password
   const passwordError = validatePassword(password);
   if (passwordError) {
     return res.status(400).json({ error: true, message: passwordError });
@@ -167,6 +199,7 @@ exports.clinicianSignup = async (req, res) => {
       .json({ error: true, message: "User already exists." });
   }
 
+  // Hash the password
   const hashedPassword = await hashPassword(password);
 
   existingClinician.firstName = firstName;
@@ -183,6 +216,12 @@ exports.clinicianSignup = async (req, res) => {
 
   await existingClinician.save();
 
+  await createAuditLog(
+    "clinicianSignup",
+    email,
+    `Clinician with email ${email} signed up`
+  );
+
   const accessToken = jwt.sign(
     { clinician: existingClinician },
     process.env.ACCESS_TOKEN_SECRET,
@@ -190,17 +229,6 @@ exports.clinicianSignup = async (req, res) => {
       expiresIn: "15m",
     }
   );
-
-  try {
-    // Create audit log with the clinician's email
-    await createAuditLog(
-      "clinicianSignup",
-      email, // Pass the clinician's email
-      `Clinician with email ${email} signed up successfully`
-    );
-  } catch (error) {
-    console.error("Error creating audit log:", error); // Log the error details
-  }
 
   return res.json({
     error: false,

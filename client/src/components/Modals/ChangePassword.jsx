@@ -24,6 +24,16 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
+  const [passwordValidationMessages, setPasswordValidationMessages] = useState({
+    length: "Must be at least 8 characters",
+    lowercase: "Must have one lowercase letter",
+    uppercase: "Must have one uppercase letter",
+    number: "Must include a number",
+    special: "Must include a special character",
+  });
+
+  const [isTypingPassword, setIsTypingPassword] = useState(false);
+
   const notify = (message) =>
     toast.success(message, {
       transition: Slide,
@@ -48,6 +58,17 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
       setCurrentPassword(value);
     } else if (placeholder === "Enter new password") {
       setNewPassword(value);
+      setIsTypingPassword(true);
+      const validationMessages = {
+        length: value.length >= 8 ? "" : "Must be at least 8 characters",
+        lowercase: /[a-z]/.test(value) ? "" : "Must have one lowercase letter",
+        uppercase: /[A-Z]/.test(value) ? "" : "Must have one uppercase letter",
+        number: /\d/.test(value) ? "" : "Must include a number",
+        special: /[^a-zA-Z0-9]/.test(value)
+          ? ""
+          : "Must include a special character",
+      };
+      setPasswordValidationMessages(validationMessages);
     } else if (placeholder === "Confirm new password") {
       setConfirmPassword(value);
     }
@@ -95,7 +116,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
         if (data.message === "Current password is incorrect") {
           failNotify("Current password is incorrect.");
         } else {
-          failNotify(toastMessage.fail.edit);
+          failNotify("Current password is incorrect.");
         }
       }
     } catch (error) {
@@ -167,6 +188,17 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
                   {showNewPassword ? "Hide" : "Show"}
                 </button>
               </div>
+            </div>
+            <div className="mt-2">
+              {isTypingPassword &&
+                Object.values(passwordValidationMessages).map(
+                  (message, index) =>
+                    message && (
+                      <p key={index} className="text-danger mb-0">
+                        {message}
+                      </p>
+                    )
+                )}
             </div>
           </div>
 

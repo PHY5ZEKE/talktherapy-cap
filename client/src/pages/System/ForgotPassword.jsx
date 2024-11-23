@@ -15,6 +15,16 @@ export default function ForgotPassword() {
   const [message, setMessage] = useState("");
   const appURL = import.meta.env.VITE_APP_URL;
 
+  const [passwordValidationMessages, setPasswordValidationMessages] = useState({
+    length: "Must be at least 8 characters",
+    lowercase: "Must have one lowercase letter",
+    uppercase: "Must have one uppercase letter",
+    number: "Must include a number",
+    special: "Must include a special character",
+  });
+
+  const [isTypingPassword, setIsTypingPassword] = useState(false);
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -24,6 +34,22 @@ export default function ForgotPassword() {
   };
 
   const [isSending, setIsSending] = useState(false);
+
+  const handlePasswordChange = (e) => {
+    const { value } = e.target;
+    setPassword(value);
+    setIsTypingPassword(true);
+    const validationMessages = {
+      length: value.length >= 8 ? "" : "Must be at least 8 characters",
+      lowercase: /[a-z]/.test(value) ? "" : "Must have one lowercase letter",
+      uppercase: /[A-Z]/.test(value) ? "" : "Must have one uppercase letter",
+      number: /\d/.test(value) ? "" : "Must include a number",
+      special: /[^a-zA-Z0-9]/.test(value)
+        ? ""
+        : "Must include a special character",
+    };
+    setPasswordValidationMessages(validationMessages);
+  };
 
   const handleNext = async (e) => {
     e.preventDefault();
@@ -260,7 +286,7 @@ export default function ForgotPassword() {
                       aria-label="Password"
                       aria-describedby="basic-addon2"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                     />
                     <span
                       className="input-group-text"
@@ -270,6 +296,17 @@ export default function ForgotPassword() {
                     >
                       {showPassword ? <EyeSlashFill /> : <EyeFill />}
                     </span>
+                  </div>
+                  <div className="mt-2">
+                    {isTypingPassword &&
+                      Object.values(passwordValidationMessages).map(
+                        (message, index) =>
+                          message && (
+                            <p key={index} className="text-danger mb-0">
+                              {message}
+                            </p>
+                          )
+                      )}
                   </div>
                 </div>
 

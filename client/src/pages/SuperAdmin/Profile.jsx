@@ -4,6 +4,7 @@ import { AuthContext } from "../../utils/AuthContext";
 import Sidebar from "../../components/Sidebar/SidebarSuper";
 import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
+import ChangeProfilePicture from "../../components/Modals/ChangeProfilePicture";
 import MenuDropdown from "../../components/Layout/SudoMenu";
 
 import { toastMessage } from "../../utils/toastHandler";
@@ -37,6 +38,12 @@ export default function Profile() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
+  };
+
+  const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] =
+    useState(false);
+  const handleProfilePictureModal = () => {
+    setIsProfilePictureModalOpen(!isProfilePictureModalOpen);
   };
 
   const socket = useRef(null);
@@ -99,7 +106,7 @@ export default function Profile() {
   }, []);
 
   const webSocketFetch = async () => {
-      SocketFetch(socket);
+    SocketFetch(socket);
   };
 
   if (error) {
@@ -126,6 +133,15 @@ export default function Profile() {
           userDetails={userDetails}
           closeModal={handleModal}
           isOwner={true}
+          onFetch={webSocketFetch}
+        />
+      )}
+
+      {/* CHANGE PROFILE PICTURE MODAL */}
+      {isProfilePictureModalOpen && (
+        <ChangeProfilePicture
+          editPictureAPI={route.sudo.picture}
+          closeModal={handleProfilePictureModal}
           onFetch={webSocketFetch}
         />
       )}
@@ -222,6 +238,13 @@ export default function Profile() {
                       onClick={handleModal}
                     >
                       Edit Profile
+                    </div>
+
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handleProfilePictureModal}
+                    >
+                      Change Profile Picture
                     </div>
 
                     <div

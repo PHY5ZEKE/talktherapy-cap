@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
 import MenuDropdown from "../../components/Layout/AdminMenu";
 import EditProfile from "../../components/Modals/EditProfile";
+import ChangeProfilePicture from "../../components/Modals/ChangeProfilePicture";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import RequestView from "../../components/Modals/RequestView";
 
@@ -37,6 +38,12 @@ export default function Profile() {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const handlePasswordModal = () => {
     setIsPasswordModalOpen(!isPasswordModalOpen);
+  };
+
+  const [isProfilePictureModalOpen, setIsProfilePictureModalOpen] =
+    useState(false);
+  const handleProfilePictureModal = () => {
+    setIsProfilePictureModalOpen(!isProfilePictureModalOpen);
   };
 
   // WebSocket Notification
@@ -184,6 +191,15 @@ export default function Profile() {
         />
       )}
 
+      {/* CHANGE PROFILE PICTURE MODAL */}
+      {isProfilePictureModalOpen && (
+        <ChangeProfilePicture
+          editPictureAPI={route.admin.picture}
+          closeModal={handleProfilePictureModal}
+          onFetch={webSocketFetch}
+        />
+      )}
+
       {isPasswordModalOpen && (
         <ChangePassword
           editPasswordAPI={route.admin.password}
@@ -270,6 +286,12 @@ export default function Profile() {
                       onClick={handleModal}
                     >
                       Edit Profile
+                    </div>
+                    <div
+                      className="mb-3 fw-bold text-button border w-100"
+                      onClick={handleProfilePictureModal}
+                    >
+                      Change Profile Picture
                     </div>
                     <div
                       className="mb-3 fw-bold text-button border w-100"

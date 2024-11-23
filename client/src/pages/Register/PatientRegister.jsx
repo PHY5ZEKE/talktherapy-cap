@@ -8,7 +8,7 @@ import { toastMessage } from "../../utils/toastHandler";
 import ConsentForm from "../../components/Modals/ConsentForm.jsx";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 
-export default function ClinicianRegister() {
+export default function PatientRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
 
@@ -25,10 +25,15 @@ export default function ClinicianRegister() {
     consent: "",
   });
 
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState(false);
+  const [passwordValidationMessages, setPasswordValidationMessages] = useState({
+    length: "Must be at least 8 characters",
+    lowercase: "Must have one lowercase letter",
+    uppercase: "Must have one uppercase letter",
+    number: "Must include a number",
+    special: "Must include a special character",
+  });
 
-  const appURL = import.meta.env.VITE_APP_URL;
+  const [isTypingPassword, setIsTypingPassword] = useState(false);
 
   const notify = (message) =>
     toast.success(message, {
@@ -41,6 +46,11 @@ export default function ClinicianRegister() {
       transition: Slide,
       autoClose: 2000,
     });
+
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState(false);
+
+  const appURL = import.meta.env.VITE_APP_URL;
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -58,6 +68,20 @@ export default function ClinicianRegister() {
       ...prevData,
       [name]: value,
     }));
+
+    if (name === "password") {
+      setIsTypingPassword(true);
+      const validationMessages = {
+        length: value.length >= 8 ? "" : "Must be at least 8 characters",
+        lowercase: /[a-z]/.test(value) ? "" : "Must have one lowercase letter",
+        uppercase: /[A-Z]/.test(value) ? "" : "Must have one uppercase letter",
+        number: /\d/.test(value) ? "" : "Must include a number",
+        special: /[^a-zA-Z0-9]/.test(value)
+          ? ""
+          : "Must include a special character",
+      };
+      setPasswordValidationMessages(validationMessages);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -168,9 +192,9 @@ export default function ClinicianRegister() {
                     FAQ
                   </Link>
                 </li>
-                <li class="nav-item dropdown">
+                <li className="nav-item dropdown">
                   <a
-                    class="nav-link dropdown-toggle fw-bold"
+                    className="nav-link dropdown-toggle fw-bold"
                     href="#"
                     role="button"
                     data-bs-toggle="dropdown"
@@ -178,22 +202,22 @@ export default function ClinicianRegister() {
                   >
                     Register
                   </a>
-                  <ul class="dropdown-menu">
+                  <ul className="dropdown-menu">
                     <li>
-                      <Link class="dropdown-item" to="/register/patientslp">
+                      <Link className="dropdown-item" to="/register/patientslp">
                         Patient
                       </Link>
                     </li>
                     <li>
-                      <Link class="dropdown-item" to="/register/clinician">
+                      <Link className="dropdown-item" to="/register/clinician">
                         Clinician
                       </Link>
                     </li>
                     <li>
-                      <hr class="dropdown-divider" />
+                      <hr className="dropdown-divider" />
                     </li>
                     <li>
-                      <Link class="dropdown-item" to="/register/admin">
+                      <Link className="dropdown-item" to="/register/admin">
                         Admin
                       </Link>
                     </li>
@@ -392,6 +416,17 @@ export default function ClinicianRegister() {
                     >
                       {showPassword ? <EyeSlashFill /> : <EyeFill />}
                     </span>
+                  </div>
+                  <div className="mt-2">
+                    {isTypingPassword &&
+                      Object.values(passwordValidationMessages).map(
+                        (message, index) =>
+                          message && (
+                            <p key={index} className="text-danger mb-0">
+                              {message}
+                            </p>
+                          )
+                      )}
                   </div>
                 </div>
 

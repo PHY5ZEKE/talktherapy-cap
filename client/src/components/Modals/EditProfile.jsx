@@ -10,7 +10,6 @@ import { toastMessage } from "../../utils/toastHandler";
 // FOR SUDO, ADMIN, AND PATIENT
 export default function EditProfile({
   editProfileAPI,
-  editPictureAPI,
   userDetails,
   closeModal,
   isOwner,
@@ -108,45 +107,6 @@ export default function EditProfile({
     }
   };
 
-  // Change Profile Picture Listener
-  const handleProfilePictureChange = (e) => {
-    setProfilePicture(e.target.files[0]);
-  };
-
-  // Upload Profile Picture Listener
-  const handleProfilePictureUpload = async () => {
-    if (!profilePicture) {
-      failNotify("Select an image for profile picture upload.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("profilePicture", profilePicture);
-
-    try {
-      const response = await fetch(`${appURL}/${editPictureAPI}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: formData,
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        notify(toastMessage.success.edit);
-        onFetch();
-      } else {
-        failNotify(
-          "Invalid Upload. File limit is 1MB and only JPEG, JPG, and PNG are allowed."
-        );
-      }
-    } catch (error) {
-      failNotify(toastMessage.fail.error);
-    }
-  };
-
   return (
     <Modal show={showModal} onHide={handleCloseModal} centered>
       <Modal.Header>
@@ -154,27 +114,6 @@ export default function EditProfile({
       </Modal.Header>
       <Modal.Body>
         <form onSubmit={handleEditProfileSubmit}>
-          {isOwner && (
-            <>
-              <h3 className="">Profile Picture</h3>
-              <div className="form-group d-flex flex-column mb-3">
-                <p className="mb-0">Upload Profile Picture</p>
-                <input
-                  type="file"
-                  className="form-control"
-                  onChange={handleProfilePictureChange}
-                />
-                <button
-                  type="button"
-                  className="text-button border w-100 mt-3"
-                  onClick={handleProfilePictureUpload}
-                >
-                  Upload Picture
-                </button>
-              </div>
-            </>
-          )}
-
           <h3>Basic Information</h3>
           <div className="form-group">
             <p className="mb-0">First Name</p>
