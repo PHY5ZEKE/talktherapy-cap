@@ -672,15 +672,16 @@ function initializeExercise(loadedProgress = null) {
                 console.warn('webkitSpeechRecognition is not supported in this browser.');
                 return; 
             }
-            var recognition;
-                if (typeof window.SpeechRecognition !== 'undefined') {
-                    recognition = new window.SpeechRecognition(); // Standard SpeechRecognition
-                } else if (typeof window.webkitSpeechRecognition !== 'undefined') {
-                    recognition = new window.webkitSpeechRecognition(); // WebKit-based SpeechRecognition
-                } else {
-                    $recognition.innerHTML('SpeechRecognition is not supported in this browser.');
-                    return; 
-                }
+            // var recognition;
+            //     if (typeof window.SpeechRecognition !== 'undefined') {
+            //         recognition = new window.SpeechRecognition(); // Standard SpeechRecognition
+            //     } else if (typeof window.webkitSpeechRecognition !== 'undefined') {
+            //         recognition = new window.webkitSpeechRecognition(); // WebKit-based SpeechRecognition
+            //     } else {
+            //         $recognition.innerHTML('SpeechRecognition is not supported in this browser.');
+            //         return; 
+            //     }
+            var recognition = new webkitSpeechRecognition(); 
             var chunks, userAudio;
     
             var mediaRecorder = new MediaRecorder(stream);
@@ -692,6 +693,22 @@ function initializeExercise(loadedProgress = null) {
             var $panel_recognition = document.querySelector('#page-main #panel-recognition');
             var $recognition = document.querySelector('#page-main #recognition');
             var $compare = document.querySelector('#page-main #compare');
+
+            function cleanup() {
+                if (mediaRecorder && mediaRecorder.state === 'recording') {
+                    mediaRecorder.stop();
+                }
+
+                if (recognition) {
+                    recognition.stop();
+                }
+
+                if (stream) {
+                    stream.getTracks().forEach(track => track.stop());
+                }
+            }
+            window.addEventListener('beforeunload', cleanup);
+
     
             function startRecord(event) {
                 resetRecognitionStyles();
@@ -891,6 +908,7 @@ function initializeExercise(loadedProgress = null) {
     
             
         }).catch((err) => alert(err.message));
+
 
 
         function parseTexts(data) {
