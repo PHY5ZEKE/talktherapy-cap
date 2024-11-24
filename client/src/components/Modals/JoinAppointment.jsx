@@ -50,7 +50,12 @@ export default function JoinAppointment({
     setIsDisabled(true);
     setIsSubmitting(true);
 
-    if (!medicalDiagnosis || !sourceOfReferral || !chiefComplaint) {
+    if (
+      !medicalDiagnosis ||
+      !sourceOfReferral ||
+      !chiefComplaint ||
+      !referralUpload
+    ) {
       failNotify("All fields are required.");
       setIsSubmitting(false);
       setIsDisabled(false);
@@ -133,7 +138,7 @@ export default function JoinAppointment({
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-content-center">
         <div className="d-flex flex-column text-center">
-          <h3 className="fw-bold">Join Appointment</h3>
+          <h3 className="fw-bold">Book Appointment</h3>
           <p className="mb-0">Please fill up the form accordingly.</p>
         </div>
 
@@ -189,9 +194,17 @@ export default function JoinAppointment({
                 </Form.Group>
 
                 <div className="d-flex justify-content-center mt-3 gap-3">
-                <button type="submit" className="text-button border" disabled={isDisabled || isSubmitting}>
-                {isSubmitting ? <p className="fw-bold my-0 status">Submitting...</p> : <p className="fw-bold my-0 status">BOOK</p>}
-                </button>
+                  <button
+                    type="submit"
+                    className="text-button border"
+                    disabled={isDisabled || isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      <p className="fw-bold my-0 status">Submitting...</p>
+                    ) : (
+                      <p className="fw-bold my-0 status">BOOK</p>
+                    )}
+                  </button>
                   <button onClick={handleClose} className="text-button border">
                     <p className="fw-bold my-0 status">CANCEL</p>
                   </button>

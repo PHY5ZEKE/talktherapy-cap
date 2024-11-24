@@ -66,6 +66,63 @@ export default function EditProfile({
 
   const handleEditProfileSubmit = async (e) => {
     e.preventDefault();
+
+    // Check for empty fields
+    if (!firstName.trim()) {
+      failNotify("First name is required.");
+      return;
+    }
+    if (!middleName.trim()) {
+      failNotify("Middle name is required.");
+      return;
+    }
+    if (!lastName.trim()) {
+      failNotify("Last name is required.");
+      return;
+    }
+    if (!mobile.trim()) {
+      failNotify("Mobile number is required.");
+      return;
+    }
+    if (!address.trim()) {
+      failNotify("Address is required.");
+      return;
+    }
+
+    // Validate firstName, middleName, and lastName
+    const nameRegex = /^[A-Za-z\s]{1,35}$/;
+    if (!nameRegex.test(firstName)) {
+      failNotify(
+        "First name must be a string of letters and not exceed 35 characters."
+      );
+      return;
+    }
+    if (!nameRegex.test(middleName)) {
+      failNotify(
+        "Middle name must be a string of letters and not exceed 35 characters."
+      );
+      return;
+    }
+    if (!nameRegex.test(lastName)) {
+      failNotify(
+        "Last name must be a string of letters and not exceed 35 characters."
+      );
+      return;
+    }
+
+    // Validate mobile number (Philippine 11-digit format)
+    const mobileRegex = /^09\d{9}$/;
+    if (!mobileRegex.test(mobile)) {
+      failNotify("Mobile number must be a valid Philippine 11-digit format.");
+      return;
+    }
+
+    // Validate address (must not exceed 250 characters)
+    if (address.length > 250) {
+      failNotify("Address must not exceed 250 characters.");
+      return;
+    }
+
     try {
       const response = await fetch(`${appURL}/${editProfileAPI}`, {
         method: "PUT",
