@@ -1,0 +1,28 @@
+/* Custom CSS for text items */
+.text-item {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #ccc; /* Light gray border */
+    border-radius: 5px; /* Rounded corners */
+    padding: 10px; /* Padding inside the item */
+    margin-bottom: 10px; /* Space between items */
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Space between text and view icon */
+    align-items: center; /* Center items vertically */
+    transition: background-color 0.3s; /* Smooth background color transition */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+.text-item:hover {
+    background-color: #f0f0f0; /* Light gray background on hover */
+}
+
+.view-icon {
+    font-size: 20px; /* Size of the view icon */
+    color: #007bff; /* Bootstrap primary color */
+    margin-left: 10px; /* Space between text and icon */
+    cursor: pointer; /* Change cursor to pointer */
+}
+
+.view-icon:hover {
+    color: #0056b3; /* Darker shade on hover */
+}

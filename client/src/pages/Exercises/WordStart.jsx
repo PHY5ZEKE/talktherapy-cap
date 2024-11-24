@@ -3,10 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import { route } from "../../utils/route";
 import { AuthContext } from "../../utils/AuthContext";
 import './libs/exercises.css';
+import './libs/skibidi.css';
 
 export default function WordStart() {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
+  const [patientData, setPatientData] = useState(null);
+  
 
   const [isRecording, setIsRecording] = useState(false);
   const [isPhonemeVisible, setIsPhonemeVisible] = useState(false);
@@ -43,7 +46,8 @@ export default function WordStart() {
           setLoading(false);
           return;
         }
-
+        const data = await response.json();
+        setPatientData(data.patient);
         setLoading(false);
 
       } catch (error) {
@@ -282,6 +286,16 @@ export default function WordStart() {
 
     {/* Page Start */}
     <div id="page-start" className="text-center">
+    <div className="mb-4">
+      {patientData ? (
+        <h2>
+          Hello {patientData.firstName} {patientData.lastName}!
+        </h2>
+      ) : (
+        <h2>No patient user logged in</h2>
+      )}
+    </div>
+
       <div className="content">
         <h1 id="power-by" className="mb-4">Speech Exercises!</h1>
         <p className="description mb-3">Practice your speaking with our voice recognition speech exercises</p>
@@ -293,10 +307,12 @@ export default function WordStart() {
 
     {/* Page Main */}
     <div id="page-main" className="page-center" style={{ display: 'none' }}>
-      <div className="button-container mb-4">
-        <div id = "button-text-selector" className="btn btn-outline-primary me-2">More</div>
-        <button id="button-help" className="btn btn-outline-primary me-2">Help</button>
-        <button id="button-option" className="btn btn-outline-secondary">Option</button>
+      <div className="d-flex justify-content-center align-items-center">
+        <div className="button-container mb-4 text-center">
+          <div id="button-text-selector" className="btn btn-outline-primary me-2">More</div>
+          <button id="button-help" className="btn btn-outline-primary me-2">Help</button>
+          <button id="button-option" className="btn btn-outline-secondary">Option</button>
+        </div>
       </div>
 
       <div className="content">
@@ -314,7 +330,7 @@ export default function WordStart() {
             <div className="d-flex">
               <button
                 id="display_phoneme"
-                className="btn btn-success me-3"
+                className="btn btn-primary me-2"
                 onClick={() => setIsPhonemeVisible((prev) => !prev)} 
               >
                 Show
@@ -387,6 +403,7 @@ export default function WordStart() {
                     {/* Success ring selector content goes here */}
                   </div>
                   <div className="instruction-content">
+                  <p><span style={{ fontWeight: 'bold', fontSize: '20px'}}>If there's a problem refresh the page!</span> </p>
                     <p>Hello! If this is your first time, allow your microphone access to the website.</p>
                     <p>
                       <span style={{ fontWeight: 'bold' }}>Hold </span> 
@@ -419,6 +436,7 @@ export default function WordStart() {
                 </div>
                 <div className="modal-body">
                   <div className="content d-flex">
+                    <input type="text" id="filter-input" placeholder="Find an Exercise"></input><br></br>
                     <div id="texts" className="me-3"></div>
                     {/* <div id="text-wrapper" className="flex-grow-1">
                       <div id="text" autoComplete="off" className="border p-2" style={{ height: '100%', overflowY: 'auto' }}></div>

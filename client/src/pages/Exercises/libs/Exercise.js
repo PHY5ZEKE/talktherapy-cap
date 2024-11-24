@@ -167,6 +167,11 @@ function initializeExercise(loadedProgress = null) {
         var selectButtonStart = document.querySelector('#page-start #button-text-selector');
         if (selectButtonStart) {
             selectButtonStart.addEventListener('click', function() {
+                var closeButtonMain = document.querySelector('#page-text-selector #close-button');
+                if (closeButtonMain) {
+                    closeButtonMain.style.display = 'none';
+                }
+                    
                 var phonemeContainer = document.getElementById("phoneme-output");
                     phonemeContainer.innerHTML = '';
 
@@ -318,8 +323,13 @@ function initializeExercise(loadedProgress = null) {
         function addText(id, name, text) {
             var $div = document.createElement('div');
             $div.setAttribute('id', id);
+            $div.classList.add('text-item'); 
             $div.innerHTML = name;
             $div.addEventListener('click', function() {
+                var closeButtonMain = document.querySelector('#page-text-selector #close-button');
+                if (closeButtonMain) {
+                    closeButtonMain.style.display = 'inline';
+                }
                 if ($div.hasAttribute('current')) return;
     
                 var textsChildren = document.querySelectorAll('#texts div');
@@ -339,6 +349,7 @@ function initializeExercise(loadedProgress = null) {
             var $view = document.createElement('div');
             $view.setAttribute('id', 'view');
             $view.innerHTML = '&#10148;';
+            $view.classList.add('view-icon');
             $view.addEventListener('click', function(event) {
                 event.stopImmediatePropagation();
     
@@ -355,6 +366,21 @@ function initializeExercise(loadedProgress = null) {
     
             var textsContainer = document.querySelector('#texts');
             if (textsContainer) textsContainer.appendChild($div);
+        }
+
+        document.getElementById('filter-input').addEventListener('input', filterTexts);
+        function filterTexts() {
+            var filterInput = document.getElementById('filter-input');
+            var filterValue = filterInput.value.toLowerCase();
+            var textsChildren = document.querySelectorAll('#texts div');
+        
+            textsChildren.forEach(child => {
+                if (child.innerHTML.toLowerCase().includes(filterValue)) {
+                    child.style.display = ''; 
+                } else {
+                    child.style.display = 'none'; 
+                }
+            });
         }
 
         async function loadProgressForTextId(textId) {

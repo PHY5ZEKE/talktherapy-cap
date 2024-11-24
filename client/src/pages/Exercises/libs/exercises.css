@@ -18,7 +18,7 @@
 }
 
 .button-container {
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
 
 /* Button Styles */
@@ -308,6 +308,12 @@
 	font-size: 20px;
 	padding: 10px; /* Added padding for phoneme output */
 }
+
+.phoneme-output {
+	max-height: 200px; /* Set a maximum height */
+	overflow-y: auto;  /* Enable vertical scrolling */
+	padding: 10px; /* Optional: Add some padding for aesthetics */
+  }
 
 
 #page-main #panel-recognition #recognition[correct="true"] {
