@@ -95,7 +95,7 @@ export default function FeedbackDiagnosis() {
         });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch patient progress");
+          console.log("Failed to fetch patient progress");
         }
 
         const data = await response.json();
