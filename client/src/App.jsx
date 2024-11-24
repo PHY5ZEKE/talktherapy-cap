@@ -19,11 +19,9 @@ import "react-toastify/dist/ReactToastify.css";
 const Landing = lazy(() => import("./pages/System/Landing"));
 const Login = lazy(() => import("./pages/System/Login"));
 const RegisterAdmin = lazy(() => import("./pages/Register/AdminRegister"));
-const RegisterClinician = lazy(() =>
-  import("./pages/Register/ClinicianRegister")
+const RegisterClinician = lazy(() => import("./pages/Register/ClinicianRegister")
 );
-const RegisterPatientSlp = lazy(() =>
-  import("./pages/Register/PatientRegister")
+const RegisterPatientSlp = lazy(() => import("./pages/Register/PatientRegister")
 );
 const ForgotPassword = lazy(() => import("./pages/System/ForgotPassword"));
 
@@ -46,8 +44,7 @@ const ClinicianHome = lazy(() => import("./pages/Clinician/Home"));
 const ClinicianPatient = lazy(() => import("./pages/Clinician/SearchPatients"));
 const ClinicianContent = lazy(() => import("./pages/Clinician/ViewContent"));
 const ClinicianProfile = lazy(() => import("./pages/Clinician/Profile"));
-const ClinicianSchedule = lazy(() =>
-  import("./pages/Clinician/ManageSchedule")
+const ClinicianSchedule = lazy(() => import("./pages/Clinician/ManageSchedule")
 );
 
 // Patient TalkTherapy
@@ -74,8 +71,7 @@ const ExerFace = lazy(() => import("./pages/Exercises/ExerFace"));
 
 // Error Handlers
 const NotFound = lazy(() => import("./pages/System/NotFound"));
-const UnauthorizedAccess = lazy(() =>
-  import("./pages/System/UnauthorizedAccess")
+const UnauthorizedAccess = lazy(() => import("./pages/System/UnauthorizedAccess")
 );
 
 // Testing Pages

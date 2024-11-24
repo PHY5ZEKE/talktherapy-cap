@@ -55,6 +55,8 @@ export const route = {
     updateBookmarks: "api/patient-SLP/update-bookmarks",
     saveProgress: "api/patient-SLP/save-progress",
     loadProgress: "api/patient-SLP/load-progress",
+    showProgress: "api/patient-SLP/show-progress",
+    getProgress: "api/patient-SLP/get-progress",
   },
   system: {
     login: "api/super-admin-slp/login",

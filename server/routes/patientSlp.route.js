@@ -13,6 +13,8 @@ const {
 const {
   saveProgress,
   loadProgress,
+  showProgress,
+  getProgress,
 } = require("../controllers/patientProgress.controller");
 
 const verifyToken = require("../middleware/verifyToken");
@@ -37,5 +39,8 @@ router.post("/save-progress", verifyToken, saveProgress);
 // Load patient progress
 router.get("/load-progress", verifyToken, loadProgress);
 
+router.get("/show-progress", verifyToken, showProgress);
+
+router.get("/get-progress/:patientId", verifyToken, getProgress);
 
 module.exports = router;

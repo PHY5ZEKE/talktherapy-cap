@@ -49,6 +49,7 @@ export default function ManageSchedule() {
 
   const [viewMode, setViewMode] = useState(VIEW_MODES.NONE);
   const [soapRecords, setSoapRecords] = useState([]);
+  const [progressRecords, setProgressRecords] = useState([]);
   const [patientName, setPatientName] = useState("");
 
   const [showAllPatients, setShowAllPatients] = useState(true);
@@ -286,6 +287,29 @@ export default function ManageSchedule() {
     }
   };
 
+  const fetchPatientProgress = async (patientId) => {
+    try {
+      const response = await fetch(
+        `${appURL}/${route.patient.getProgress}/${patientId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const data = await response.json();
+  
+      if (!data.error) {
+        setProgressRecords(data); // Assuming data is an array of progress items
+      } else {
+        failNotify(toastMessage.fail.fetch);
+      }
+    } catch (error) {
+      failNotify(toastMessage.fail.fetch);
+      failNotify(toastMessage.fail.error);
+    }
+  };
+
   const fetchSoapRecords = async (patientId) => {
     try {
       const response = await fetch(
@@ -324,6 +348,13 @@ export default function ManageSchedule() {
     if (selectedPatient) {
       fetchSoapRecords(selectedPatient._id);
       setViewMode(VIEW_MODES.RECORDS);
+    }
+  };
+
+  const handleViewProgress = () => {
+    if (selectedPatient) {
+      fetchPatientProgress(selectedPatient._id);
+      setViewMode(VIEW_MODES.PROGRESS);
     }
   };
 
@@ -564,9 +595,7 @@ export default function ManageSchedule() {
                                   Add SOAP
                                 </button>
                                 <button
-                                  onClick={() =>
-                                    setViewMode(VIEW_MODES.PROGRESS)
-                                  }
+                                  onClick={handleViewProgress}
                                   className="text-button border w-100"
                                 >
                                   View Progress
@@ -651,14 +680,33 @@ export default function ManageSchedule() {
                       </div>
                     ) : viewMode === VIEW_MODES.PROGRESS ? (
                       <>
-                        <h5 className="text-center fw-bold">
-                          Progress Records
-                        </h5>
-                        <ViewProgress
-                          header="Exercise - Progress"
-                          details="Sample progress details"
-                        />
-                      </>
+                      <h5 className="fw-bold text-center">Progress Records</h5>
+                      {progressRecords.length > 0 ? (
+                        progressRecords.map((record) => {
+                          const correctCount = record.correctCount || 0; 
+                          const totalPhrases = record.totalPhrases || 1; 
+                          const progressPercentage = ((correctCount / totalPhrases) * 100).toFixed(2); 
+                          const completionStatus = record.completed ? "Completed" : "Not Completed";
+                    
+                          return (
+                            <ViewProgress
+                              key={record._id}
+                              header={record.textName} 
+                              details={
+                                <>
+                                  <div>Correct Count: {correctCount}</div>
+                                  <div>Progress: {progressPercentage}%</div>
+                                  <div>Status: {completionStatus}</div>
+                                </>
+                              }
+                              role={userRole}
+                            />
+                          );
+                        })
+                      ) : (
+                        <h5 className="mb-0 fw-bold text-center">No progress records available.</h5>
+                      )}
+                    </>
                     ) : (
                       <h5 className="mb-0 fw-bold text-center">
                         Select an option to view related information.

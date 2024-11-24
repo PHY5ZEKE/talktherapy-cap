@@ -21,6 +21,7 @@ export default function FeedbackDiagnosis() {
   const [error, setError] = useState(null);
   const [diagnosisData, setDiagnosisData] = useState([]);
   const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
+  const [patientProgress, setPatientProgress] = useState([]); 
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -47,7 +48,8 @@ export default function FeedbackDiagnosis() {
     };
 
     fetchPatientData();
-  }, []);
+  }, [appURL, accessToken]);
+
 
   useEffect(() => {
     const fetchDiagnosisData = async () => {
@@ -77,7 +79,36 @@ export default function FeedbackDiagnosis() {
     if (patientData) {
       fetchDiagnosisData();
     }
-  }, [patientData]);
+  }, [patientData, appURL, accessToken]);
+
+
+  
+  useEffect(() => {
+    const fetchPatientProgress = async () => {
+      try {
+        const response = await fetch(`${appURL}/${route.patient.showProgress}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch patient progress");
+        }
+
+        const data = await response.json();
+        setPatientProgress(data); // Assuming data is an array of progress items
+      } catch (error) {
+        setError(error.message);
+      }
+    };
+
+    if (patientData) {
+      fetchPatientProgress();
+    }
+  }, [patientData, appURL, accessToken]);
 
   const handleDateClick = (diagnosis) => {
     setSelectedDiagnosis(diagnosis);
@@ -165,7 +196,7 @@ export default function FeedbackDiagnosis() {
                   <div className="col d-flex align-items-center gap-3 bg-white border rounded-4 p-3">
                     <FontAwesomeIcon icon={faMagnifyingGlass} />
                     <input
-                      type="text "
+                      type="text"
                       placeholder="Search for your records"
                       className="search-input rounded-3 w-100"
                       value={searchTerm}
@@ -201,7 +232,34 @@ export default function FeedbackDiagnosis() {
                   </div>
                 </div>
               </div>
+            </div>
 
+            {/* New section for displaying patient progress */}
+            <div className="row p-3">
+              <div className="col bg-white border rounded-4 p-3">
+                <p className="mb-0 fw-bold">Patient Progress</p>
+                {patientProgress.length > 0 ? (
+                  <div>
+                    {patientProgress.map((progress) => {
+                      const completionPercentage = 
+                        (progress.correctCount / progress.totalPhrases) * 100;
+                      return (
+                        <div key={progress.textId} className="mb-2">
+                          <span>{progress.textName}:</span>
+                          <span className="ms-2">
+                            {completionPercentage.toFixed(2)}%
+                          </span>
+                          <span className="ms-2">
+                            {progress.completed ? "completed" : "in progress"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p>No progress data available.</p>
+                )}
+              </div>
             </div>
           </div>
         </div>

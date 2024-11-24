@@ -66,7 +66,47 @@ loadProgress = async (req, res) => {
   }
 };
 
+// Load patient progress
+showProgress = async (req, res) => {
+  try {
+    const patientId = req.user.id; // Get the patient ID from the token
+
+    // Fetch all progress records for the logged-in patient
+    const progress = await PatientProgress.find({ patient: patientId });
+
+    if (progress.length > 0) {
+      res.status(200).json(progress); // Return all progress records
+    } else {
+      res.status(404).json({ message: 'No progress found for this patient' });
+    }
+  } catch (error) {
+    console.error("Error loading progress:", error);
+    res.status(500).json({ message: 'Error loading progress', error });
+  }
+};
+
+// Load patient progress
+getProgress = async (req, res) => {
+  try {
+    const patientId = req.params.patientId; // Get the patient ID from the request parameters
+
+    // Fetch all progress records for the specified patient
+    const progress = await PatientProgress.find({ patient: patientId });
+
+    if (progress.length > 0) {
+      res.status(200).json(progress); // Return all progress records
+    } else {
+      res.status(404).json({ message: 'No progress found for this patient' });
+    }
+  } catch (error) {
+    console.error("Error loading progress:", error);
+    res.status(500).json({ message: 'Error loading progress', error });
+  }
+};
+
 module.exports = {
   loadProgress,
   saveProgress,
+  showProgress,
+  getProgress,
 };

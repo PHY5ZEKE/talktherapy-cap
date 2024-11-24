@@ -4,7 +4,6 @@ import { route } from "../../utils/route";
 import { AuthContext } from "../../utils/AuthContext";
 import './libs/exercises.css';
 
-// PageStart Component
 export default function WordStart() {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -45,7 +44,6 @@ export default function WordStart() {
           return;
         }
 
-        //const data = await response.json();
         setLoading(false);
 
       } catch (error) {
@@ -57,6 +55,8 @@ export default function WordStart() {
     fetchPatientData();
   }
 }, [accessToken, appURL, authState?.userRole]);
+
+
 
   // Function to send progress to the backend
   function saveProgressToBackend(progress) {
@@ -97,13 +97,12 @@ export default function WordStart() {
   }, [accessToken]);
 
 
+
 // Function to fetch the saved progress from the backend
     const fetchProgressFromBackend = async (textId) => {
       try {
-        // const textId = localStorage.getItem('speech-current-text');
         if (!textId) return;
 
-        // Make the API call to fetch the saved progress
         const response = await fetch(`${appURL}/${route.patient.loadProgress}?textId=${textId}`, {
           method: 'GET',
           headers: {
@@ -125,18 +124,7 @@ export default function WordStart() {
       }
     };
 
-  // // Fetch progress when component mounts or textId changes
-  // useEffect(() => {
-  //   const textId = localStorage.getItem('speech-current-text'); 
-  //   fetchProgressFromBackend(textId); 
-  // }, [accessToken]);
 
-    // // Fetch progress when component mounts or accessToken changes
-    // useEffect(() => {
-    //   if (accessToken) {
-    //     fetchProgressFromBackend(); 
-    //   }
-    // }, [accessToken]);
 
     useEffect(() => {
       const fetchProgress = async () => {
@@ -149,15 +137,6 @@ export default function WordStart() {
       fetchProgress();
     }, [accessToken]);
   
-
-    // Optionally, handle cases where progress is not loaded
-    // useEffect(() => {
-    //   if (progress) {
-    //     console.log("Progress data available:", progress);
-    //     // optional ui change
-    //   }
-    // }, [progress]);
-
 
     // for LoadTextID
     useEffect(() => {
@@ -181,19 +160,18 @@ export default function WordStart() {
               if (response.ok) {
                   const data = await response.json();
                   console.log("Progress fetched successfully:", data);
-                  return data; // Return progress data
+                  return data; 
               } else {
                   console.log("No progress found for textId:", textId);
-                  return null; // No progress found
+                  return null; 
               }
           } catch (error) {
               console.error("Error fetching progress:", error);
-              return null; // Handle error case
+              return null; 
           }
       };
   
       return () => {
-          // Cleanup exposed function when component unmounts
           delete window.fetchProgressForTextId;
       };
   }, [accessToken, appURL, route]);
@@ -213,7 +191,6 @@ export default function WordStart() {
       }
     };
 
-    // Function to remove script when component unmounts
     const removeScript = () => {
       const existingScript = document.getElementById(scriptId);
       if (existingScript) {
@@ -243,7 +220,7 @@ export default function WordStart() {
       scriptInitialized.current = true;
     } else {
       console.log("Exercise.js already exists");
-      initialize(); // Only called if the script was already loaded
+      initialize(); 
     }
 
     return () => {
