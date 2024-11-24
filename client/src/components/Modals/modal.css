@@ -1,3 +1,35 @@
+@keyframes scaleUpDown {
+  0%, 100% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes typewriter {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+
+.scale-up-down {
+  animation: scaleUpDown 2.75s ease-in-out infinite;
+}
+
+.typewriter {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typewriter 4s steps(10, end) infinite;
+}
+
 .modal-background {
   position: fixed;
   top: 0;
@@ -35,17 +67,25 @@
   border-radius: 4px; /* Optional: add rounded corners */
 }
 
+/* Loader */
+.modal-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: auto;
+  background-color: none;
+  padding: 20px;
+  border-radius: 10px;
+  max-height: 90vh; /* Set a maximum height based on the viewport height */
+  overflow-y: auto; /* Enable vertical scrolling if content exceeds max height */
+  box-sizing: border-box;
+}
 
 /* Media query for 768 and below */
 @media (max-width: 768px) {
   .modal-container {
     width: 90%;
   }
-  /* .div-cal {
-    position: relative;
-    top: 20%;
-    left: 30%;
-    transform: translate(-50%, -50%);
-    transition: z-index 0.3s ease;
-  } */
 }

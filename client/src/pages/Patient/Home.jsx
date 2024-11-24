@@ -228,7 +228,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {firstCollapse && (
+                {!firstCollapse && (
                   <div className="row p-3">
                     {loading ? (
                       <div className="col bg-white border rounded-4 p-3 overflow-auto">
@@ -357,7 +357,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {secondCollapse && (
+                {!secondCollapse && (
                   <div className="row p-3">
                     <div
                       className="col bg-white border rounded-4 p-3"
@@ -411,7 +411,7 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-                {thirdCollapse && (
+                {!thirdCollapse && (
                   <div className="row p-3">
                     <div
                       className="col bg-white border rounded-4 p-3 overflow-auto"
