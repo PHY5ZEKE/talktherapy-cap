@@ -19,12 +19,10 @@ export default function AddContent({ closeModal, onSubmit }) {
   const [videoUrl, setVideoUrl] = useState("");
   const [error, setError] = useState(null);
 
-
-
   const handleChange = (value) => {
     setDescription(value);
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,6 +31,19 @@ export default function AddContent({ closeModal, onSubmit }) {
     if (!name || !description || !category || !image) {
       toast.error("All fields are required");
       return; // Prevent form submission if any field is missing
+    }
+
+    // Validate name (must not exceed 250 characters)
+    if (name.length > 250) {
+      toast.error("Name must not exceed 250 characters");
+      return;
+    }
+
+    // Validate video URL (must be a valid URL)
+    const urlRegex = /^(https?|chrome|www):\/\/[^\s$.?#].[^\s]*$/;
+    if (videoUrl && !urlRegex.test(videoUrl)) {
+      toast.error("Invalid video URL format");
+      return;
     }
 
     // Prepare form data
@@ -87,8 +98,7 @@ export default function AddContent({ closeModal, onSubmit }) {
 
             <div className="form-group">
               <label className="mb-0 fw-bold">Description</label>
-              <div className="quill-editor"
-              style={{maxHeight: "300px"}}>
+              <div className="quill-editor" style={{ maxHeight: "300px" }}>
                 <ReactQuill
                   value={description}
                   onChange={handleChange}
