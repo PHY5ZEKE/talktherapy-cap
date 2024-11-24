@@ -120,8 +120,11 @@ export default function Landing() {
               </div>
             </div>
 
-            <div className="d-flex flex-wrap gap-4 align-items-center justify-content-center p-3 my-3">
-              <div className="bg-white shadow p-4 rounded-3">
+            <div className="row row-cols-sm-4 row-cols-1 container gap-4 align-items-center justify-content-center p-3 my-3">
+              <div
+                className="col bg-white shadow p-4 rounded-3 overflow-y-scroll"
+                style={{maxHeight: "300px" }}
+              >
                 <FontAwesomeIcon
                   mask={faSquareFull}
                   icon={faCommentMedical}
@@ -144,7 +147,9 @@ export default function Landing() {
                 </p>
               </div>
 
-              <div className="bg-white shadow p-4 rounded-3">
+              <div
+                className="col bg-white shadow p-4 rounded-3 overflow-y-scroll"
+                style={{maxHeight: "300px" }}              >
                 <FontAwesomeIcon
                   mask={faSquareFull}
                   icon={faFileMedical}
@@ -163,7 +168,9 @@ export default function Landing() {
                 </p>
               </div>
 
-              <div className="bg-white shadow p-4 rounded-3">
+              <div
+                className="col bg-white shadow p-4 rounded-3 overflow-y-scroll"
+                style={{maxHeight: "300px" }}              >
                 <FontAwesomeIcon
                   mask={faSquareFull}
                   icon={faLaptopMedical}

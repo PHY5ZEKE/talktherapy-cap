@@ -190,6 +190,10 @@
   color: #1c9dff;
 }
 
+.text-red{
+  color: #f44336;
+}
+
 .text-landing {
   background: linear-gradient(0deg, #225ef9 0%, #1c9dff 100%);
   -webkit-background-clip: text;

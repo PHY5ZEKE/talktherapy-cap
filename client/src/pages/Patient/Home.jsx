@@ -211,8 +211,6 @@ export default function Home() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3"
-                    data-bs-toggle="collapse"
-                    href="#first-collapse"
                     onClick={() => {
                       setFirstCollapse(!firstCollapse);
                     }}
@@ -230,100 +228,109 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="row p-3" id="first-collapse">
-                  {loading ? (
-                    <div className="col bg-white border rounded-4 p-3 overflow-auto">
-                      <h5 className="mb-0 fw-bold text-center">
-                        Loading your appointments.
-                      </h5>
-                    </div>
-                  ) : error ? (
-                    <div className="col bg-white border rounded-4 p-3 overflow-auto">
-                      <h5 className="mb-0 fw-bold text-center">{error}</h5>
-                    </div>
-                  ) : acceptedAppointments.length > 0 ? (
-                    acceptedAppointments.map((appointment) => (
-                      <div
-                        key={appointment._id}
-                        className="col bg-white border rounded-4 p-3 overflow-auto"
-                        style={{ maxHeight: "75vh" }}
-                      >
-                        <div className="mb-3 border border-top-0 border-start-0 border-end-0">
-                          <div className="d-flex align-items-center gap-3">
-                            <h5 className="mb-0 fw-bold">
-                              {appointment.status === "Temporarily Rescheduled"
-                                ? appointment.temporaryReschedule.day
-                                : appointment.selectedSchedule.day}
-                            </h5>
-                            <div className="text-accepted">
-                              {appointment.status.toUpperCase()}
-                            </div>
-                          </div>
-
-                          <p className="mb-0 fw-bold">
-                            {appointment.status === "Temporarily Rescheduled"
-                              ? appointment.temporaryReschedule.startTime
-                              : appointment.selectedSchedule.startTime}{" "}
-                            -{" "}
-                            {appointment.status === "Temporarily Rescheduled"
-                              ? appointment.temporaryReschedule.endTime
-                              : appointment.selectedSchedule.endTime}
-                          </p>
-                          <p className="mb-3">
-                            Session of{" "}
-                            {appointment.status === "Temporarily Rescheduled"
-                              ? appointment.temporaryReschedule.clinicianName
-                              : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}
-                            with ${patientData?.firstName}`}
-                            .
-                          </p>
-
-                          {appointment.status === "Accepted" ? (
-                            <div className="d-flex justify-content-between flex gap-3">
-                              <div className="d-flex gap-3">
-                                <div
-                                  className="fw-bold text-button mb-3 border"
-                                  onClick={() =>
-                                    joinMeeting(appointment.roomId, appointment)
-                                  }
-                                >
-                                  Join
-                                </div>
-                              </div>
-                            </div>
-                          ) : appointment.status ===
-                            "Temporarily Rescheduled" ? (
-                            <div className="d-flex justify-content-between flex-wrap gap-3">
-                              <div className="mb-3 text-accepted">
-                                {appointment.status}
-                              </div>
-
-                              <div className="d-flex gap-3">
-                                <div
-                                  className="mb-3 fw-bold text-button border"
-                                  onClick={() =>
-                                    joinMeeting(appointment.roomId, appointment)
-                                  }
-                                >
-                                  Join
-                                </div>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="mb-3 text-pending">PENDING</div>
-                          )}
-                        </div>
+                {firstCollapse && (
+                  <div className="row p-3">
+                    {loading ? (
+                      <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                        <h5 className="mb-0 fw-bold text-center">
+                          Loading your appointments.
+                        </h5>
                       </div>
-                    ))
-                  ) : (
-                    <div className="col bg-white border rounded-4 p-3 overflow-auto">
-                      <p className="mb-0 fw-bold text-center">
-                        You currently don't have an accepted appointment. Check
-                        the Scheduling Page to book an appointment.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                    ) : error ? (
+                      <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                        <h5 className="mb-0 fw-bold text-center">{error}</h5>
+                      </div>
+                    ) : acceptedAppointments.length > 0 ? (
+                      acceptedAppointments.map((appointment) => (
+                        <div
+                          key={appointment._id}
+                          className="col bg-white border rounded-4 p-3 overflow-auto"
+                          style={{ maxHeight: "75vh" }}
+                        >
+                          <div className="mb-3 border border-top-0 border-start-0 border-end-0">
+                            <div className="d-flex align-items-center gap-3">
+                              <h5 className="mb-0 fw-bold">
+                                {appointment.status ===
+                                "Temporarily Rescheduled"
+                                  ? appointment.temporaryReschedule.day
+                                  : appointment.selectedSchedule.day}
+                              </h5>
+                              <div className="text-accepted">
+                                {appointment.status.toUpperCase()}
+                              </div>
+                            </div>
+
+                            <p className="mb-0 fw-bold">
+                              {appointment.status === "Temporarily Rescheduled"
+                                ? appointment.temporaryReschedule.startTime
+                                : appointment.selectedSchedule.startTime}{" "}
+                              -{" "}
+                              {appointment.status === "Temporarily Rescheduled"
+                                ? appointment.temporaryReschedule.endTime
+                                : appointment.selectedSchedule.endTime}
+                            </p>
+                            <p className="mb-3">
+                              Session of{" "}
+                              {appointment.status === "Temporarily Rescheduled"
+                                ? appointment.temporaryReschedule.clinicianName
+                                : `${appointment.selectedClinician?.firstName} ${appointment.selectedClinician?.middleName} ${appointment.selectedClinician?.lastName}
+                                    with ${patientData?.firstName}`}
+                              .
+                            </p>
+
+                            {appointment.status === "Accepted" ? (
+                              <div className="d-flex justify-content-between flex gap-3">
+                                <div className="d-flex gap-3">
+                                  <div
+                                    className="fw-bold text-button mb-3 border"
+                                    onClick={() =>
+                                      joinMeeting(
+                                        appointment.roomId,
+                                        appointment
+                                      )
+                                    }
+                                  >
+                                    Join
+                                  </div>
+                                </div>
+                              </div>
+                            ) : appointment.status ===
+                              "Temporarily Rescheduled" ? (
+                              <div className="d-flex justify-content-between flex-wrap gap-3">
+                                <div className="mb-3 text-accepted">
+                                  {appointment.status}
+                                </div>
+
+                                <div className="d-flex gap-3">
+                                  <div
+                                    className="mb-3 fw-bold text-button border"
+                                    onClick={() =>
+                                      joinMeeting(
+                                        appointment.roomId,
+                                        appointment
+                                      )
+                                    }
+                                  >
+                                    Join
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="mb-3 text-pending">PENDING</div>
+                            )}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="col bg-white border rounded-4 p-3 overflow-auto">
+                        <p className="mb-0 fw-bold text-center">
+                          You currently don't have an accepted appointment.
+                          Check the Scheduling Page to book an appointment.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* SECOND COL */}
@@ -331,8 +338,6 @@ export default function Home() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3"
-                    data-bs-toggle="collapse"
-                    href="#second-collapse"
                     onClick={() => {
                       setSecondCollapse(!secondCollapse);
                     }}
@@ -352,33 +357,35 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="row p-3" id="second-collapse">
-                  <div
-                    className="col bg-white border rounded-4 p-3"
-                    style={{
-                      maxHeight: "75vh", // Card's maximum height
-                      overflowY: "auto", // Enables vertical scrolling
-                    }}
-                  >
-                    {bookmarkedExercises.length > 0 ? (
-                      bookmarkedExercises.map((content) => (
-                        <div
-                          key={content._id}
-                          className="bookmark-item border rounded-3 p-2"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => handleCardClick(content._id)}
-                        >
-                          <h5 className="mb-1 fw-bold">{content.name}</h5>
-                          <p className="mb-0">{content.category}</p>
-                        </div>
-                      ))
-                    ) : (
-                      <p className="fw-bold text-center mb-0">
-                        No bookmarked exercises available.
-                      </p>
-                    )}
+                {secondCollapse && (
+                  <div className="row p-3">
+                    <div
+                      className="col bg-white border rounded-4 p-3"
+                      style={{
+                        maxHeight: "75vh", // Card's maximum height
+                        overflowY: "auto", // Enables vertical scrolling
+                      }}
+                    >
+                      {bookmarkedExercises.length > 0 ? (
+                        bookmarkedExercises.map((content) => (
+                          <div
+                            key={content._id}
+                            className="bookmark-item border rounded-3 p-2"
+                            style={{ cursor: "pointer" }}
+                            onClick={() => handleCardClick(content._id)}
+                          >
+                            <h5 className="mb-1 fw-bold">{content.name}</h5>
+                            <p className="mb-0">{content.category}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="fw-bold text-center mb-0">
+                          No bookmarked exercises available.
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
 
               {/* THIRD COL */}
@@ -386,8 +393,6 @@ export default function Home() {
                 <div className="row p-3">
                   <div
                     className="col bg-white border rounded-4 p-3"
-                    data-bs-toggle="collapse"
-                    href="#third-collapse"
                     onClick={() => {
                       setThirdCollapse(!thirdCollapse);
                     }}
@@ -406,35 +411,38 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-
-                <div className="row p-3" id="third-collapse">
-                  <div
-                    className="col bg-white border rounded-4 p-3 overflow-auto"
-                    style={{ maxHeight: "75vh" }}
-                  >
-                    {notifications.length > 0 ? (
-                      notifications
-                        .filter((notif) =>
-                          notif.show_to.includes(patientData?._id)
-                        )
-                        .map((notification) => (
-                          <div
-                            key={notification._id}
-                            className="mb-3 border border border-top-0 border-start-0 border-end-0"
-                          >
-                            <p className="mb-0 fw-bold">{notification.body}</p>
-                            <p className="mb-0">
-                              {formatDate(notification.date)}
-                            </p>
-                          </div>
-                        ))
-                    ) : (
-                      <p className="fw-bold text-center mb-0">
-                        No notifications available
-                      </p>
-                    )}
+                {thirdCollapse && (
+                  <div className="row p-3">
+                    <div
+                      className="col bg-white border rounded-4 p-3 overflow-auto"
+                      style={{ maxHeight: "75vh" }}
+                    >
+                      {notifications.length > 0 ? (
+                        notifications
+                          .filter((notif) =>
+                            notif.show_to.includes(patientData?._id)
+                          )
+                          .map((notification) => (
+                            <div
+                              key={notification._id}
+                              className="mb-3 border border border-top-0 border-start-0 border-end-0"
+                            >
+                              <p className="mb-0 fw-bold">
+                                {notification.body}
+                              </p>
+                              <p className="mb-0">
+                                {formatDate(notification.date)}
+                              </p>
+                            </div>
+                          ))
+                      ) : (
+                        <p className="fw-bold text-center mb-0">
+                          No notifications available
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>

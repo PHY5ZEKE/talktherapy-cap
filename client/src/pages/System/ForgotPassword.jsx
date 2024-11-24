@@ -13,6 +13,7 @@ export default function ForgotPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [isError, setIsError] = useState(false);
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [passwordValidationMessages, setPasswordValidationMessages] = useState({
@@ -34,6 +35,7 @@ export default function ForgotPassword() {
   };
 
   const [isSending, setIsSending] = useState(false);
+  const [isOtp, setIsOtp] = useState(false)
 
   const handlePasswordChange = (e) => {
     const { value } = e.target;
@@ -65,7 +67,10 @@ export default function ForgotPassword() {
       const data = await response.json();
       if (data.error) {
         setMessage(data.message);
+        setIsError(true)
+        setIsSending(false);
       } else {
+        setIsError(false)
         setMessage("OTP sent to your email.");
         setIsSending(false);
         setStep(2);
@@ -73,6 +78,7 @@ export default function ForgotPassword() {
     } else if (step === 2) {
       // Handle verify OTP
       setIsSending(true);
+      setIsOtp(true);
       const response = await fetch(`${appURL}/${route.system.otp}`, {
         method: "POST",
         headers: {
@@ -82,8 +88,13 @@ export default function ForgotPassword() {
       });
       const data = await response.json();
       if (data.error) {
+        setIsError(true)
+        setIsOtp(false)
+        setIsSending(false)
         setMessage(data.message);
       } else {
+        setIsError(false)
+        setIsOtp(false)
         setIsSending(false);
         setMessage("OTP verified. Please enter your new password.");
         setStep(3);
@@ -100,8 +111,11 @@ export default function ForgotPassword() {
       });
       const data = await response.json();
       if (data.error) {
+        setIsError(true)
+        setIsSending(false);
         setMessage(data.message);
       } else {
+        setIsError(false)
         setIsSending(false);
         setMessage("Password has been reset successfully.");
       }
@@ -200,7 +214,7 @@ export default function ForgotPassword() {
             {message && (
               <p
                 className={`text-center text-${
-                  message ? "success" : "success"
+                  !isError ? "success" : "danger"
                 } p-2 rounded-2 mb-2`}
               >
                 {message}
@@ -248,7 +262,7 @@ export default function ForgotPassword() {
                 </p>
 
                 <div className="row">
-                  <p className="fw-bold mb-2 text-center">Email</p>
+                  <p className="fw-bold mb-2 text-center">OTP</p>
                   <div className="input-group mb-3">
                     <input
                       type="number"
@@ -266,7 +280,7 @@ export default function ForgotPassword() {
                   onClick={handleNext}
                   disabled={isSending}
                 >
-                  {isSending ? "Sending..." : "Submit"}
+                  {isSending && isOtp ? "Verifying..." : "Submit"}
                 </button>
               </form>
             )}
@@ -302,7 +316,7 @@ export default function ForgotPassword() {
                       Object.values(passwordValidationMessages).map(
                         (message, index) =>
                           message && (
-                            <p key={index} className="text-danger mb-0">
+                            <p key={index} className="text-red mb-0">
                               {message}
                             </p>
                           )
