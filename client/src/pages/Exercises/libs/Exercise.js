@@ -294,9 +294,23 @@ function initializeExercise(loadedProgress = null) {
             });
         }
 
+        const phonemeToSymbol = {
+            "AA": "ɑ", "AE": "æ", "AH": "ʌ", "AO": "ɔ", "AW": "aʊ",
+            "AY": "aɪ", "B": "b", "CH": "tʃ", "D": "d", "DH": "ð",
+            "EH": "ɛ", "ER": "ɝ", "EY": "eɪ", "F": "f", "G": "ɡ",
+            "HH": "h", "IH": "ɪ", "IY": "i", "JH": "dʒ", "K": "k",
+            "L": "l", "M": "m", "N": "n", "NG": "ŋ", "OW": "oʊ",
+            "OY": "ɔɪ", "P": "p", "R": "ɹ", "S": "s", "SH": "ʃ",
+            "T": "t", "TH": "θ", "UH": "ʊ", "UW": "u", "V": "v",
+            "W": "w", "Y": "j", "Z": "z", "ZH": "ʒ",
+            "0": "", // No stress
+            "1": "ˈ", // Primary stress
+            "2": "ˌ"  // Secondary stress
+        };
+
 
         function displayPhonemesForCurrentPhrase(phrase) {
-            var words = phrase.split(' '); // Split the phrase into words
+            var words = phrase.split(' '); 
             var phonemeContainer = document.getElementById("phonphrase"); 
             phonemeContainer.innerHTML = '';
         
@@ -307,13 +321,20 @@ function initializeExercise(loadedProgress = null) {
                 var phonemeElement = document.createElement("div");
                 if (phonemeSequence.length > 0) {
                     var phonemeArray = phonemeSequence[0].split(" ");
-                    phonemeElement.innerText = cleanedWord + ": " + phonemeArray.join(", ");
+                    // Convert to symbols
+                    var symbolArray = phonemeArray.map(phoneme => {
+                        // Extract base phoneme and stress
+                        let basePhoneme = phoneme.replace(/\d/, "");
+                        let stress = phoneme.match(/\d/) || [""]; 
+                        return (phonemeToSymbol[stress[0]] || "") + (phonemeToSymbol[basePhoneme] || phoneme);
+                    });
+                    phonemeElement.innerText = cleanedWord + ": " + symbolArray.join(" ");
                 } else {
                     phonemeElement.innerText = cleanedWord + ": No phonemes found";
                 }
                 phonemeContainer.appendChild(phonemeElement);
             });
-
+        
             function cleanWord(word) {
                 return word.replace(/[^\w\s]|_/g, "").replace(/\s+/g, " ").toLowerCase();
             }
@@ -789,11 +810,18 @@ function initializeExercise(loadedProgress = null) {
                     words.forEach(word => {
                         var cleanedWord = cleanWord(word);
                         var phonemeSequence = window.pronouncing.phonesForWord(cleanedWord);
-            
+                
                         if (phonemeSequence.length > 0) {
                             var phonemeArray = phonemeSequence[0].split(" ");
+                            // Convert phonemes to symbols
+                            var symbolArray = phonemeArray.map(phoneme => {
+                                let basePhoneme = phoneme.replace(/\d/, ""); // Extract base phoneme
+                                let stress = phoneme.match(/\d/) || [""]; // Extract stress
+                                return (phonemeToSymbol[stress[0]] || "") + (phonemeToSymbol[basePhoneme] || phoneme);
+                            });
+                
                             var phonemeElement = document.createElement("div");
-                            phonemeElement.innerText = cleanedWord + ": " + phonemeArray.join(", ");
+                            phonemeElement.innerText = cleanedWord + ": " + symbolArray.join(" ");
                             phonemeContainer.appendChild(phonemeElement);
                         } else {
                             phonemeElement = document.createElement("div");

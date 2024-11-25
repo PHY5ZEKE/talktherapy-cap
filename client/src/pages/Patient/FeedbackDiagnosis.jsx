@@ -22,6 +22,7 @@ export default function FeedbackDiagnosis() {
   const [diagnosisData, setDiagnosisData] = useState([]);
   const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
   const [patientProgress, setPatientProgress] = useState([]); 
+  const [filter, setFilter] = useState("all");
 
   useEffect(() => {
     const fetchPatientData = async () => {
@@ -109,6 +110,22 @@ export default function FeedbackDiagnosis() {
       fetchPatientProgress();
     }
   }, [patientData, appURL, accessToken]);
+
+
+  const filteredProgress = patientProgress
+    .filter((progress) => {
+      if (filter === "completed") return progress.completed;
+      if (filter === "in-progress") return !progress.completed;
+      return true; 
+    })
+    .sort((a, b) => {
+      if (filter === "in-progress") {
+        const aCompletion = a.correctCount / a.totalPhrases;
+        const bCompletion = b.correctCount / b.totalPhrases;
+        return bCompletion - aCompletion; 
+      }
+      return 0;
+    });
 
   const handleDateClick = (diagnosis) => {
     setSelectedDiagnosis(diagnosis);
@@ -234,14 +251,43 @@ export default function FeedbackDiagnosis() {
               </div>
             </div>
 
-            {/* New section for displaying patient progress */}
+            {/* Patient Progress with Filter */}
             <div className="row p-3">
               <div className="col bg-white border rounded-4 p-3">
                 <p className="mb-0 fw-bold">Patient Progress</p>
-                {patientProgress.length > 0 ? (
+
+                {/* Filter Buttons */}
+                <div className="mb-3">
+                  <button
+                    className={`btn text-button border me-2 ${
+                      filter === "all" ? "btn-primary" : "btn-secondary"
+                    }`}
+                    onClick={() => setFilter("all")}
+                  >
+                    All
+                  </button>
+                  <button
+                    className={`btn text-button border me-2 ${
+                      filter === "completed" ? "btn-primary" : "btn-secondary"
+                    }`}
+                    onClick={() => setFilter("completed")}
+                  >
+                    Completed
+                  </button>
+                  <button
+                    className={`btn text-button border ${ filter === "in-progress" ? "btn-primary" : "btn-secondary"
+                    }`}
+                    onClick={() => setFilter("in-progress")}
+                  >
+                    In Progress
+                  </button>
+                </div>
+
+                {/* Filtered Progress List */}
+                {filteredProgress.length > 0 ? (
                   <div>
-                    {patientProgress.map((progress) => {
-                      const completionPercentage = 
+                    {filteredProgress.map((progress) => {
+                      const completionPercentage =
                         (progress.correctCount / progress.totalPhrases) * 100;
                       return (
                         <div key={progress.textId} className="mb-2">
@@ -250,7 +296,7 @@ export default function FeedbackDiagnosis() {
                             {completionPercentage.toFixed(2)}%
                           </span>
                           <span className="ms-2">
-                            {progress.completed ? "completed" : "in progress"}
+                            {progress.completed ? "Completed" : "In Progress"}
                           </span>
                         </div>
                       );

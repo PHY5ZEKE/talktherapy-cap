@@ -114,10 +114,7 @@ const routes = (
         <Route path="/assist/speech" element={<AssistSpeech />} />
         <Route path="/content/exercises/:id" element={<ExerciseContent />} />
         <Route path="/content/exercises/speech" element={<ExerRun />} />
-        <Route
-          path="/content/exercises/assistspeech"
-          element={<ExerSpeech />}
-        />
+        <Route path="/content/exercises/assistspeech" element={<ExerSpeech />} />
         <Route path="/content/exercises/facespeech" element={<ExerFace />} />
 
         {/* TO DO: Create a page for landing instead of login */}

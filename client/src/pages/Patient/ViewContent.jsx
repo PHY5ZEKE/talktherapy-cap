@@ -200,7 +200,7 @@ export default function ViewContent() {
                       {/* Static Exercise Card: Run*/}
                       <div
                         className="col"
-                        onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
+                        onClick={() => handleCardClick("speech")} 
                       >
                         <div className="mx-1 my-3 card exercise-container exercise-child border">
                           <img
@@ -222,11 +222,11 @@ export default function ViewContent() {
                       {/* Static Exercise Card: Speech*/}
                       <div
                         className="col"
-                        onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
+                        onClick={() => handleCardClick("assistspeech")} 
                       >
                         <div className="mx-1 my-3 card exercise-container exercise-child border">
                           <img
-                            src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
+                            src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" 
                             className="card-img-top border-bottom"
                             alt="Speech Exercise 2"
                             style={{ height: "200px", objectFit: "cover" }}
@@ -240,6 +240,29 @@ export default function ViewContent() {
                           </div>
                         </div>
                       </div>
+
+                        {/* Static Exercise Card: Face*/}
+                        <div
+                        className="col"
+                        onClick={() => handleCardClick("facespeech")} 
+                      >
+                        <div className="mx-1 my-3 card exercise-container exercise-child border">
+                          <img
+                            src="https://deeplobe.ai/wp-content/uploads/2022/02/Main-1.jpg" 
+                            className="card-img-top border-bottom"
+                            alt="Speech Exercise 3"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body p-3">
+                            <h5 className="card-title fw-bold mb-0 text-truncate">
+                              Machine Learning: Assistive Face Diagnostic Tool
+                            </h5>
+                            <p>Machine Learning</p>
+                            <FontAwesomeIcon icon={faStar} />
+                          </div>
+                        </div>
+                      </div>
+
 
                       {filteredContent.map((content) => (
                         <div
@@ -280,39 +303,6 @@ export default function ViewContent() {
                         </div>
                       ))}
                     </div>
-
-                    {/* Static Exercise Card: Face*/}
-                    {/* <div
-                    className="card exercise-container border"
-                    style={{ width: "18rem" }}
-                    onClick={() => handleCardClick("facespeech")} // Replace with actual ID logic if needed
-                  >
-                    <img
-                      src="https://www.example.com/image1.jpg" // Static image URL
-                      className="card-img-top"
-                      alt="Speech Exercise 3"
-                      style={{ height: "16rem", objectFit: "cover" }}
-                    />
-                    <div className="card-body">
-                      <h5 className="card-title fw-bold mb-0 text-truncate">
-                        Machine Learning: Assistive Face Therapy
-                      </h5>
-                      <p>Machine Learning</p>
-                      <FontAwesomeIcon
-                        icon={faBookmark}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBookmarkClick({ _id: "1", name: "Speech Exercise 1" }); // Static bookmark logic
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          color: patientData?.bookmarkedContent.includes("1") // Replace with actual logic
-                            ? "blue"
-                            : "black",
-                        }}
-                      />
-                    </div>
-                  </div> */}
                   </div>
                 </div>
               </div>

@@ -199,6 +199,27 @@ export default function ViewContent() {
                         </div>
                       </div>
 
+                      {/* Static Exercise Card: Face*/}
+                      <div
+                        className="col"
+                        onClick={() => handleCardClick("facespeech")} 
+                      >
+                        <div className="mx-1 my-3 card exercise-container exercise-child border">
+                          <img
+                            src="https://deeplobe.ai/wp-content/uploads/2022/02/Main-1.jpg" 
+                            className="card-img-top border-bottom"
+                            alt="Speech Exercise 3"
+                            style={{ height: "200px", objectFit: "cover" }}
+                          />
+                          <div className="card-body p-3">
+                            <h5 className="card-title fw-bold mb-0 text-truncate">
+                              Machine Learning: Assistive Face Diagnostic Tool
+                            </h5>
+                            <p>Machine Learning</p>
+                          </div>
+                        </div>
+                      </div>
+
                       {filteredContent.map((content) => (
                         <div
                           key={content._id}
