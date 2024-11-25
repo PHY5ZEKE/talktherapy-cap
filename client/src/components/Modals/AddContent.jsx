@@ -23,9 +23,15 @@ export default function AddContent({ closeModal, onSubmit }) {
     setDescription(value);
   };
 
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsDisabled(true);
+    setIsSubmitting(true);
 
     // Validate that all fields are filled
     if (!name || !description || !category || !image) {
@@ -65,6 +71,9 @@ export default function AddContent({ closeModal, onSubmit }) {
     } catch (error) {
       setError(error.message);
       toast.error("Failed to add content");
+    } finally {
+      setIsSubmitting(false);
+      setIsDisabled(false);
     }
   };
 
@@ -78,10 +87,6 @@ export default function AddContent({ closeModal, onSubmit }) {
       return;
     }
     setImage(file);
-  };
-
-  const modules = {
-    toolbar: false,
   };
 
   return (
@@ -182,8 +187,14 @@ export default function AddContent({ closeModal, onSubmit }) {
         </div>
 
         <div className="d-flex justify-content-center mt-3 gap-3">
-          <button onClick={handleSubmit} className="text-button border">
-            <p className="fw-bold my-0">SUBMIT</p>
+          <button
+            onClick={handleSubmit}
+            className="text-button border"
+            disabled={isDisabled || isSubmitting}
+          >
+            <p className="fw-bold my-0">
+              {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
+            </p>
           </button>
           <button onClick={handleClose} className="text-button border">
             <p className="fw-bold my-0">CANCEL</p>

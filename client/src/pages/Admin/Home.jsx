@@ -532,7 +532,7 @@ export default function Home() {
                     style={{ cursor: "pointer" }}
                   >
                     <p className="mb-0 fw-bold">
-                      {!firstCollapse ? (
+                      {firstCollapse ? (
                         <FontAwesomeIcon icon={faCaretUp} />
                       ) : (
                         <FontAwesomeIcon icon={faCaretDown} />
@@ -543,7 +543,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                {firstCollapse && (
+                {!firstCollapse && (
                   <div className="row p-3">
                     <div
                       className="col bg-white border rounded-4 p-3 overflow-auto"

@@ -360,7 +360,7 @@ export default function Home() {
                 {!secondCollapse && (
                   <div className="row p-3">
                     <div
-                      className="col bg-white border rounded-4 p-3"
+                      className="col d-flex flex-column gap-3 bg-white border rounded-4 p-3"
                       style={{
                         maxHeight: "75vh", // Card's maximum height
                         overflowY: "auto", // Enables vertical scrolling

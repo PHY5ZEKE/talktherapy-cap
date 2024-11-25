@@ -60,6 +60,9 @@ class WebSocketServer {
         case "camera-status":
           this.cameraStatus(data.roomID, data.enabled);
           break;
+        case "mic-status":
+          this.micStatus(data.roomID, data.enabled);
+          break;
         default:
           console.error("Unknown message type:", data.type);
       }
@@ -228,6 +231,22 @@ class WebSocketServer {
 
     const message = JSON.stringify({
       type: "camera-status",
+      enabled,
+    });
+
+    room.users.forEach((user) => {
+      if (user.connection.readyState === WebSocket.OPEN) {
+        user.connection.send(message);
+      }
+    });
+  }
+
+  micStatus(roomID, enabled) {
+    const room = this.rooms[roomID];
+    if (!room) return;
+
+    const message = JSON.stringify({
+      type: "mic-status",
       enabled,
     });
 

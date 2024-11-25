@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 // UI Components
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -18,7 +19,7 @@ import { AuthContext } from "../../utils/AuthContext";
 
 export default function Sidebar() {
   const { clearOnLogOut } = useContext(AuthContext);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -28,12 +29,10 @@ export default function Sidebar() {
     // Redirect to the login page
     navigate("/login");
   };
-  
+
   const isActive = (path) => {
-    // Check if the current pathname matches the base of the route
     if (path === page.patient.exercise) {
-      // Check if the current location is any `/patient/content/exercises/:id` page
-      return location.pathname.startsWith('/content/exercises');
+      return location.pathname.startsWith("/content/exercises");
     }
     return location.pathname === path;
   };
@@ -48,25 +47,47 @@ export default function Sidebar() {
       </div>
 
       <div className="d-flex flex-column gap-5 mb-auto text-link">
-        <Link to={page.patient.home} className={`text-link ${isActive(page.patient.home) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faHouse} size="xl" />
+      <Link to={page.patient.home} className={`text-link ${isActive(page.patient.home) ? 'active' : ''}`}>
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faHouse} size="xl" />
+            <span className="tooltip tooltip-right px-3">Home</span>
+          </div>
         </Link>
         <Link to={page.patient.feedback} className={`text-link ${isActive(page.patient.feedback) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faStethoscope} size="xl" />
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faStethoscope} size="xl" />
+            <span className="tooltip tooltip-right px-3">Feedbacks</span>
+          </div>
         </Link>
-        <Link to={page.patient.content} className={`text-link ${isActive(page.patient.content) || isActive(page.patient.exercise)? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
+        <Link to={page.patient.content} className={`text-link ${isActive(page.patient.content) || isActive(page.patient.exercise) ? 'active' : ''}`}>
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
+            <span className="tooltip tooltip-right px-3">Exercises</span>
+          </div>
         </Link>
         <Link to={page.patient.book} className={`text-link ${isActive(page.patient.book) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faCalendar} size="xl" />
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faCalendar} size="xl" />
+            <span className="tooltip tooltip-right px-3">Appointments</span>
+          </div>
         </Link>
         <Link to={page.patient.profile} className={`text-link ${isActive(page.patient.profile) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faGear} size="xl" />
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faGear} size="xl" />
+            <span className="tooltip tooltip-right px-3">Profile</span>
+          </div>
         </Link>
       </div>
 
-      <div className="my-3 text-link" style={{cursor: "pointer"}} onClick={handleLogout}>
-        <FontAwesomeIcon icon={faRightFromBracket} size="xl" />
+      <div
+        className="my-3 text-link"
+        style={{ cursor: "pointer" }}
+        onClick={handleLogout}
+      >
+        <div className="h-tooltip">
+          <FontAwesomeIcon icon={faRightFromBracket} size="xl" />
+          <span className="tooltip tooltip-right px-3">Logout</span>
+        </div>
       </div>
     </div>
   );

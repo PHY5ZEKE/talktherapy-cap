@@ -190,7 +190,7 @@
   color: #1c9dff;
 }
 
-.text-red{
+.text-red {
   color: #f44336;
 }
 
@@ -215,6 +215,47 @@
 
 .landing-subtext {
   width: 40%;
+}
+
+.h-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.h-tooltip .tooltip {
+  visibility: hidden;
+  position: absolute;
+  max-width: max-content;
+  background-color: #1c9dff;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  z-index: 1;
+  opacity: 0;
+  transition: opacity 0.3s;
+  margin-left: 0.5rem;
+}
+
+.tooltip-right {
+  top: -5px;
+  left: 125%;
+}
+
+.h-tooltip:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.h-tooltip .tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 100%;
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent #1c9dff transparent transparent;
 }
 
 /* Media query for 768 and below */

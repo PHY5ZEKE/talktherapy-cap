@@ -18,7 +18,7 @@ import { AuthContext } from "../../utils/AuthContext";
 
 export default function Sidebar() {
   const { clearOnLogOut } = useContext(AuthContext);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -31,7 +31,7 @@ export default function Sidebar() {
   const isActive = (path) => {
     // Check if the current pathname matches the base of the route
     if (path === page.clinician.exercise) {
-      return location.pathname.startsWith('/content/exercises');
+      return location.pathname.startsWith("/content/exercises");
     }
     return location.pathname === path;
   };
@@ -46,25 +46,75 @@ export default function Sidebar() {
       </div>
 
       <div className="d-flex flex-column gap-5 mb-auto text-link">
-        <Link to={page.clinician.home} className={`text-link ${isActive(page.clinician.home) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faHouse} size="xl" />
+        <Link
+          to={page.clinician.home}
+          className={`text-link ${
+            isActive(page.clinician.home) ? "active" : ""
+          }`}
+        >
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faHouse} size="xl" />
+            <span className="tooltip tooltip-right px-3">Home</span>
+          </div>
         </Link>
-        <Link to={page.clinician.content} className={`text-link ${isActive(page.clinician.content) || isActive(page.clinician.exercise)? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
+        <Link
+          to={page.clinician.content}
+          className={`text-link ${
+            isActive(page.clinician.content) ||
+            isActive(page.clinician.exercise)
+              ? "active"
+              : ""
+          }`}
+        >
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faPhotoFilm} size="xl" />
+            <span className="tooltip tooltip-right px-3">Exercises</span>
+          </div>
         </Link>
-        <Link to={page.clinician.patients} className={`text-link ${isActive(page.clinician.patients) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faUsers} size="xl" />
+        <Link
+          to={page.clinician.patients}
+          className={`text-link ${
+            isActive(page.clinician.patients) ? "active" : ""
+          }`}
+        >
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faUsers} size="xl" />
+            <span className="tooltip tooltip-right px-3">Patients</span>
+          </div>
         </Link>
-        <Link to={page.clinician.schedule} className={`text-link ${isActive(page.clinician.schedule) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faCalendar} size="xl" />
+        <Link
+          to={page.clinician.schedule}
+          className={`text-link ${
+            isActive(page.clinician.schedule) ? "active" : ""
+          }`}
+        >
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faCalendar} size="xl" />
+            <span className="tooltip tooltip-right px-3">Schedule</span>
+          </div>
         </Link>
-        <Link to={page.clinician.profile} className={`text-link ${isActive(page.clinician.profile) ? 'active' : ''}`}>
-          <FontAwesomeIcon icon={faGear} size="xl" />
+        <Link
+          to={page.clinician.profile}
+          className={`text-link ${
+            isActive(page.clinician.profile) ? "active" : ""
+          }`}
+        >
+          <div className="h-tooltip">
+            <FontAwesomeIcon icon={faGear} size="xl" />
+            <span className="tooltip tooltip-right px-3">Profile</span>
+          </div>
         </Link>
       </div>
 
-      <div className="my-3 text-link" style={{cursor: "pointer"}} onClick={handleLogout}>
-        <FontAwesomeIcon icon={faRightFromBracket} size="xl" />
+      <div
+        className="my-3 text-link"
+        style={{ cursor: "pointer" }}
+        onClick={handleLogout}
+      >
+        <div className="h-tooltip">
+          <FontAwesomeIcon icon={faRightFromBracket} size="xl" />
+          <span className="tooltip tooltip-right px-3">Logout</span>
+        </div>
       </div>
     </div>
   );

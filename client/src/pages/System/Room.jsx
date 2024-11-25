@@ -20,15 +20,17 @@ import { startVoiceRecognitionHandler } from "../../machinelearning/DiagToolRoom
 import { init } from "../../machinelearning/speech.js";
 
 import { route } from "../../utils/route";
-import ReactQuill from "react-quill";
 
 import ConfirmVideoCall from "../../components/Modals/ConfirmVideoCall.jsx";
 import SoapSidebar from "../../components/Modals/SoapSidebar.jsx";
 
 const useMediaStream = (localVideoRef) => {
+  const [selectedVideoDeviceId, setSelectedVideoDeviceId] = useState(null);
+  const [selectedAudioDeviceId, setSelectedAudioDeviceId] = useState(null);
   const localStream = useRef(null);
+
   const getMediaStream = useCallback(
-    async (constraints = { video: true, audio: true }) => {
+    async (constraints = { video: { deviceId: selectedVideoDeviceId ? { exact: selectedVideoDeviceId } : undefined }, audio: { deviceId: selectedAudioDeviceId ? { exact: selectedAudioDeviceId } : undefined } }) => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
         localStream.current = stream;
@@ -38,25 +40,8 @@ const useMediaStream = (localVideoRef) => {
         console.warn("Failed to get user media:", error);
       }
     },
-    [localVideoRef]
+    [localVideoRef, selectedVideoDeviceId, selectedAudioDeviceId]
   );
-
-  const stopVideoStream = useCallback(() => {
-    const videoTrack = localStream.current.getVideoTracks()[0];
-    if (videoTrack) {
-      videoTrack.stop();
-      localStream.current.removeTrack(videoTrack);
-    }
-    localStream.current?.getVideoTracks().forEach((track) => track.stop());
-    if (localVideoRef.current) localVideoRef.current.srcObject = null;
-  }, [localVideoRef]);
-
-  const stopAudioStream = useCallback(() => {
-    const audioTrack = localStream.current.getAudioTracks()[0];
-    if (audioTrack) {
-      audioTrack.enabled = !audioTrack.enabled;
-    }
-  }, []);
 
   const stopMediaStream = useCallback(() => {
     localStream.current?.getTracks().forEach((track) => track.stop());
@@ -67,9 +52,9 @@ const useMediaStream = (localVideoRef) => {
   return {
     getMediaStream,
     stopMediaStream,
-    stopVideoStream,
-    stopAudioStream,
     localStream,
+    setSelectedVideoDeviceId,
+    setSelectedAudioDeviceId,
   };
 };
 
@@ -127,9 +112,9 @@ export default function Room() {
   const {
     getMediaStream,
     stopMediaStream,
-    stopVideoStream,
-    stopAudioStream,
     localStream,
+    setSelectedVideoDeviceId,
+    setSelectedAudioDeviceId,
   } = useMediaStream(localVideoRef);
 
   useEffect(() => {
@@ -217,6 +202,8 @@ export default function Room() {
   };
 
   const pageReady = async (videoDeviceId, audioDeviceId) => {
+    setSelectedVideoDeviceId(videoDeviceId);
+    setSelectedAudioDeviceId(audioDeviceId);
     await getMediaStream({
       video: { deviceId: videoDeviceId ? { exact: videoDeviceId } : undefined },
       audio: { deviceId: audioDeviceId ? { exact: audioDeviceId } : undefined },
@@ -327,9 +314,15 @@ export default function Room() {
     } else if (signal.type === "camera-status") {
       if (remoteVideoRef.current) {
         if (signal.enabled) {
-          remoteVideoRef.current.srcObject = localStream.current;
-        } else {
-          remoteVideoRef.current.srcObject = null;
+          remoteVideoRef.current.srcObject = peerConnection.current.getRemoteStreams()[0];
+        }
+      }
+    } else if (signal.type === "mic-status") {
+      if (remoteVideoRef.current) {
+        const remoteStream = peerConnection.current.getRemoteStreams()[0];
+        const audioTrack = remoteStream?.getAudioTracks()[0];
+        if (audioTrack) {
+          audioTrack.enabled = signal.enabled;
         }
       }
     }
@@ -414,21 +407,35 @@ export default function Room() {
   };
 
   const toggleMic = () => {
-    stopAudioStream();
-    setIsMicEnabled(!isMicEnabled);
+    const audioTrack = localStream.current?.getAudioTracks()[0];
+    if (audioTrack) {
+      audioTrack.enabled = !audioTrack.enabled;
+      setIsMicEnabled(audioTrack.enabled);
+    }
+  
+    if (socket.current.readyState === WebSocket.OPEN) {
+      socket.current.send(
+        JSON.stringify({
+          type: "mic-status",
+          enabled: audioTrack.enabled,
+          roomID: roomid,
+        })
+      );
+    }
   };
 
-  const toggleCamera = async () => {
-    isCameraEnabled
-      ? stopVideoStream()
-      : await getMediaStream({ video: true, audio: true });
-    setIsCameraEnabled(!isCameraEnabled);
-
+  const toggleCamera = () => {
+    const videoTrack = localStream.current?.getVideoTracks()[0];
+    if (videoTrack) {
+      videoTrack.enabled = !videoTrack.enabled;
+      setIsCameraEnabled(videoTrack.enabled);
+    }
+  
     if (socket.current.readyState === WebSocket.OPEN) {
       socket.current.send(
         JSON.stringify({
           type: "camera-status",
-          enabled: !isCameraEnabled,
+          enabled: videoTrack.enabled,
           roomID: roomid,
         })
       );

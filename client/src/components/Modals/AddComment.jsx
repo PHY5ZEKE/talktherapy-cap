@@ -29,7 +29,12 @@ export default function AddComment({ handleModal, recordId }) {
     handleModal();
   };
 
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async () => {
+    setIsDisabled(true);
+    setIsSubmitting(true);
     try {
       const response = await fetch(
         `${appURL}/${route.soap.comment}/${recordId}`,
@@ -44,6 +49,7 @@ export default function AddComment({ handleModal, recordId }) {
       );
 
       if (!response.ok) {
+        failNotify("Failed to add comment. Try again.");
         throw new Error("Failed to add comment");
       }
 
@@ -52,6 +58,9 @@ export default function AddComment({ handleModal, recordId }) {
     } catch (error) {
       console.log(error);
       failNotify("Failed to add comment. Try again.");
+    } finally {
+      setIsSubmitting(false);
+      setIsDisabled(false);
     }
   };
 
@@ -79,20 +88,25 @@ export default function AddComment({ handleModal, recordId }) {
         </div>
 
         <div className="d-flex justify-content-center mt-3 gap-3">
-          <div
+          <button
             className="text-button border fw-bold"
             style={{ cursor: "pointer" }}
             onClick={handleSubmit}
+            disabled={isDisabled || isSubmitting}
           >
-            Submit
-          </div>
-          <div
+            {isSubmitting ? (
+             `SUBMITTING...`
+            ) : (
+              `SUBMIT`
+            )}
+          </button>
+          <button
             className="text-button border fw-bold"
             style={{ cursor: "pointer" }}
             onClick={handleClose}
           >
-            Cancel
-          </div>
+            CANCEL
+          </button>
         </div>
       </div>
     </div>

@@ -47,8 +47,15 @@ export default function Soap({
     openModal();
   };
 
+  // Handle form submit
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsDisabled(true);
+    setIsSubmitting(true);
 
     if (!date) {
       failNotify("Session Date is required");
@@ -122,6 +129,9 @@ export default function Soap({
       openModal(); // Close the modal after successful submission
     } catch (error) {
       failNotify("Failed to create SOAP diagnosis");
+    } finally {
+      setIsSubmitting(false);
+      setIsDisabled(false);
     }
   };
 
@@ -249,8 +259,11 @@ export default function Soap({
               type="submit"
               className="text-button border"
               onClick={handleSubmit}
+              disabled={isDisabled || isSubmitting}
             >
-              <p className="fw-bold my-0 status">SUBMIT</p>
+              <p className="fw-bold my-0 status">
+                {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
+              </p>
             </button>
             <button className="text-button border" onClick={handleClose}>
               <p className="fw-bold my-0 status">CANCEL</p>

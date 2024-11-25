@@ -29,13 +29,13 @@ export default function SudoMenu() {
               </Link>
             </li>
             <li>
-              <Link className="dropdown-item" to={page.sudo.audit}>
-                Audit Logs
+              <Link className="dropdown-item" to={page.sudo.archival}>
+                Archival
               </Link>
             </li>
             <li>
-              <Link className="dropdown-item" to={page.sudo.archival}>
-                Data Archival
+              <Link className="dropdown-item" to={page.sudo.audit}>
+                Audit Logs
               </Link>
             </li>
             <li>

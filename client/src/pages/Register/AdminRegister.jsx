@@ -79,8 +79,14 @@ export default function AdminRegister() {
     }
   };
 
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsDisabled(true);
+    setIsSubmitting(true);
 
     const {
       firstName,
@@ -94,6 +100,8 @@ export default function AdminRegister() {
     } = formData;
 
     if (password !== confPassword) {
+      setIsDisabled(false);
+      setIsSubmitting(false);
       setError(true);
       setMessage("Passwords do not match.");
       return;
@@ -133,6 +141,9 @@ export default function AdminRegister() {
       failNotify(toastMessage.fail.error);
       failNotify(error);
       setError(true);
+    } finally {
+      setIsDisabled(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -371,7 +382,7 @@ export default function AdminRegister() {
                     Object.values(passwordValidationMessages).map(
                       (message, index) =>
                         message && (
-                          <p key={index} className="text-danger mb-0">
+                          <p key={index} className="text-red mb-0">
                             {message}
                           </p>
                         )
@@ -444,8 +455,9 @@ export default function AdminRegister() {
                 className="text-button fw-bold border rounded-5 my-3"
                 type="submit"
                 onClick={handleSubmit}
+                disabled={isDisabled || isSubmitting}
               >
-                Submit
+                {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
               </button>
               <Link to="/login" className="fw-bold">
                 I want to login

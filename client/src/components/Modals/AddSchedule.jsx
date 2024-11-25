@@ -52,9 +52,16 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
     return `${hour12}:${minute} ${period}`;
   };
 
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setIsDisabled(true);
+    setIsSubmitting(true);
+
     const formattedStartTime = formatTime(startTime);
     const formattedEndTime = formatTime(endTime);
     const schedule = {
@@ -82,6 +89,9 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
       }
     } catch (error) {
       setErrorMessage("An error occurred. Please try again.", error); // Set generic error message
+    } finally {
+      setIsSubmitting(false);
+      setIsDisabled(false);
     }
   };
 
@@ -138,8 +148,14 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
             )}
 
             <div className="d-flex justify-content-center mt-3 gap-3">
-              <button type="submit" className="text-button border">
-                <p className="fw-bold my-0 status">SUBMIT</p>
+              <button
+                type="submit"
+                className="text-button border"
+                disabled={isDisabled || isSubmitting}
+              >
+                <p className="fw-bold my-0 status">
+                  {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
+                </p>
               </button>
               <button onClick={handleClose} className="text-button border">
                 <p className="fw-bold my-0 status">CANCEL</p>

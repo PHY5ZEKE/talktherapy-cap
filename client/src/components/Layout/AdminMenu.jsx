@@ -30,17 +30,22 @@ export default function AdminMenu() {
             </li>
             <li>
               <Link className="dropdown-item" to={page.admin.content}>
-                Manage Content
+                Exercises
+              </Link>
+            </li>
+            <li>
+              <Link className="dropdown-item" to={page.admin.patients}>
+                Patients
               </Link>
             </li>
             <li>
               <Link className="dropdown-item" to={page.admin.schedule}>
-                Manage Schedules
+                Schedules
               </Link>
             </li>
             <li>
               <Link className="dropdown-item" to={page.admin.archival}>
-                Data Archival
+                Archival
               </Link>
             </li>
             <li>

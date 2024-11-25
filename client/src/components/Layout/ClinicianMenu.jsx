@@ -41,7 +41,7 @@ export default function ClinicianMenu() {
             </li>
             <li>
               <Link className="dropdown-item" to={page.clinician.schedule}>
-                Appointments
+                Schedule
               </Link>
             </li>
             <li>
