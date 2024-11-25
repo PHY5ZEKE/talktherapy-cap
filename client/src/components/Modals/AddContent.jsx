@@ -70,7 +70,14 @@ export default function AddContent({ closeModal, onSubmit }) {
 
   // Handle file selection
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file && file.size > 1 * 1024 * 1024) {
+      // Check if file size exceeds 5 MB
+      toast.error("Image must not exceed 5 MB");
+      setImage(null); // Reset image input
+      return;
+    }
+    setImage(file);
   };
 
   const modules = {
