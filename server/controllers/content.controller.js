@@ -61,7 +61,7 @@ const createContent = [
       await createAuditLog(
         "createContent",
         adminEmail,
-        `Admin ${adminEmail} created new content with ID ${content._id}.`
+        `Admin ${adminEmail} created new content "${content.name}" with ID ${content._id}.`
       );
 
       res.status(201).send(content);
@@ -132,7 +132,7 @@ const updateContent = async (req, res) => {
       await createAuditLog(
         "updateContent",
         adminEmail,
-        `Admin ${adminEmail} updated content with ID ${updatedContent._id}.`
+        `Admin ${adminEmail} updated content "${updatedContent.name}" with ID ${updatedContent._id}.`
       );
 
       res.status(200).json(updatedContent);
@@ -164,7 +164,7 @@ const deleteContent = async (req, res) => {
     await createAuditLog(
       "deleteContent",
       adminEmail,
-      `Admin ${adminEmail} deleted content with ID ${id}.`
+      `Admin ${adminEmail} deleted content "${content.name}" with ID ${id}.`
     );
 
     res.status(200).send({ message: "Content deleted successfully" });
