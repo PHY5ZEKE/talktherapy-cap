@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 
 const SuperAdmin = require("../models/superAdminSLP.model");
 const Admin = require("../models/adminSLP.model");
@@ -7,7 +7,7 @@ const Patient = require("../models/patientSlp.model");
 const AuditLog = require("../models/auditLogSLP.model");
 const Appointment = require("../models/appointment.model.js");
 const Assignment = require("../models/assignmentSLP.model.js");
-const Schedule = require("../models/schedule.model.js")
+const Schedule = require("../models/schedule.model.js");
 
 const { createAuditLog } = require("../middleware/auditLog.js");
 const jwt = require("jsonwebtoken");
@@ -247,61 +247,99 @@ exports.sendNotification = async (req, res) => {
     },
   });
 
-  let htmlContent = '';
+  let htmlContent = "";
 
   let statusEmail = [];
 
   // Process Email Type
   if (type === "account-archive") {
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-archive.html'), 'utf8');
-    htmlContent = htmlTemplate.replace('${email}', email);
-  }
-  else if (type === "account-restore") {
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-restore.html'), 'utf8');
-    htmlContent = htmlTemplate.replace('${email}', email);
-  }
-  else if (type === "account-edit") {
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-edit.html'), 'utf8');
-    htmlContent = htmlTemplate.replace('${adminName}', whoEdited);
-  }
-  else if (type === "account-register") {
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-register.html'), 'utf8');
-    htmlContent = htmlTemplate.replace('${email}', email);
-  }
-  else if (type === "request-records-access") {
-    const [clinicianFirstName, clinicianLastName, patientFirstName, patientLastName, reason] = details;
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/request-access.html'), 'utf8');
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/account-archive.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate.replace("${email}", email);
+  } else if (type === "account-restore") {
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/account-restore.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate.replace("${email}", email);
+  } else if (type === "account-edit") {
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/account-edit.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate.replace("${adminName}", whoEdited);
+  } else if (type === "account-register") {
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/account-register.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate.replace("${email}", email);
+  } else if (type === "request-records-access") {
+    const [
+      clinicianFirstName,
+      clinicianLastName,
+      patientFirstName,
+      patientLastName,
+      reason,
+    ] = details;
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/request-access.html"),
+      "utf8"
+    );
     htmlContent = htmlTemplate
-      .replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`)
-      .replace('${patientName}', `${patientFirstName} ${patientLastName}`)
-      .replace('${reason}', reason);
-  }
-  else if (type === "request-content") {
+      .replace("${clinicianName}", `${clinicianFirstName} ${clinicianLastName}`)
+      .replace("${patientName}", `${patientFirstName} ${patientLastName}`)
+      .replace("${reason}", reason);
+  } else if (type === "request-content") {
     const [clinicianFirstName, clinicianLastName, request] = details;
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/request-content.html'), 'utf8');
-    htmlContent = htmlTemplate.replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`).replace('${reason}', request);
-  }
-  else if (type === 'soap') {
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/request-content.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate
+      .replace("${clinicianName}", `${clinicianFirstName} ${clinicianLastName}`)
+      .replace("${reason}", request);
+  } else if (type === "soap") {
     const [clinicianFirstName, clinicianLastName, soapData] = details;
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/account-soap.html'), 'utf8');
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/account-soap.html"),
+      "utf8"
+    );
     htmlContent = htmlTemplate
-      .replace('${clinicianName}', `${clinicianFirstName} ${clinicianLastName}`)
-      .replace('${soap}', soapData);
-  }
-  else if (type === 'appointment-delete') {
-    const [clinicianFirstName, clinicianMiddleName, clinicianLastName,] = details;
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/appointment-affected.html'), 'utf8');
+      .replace("${clinicianName}", `${clinicianFirstName} ${clinicianLastName}`)
+      .replace("${soap}", soapData);
+  } else if (type === "appointment-delete") {
+    const [clinicianFirstName, clinicianMiddleName, clinicianLastName] =
+      details;
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/appointment-affected.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate.replace(
+      "${clinicianName}",
+      `${clinicianFirstName} ${clinicianMiddleName} ${clinicianLastName}`
+    );
+  } else if (type === "appointment-status") {
+    const [
+      patientFirstName,
+      patientLastName,
+      clinicianName,
+      day,
+      startTime,
+      endTime,
+      content,
+    ] = details;
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/appointment-status.html"),
+      "utf8"
+    );
     htmlContent = htmlTemplate
-      .replace('${clinicianName}', `${clinicianFirstName} ${clinicianMiddleName} ${clinicianLastName}`)
-  }
-  else if (type === 'appointment-status') {
-    const [patientFirstName, patientLastName, clinicianName, day, startTime, endTime, content] = details;
-    const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/appointment-status.html'), 'utf8');
-    htmlContent = htmlTemplate
-    .replace('${patientName}', `${patientFirstName} ${patientLastName}`)
-    .replace('${clinicianName}', clinicianName)
-    .replace('${date}', `${day} ${startTime} - ${endTime}`)
-    .replace('${status}', content);
+      .replace("${patientName}", `${patientFirstName} ${patientLastName}`)
+      .replace("${clinicianName}", clinicianName)
+      .replace("${date}", `${day} ${startTime} - ${endTime}`)
+      .replace("${status}", content);
 
     // Get Email Address of Clinician using ID
     const clinician = await Clinician.findById(email[0]);
@@ -368,8 +406,11 @@ exports.forgotPassword = async (req, res) => {
     },
   });
 
-  const htmlTemplate = fs.readFileSync(path.join(__dirname, '../email-template/otp.html'), 'utf8');
-  const htmlContent = htmlTemplate.replace('${otp}', otp);
+  const htmlTemplate = fs.readFileSync(
+    path.join(__dirname, "../email-template/otp.html"),
+    "utf8"
+  );
+  const htmlContent = htmlTemplate.replace("${otp}", otp);
 
   const mailOptions = {
     to: user.email,
@@ -465,10 +506,10 @@ exports.resetPassword = async (req, res) => {
     user = await Admin.findOne({ email });
   }
   if (!user) {
-    user = await Clinician.findOne({ email }); // Added Clinician check
+    user = await Clinician.findOne({ email });
   }
   if (!user) {
-    user = await Patient.findOne({ email }); // Added Clinician check
+    user = await Patient.findOne({ email });
   }
 
   if (!user || !user.resetPasswordToken || user.resetPasswordToken !== otp) {
@@ -939,8 +980,8 @@ exports.archiveUser = [
       if (userRole === "clinician") {
         // If clinician, delete all schedule, appointments, and assignments
         await Schedule.deleteMany({ clinicianId: id });
-        await Appointment.deleteMany({ selectedClinician: id})
-        await Assignment.deleteMany({ clinicianId: id })
+        await Appointment.deleteMany({ selectedClinician: id });
+        await Assignment.deleteMany({ clinicianId: id });
       }
 
       userInfo.active = false;
@@ -950,7 +991,7 @@ exports.archiveUser = [
       await createAuditLog(
         "editAdmin",
         userInfo.email,
-        `User ${userInfo.email} account is tagged as 'For Archival' and disabled.`
+        `User ${userInfo.email} account is tagged as archived and disabled.`
       );
 
       return res.json({
@@ -961,8 +1002,7 @@ exports.archiveUser = [
     } catch (error) {
       return res.status(500).json({
         error: true,
-        message:
-          `${error}`,
+        message: `${error}`,
       });
     }
   },
@@ -989,7 +1029,7 @@ exports.unarchiveUser = [
       await createAuditLog(
         "editAdmin",
         userInfo.email,
-        `User ${userInfo.email} account is tagged as 'For Archival' and disabled.`
+        `User ${userInfo.email} account is unarchived and enabled.`
       );
 
       return res.json({
@@ -1069,35 +1109,74 @@ exports.getAllArchivedUsers = [
   },
 ];
 
-// Archive Users With No Activity for the last 3 Months based on lastActivity
 const archiveInactiveUsers = async () => {
   const threeMonthsAgo = new Date();
   threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 
   try {
     // Archive SuperAdmins
-    await SuperAdmin.updateMany(
-      { lastActivity: { $lt: threeMonthsAgo }, active: true },
-      { $set: { status: "archival", active: false } }
-    );
+    const superAdmins = await SuperAdmin.find({
+      lastActivity: { $lt: threeMonthsAgo },
+      active: true,
+    });
+    for (const superAdmin of superAdmins) {
+      superAdmin.status = "archival";
+      superAdmin.active = false;
+      await superAdmin.save();
+      await createAuditLog(
+        "archiveUser",
+        superAdmin.email,
+        `${superAdmin.email} has been archived due to inactivity`
+      );
+    }
 
     // Archive Admins
-    await Admin.updateMany(
-      { lastActivity: { $lt: threeMonthsAgo }, active: true },
-      { $set: { status: "archival", active: false } }
-    );
+    const admins = await Admin.find({
+      lastActivity: { $lt: threeMonthsAgo },
+      active: true,
+    });
+    for (const admin of admins) {
+      admin.status = "archival";
+      admin.active = false;
+      await admin.save();
+      await createAuditLog(
+        "archiveUser",
+        admin.email,
+        `${admin.email} has been archived due to inactivity`
+      );
+    }
 
     // Archive Clinicians
-    await Clinician.updateMany(
-      { lastActivity: { $lt: threeMonthsAgo }, active: true },
-      { $set: { status: "archival", active: false } }
-    );
+    const clinicians = await Clinician.find({
+      lastActivity: { $lt: threeMonthsAgo },
+      active: true,
+    });
+    for (const clinician of clinicians) {
+      clinician.status = "archival";
+      clinician.active = false;
+      await clinician.save();
+      await createAuditLog(
+        "archiveUser",
+        clinician.email,
+        `${clinician.email} has been archived due to inactivity`
+      );
+    }
 
     // Archive Patients
-    await Patient.updateMany(
-      { lastActivity: { $lt: threeMonthsAgo }, active: true },
-      { $set: { status: "archival", active: false } }
-    );
+    const patients = await Patient.find({
+      lastActivity: { $lt: threeMonthsAgo },
+      active: true,
+    });
+    for (const patient of patients) {
+      patient.status = "archival";
+      patient.active = false;
+      await patient.save();
+      await createAuditLog(
+        "archiveUser",
+        patient.email,
+        `${patient.email} has been archived due to inactivity`
+      );
+    }
 
     console.log("Inactive users archived successfully.");
   } catch (error) {
