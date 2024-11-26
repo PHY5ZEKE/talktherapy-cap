@@ -2,6 +2,8 @@ const Content = require("../models/content.model");
 const { PutObjectCommand } = require("@aws-sdk/client-s3");
 const upload = require("../middleware/uploadProfilePicture");
 const s3 = require("../config/aws");
+const { createAuditLog } = require("../middleware/auditLog");
+const Admin = require("../models/adminSLP.model");
 
 const getContents = async (req, res) => {
   try {
@@ -26,9 +28,17 @@ const createContent = [
   upload.single("image"),
   async (req, res) => {
     try {
+      const adminId = req.user.id; // Extract admin ID from authenticated user
+
+      // Find the admin's email using the admin ID
+      const admin = await Admin.findOne({ _id: adminId });
+      if (!admin) {
+        return res.status(404).json({ message: "Admin not found" });
+      }
+      const adminEmail = admin.email;
+
       let imageUrl = null;
 
-      // If an image file is uploaded, save it to S3
       if (req.file) {
         const fileName = `${Date.now()}_${req.file.originalname}`;
         const uploadParams = {
@@ -47,9 +57,16 @@ const createContent = [
         image: imageUrl || null,
       });
 
+      // Create an audit log entry
+      await createAuditLog(
+        "createContent",
+        adminEmail,
+        `Admin ${adminEmail} created new content with ID ${content._id}.`
+      );
+
       res.status(201).send(content);
     } catch (error) {
-      console.error('Error in createContent:', error);
+      console.error("Error in createContent:", error);
       res.status(500).send({ message: error.message });
     }
   },
@@ -63,11 +80,19 @@ const updateContent = async (req, res) => {
     }
 
     try {
-      const contentId = req.params.id;
-      const { name, description, category, image, videoUrl } = req.body; 
-      let imageUrl = image || ""; 
+      const adminId = req.user.id; // Extract admin ID from authenticated user
 
-      
+      // Find the admin's email using the admin ID
+      const admin = await Admin.findOne({ _id: adminId });
+      if (!admin) {
+        return res.status(404).json({ message: "Admin not found" });
+      }
+      const adminEmail = admin.email;
+
+      const contentId = req.params.id;
+      const { name, description, category, image, videoUrl } = req.body;
+      let imageUrl = image || "";
+
       if (req.file) {
         const fileName = `${Date.now()}_${req.file.originalname}`;
         const uploadParams = {
@@ -82,18 +107,35 @@ const updateContent = async (req, res) => {
         imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/content-images/${fileName}`;
       } else if (!imageUrl) {
         const content = await Content.findById(contentId);
-        imageUrl = content?.image || ""; 
+        imageUrl = content?.image || "";
       }
 
-      const updates = { name, description, category, videoUrl, image: imageUrl };
+      const updates = {
+        name,
+        description,
+        category,
+        videoUrl,
+        image: imageUrl,
+      };
 
-      const updatedContent = await Content.findByIdAndUpdate(contentId, updates, { new: true });
+      const updatedContent = await Content.findByIdAndUpdate(
+        contentId,
+        updates,
+        { new: true }
+      );
 
       if (!updatedContent) {
         return res.status(404).json({ message: "Content not found" });
       }
 
-      res.status(200).json(updatedContent); 
+      // Create an audit log entry
+      await createAuditLog(
+        "updateContent",
+        adminEmail,
+        `Admin ${adminEmail} updated content with ID ${updatedContent._id}.`
+      );
+
+      res.status(200).json(updatedContent);
     } catch (error) {
       console.error("Error updating content:", error);
       res.status(500).json({ message: "Failed to update content" });
@@ -101,17 +143,33 @@ const updateContent = async (req, res) => {
   });
 };
 
-
-
 const deleteContent = async (req, res) => {
   try {
+    const adminId = req.user.id; // Extract admin ID from authenticated user
+
+    // Find the admin's email using the admin ID
+    const admin = await Admin.findOne({ _id: adminId });
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+    const adminEmail = admin.email;
+
     const { id } = req.params;
     const content = await Content.findByIdAndDelete(id);
     if (!content) {
       return res.status(404).send({ message: "Content not found" });
     }
+
+    // Create an audit log entry
+    await createAuditLog(
+      "deleteContent",
+      adminEmail,
+      `Admin ${adminEmail} deleted content with ID ${id}.`
+    );
+
     res.status(200).send({ message: "Content deleted successfully" });
   } catch (error) {
+    console.error("Error deleting content:", error);
     res.status(500).send({ message: error.message });
   }
 };
