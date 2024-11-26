@@ -624,6 +624,27 @@ exports.requestAccess = async (req, res) => {
 
     await newAssignment.save();
 
+    // Retrieve the clinician's and patient's emails
+    const clinician = await Clinician.findById(clinicianId);
+    const patient = await Patient.findById(patientId);
+
+    if (!clinician || !patient) {
+      return res.status(404).json({
+        error: true,
+        message: "Clinician or Patient not found.",
+      });
+    }
+
+    const clinicianEmail = clinician.email;
+    const patientEmail = patient.email;
+
+    // Create an audit log entry
+    await createAuditLog(
+      "requestAccess",
+      clinicianEmail,
+      `Clinician ${clinicianEmail} requested access for patient ${patientEmail}.`
+    );
+
     res.status(201).json({ message: "Access requested successfully" });
   } catch (error) {
     console.error("Error requesting access:", error);
