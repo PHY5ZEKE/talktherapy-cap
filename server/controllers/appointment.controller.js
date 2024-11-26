@@ -760,53 +760,52 @@ exports.getClinicianAppointments = async (req, res) => {
         select: "clinicianName specialization day startTime endTime", // Select the schedule details
       });
 
-        // Decrypt patient and clinician details
-        const decryptedAppointments = appointments.map((appointment) => {
-          if (appointment.patientId) {
-            try {
-              if (isEncrypted(appointment.patientId.firstName)) {
-                appointment.patientId.firstName = decrypt(
-                  appointment.patientId.firstName
-                );
-              }
-              if (isEncrypted(appointment.patientId.middleName)) {
-                appointment.patientId.middleName = decrypt(
-                  appointment.patientId.middleName
-                );
-              }
-              if (isEncrypted(appointment.patientId.lastName)) {
-                appointment.patientId.lastName = decrypt(
-                  appointment.patientId.lastName
-                );
-              }
-            } catch (decryptError) {
-              console.error("Error decrypting patient details:", decryptError);
-            }
+    // Decrypt patient and clinician details
+    const decryptedAppointments = appointments.map((appointment) => {
+      if (appointment.patientId) {
+        try {
+          if (isEncrypted(appointment.patientId.firstName)) {
+            appointment.patientId.firstName = decrypt(
+              appointment.patientId.firstName
+            );
           }
-          if (appointment.selectedClinician) {
-            try {
-              if (isEncrypted(appointment.selectedClinician.firstName)) {
-                appointment.selectedClinician.firstName = decrypt(
-                  appointment.selectedClinician.firstName
-                );
-              }
-              if (isEncrypted(appointment.selectedClinician.middleName)) {
-                appointment.selectedClinician.middleName = decrypt(
-                  appointment.selectedClinician.middleName
-                );
-              }
-              if (isEncrypted(appointment.selectedClinician.lastName)) {
-                appointment.selectedClinician.lastName = decrypt(
-                  appointment.selectedClinician.lastName
-                );
-              }
-            } catch (error) {
-              console.error("Error decrypting clinician details:", error);
-            }
+          if (isEncrypted(appointment.patientId.middleName)) {
+            appointment.patientId.middleName = decrypt(
+              appointment.patientId.middleName
+            );
           }
-          return appointment;
-        });
-    
+          if (isEncrypted(appointment.patientId.lastName)) {
+            appointment.patientId.lastName = decrypt(
+              appointment.patientId.lastName
+            );
+          }
+        } catch (decryptError) {
+          console.error("Error decrypting patient details:", decryptError);
+        }
+      }
+      if (appointment.selectedClinician) {
+        try {
+          if (isEncrypted(appointment.selectedClinician.firstName)) {
+            appointment.selectedClinician.firstName = decrypt(
+              appointment.selectedClinician.firstName
+            );
+          }
+          if (isEncrypted(appointment.selectedClinician.middleName)) {
+            appointment.selectedClinician.middleName = decrypt(
+              appointment.selectedClinician.middleName
+            );
+          }
+          if (isEncrypted(appointment.selectedClinician.lastName)) {
+            appointment.selectedClinician.lastName = decrypt(
+              appointment.selectedClinician.lastName
+            );
+          }
+        } catch (error) {
+          console.error("Error decrypting clinician details:", error);
+        }
+      }
+      return appointment;
+    });
 
     res.status(200).json(decryptedAppointments);
   } catch (error) {
@@ -842,6 +841,29 @@ exports.requestScheduleChange = async (req, res) => {
     appointment.status = "Schedule Change Request";
 
     await appointment.save();
+
+    // Retrieve the patient's and clinician's emails
+    const patient = await Patient.findById(patientId);
+    const clinician = await ClinicianSLP.findById(
+      appointment.selectedClinician
+    );
+
+    if (!patient || !clinician) {
+      return res.status(404).json({
+        error: true,
+        message: "Patient or Clinician not found.",
+      });
+    }
+
+    const patientEmail = patient.email;
+    const clinicianEmail = clinician.email;
+
+    // Create an audit log entry
+    await createAuditLog(
+      "requestScheduleChange",
+      patientEmail,
+      `Patient ${patientEmail} requested a schedule change for an appointment with clinician ${clinicianEmail}.`
+    );
 
     res.status(200).json({
       message: "Schedule change request submitted successfully",
@@ -881,6 +903,29 @@ exports.requestTemporaryReschedule = async (req, res) => {
 
     await appointment.save();
 
+    // Retrieve the patient's and clinician's emails
+    const patient = await Patient.findById(patientId);
+    const clinician = await ClinicianSLP.findById(
+      appointment.selectedClinician
+    );
+
+    if (!patient || !clinician) {
+      return res.status(404).json({
+        error: true,
+        message: "Patient or Clinician not found.",
+      });
+    }
+
+    const patientEmail = patient.email;
+    const clinicianEmail = clinician.email;
+
+    // Create an audit log entry
+    await createAuditLog(
+      "requestTemporaryReschedule",
+      patientEmail,
+      `Patient ${patientEmail} requested a temporary reschedule for an appointment with clinician ${clinicianEmail}.`
+    );
+
     res.status(200).json({
       message: "Temporary reschedule request submitted successfully",
       appointment,
@@ -896,7 +941,9 @@ exports.getAffectedAppointments = async (req, res) => {
     const clinicianId = req.params.clinicianId; // Retrieve clinicianId from URL parameters
 
     // Find appointments for the logged-in clinician with status "Accepted" or "Completed"
-    const appointments = await Appointment.find({ selectedClinician: clinicianId })
+    const appointments = await Appointment.find({
+      selectedClinician: clinicianId,
+    })
       .populate({
         path: "patientId",
         select: "email", // Select the patient details
@@ -904,32 +951,32 @@ exports.getAffectedAppointments = async (req, res) => {
       .populate({
         path: "selectedClinician",
         select: "firstName middleName lastName",
-      })
-
-      const decryptedAppointments = appointments.map((appointment) => {
-        if (appointment.selectedClinician) {
-          try {
-            if (isEncrypted(appointment.selectedClinician.firstName)) {
-              appointment.selectedClinician.firstName = decrypt(
-                appointment.selectedClinician.firstName
-              );
-            }
-            if (isEncrypted(appointment.selectedClinician.middleName)) {
-              appointment.selectedClinician.middleName = decrypt(
-                appointment.selectedClinician.middleName
-              );
-            }
-            if (isEncrypted(appointment.selectedClinician.lastName)) {
-              appointment.selectedClinician.lastName = decrypt(
-                appointment.selectedClinician.lastName
-              );
-            }
-          } catch (error) {
-            console.error("Error decrypting clinician details:", error);
-          }
-        }
-        return appointment;
       });
+
+    const decryptedAppointments = appointments.map((appointment) => {
+      if (appointment.selectedClinician) {
+        try {
+          if (isEncrypted(appointment.selectedClinician.firstName)) {
+            appointment.selectedClinician.firstName = decrypt(
+              appointment.selectedClinician.firstName
+            );
+          }
+          if (isEncrypted(appointment.selectedClinician.middleName)) {
+            appointment.selectedClinician.middleName = decrypt(
+              appointment.selectedClinician.middleName
+            );
+          }
+          if (isEncrypted(appointment.selectedClinician.lastName)) {
+            appointment.selectedClinician.lastName = decrypt(
+              appointment.selectedClinician.lastName
+            );
+          }
+        } catch (error) {
+          console.error("Error decrypting clinician details:", error);
+        }
+      }
+      return appointment;
+    });
 
     res.status(200).json(decryptedAppointments);
   } catch (error) {
