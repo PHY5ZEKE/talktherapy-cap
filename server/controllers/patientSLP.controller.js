@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
+const SuperAdmin = require("../models/superAdminSLP.model");
 const PatientSlp = require("../models/patientSlp.model");
+const Clinician = require("../models/clinicianSLP.model");
 const Admin = require("../models/adminSLP.model");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
@@ -166,12 +168,21 @@ const signupPatient = async (req, res) => {
 
   const createdOn = req.body.createdOn || new Date().getTime();
 
-  const isPatientSlp = await PatientSlp.findOne({ email: email });
+  // Check if email already exists in SuperAdmin, Admin, Clinician, or Patient schemas
+  const existingSuperAdmin = await SuperAdmin.findOne({ email });
+  const existingAdmin = await Admin.findOne({ email });
+  const existingClinician = await Clinician.findOne({ email });
+  const existingPatient = await PatientSlp.findOne({ email });
 
-  if (isPatientSlp) {
-    return res.json({
+  if (
+    existingSuperAdmin ||
+    existingAdmin ||
+    existingClinician ||
+    existingPatient
+  ) {
+    return res.status(400).json({
       error: true,
-      message: "User already exist.",
+      message: "Email already exists in the system.",
     });
   }
 
@@ -198,7 +209,7 @@ const signupPatient = async (req, res) => {
     { patientSlp },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "2m",
+      expiresIn: "1m",
     }
   );
 

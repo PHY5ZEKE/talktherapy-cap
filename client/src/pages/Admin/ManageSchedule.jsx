@@ -223,6 +223,7 @@ export default function ManageSchedule() {
                           <p className="mb-0">
                             {schedule.startTime} - {schedule.endTime}
                           </p>
+                          <p className="mb-0">{schedule.status}</p>
                         </div>
                       ))
                     ) : (

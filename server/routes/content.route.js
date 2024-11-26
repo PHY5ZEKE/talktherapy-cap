@@ -1,5 +1,6 @@
 const express = require("express");
 const Content = require("../models/content.model.js");
+const verifyToken = require("../middleware/verifyToken");
 const router = express.Router();
 const {
   getContents,
@@ -12,8 +13,8 @@ const { get } = require("mongoose");
 
 router.get("/", getContents);
 router.get("/:id", getContentById);
-router.post("/", createContent);
-router.put("/:id", updateContent);
-router.delete("/:id", deleteContent);
+router.post("/", verifyToken, createContent);
+router.put("/:id", verifyToken, updateContent);
+router.delete("/:id", verifyToken, deleteContent);
 
 module.exports = router;

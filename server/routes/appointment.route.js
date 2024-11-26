@@ -66,4 +66,6 @@ router.post(
   appointmentController.requestTemporaryReschedule
 );
 
+router.post("/join-room", verifyToken, appointmentController.joinRoomAudit);
+
 module.exports = router;

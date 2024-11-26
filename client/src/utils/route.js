@@ -80,7 +80,8 @@ export const route = {
     requestTemporaryReschedule:
       "api/appointments-slp/request-temporary-reschedule",
     endSession: "api/appointments-slp/end-session-status",
-    affectedAppointment: "api/appointments-slp/get-affected-appointment"
+    affectedAppointment: "api/appointments-slp/get-affected-appointment",
+    roomAudit: "api/appointments-slp/join-room",
   },
   schedule: {
     create: "api/schedule-slp/add-schedule",

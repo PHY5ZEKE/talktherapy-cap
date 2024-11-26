@@ -32,7 +32,6 @@ export default function AdminContent() {
   const accessToken = authState.accessToken;
   const navigate = useNavigate();
 
-
   // Function to open the confirmation dialog
   const handleDeleteClick = (content) => {
     setContentToDelete(content);
@@ -225,7 +224,9 @@ export default function AdminContent() {
       {isConfirmDeleteOpen && (
         <ConfirmationDialog
           header="Confirm Deletion"
-          body={`Are you sure you want to delete "${contentToDelete ? contentToDelete.name : ""}"?`}
+          body={`Are you sure you want to delete "${
+            contentToDelete ? contentToDelete.name : ""
+          }"?`}
           handleModal={() => setIsConfirmDeleteOpen(false)}
           confirm={handleConfirmDelete}
         />

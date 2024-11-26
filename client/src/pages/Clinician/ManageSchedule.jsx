@@ -154,6 +154,35 @@ export default function ManageSchedule() {
     fetchSchedules();
   }, []);
 
+  // Sort schedules
+  const daysOfWeek = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
+
+  const sortSchedules = (schedules) => {
+    return schedules.sort((a, b) => {
+      const dayA = daysOfWeek.indexOf(a.day);
+      const dayB = daysOfWeek.indexOf(b.day);
+
+      if (dayA !== dayB) {
+        return dayA - dayB;
+      }
+
+      const timeA = new Date(`1970-01-01T${a.startTime}:00`).getTime();
+      const timeB = new Date(`1970-01-01T${b.startTime}:00`).getTime();
+
+      return timeA - timeB;
+    });
+  };
+
+  const sortedSchedules = useMemo(() => sortSchedules(schedules), [schedules]);
+
   const getSchedulesForSelectedDay = useMemo(() => {
     if (!selectedDate) return [];
     const dayOfWeek = selectedDate.toLocaleDateString("en-US", {
@@ -188,7 +217,7 @@ export default function ManageSchedule() {
   const handleConfirmDelete = () => {
     setIsConfirmationOpen(!isConfirmationOpen);
     handleDelete(scheduleToDelete);
-    notify("Successfully deleted this schedule.")
+    notify("Successfully deleted this schedule.");
   };
 
   return (
@@ -311,14 +340,15 @@ export default function ManageSchedule() {
                           className="d-flex justify-content-start align-items-center w-100 p-2 border-top-0 border-bottom"
                         >
                           <div className="w-100">
-                            <h5 className="fw-bold mb-0">
-                              {schedule.startTime} - {schedule.endTime}
+                            <h5 className="fw-bold mb-0 d-flex gap-2 align-items-center">
+                              {schedule.day}
+                              <span className="fw-medium mb-0 status-booked">
+                                {schedule.status}
+                              </span>
                             </h5>
 
-                            <p className="mb-0">{schedule.day}</p>
-                            <p className="mb-0 my-2">
-                              Status:{" "}
-                              <span className="fw-bold">{schedule.status}</span>
+                            <p className="d-flex gap-2 align-items-center">
+                              {schedule.startTime} - {schedule.endTime}
                             </p>
                           </div>
 
@@ -347,8 +377,52 @@ export default function ManageSchedule() {
                 </div>
               </div>
 
-              {/* SECOND COL */}
-              <div className="col-sm bg-white"></div>
+              {/* THIRD COL */}
+              <div className="col-sm bg-white">
+                <div className="row p-3">
+                  <div className="col bg-white border rounded-4 p-3">
+                    <p className="mb-0 fw-bold">
+                      {clinicianData?.firstName}'s Overall Schedule
+                    </p>
+                    <p className="mb-0">
+                      All of your schedules are displayed here.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="row p-3">
+                  <div
+                    className="col bg-white border rounded-4 p-3 overflow-auto"
+                    style={{ maxHeight: "75vh" }}
+                  >
+                    {schedules.length === 0 ? (
+                      <h5 className="mb-0 fw-bold text-center">
+                        No schedule available for the selected date.
+                      </h5>
+                    ) : (
+                      sortedSchedules.map((schedule, index) => (
+                        <div
+                          key={index}
+                          className="d-flex flex-column align-items-center w-100 p-2 border-top-0 border-bottom"
+                        >
+                          <div className="w-100">
+                            <h5 className="fw-bold mb-0 d-flex gap-2 align-items-center">
+                              {schedule.day}
+                              <span className="fw-medium mb-0 status-booked">
+                                {schedule.status}
+                              </span>
+                            </h5>
+
+                            <p className="d-flex gap-2 align-items-center">
+                              {schedule.startTime} - {schedule.endTime}
+                            </p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -552,6 +552,8 @@ export default function Room() {
             navigate("/");
           }}
           confirm={onConfirm}
+          user={getUserName()}
+          room={roomid}
         />
       )}
 

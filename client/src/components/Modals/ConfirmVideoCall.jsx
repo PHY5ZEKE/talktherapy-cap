@@ -1,8 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
+import { route } from "../../utils/route";
+import { AuthContext } from "../../utils/AuthContext";
 
 import "./modal.css";
 
-export default function ConfirmVideoCall({ close, confirm }) {
+export default function ConfirmVideoCall({ close, confirm, user, room }) {
+  const appURL = import.meta.env.VITE_APP_URL;
+
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+
   const [videoDevices, setVideoDevices] = useState([]);
   const [audioDevices, setAudioDevices] = useState([]);
   const [selectedVideoDevice, setSelectedVideoDevice] = useState("");
@@ -25,9 +32,30 @@ export default function ConfirmVideoCall({ close, confirm }) {
     });
   }, []);
 
-  const handleConfirm = (e) => {
+  const handleConfirm = async (e) => {
     e.preventDefault();
-    confirm(selectedVideoDevice, selectedAudioDevice);
+
+    const audit = {
+      action: "joinRoom",
+      user: user,
+      details: `${user} has joined teleconference room ${room}`,
+    };
+
+    const response = await fetch(`${appURL}/${route.appointment.roomAudit}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+      body: JSON.stringify(audit),
+    });
+
+    if (!response.ok) {
+      console.error("Unable to send audit to server.");
+    } else {
+      confirm(selectedVideoDevice, selectedAudioDevice);
+    }
+
   };
 
   const handleClose = (e) => {
@@ -57,18 +85,34 @@ export default function ConfirmVideoCall({ close, confirm }) {
 
           <div className="d-flex flex-column align-items-center mt-3 gap-3">
             <div className="d-flex flex-column text-center">
-              <p htmlFor="videoSelect" className="mb-0">Select Camera:</p>
-              <select id="videoSelect" value={selectedVideoDevice} onChange={(e) => setSelectedVideoDevice(e.target.value)}>
+              <p htmlFor="videoSelect" className="mb-0">
+                Select Camera:
+              </p>
+              <select
+                id="videoSelect"
+                value={selectedVideoDevice}
+                onChange={(e) => setSelectedVideoDevice(e.target.value)}
+              >
                 {videoDevices.map((device) => (
-                  <option key={device.deviceId} value={device.deviceId}>{device.label || `Camera ${device.deviceId}`}</option>
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Camera ${device.deviceId}`}
+                  </option>
                 ))}
               </select>
             </div>
             <div className="d-flex flex-column text-center">
-              <p htmlFor="audioSelect" className="mb-0">Select Microphone:</p>
-              <select id="audioSelect" value={selectedAudioDevice} onChange={(e) => setSelectedAudioDevice(e.target.value)}>
+              <p htmlFor="audioSelect" className="mb-0">
+                Select Microphone:
+              </p>
+              <select
+                id="audioSelect"
+                value={selectedAudioDevice}
+                onChange={(e) => setSelectedAudioDevice(e.target.value)}
+              >
                 {audioDevices.map((device) => (
-                  <option key={device.deviceId} value={device.deviceId}>{device.label || `Microphone ${device.deviceId}`}</option>
+                  <option key={device.deviceId} value={device.deviceId}>
+                    {device.label || `Microphone ${device.deviceId}`}
+                  </option>
                 ))}
               </select>
             </div>

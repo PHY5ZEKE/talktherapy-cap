@@ -30,7 +30,6 @@ const contentRoute = require("./routes/content.route.js");
 const appointmentRoute = require("./routes/appointment.route.js");
 const soapSLPRoute = require("./routes/soapSLP.route.js");
 const notificationRoutes = require("./routes/notification.route.js");
-const { send } = require("process");
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
