@@ -761,7 +761,7 @@ function initializeExercise(loadedProgress = null) {
     
                 recognition.lang = isMobile ? 'en-US' : 'en-UK';
                 recognition.interimResults = false;
-                recognition.continuous = false;
+                recognition.continuous = true;
 
                 let recognitionTimeout;
 
