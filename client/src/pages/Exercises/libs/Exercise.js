@@ -734,6 +734,9 @@ function initializeExercise(loadedProgress = null) {
             function startRecord(event) {
                 resetRecognitionStyles();
                 event.stopImmediatePropagation();
+
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+                var recognition = new window.SpeechRecognition(); 
     
                 if (event.type !== 'touchstart' && event.type === 'mousedown' && event.which !== 1) return;
     
