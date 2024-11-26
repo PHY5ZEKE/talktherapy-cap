@@ -191,12 +191,10 @@ exports.getClinicianSched = async (req, res) => {
           console.error("Error fetching clinician details:", clinicianError);
           return null; // Return null if there is an error fetching clinician details
         }
-        return schedule;
       })
     );
 
     const validSchedules = schedulesWithSpecialization.filter(schedule => schedule !== null);
-
     res.status(200).json(validSchedules);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
