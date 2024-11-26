@@ -760,9 +760,10 @@ function initializeExercise(loadedProgress = null) {
     
                 mediaRecorder.start();
     
-                recognition.lang = 'en-US';
+                recognition.lang = isMobile ? 'en-US' : 'en-UK';
                 recognition.interimResults = false;
                 recognition.continuous = false;
+                let listening = false;
 
                 let recognitionTimeout;
 
@@ -810,6 +811,7 @@ function initializeExercise(loadedProgress = null) {
                         $recognition.removeAttribute('confidence');
                     }
                     recognition.stop();
+                    listening = false;
                 };
             
     
@@ -910,7 +912,13 @@ function initializeExercise(loadedProgress = null) {
                     recognition.stop();
                 };
     
-                recognition.start();
+                if (listening == false) {
+                    recognition.start();
+                    listening = true;
+                } else {
+                        recognition.stop();
+                        recognition.abort();
+                      }
             }
             window.startRecord = startRecord;
 
