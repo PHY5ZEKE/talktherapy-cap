@@ -763,7 +763,6 @@ function initializeExercise(loadedProgress = null) {
                 recognition.lang = isMobile ? 'en-US' : 'en-UK';
                 recognition.interimResults = false;
                 recognition.continuous = false;
-                let listening = false;
 
                 let recognitionTimeout;
 
@@ -775,34 +774,34 @@ function initializeExercise(loadedProgress = null) {
                     }
                 };
 
-                recognition.onaudiostart = function () {
-                    console.log("Audio started");
-                    if (watElement) watElement.innerHTML = "Audio started"; // Update Wat element
-                };
+                // recognition.onaudiostart = function () {
+                //     console.log("Audio started");
+                //     if (watElement) watElement.innerHTML = "Audio started"; // Update Wat element
+                // };
             
-                recognition.onsoundstart = function () {
-                    console.log("Sound started");
-                    if (watElement) watElement.innerHTML = "Sound started"; // Update Wat element
-                };
+                // recognition.onsoundstart = function () {
+                //     console.log("Sound started");
+                //     if (watElement) watElement.innerHTML = "Sound started"; // Update Wat element
+                // };
 
-                recognition.onspeechstart = function () {
-                    console.log("Speech started");
-                    if (watElement) watElement.innerHTML = "Speech started"; // Update Wat element
-                };
+                // recognition.onspeechstart = function () {
+                //     console.log("Speech started");
+                //     if (watElement) watElement.innerHTML = "Speech started"; // Update Wat element
+                // };
             
-                recognition.onsoundend = function () {
-                    console.log("Sound ended");
-                    if (watElement) watElement.innerHTML = "Sound ended"; // Update Wat element
-                };
+                // recognition.onsoundend = function () {
+                //     console.log("Sound ended");
+                //     if (watElement) watElement.innerHTML = "Sound ended"; // Update Wat element
+                // };
             
-                recognition.onaudioend = function () {
-                    console.log("Audio ended");
-                    if (watElement) watElement.innerHTML = "Audio ended"; // Update Wat element
-                };
+                // recognition.onaudioend = function () {
+                //     console.log("Audio ended");
+                //     if (watElement) watElement.innerHTML = "Audio ended"; // Update Wat element
+                // };
                 
                 recognitionTimeout = setTimeout(() => {
                     recognition.onspeechend();
-                }, 5000);
+                }, 10000);
                 
             
                 recognition.onspeechend = function () {
@@ -811,7 +810,6 @@ function initializeExercise(loadedProgress = null) {
                         $recognition.removeAttribute('confidence');
                     }
                     recognition.stop();
-                    listening = false;
                 };
             
     
@@ -912,13 +910,7 @@ function initializeExercise(loadedProgress = null) {
                     recognition.stop();
                 };
     
-                if (listening == false) {
-                    recognition.start();
-                    listening = true;
-                } else {
-                        recognition.stop();
-                        recognition.abort();
-                      }
+                recognition.start();
             }
             window.startRecord = startRecord;
 

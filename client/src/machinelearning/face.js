@@ -1,79 +1,77 @@
-const URL = "https://talktherapy.site/src/machinelearning/my_model/";
-import * as tf from '@tensorflow/tfjs'; 
+const URL = "http://localhost:5173/src/machinelearning/face_model/";
+import * as tf from '@tensorflow/tfjs';
 import Chart from 'chart.js/auto';
 
-let model, webcam, labelContainer, maxPredictions;
-let chart, chartData, chartOptions;
+let model, webcam, labelContainer, maxPredictions, chartInstance, classLabels;
 
-async function init() {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
+export async function createModel() {
+  const modelURL = URL + "model.json";
+  const metadataURL = URL + "metadata.json";
 
-    model = await tmImage.load(modelURL, metadataURL);
-    maxPredictions = model.getTotalClasses();
+  // Load the model and metadata
+  model = await window.tmImage.load(modelURL, metadataURL);
+  const metadata = await fetch(metadataURL).then(res => res.json());
 
-    const flip = true;
-    webcam = new tmImage.Webcam(200, 200, flip);
-    await webcam.setup();
-    await webcam.play();
-    window.requestAnimationFrame(loop);
+  // Extract class labels from metadata
+  classLabels = metadata.labels; 
+  maxPredictions = classLabels.length;
 
-    document.getElementById("webcam-container").appendChild(webcam.canvas);
-    labelContainer = document.getElementById("label-container");
-    for (let i = 0; i < maxPredictions; i++) {
-      labelContainer.appendChild(document.createElement("div"));
-    }
+  // Setup webcam
+  const flip = true;
+  webcam = new window.tmImage.Webcam(200, 200, flip); 
+  await webcam.setup(); 
+  await webcam.play();  
+  window.requestAnimationFrame(loop);
 
-    setupChart();
-  }
+  // Append webcam canvas to the DOM
+  document.getElementById("webcam-container").appendChild(webcam.canvas);
 
+  // Initialize labelContainer for chart rendering
+  labelContainer = document.getElementById("label-container");
 
-
-  function setupChart() {
-    const ctx = document.getElementById("predictionChart").getContext("2d");
-    chartData = {
-      labels: [], // class names
+  // Create a chart instance to visualize the predictions
+  const ctx = document.getElementById("outputChart").getContext("2d");
+  chartInstance = new Chart(ctx, {
+    type: 'bar', 
+    data: {
+      labels: classLabels, 
       datasets: [{
-        label: 'Probability',
-        data: [], // probabilities
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-        borderColor: 'rgba(75, 192, 192, 1)',
+        label: 'Prediction Probability',
+        data: Array(maxPredictions).fill(0), 
+        backgroundColor: 'rgba(0, 123, 255, 0.6)',
+        borderColor: 'rgba(0, 123, 255, 1)',
         borderWidth: 1
       }]
-    };
-    chartOptions = {
-      indexAxis: 'y', // This makes the chart horizontal
+    },
+    options: {
+      responsive: true,
       scales: {
-        x: {
+        y: {
           beginAtZero: true,
           max: 1
         }
       }
-    };
-    chart = new Chart(ctx, {
-      type: 'bar', // Horizontal bar chart
-      data: chartData,
-      options: chartOptions
-    });
-  }
-
-  async function loop() {
-    webcam.update();
-    await predict();
-    window.requestAnimationFrame(loop);
-  }
-
-  async function predict() {
-    const prediction = await model.predict(webcam.canvas);
-    for (let i = 0; i < maxPredictions; i++) {
-      const classPrediction = prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-      labelContainer.childNodes[i].innerHTML = classPrediction;
     }
-    updateChart(prediction);
-  }
+  });
+}
 
-  function updateChart(prediction) {
-    chartData.labels = prediction.map(p => p.className);
-    chartData.datasets[0].data = prediction.map(p => p.probability);
-    chart.update();
-  }
+async function loop() {
+  webcam.update(); 
+  await predict(); 
+  window.requestAnimationFrame(loop); 
+}
+
+// Run the webcam image through the image model
+async function predict() {
+  const prediction = await model.predict(webcam.canvas);
+
+  const predictionData = prediction.map(p => p.probability);
+
+
+  chartInstance.data.datasets[0].data = predictionData;
+  chartInstance.update(); 
+}
+
+export async function init() {
+  await createModel();
+}

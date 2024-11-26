@@ -1,4 +1,4 @@
-const URL = "https://talktherapy.site/src/machinelearning/my_model/";
+const URL = "http://localhost:5173/src/machinelearning/my_model/";
 import * as tf from '@tensorflow/tfjs'; 
 import Chart from 'chart.js/auto';
 

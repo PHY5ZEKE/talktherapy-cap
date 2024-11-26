@@ -1,93 +1,78 @@
 /* General body setup for visual appeal */
 body {
-    background-color: #f8f9fa;
-    font-family: 'Arial', sans-serif;
-    color: #333;
-    margin: 0;
-    padding: 0;
-  }
-  
-  /* Header styling */
-  .header h5.title {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #007bff;
-  }
-  
-  /* Button Styles */
-  .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
-    font-weight: bold;
-  }
-  
-  .btn-primary:hover {
-    background-color: #0056b3;
-    border-color: #0056b3;
-  }
-  
-  /* Card Styles */
-  .card {
-    border-radius: 12px;
-    border: none;
-    transition: box-shadow 0.3s ease;
-  }
-  
-  .card:hover {
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  .card-body {
-    padding: 30px;
-  }
-  
-  /* Canvas styling */
-  #chartContainer {
-    height: 350px;
-  }
-  
-  /* Phoneme Output Styles */
+  background-color: #f8f9fa;
+  font-family: 'Arial', sans-serif;
+  color: #333;
+  margin: 0;
+  padding: 0;
+}
+
+/* Header Styling */
+.header h5.title {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #007bff;
+  text-align: center;
+}
+
+/* Card Styles */
+.card {
+  max-width: 600px; /* Limit the card's width */
+  margin: 20px auto; /* Center the card and add spacing */
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+  padding: 20px; /* Adjust padding */
+  text-align: center; /* Center-align content */
+}
+
+/* Center All Rows */
+.row {
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Align content horizontally */
+  align-items: center; /* Align content vertically (optional if needed) */
+  flex-wrap: wrap; /* Allow wrapping for responsive design */
+  margin: 0 auto; /* Center within container */
+}
+
+/* Chart Container */
+#chartContainer {
+  height: 250px; /* Fixed height for the chart */
+  max-width: 600px; /* Prevents stretching */
+  width: 100%; /* Makes it responsive */
+  margin: 0 auto; /* Centers the chart */
+  background-color: #f9f9f9; /* Optional background for visual clarity */
+  border-radius: 8px; /* Rounded corners for aesthetic appeal */
+  border: 1px solid #ddd; /* Subtle border */
+  display: flex; /* For alignment */
+  justify-content: center;
+  align-items: center;
+}
+
+/* Recognized Sounds Box */
+#phoneme-container {
+  max-width: 600px; /* Maximum width for the box */
+  width: 100%; /* Full width within constraints */
+  margin: 20px auto; /* Centers the box with spacing */
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  border: 1px solid #ddd;
+  text-align: center; /* Centers the text */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .card,
+  #chartContainer,
   #phoneme-container {
+    max-width: 90%; /* Adjust container width for smaller screens */
     padding: 15px;
-    background-color: #f1f1f1;
-    border-radius: 8px;
   }
-  
-  #comment {
-    font-size: 1.1rem;
+  #chartContainer {
+    height: 200px; /* Smaller height for mobile */
   }
-  
-  /* Speech Assessment Scores Styles */
-  #score-output {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-  
-  .score-text {
-    color: #333;
-  }
-  
-  #output {
-    font-size: 1.1rem;
-    font-weight: normal;
-    color: #777;
-  }
-  
-  /* Visually Hidden Content */
-  .visually-hidden {
-    visibility: hidden;
-  }
-  
-  /* Responsive Styling */
-  @media (max-width: 576px) {
-    .header h5 {
-      font-size: 1.8rem;
-    }
-    .btn-primary {
-      font-size: 1.1rem;
-    }
-    .card-body {
-      padding: 20px;
-    }
-  }
-  
+}
