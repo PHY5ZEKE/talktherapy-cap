@@ -45,6 +45,7 @@ exports.addClinician = async (req, res) => {
 
   const existingClinician = await Clinician.findOne({ email });
   const existingAdmin = await Admin.findOne({ email });
+  const existingPatient = await Patient.findOne({ email });
 
   if (existingClinician) {
     if (existingClinician.active === true) {
@@ -70,6 +71,13 @@ exports.addClinician = async (req, res) => {
     return res.status(400).json({
       error: true,
       message: "Email already exists as an admin.",
+    });
+  }
+
+  if (existingPatient) {
+    return res.status(400).json({
+      error: true,
+      message: "Email already exists as a patient.",
     });
   }
 
@@ -226,7 +234,7 @@ exports.clinicianSignup = async (req, res) => {
     { clinician: existingClinician },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "15m",
+      expiresIn: "1m",
     }
   );
 
