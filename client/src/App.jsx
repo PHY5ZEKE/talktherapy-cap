@@ -71,6 +71,7 @@ const ExerciseContent = lazy(() => import("./pages/Exercises/ExerciseContent"));
 const ExerRun = lazy(() => import("./pages/Exercises/ExerRun"));
 const ExerSpeech = lazy(() => import("./pages/Exercises/ExerSpeech"));
 const ExerFace = lazy(() => import("./pages/Exercises/ExerFace"));
+const AssistFace = lazy(() => import("./pages/Exercises/AssistFace"));
 
 // Error Handlers
 const NotFound = lazy(() => import("./pages/System/NotFound"));
@@ -116,6 +117,7 @@ const routes = (
         <Route path="/content/exercises/speech" element={<ExerRun />} />
         <Route path="/content/exercises/assistspeech" element={<ExerSpeech />} />
         <Route path="/content/exercises/facespeech" element={<ExerFace />} />
+        <Route path="/assist/face" element={<AssistFace/>} />
 
         {/* TO DO: Create a page for landing instead of login */}
         <Route
