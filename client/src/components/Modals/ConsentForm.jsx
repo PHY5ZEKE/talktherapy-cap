@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 
 import "./modal.css";
-import { Tooltip } from 'react-tooltip'
+import { Tooltip } from "react-tooltip";
 
 export default function ConsentForm({ handleModal }) {
   const [isScrolledToEnd, setIsScrolledToEnd] = useState(false);
@@ -18,9 +18,9 @@ export default function ConsentForm({ handleModal }) {
 
   useEffect(() => {
     const contentElement = contentRef.current;
-    contentElement.addEventListener('scroll', handleScroll);
+    contentElement.addEventListener("scroll", handleScroll);
     return () => {
-      contentElement.removeEventListener('scroll', handleScroll);
+      contentElement.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -39,33 +39,21 @@ export default function ConsentForm({ handleModal }) {
           <h2>Evaluation & Therapy Sessions</h2>
           <h5>1. Patient Contact</h5>
           <p>
-            That the student-in-charge and their respective academic and
-            clinical supervisors have access to the client’s contact details. If
-            and when the client changes contact details, it must be reported to
-            the current academic student-in-charge immediately.
+            Administrators and clinicians will have access to the client’s
+            contact details. If and when the client changes contact details, it
+            must be reported to the assigned clinician immediately.
+          </p>
+          <h5>2. Patient Handling</h5>
+          <p>
+            That the assessment and intervention will be done by the clinicians
+            registered in the website
           </p>
 
-          <h5>2. Laboratory Entry</h5>
+          <h5>3. In-session Documentation</h5>
           <p>
-            That you will be allowed entry in the UST SLP CSC Laboratory during
-            your scheduled time slot. Upon arrival at Gate 10, the students will
-            fetch you and will be escorted to your assigned room in the SLP
-            laboratory. The parent should always be inside the room. Only one
-            companion is allowed inside the SLP laboratory.
-          </p>
-
-          <h5>3. Patient Handling</h5>
-          <p>
-            That the assessment and intervention will be done by the
-            student-in-charge, supervised by certified academic and clinical
-            speech-language pathology supervisors at this center.
-          </p>
-
-          <h5>4. In-session Documentation</h5>
-          <p>
-            That sessions and any other activities related to the case will be
-            recorded in audio and/or video formats. The recordings will be used
-            in teaching, learning activities, and research purposes.
+            That SOAP templates will be used to document the sessions. These
+            will be recorded in text. The recordings will be used in teaching,
+            learning activities, and research purposes.
           </p>
 
           <h2>Assessment (and other) Documentation</h2>
@@ -79,51 +67,31 @@ export default function ConsentForm({ handleModal }) {
 
           <h5>2. Data Storage</h5>
           <p>
-            That the hard copy data of the client will be stored and can only be
-            accessed by current students-in-charge and clinical supervisors in a
-            secured room. Soft copy data will be stored in a Google Drive that
-            can only be accessed by current students-in-charge and their current
-            clinical supervisors. In-session recordings will be stored in a hard
-            drive that can only be accessed by the current students-in-charge
-            and their current clinical supervisors. Both hard and soft copy data
-            will be kept until they are active as current clients of the center.
+            That the soft copy data of the client will be stored and can only be
+            accessed by current authorized personnel in the website, Soft copy
+            data will be stored in MongoDB. Data will be kept until they are
+            active as current clients of the center.
           </p>
 
-          <h5>3. Data Disposal</h5>
+          <h5>3. Account Disposal</h5>
           <p>
-            That once the client is no longer an active member of the center,
-            data will only be disposed of a year after their first session.
-            Afterwards, these data will be disposed of through shredding (if
-            hard copy) and deletion (if soft copy).
+            That once the client is no longer an active member, data and access
+            to the website will be disposed of after 3 months of inactivity in
+            the website
           </p>
 
-          <h2>Attendance</h2>
-          <h5>1. Attendance</h5>
-          <p>
-            That failure to inform the center or its representatives of
-            tardiness or absence from a session twice (2 sessions consecutive),
-            will drop you from the deck and waitlist. Acquiring 2 informed
-            absences (2 sessions consecutive, in a month) will likewise drop you
-            from the deck. Lastly, inconsistent attendance (50% absences or more
-            in a 2-month period) throughout the program will likewise drop you
-            from the deck.
-          </p>
+          <h2>Consent</h2>
 
-          <h5>2. Rescheduling</h5>
           <p>
-            Rescheduling of sessions is not allowed, except for emergency
-            situations. This will be subject to the room availability and
-            approval of the CSC service coordinator.
+            By clicking yes to the consent, you agree to the terms and
+            conditions of the usage of TalkTherapy.
           </p>
         </div>
 
-        <Tooltip
-            anchorSelect=".text-button"
-            place="top"
-        >
-            You can only proceed after reading the document.
+        <Tooltip anchorSelect=".text-button" place="top">
+          You can only proceed after reading the document.
         </Tooltip>
-        
+
         <button
           type="button"
           onClick={triggerModal}
