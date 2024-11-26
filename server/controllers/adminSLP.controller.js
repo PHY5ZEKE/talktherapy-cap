@@ -617,7 +617,11 @@ exports.editPatient = [
   verifyToken,
   async (req, res) => {
     const { firstName, middleName, lastName, mobile, id } = req.body;
-    const { email } = req.user; // Extract admin email from authenticated user
+    const adminId = req.user.id; // Extract admin ID from authenticated user
+
+    // Log the request body and admin ID
+    console.log("Request Body:", req.body);
+    console.log("Authenticated Admin ID:", adminId);
 
     // Validate input
     if (!firstName) {
@@ -642,7 +646,22 @@ exports.editPatient = [
     }
 
     try {
+      // Find the admin's email using the admin ID
+      const admin = await Admin.findOne({ _id: adminId });
+      if (!admin) {
+        return res
+          .status(404)
+          .json({ error: true, message: "Admin not found." });
+      }
+      const adminEmail = admin.email;
+
+      // Log the admin details
+      console.log("Admin Found:", admin);
+
       const patient = await Patient.findOne({ _id: id });
+
+      // Log the patient details
+      console.log("Patient Found:", patient);
 
       if (!patient) {
         return res
@@ -659,13 +678,27 @@ exports.editPatient = [
       // Save the updated patient information
       await patient.save();
 
+      // Log the updated patient details
+      console.log("Updated Patient:", patient);
+
+      // Create an audit log entry
+      await createAuditLog(
+        "editPatient",
+        adminEmail,
+        `${adminEmail} edited the patient account with email ${patient.email}.`
+      );
+
+      // Log the audit log creation
+      console.log("Audit Log Created");
+
       return res.json({
         error: false,
-        patient, // Ensure this matches the client expectation
+        patient,
         message: "Patient information updated successfully.",
       });
     } catch (error) {
-      console.error("Error updating patient information:", error); // Log the error details
+      // Log the error details
+      console.error("Error updating patient information:", error);
       return res.status(500).json({
         error: true,
         message: "An error occurred while updating patient information.",
@@ -678,6 +711,7 @@ exports.editClinician = [
   verifyToken,
   async (req, res) => {
     const { firstName, middleName, lastName, address, id } = req.body;
+    const adminId = req.user.id; // Extract admin ID from authenticated user
 
     // Validate input
     if (!firstName) {
@@ -702,12 +736,21 @@ exports.editClinician = [
     }
 
     try {
+      // Find the admin's email using the admin ID
+      const admin = await Admin.findOne({ _id: adminId });
+      if (!admin) {
+        return res
+          .status(404)
+          .json({ error: true, message: "Admin not found." });
+      }
+      const adminEmail = admin.email;
+
       const clinician = await Clinician.findOne({ _id: id });
 
       if (!clinician) {
         return res
           .status(404)
-          .json({ error: true, message: " Admin not found." });
+          .json({ error: true, message: "Clinician not found." });
       }
 
       // Update the clinician's information
@@ -719,15 +762,24 @@ exports.editClinician = [
       // Save the updated clinician information
       await clinician.save();
 
+      // Create an audit log entry
+      await createAuditLog(
+        "editClinician",
+        adminEmail,
+        `${adminEmail} edited the clinician account with email ${clinician.email}.`
+      );
+
       return res.json({
         error: false,
-        Clinician,
-        message: " Admin information updated successfully.",
+        clinician,
+        message: "Clinician information updated successfully.",
       });
     } catch (error) {
+      // Log the error details
+      console.error("Error updating clinician information:", error);
       return res.status(500).json({
         error: true,
-        message: "An error occurred while updating Admin information.",
+        message: "An error occurred while updating clinician information.",
       });
     }
   },
@@ -777,25 +829,51 @@ exports.getPendingRequests = async (req, res) => {
   }
 };
 
-exports.updateRequestStatus = async (req, res) => {
-  const { requestId, status } = req.body;
+exports.updateRequestStatus = [
+  verifyToken,
+  async (req, res) => {
+    const { requestId, status } = req.body;
+    const adminId = req.user.id;
 
-  if (!["Assigned", "Denied"].includes(status)) {
-    return res.status(400).json({ message: "Invalid status" });
-  }
-
-  try {
-    const request = await AssignmentSLP.findById(requestId);
-
-    if (!request) {
-      return res.status(404).json({ message: "Request not found" });
+    if (!["Assigned", "Denied"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
     }
 
-    request.status = status;
-    await request.save();
+    try {
+      // Find the admin's email using the admin ID
+      const admin = await Admin.findOne({ _id: adminId });
+      if (!admin) {
+        return res.status(404).json({ message: "Admin not found" });
+      }
+      const adminEmail = admin.email;
 
-    res.status(200).json({ message: "Status updated successfully", request });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error });
-  }
-};
+      const request = await AssignmentSLP.findById(requestId).populate(
+        "clinicianId patientId"
+      );
+
+      if (!request) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+
+      const clinicianEmail = request.clinicianId.email;
+      const patientEmail = request.patientId.email;
+
+      // Update the request status
+      request.status = status;
+      await request.save();
+
+      // Create an audit log entry
+      await createAuditLog(
+        "updateRequestStatus",
+        adminEmail,
+        `${adminEmail} has ${status.toLowerCase()} clinician access for patient ${patientEmail} by clinician ${clinicianEmail}.`
+      );
+
+      res.status(200).json({ message: "Status updated successfully", request });
+    } catch (error) {
+      // Log the error details
+      console.error("Error updating request status:", error);
+      res.status(500).json({ message: "Server error", error });
+    }
+  },
+];

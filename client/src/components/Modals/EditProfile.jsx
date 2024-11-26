@@ -84,10 +84,6 @@ export default function EditProfile({
       failNotify("Mobile number is required.");
       return;
     }
-    if (!address.trim()) {
-      failNotify("Address is required.");
-      return;
-    }
 
     // Validate firstName, middleName, and lastName
     const nameRegex = /^[A-Za-z\s]{1,35}$/;
