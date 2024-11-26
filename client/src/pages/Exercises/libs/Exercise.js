@@ -741,6 +741,7 @@ function initializeExercise(loadedProgress = null) {
                 if (recordButton && recordButton.hasAttribute('record')) return;            
 
                 var phonemeContainer = document.getElementById("phoneme-output");
+                var watElement = document.getElementById("Wat");
                 phonemeContainer.innerHTML = '';
 
                 time = new Date().getTime();
@@ -759,9 +760,9 @@ function initializeExercise(loadedProgress = null) {
     
                 mediaRecorder.start();
     
-                recognition.lang = isMobile ? 'en-US' : 'en-UK';
+                recognition.lang = 'en-US';
                 recognition.interimResults = false;
-                recognition.continuous = true;
+                recognition.continuous = false;
 
                 let recognitionTimeout;
 
@@ -772,6 +773,31 @@ function initializeExercise(loadedProgress = null) {
                         $recognition.innerHTML = 'listening...';
                     }
                 };
+
+                recognition.onaudiostart = function () {
+                    console.log("Audio started");
+                    if (watElement) watElement.innerHTML = "Audio started"; // Update Wat element
+                };
+            
+                recognition.onsoundstart = function () {
+                    console.log("Sound started");
+                    if (watElement) watElement.innerHTML = "Sound started"; // Update Wat element
+                };
+
+                recognition.onspeechstart = function () {
+                    console.log("Speech started");
+                    if (watElement) watElement.innerHTML = "Speech started"; // Update Wat element
+                };
+            
+                recognition.onsoundend = function () {
+                    console.log("Sound ended");
+                    if (watElement) watElement.innerHTML = "Sound ended"; // Update Wat element
+                };
+            
+                recognition.onaudioend = function () {
+                    console.log("Audio ended");
+                    if (watElement) watElement.innerHTML = "Audio ended"; // Update Wat element
+                };
                 
                 recognitionTimeout = setTimeout(() => {
                     recognition.onspeechend();
@@ -779,7 +805,6 @@ function initializeExercise(loadedProgress = null) {
                 
             
                 recognition.onspeechend = function () {
-                    clearTimeout(recognitionTimeout);
                     if ($panel_recognition) $panel_recognition.setAttribute('mode', 'recognition');
                     if ($recognition) {
                         $recognition.removeAttribute('confidence');

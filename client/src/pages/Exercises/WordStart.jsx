@@ -344,6 +344,7 @@ export default function WordStart() {
         {/* Panel Recognition */}
         <div id="panel-recognition" className="panel-recognition d-flex flex-column align-items-center mb-4">
             <div id="recognition" className="recognition-text mb-2" title="Google Speech Recognition result and its confidence">&nbsp;</div>
+            <div id="Wat" className="mb-2"></div>
             <div id="compare" className="compare-text mb-2"></div>
             <div id="phoneme" className="phoneme-output mb-2"></div>
             <div id="phoneme-output" className="phoneme-output mb-4"></div>
