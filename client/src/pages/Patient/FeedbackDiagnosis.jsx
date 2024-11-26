@@ -100,9 +100,10 @@ export default function FeedbackDiagnosis() {
         }
 
         const data = await response.json();
-        setPatientProgress(data); // Assuming data is an array of progress items
+        setPatientProgress(Array.isArray(data) ? data : []);
       } catch (error) {
         setError(error.message);
+        setPatientProgress([]);
       }
     };
 
