@@ -984,3 +984,14 @@ exports.getAffectedAppointments = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.joinRoomAudit = async (req, res) => {
+  const { action, user, details } = req.body;
+  try {
+    await createAuditLog(action, user, details);
+    res.status(200).json({ message: "Audit log created successfully" });
+  } catch (error) {
+    console.error("Cannot log join room.", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
