@@ -93,9 +93,8 @@ export default function ChooseSchedule({
           },
         });
         const data = await response.json();
-        // Filter schedules based on the selected clinician ID
         const filteredSchedules = data.filter(
-          (schedule) => schedule.clinicianId === clinicianId
+          (schedule) => schedule.clinicianId._id === clinicianId._id
         );
         setSchedules(filteredSchedules);
       } catch (error) {
