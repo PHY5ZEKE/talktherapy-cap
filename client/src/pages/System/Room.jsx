@@ -3,6 +3,18 @@ import { AuthContext } from "../../utils/AuthContext";
 
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 
+import { Line } from 'react-chartjs-2';
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+
 import "../../styles/containers.css";
 import "../../styles/diagnostic.css";
 
@@ -14,10 +26,6 @@ import {
   faMicrophone,
   faMicrophoneSlash,
 } from "@fortawesome/free-solid-svg-icons";
-
-//import { runSpeechRecognition } from "../../machinelearning/my_model/voice2text.js";
-import { startVoiceRecognitionHandler } from "../../machinelearning/DiagToolRoom.js";
-import { init } from "../../machinelearning/speech.js";
 
 import { route } from "../../utils/route";
 
@@ -69,7 +77,6 @@ export default function Room() {
   const userRole = authState.userRole;
   const currentUser = authState.userId;
 
-  const [recognitionResults, setRecognitionResults] = useState("");
 
   const appURL = import.meta.env.VITE_APP_URL;
   const accessToken = authState.accessToken;
@@ -246,15 +253,6 @@ export default function Room() {
     processQueues();
   };
 
-  const displayRecognitionResults = (outputText) => {
-    const outputDiv = document.getElementById("output");
-    const commentDiv = document.getElementById("comment");
-    setRecognitionResults(outputText);
-
-    outputDiv.innerHTML = outputText;
-    commentDiv.innerHTML = "Results received from the patient.";
-  };
-
   const gotMessageFromServer = (message) => {
     const signal = JSON.parse(message.data);
 
@@ -302,10 +300,6 @@ export default function Room() {
         ...prevMessages,
         { message: signal.message, sender: signal.sender },
       ]);
-    } else if (signal.type === "voice-recognition-result") {
-      const outputText = signal.outputText;
-      console.log("Received voice recognition from patient:", outputText);
-      displayRecognitionResults(outputText);
     } else if (signal.type === "leave-room") {
       handleCloseConnection();
     } else if (signal.type === "stop-session") {
@@ -486,13 +480,6 @@ export default function Room() {
       : `${appointmentDetails?.selectedClinician.firstName} ${appointmentDetails?.selectedClinician.lastName}`;
   };
 
-  useEffect(() => {
-    const initializeModel = async () => {
-      await init();
-    };
-    initializeModel();
-  }, []);
-
   const webSocketNotification = async (message) => {
     const response = JSON.stringify(message);
     const parsed = JSON.parse(response);
@@ -545,6 +532,7 @@ export default function Room() {
   };
 
   const [assessmentData, setAssessmentData] = useState(null);
+  const [assessmentFaceData, setAssessmentFaceData] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -586,6 +574,47 @@ export default function Room() {
         fetchPatientAssessment();
       }
     }, [appointmentDetails, appURL, accessToken]);
+
+        // Function to fetch the patient's face assessment
+    const fetchPatientFaceAssessment = async () => {
+      try {
+        const patientId = appointmentDetails?.patientId._id;  
+        if (!patientId) {
+          setError('Patient ID is missing');
+          return;
+        }
+
+        setIsLoading(true);
+        const response = await fetch(`${appURL}/${route.patient.getFaceAssessment}/${patientId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+
+        if (!response.ok) {
+          console.log("Failed to fetch patient face assessment");
+          setError('Failed to fetch face assessment');
+        } else {
+          const data = await response.json();
+          setAssessmentFaceData(data);
+        }
+      } catch (error) {
+        console.error(error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    // Call `fetchPatientFaceAssessment` when `appointmentDetails` change
+    useEffect(() => {
+      if (appointmentDetails) {
+        fetchPatientFaceAssessment();
+      }
+    }, [appointmentDetails, appURL, accessToken]);
+
 
   return (
     <>
@@ -846,68 +875,109 @@ export default function Room() {
               />
 
               {/* CANVAS FOR DIAGNOSTIC TOOL */}
-              <div
-                className="offcanvas offcanvas-end"
-                tabIndex="-1"
-                id="offcanvasDiagnosticTool"
-                aria-labelledby="offcanvasDiagnosticToolLabel"
-              >
-                <div className="offcanvas-header">
-                  <h5 className="offcanvas-title" id="offcanvasDiagnosticToolLabel">
-                    Assistive Diagnostic Tool
-                  </h5>
-                  <button
-                    type="button"
-                    className="btn-close"
-                    data-bs-dismiss="offcanvas"
-                    aria-label="Close"
-                  ></button>
-                </div>
+                <div
+                  className="offcanvas offcanvas-end"
+                  tabIndex="-1"
+                  id="offcanvasDiagnosticTool"
+                  aria-labelledby="offcanvasDiagnosticToolLabel"
+                >
+                  <div className="offcanvas-header">
+                    <h5 className="offcanvas-title" id="offcanvasDiagnosticToolLabel">
+                      Assistive Diagnostic Tool
+                    </h5>
+                    <button
+                      type="button"
+                      className="btn-close"
+                      data-bs-dismiss="offcanvas"
+                      aria-label="Close"
+                    ></button>
+                  </div>
 
-                <div className="offcanvas-body">
-                  {/* Display loading state */}
-                  {isLoading ? (
-                    <p>Loading assessment data...</p>
-                  ) : error ? (
-                    <p className="text-danger">{error}</p>
-                  ) : (
-                    <>
-                      {/* Display patient's speech assessment */}
-                      {assessmentData ? (
+                  <div className="offcanvas-body">
+                    {/* Speech Assessment Section */}
+                    <h5>Speech Assessment</h5>
+                    {isLoading ? (
+                      <p>Loading speech assessment data...</p>
+                    ) : error ? (
+                      <p className="text-danger">{error}</p>
+                    ) : assessmentData ? (
+                      <div>
+                        {/* Speech assessment results */}
                         <div>
-                          {/* Speech assessment results */}
-                          <div>
-                            <h6>Top 3 Results:</h6>
-                            <ul>
-                              {assessmentData.top3Results.map((result, index) => (
-                                <li key={index}>
-                                  {result.label}: {result.score.toFixed(2)}
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <strong>Overall Score:</strong> {assessmentData.score}
-                          </div>
-                          <div>
-                            <strong>Assessment Date:</strong> {new Date(assessmentData.date).toLocaleDateString()}
-                          </div>
+                          <h6>Top 3 Results:</h6>
+                          <ul>
+                            {assessmentData.top3Results.map((result, index) => (
+                              <li key={index}>
+                                {result.label}: {result.score.toFixed(2)}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                      ) : (
-                        <p>No speech assessment data found.</p>
-                      )}
+                        <div>
+                          <strong>Overall Score:</strong> {assessmentData.score}
+                        </div>
+                        <div>
+                          <strong>Assessment Date:</strong>{" "}
+                          {new Date(assessmentData.date).toLocaleDateString()}
+                        </div>
+                        <button
+                          className="btn btn-primary mt-2"
+                          onClick={fetchPatientAssessment}
+                        >
+                          Refresh Speech Assessment Data
+                        </button>
+                      </div>
+                    ) : (
+                      <p>No speech assessment data found.</p>
+                    )}
 
-                      {/* Refresh button to reload the assessment */}
-                      <button
-                        className="btn btn-primary"
-                        onClick={fetchPatientAssessment}
-                      >
-                        Refresh Assessment Data
-                      </button>
-                    </>
-                  )}
+                    <hr />
+
+                    {/* Face Assessment Section */}
+                    <h5>Face Assessment</h5>
+                    {isLoading ? (
+                      <p>Loading face assessment data...</p>
+                    ) : error ? (
+                      <p className="text-danger">{error}</p>
+                    ) : assessmentFaceData ? (
+                      <div>
+                        {/* Face assessment results */}
+                        <div>
+                          <h6>Top 2 Results:</h6>
+                          <ul>
+                            {assessmentFaceData.topPredictions.map((result, index) => (
+                              <li key={index}>
+                                {result.label}: {(result.probability * 100).toFixed(2)}%
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <strong>Recorded Data:</strong>
+                          <ul>
+                            {assessmentFaceData.recordedData.map((dataPoint, index) => (
+                              <li key={index}>
+                                Time {index + 1}: {dataPoint.join(", ")}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <strong>Assessment Date:</strong>{" "}
+                          {new Date(assessmentFaceData.date).toLocaleDateString()}
+                        </div>
+                        <button
+                          className="btn btn-primary mt-2"
+                          onClick={fetchPatientFaceAssessment}
+                        >
+                          Refresh Face Assessment Data
+                        </button>
+                      </div>
+                    ) : (
+                      <p>No face assessment data found.</p>
+                    )}
+                  </div>
                 </div>
-              </div>
             </>
           ) : null}
 

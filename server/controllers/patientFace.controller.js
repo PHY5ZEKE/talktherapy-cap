@@ -41,7 +41,25 @@ const saveFaceAssessment = async (req, res) => {
   }
 };
 
+// Load patient speech assessment
+getFaceAssessment = async (req, res) => {
+  try {
+    const patientId = req.params.patientId; 
+    const assessment = await FaceAssessment.findOne({ patient: patientId });
+
+    if (assessment) {
+      res.status(200).json(assessment); 
+    } else {
+      res.status(404).json({ message: 'No speech assessment found for this patient' });
+    }
+  } catch (error) {
+    console.error("Error loading speech assessment:", error);
+    res.status(500).json({ message: 'Error loading speech assessment', error });
+  }
+};
+
   
   module.exports = { 
     saveFaceAssessment,
+    getFaceAssessment,
   };

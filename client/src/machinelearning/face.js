@@ -97,21 +97,21 @@ async function predict() {
 // Capture a photo and start recording predictions for 10 seconds
 export function capturePhotoAndRecord(callback) {
   // Capture photo
-  const capturedImage = webcam.canvas.toDataURL(); // Capture as base64
-  document.getElementById("captured-image").src = capturedImage; // Display image
+  const capturedImage = webcam.canvas.toDataURL(); 
+  document.getElementById("captured-image").src = capturedImage; 
 
-  // Clear previous data
+
   recordedData = [];
   topPredictions = [];
   isRecording = true;
 
-  // Stop recording after 5 seconds and plot results
+
   setTimeout(() => {
     isRecording = false;
     displayTopScores();
     plotRecordedGraph();
 
-    // Now call saveFaceResultsToDatabase and pass the necessary data
+
     if (callback) {
       console.log("Callback called with recordedData:", recordedData, "topPredictions:", topPredictions);
       callback(recordedData, topPredictions); // Pass data to the callback
@@ -149,13 +149,11 @@ export function plotRecordedGraph() {
   
   ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
-    // Destroy the previous chart instance, if any
     if (canvasElement.chart) {
       canvasElement.chart.destroy();
-      canvasElement.chart = null; // Clean up the reference
+      canvasElement.chart = null; 
     }
   
-    // Destroy all Chart instances (if any) in the global Chart registry
     if (Chart.instances.length > 0) {
       Chart.instances.forEach((instance) => {
         instance.destroy();
@@ -172,7 +170,6 @@ export function plotRecordedGraph() {
     borderWidth: 1,
   }));
 
-  // Destroy the previous chart instance, if any
   if (Chart.instances.length > 0) {
     Chart.instances.forEach((instance) => instance.destroy());
   }
@@ -181,8 +178,8 @@ export function plotRecordedGraph() {
   new Chart(ctx, {
     type: "line",
     data: {
-      labels, // Time points
-      datasets, // Data for each class label
+      labels, 
+      datasets, 
     },
     options: {
       responsive: true,
@@ -196,7 +193,6 @@ export function plotRecordedGraph() {
   });
 }
 
-// Re-initialize the model
 export async function init() {
   await createModel();
 }

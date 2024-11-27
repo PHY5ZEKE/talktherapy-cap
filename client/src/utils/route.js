@@ -60,6 +60,7 @@ export const route = {
     saveAssessment: "api/patient-SLP/speech-assessment",
     getAssessment: "api/patient-SLP/get-assessment",
     saveFaceAssessment: "api/patient-SLP/face-assessment",
+    getFaceAssessment: "api/patient-SLP/get-face-assessment",
   },
   system: {
     login: "api/super-admin-slp/login",

@@ -24,6 +24,7 @@ const {
 
 const {
   saveFaceAssessment,
+  getFaceAssessment,
 } = require("../controllers/patientFace.controller");
 
 const verifyToken = require("../middleware/verifyToken");
@@ -59,5 +60,7 @@ router.get("/get-assessment/:patientId", verifyToken, getAssessment);
 
 // Save face assessment results for a patient
 router.post("/face-assessment", verifyToken, saveFaceAssessment);
+
+router.get("/get-face-assessment/:patientId", verifyToken, getFaceAssessment);
 
 module.exports = router;
