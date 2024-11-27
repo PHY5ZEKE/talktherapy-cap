@@ -142,7 +142,9 @@ export default function Soap({
   return (
     <>
       <div className="modal-background">
-        <div className="modal-container d-flex flex-column justify-content-center align-content-center overflow-auto">
+        <div className="modal-container d-flex flex-column justify-content-center align-content-center"
+        style={{height: "100%"}}
+        >
           <h3 className="fw-bold text-center">Add SOAP</h3>
           <p className="mb-0 text-center">
             Please verify your inputs before proceeding.

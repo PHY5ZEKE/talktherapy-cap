@@ -105,8 +105,8 @@ export default function SoapSidebar({
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Server response:", errorData); // Log the server response
-        throw new Error("Failed to create SOAP diagnosis");
+        failNotify(errorData.message);
+        throw new Error("Failed to create SOAP diagnosis. Already existing");
       }
 
       const data = await response.json();
@@ -118,12 +118,13 @@ export default function SoapSidebar({
         show_to: [patientId],
       };
 
+      console.log(data);
       notify("SOAP diagnosis created successfully");
       onWebSocket(userUpdate);
 
       openModal(); // Close the modal after successful submission
     } catch (error) {
-      failNotify("Failed to create SOAP diagnosis");
+      failNotify("Failed to create SOAP diagnosis.");
     }  finally {
       setIsSubmitting(false);
       setIsDisabled(false);
