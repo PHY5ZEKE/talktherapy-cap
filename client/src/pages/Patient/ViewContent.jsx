@@ -24,6 +24,28 @@ export default function ViewContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [staticContent] = useState([
+    {
+      _id: "speech",
+      name: "Word Exercises!",
+      category: "Speech Therapy",
+      image: "https://cdn-icons-png.flaticon.com/512/13731/13731426.png",
+    },
+    {
+      _id: "assistspeech",
+      name: "Machine Learning: Assistive Speech",
+      category: "Machine Learning",
+      image:
+        "https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=",
+    },
+    {
+      _id: "facespeech",
+      name: "Machine Learning: Assistive Face Diagnostic Tool",
+      category: "Machine Learning",
+      image: "https://deeplobe.ai/wp-content/uploads/2022/02/Main-1.jpg",
+    },
+  ]);
+
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
 
@@ -73,6 +95,7 @@ export default function ViewContent() {
 
         const data = await response.json();
         setContentData(data);
+        setFilteredContent([...staticContent, ...data]);
         setFilteredContent(data);
         setLoading(false);
       } catch (error) {
@@ -84,20 +107,20 @@ export default function ViewContent() {
     fetchContentData();
   }, [accessToken, appURL]);
 
-  //Search/Filter
+  // Search/Filter
   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredContent(contentData);
+      setFilteredContent([...staticContent, ...contentData]);
     } else {
       setFilteredContent(
-        contentData.filter(
+        [...staticContent, ...contentData].filter(
           (content) =>
             content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             content.category.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
-  }, [searchTerm, contentData]);
+  }, [searchTerm, contentData, staticContent]);
 
   const handleBookmarkClick = async (content) => {
     try {
@@ -198,7 +221,7 @@ export default function ViewContent() {
                   >
                     <div className="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-1 mx-auto my-3">
                       {/* Static Exercise Card: Run*/}
-                      <div
+                      {/* <div
                         className="col"
                         onClick={() => handleCardClick("speech")} 
                       >
@@ -217,10 +240,10 @@ export default function ViewContent() {
                             <FontAwesomeIcon icon={faStar} />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* Static Exercise Card: Speech*/}
-                      <div
+                      {/* <div
                         className="col"
                         onClick={() => handleCardClick("assistspeech")} 
                       >
@@ -239,10 +262,10 @@ export default function ViewContent() {
                             <FontAwesomeIcon icon={faStar} />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
 
-                        {/* Static Exercise Card: Face*/}
-                        <div
+                      {/* Static Exercise Card: Face*/}
+                      {/* <div
                         className="col"
                         onClick={() => handleCardClick("facespeech")} 
                       >
@@ -261,7 +284,7 @@ export default function ViewContent() {
                             <FontAwesomeIcon icon={faStar} />
                           </div>
                         </div>
-                      </div>
+                      </div> */}
 
 
                       {filteredContent.map((content) => (
@@ -282,22 +305,29 @@ export default function ViewContent() {
                                 {content.name}
                               </h5>
                               <p>{content.category}</p>
-                              <FontAwesomeIcon
-                                icon={faBookmark}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleBookmarkClick(content);
-                                }}
-                                style={{
-                                  cursor: "pointer",
-                                  color:
-                                    patientData?.bookmarkedContent.includes(
-                                      content._id
-                                    )
+                              {!staticContent.some((staticItem) => staticItem._id === content._id) ? (
+                                <FontAwesomeIcon
+                                  icon={faBookmark}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleBookmarkClick(content);
+                                  }}
+                                  style={{
+                                    cursor: "pointer",
+                                    color: patientData?.bookmarkedContent.includes(content._id)
                                       ? "blue"
                                       : "black",
-                                }}
-                              />
+                                  }}
+                                />
+                              ) : (
+                                <FontAwesomeIcon
+                                  icon={faStar}
+                                  style={{
+                                    cursor: "default",
+                                    color: "black", // you can adjust the color here as needed
+                                  }}
+                                />
+                              )}
                             </div>
                           </div>
                         </div>

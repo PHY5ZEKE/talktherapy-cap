@@ -1,8 +1,8 @@
-#chartContainer {
+.chart-container-face {
   width: 100%;
-  max-width: 800px;
-  margin: auto;
-  height: 300px;
+  max-width: 600px;
+  height: 400px;
+  margin: 0 auto;
 }
 
 .controls-container {
@@ -14,9 +14,9 @@
 
 .button-container {
   display: flex;
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
-  margin-bottom: 10px; /* Optional: Adjust spacing above the button */
+  justify-content: center; 
+  align-items: center; 
+  margin-bottom: 10px; 
 }
 
 .cardbox {

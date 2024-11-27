@@ -49,3 +49,40 @@
   color: #888;
   margin-top: 20px;
 }
+
+
+/* Scoped styles for the Assistive Diagnostic Tool */
+.assistive-help .modal-content {
+  background-color: #ffffff;
+  color: #333;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.assistive-help .modal-header {
+  border-bottom: 2px solid #007bff;
+}
+
+.assistive-help .modal-body {
+  font-size: 1rem;
+  color: #333;
+}
+
+.assistive-help .modal-footer {
+  border-top: 2px solid #007bff;
+}
+
+.assistive-help .btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.assistive-help .help-btn {
+  font-size: 24px;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.assistive-help .help-btn:hover {
+  color: #0056b3;
+}

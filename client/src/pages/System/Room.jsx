@@ -32,6 +32,16 @@ import { route } from "../../utils/route";
 import ConfirmVideoCall from "../../components/Modals/ConfirmVideoCall.jsx";
 import SoapSidebar from "../../components/Modals/SoapSidebar.jsx";
 
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
 const useMediaStream = (localVideoRef) => {
   const [selectedVideoDeviceId, setSelectedVideoDeviceId] = useState(null);
   const [selectedAudioDeviceId, setSelectedAudioDeviceId] = useState(null);
@@ -124,12 +134,6 @@ export default function Room() {
     setSelectedAudioDeviceId,
   } = useMediaStream(localVideoRef);
 
-  useEffect(() => {
-    const initializeModel = async () => {
-      await init();
-    };
-    initializeModel();
-  }, []);
 
   useEffect(() => {
     if (
@@ -575,7 +579,7 @@ export default function Room() {
       }
     }, [appointmentDetails, appURL, accessToken]);
 
-        // Function to fetch the patient's face assessment
+    // Function to fetch the patient's face assessment
     const fetchPatientFaceAssessment = async () => {
       try {
         const patientId = appointmentDetails?.patientId._id;  
@@ -614,6 +618,65 @@ export default function Room() {
         fetchPatientFaceAssessment();
       }
     }, [appointmentDetails, appURL, accessToken]);
+
+    const FaceAssessmentGraph = ({ recordedData }) => {
+      if (!recordedData || recordedData.length === 0) {
+        return <p>No recorded data available.</p>;
+      }
+    
+      const labels = recordedData.map((_, index) => index);
+    
+      const uniqueLabels = [...new Set(recordedData.flatMap(timeStep => timeStep.map(entry => entry.label)))];
+    
+      const datasets = uniqueLabels.map((label, labelIndex) => ({
+        label, 
+        data: recordedData.map(timeStep => {
+          const entry = timeStep.find(data => data.label === label);
+          return entry ? entry.probability : 0; 
+        }),
+        borderColor: `hsl(${labelIndex * 60}, 70%, 50%)`, 
+        backgroundColor: `hsl(${labelIndex * 60}, 70%, 50%, 0.3)`,
+        borderWidth: 2,
+      }));
+    
+
+      const data = {
+        labels, 
+        datasets, 
+      };
+    
+      const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'top',
+          },
+          title: {
+            display: true,
+            text: 'Face Assessment Recorded Data',
+          },
+        },
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: 'Time (In span of 10 seconds)', 
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: 'Confidence Score',
+            },
+            min: 0,
+            max: 1, 
+          },
+        },
+      };
+    
+      return <Line data={data} options={options} />;
+    };
 
 
   return (
@@ -875,39 +938,44 @@ export default function Room() {
               />
 
               {/* CANVAS FOR DIAGNOSTIC TOOL */}
-                <div
-                  className="offcanvas offcanvas-end"
-                  tabIndex="-1"
-                  id="offcanvasDiagnosticTool"
-                  aria-labelledby="offcanvasDiagnosticToolLabel"
-                >
-                  <div className="offcanvas-header">
-                    <h5 className="offcanvas-title" id="offcanvasDiagnosticToolLabel">
-                      Assistive Diagnostic Tool
-                    </h5>
-                    <button
-                      type="button"
-                      className="btn-close"
-                      data-bs-dismiss="offcanvas"
-                      aria-label="Close"
-                    ></button>
-                  </div>
+              <div
+                className="offcanvas offcanvas-end"
+                tabIndex="-1"
+                id="offcanvasDiagnosticTool"
+                aria-labelledby="offcanvasDiagnosticToolLabel"
+              >
+                <div className="offcanvas-header">
+                  <h5 className="offcanvas-title" id="offcanvasDiagnosticToolLabel">
+                    Assistive Diagnostic Tool
+                  </h5>
+                  <button
+                    type="button"
+                    className="btn-close btn-close-white"
+                    data-bs-dismiss="offcanvas"
+                    aria-label="Close"
+                  ></button>
+                </div>
 
-                  <div className="offcanvas-body">
-                    {/* Speech Assessment Section */}
-                    <h5>Speech Assessment</h5>
+                <div className="offcanvas-body">
+                  {/* Speech Assessment Section */}
+                  <div className="mb-4 p-3 bg-light rounded shadow">
+                    <h5 className="text-primary">Speech Assessment</h5>
                     {isLoading ? (
                       <p>Loading speech assessment data...</p>
                     ) : error ? (
-                      <p className="text-danger">{error}</p>
+                      <p className="text-danger">
+                        {error.includes("Failed to fetch")
+                          ? "No speech assessment data found."
+                          : error}
+                      </p>
                     ) : assessmentData ? (
                       <div>
                         {/* Speech assessment results */}
-                        <div>
+                        <div className="mb-3">
                           <h6>Top 3 Results:</h6>
-                          <ul>
+                          <ul className="list-group">
                             {assessmentData.top3Results.map((result, index) => (
-                              <li key={index}>
+                              <li key={index} className="list-group-item">
                                 {result.label}: {result.score.toFixed(2)}
                               </li>
                             ))}
@@ -921,7 +989,7 @@ export default function Room() {
                           {new Date(assessmentData.date).toLocaleDateString()}
                         </div>
                         <button
-                          className="btn btn-primary mt-2"
+                          className="btn btn-primary mt-3"
                           onClick={fetchPatientAssessment}
                         >
                           Refresh Speech Assessment Data
@@ -930,44 +998,48 @@ export default function Room() {
                     ) : (
                       <p>No speech assessment data found.</p>
                     )}
+                  </div>
 
-                    <hr />
-
-                    {/* Face Assessment Section */}
-                    <h5>Face Assessment</h5>
+                  {/* Face Assessment Section */}
+                  <div className="p-3 bg-light rounded shadow">
+                    <h5 className="text-primary">Face Assessment</h5>
                     {isLoading ? (
                       <p>Loading face assessment data...</p>
                     ) : error ? (
-                      <p className="text-danger">{error}</p>
+                      <p className="text-danger">
+                        {error.includes("Failed to fetch")
+                          ? "No face assessment data found."
+                          : error}
+                      </p>
                     ) : assessmentFaceData ? (
                       <div>
                         {/* Face assessment results */}
-                        <div>
+                        <div className="mb-3">
                           <h6>Top 2 Results:</h6>
-                          <ul>
+                          <ul className="list-group">
                             {assessmentFaceData.topPredictions.map((result, index) => (
-                              <li key={index}>
+                              <li key={index} className="list-group-item">
                                 {result.label}: {(result.probability * 100).toFixed(2)}%
                               </li>
                             ))}
                           </ul>
                         </div>
-                        <div>
+                        <div className="mb-3">
                           <strong>Recorded Data:</strong>
-                          <ul>
-                            {assessmentFaceData.recordedData.map((dataPoint, index) => (
-                              <li key={index}>
-                                Time {index + 1}: {dataPoint.join(", ")}
-                              </li>
-                            ))}
-                          </ul>
+                          {assessmentFaceData.recordedData.length > 0 ? (
+                            <div className="chart-container-face">
+                              <FaceAssessmentGraph recordedData={assessmentFaceData.recordedData}/>
+                            </div>
+                          ) : (
+                            <p>No recorded data available.</p>
+                          )}
                         </div>
                         <div>
                           <strong>Assessment Date:</strong>{" "}
-                          {new Date(assessmentFaceData.date).toLocaleDateString()}
+                          {new Date(assessmentFaceData.createdAt).toLocaleDateString()}
                         </div>
                         <button
-                          className="btn btn-primary mt-2"
+                          className="btn btn-primary mt-3"
                           onClick={fetchPatientFaceAssessment}
                         >
                           Refresh Face Assessment Data
@@ -978,6 +1050,7 @@ export default function Room() {
                     )}
                   </div>
                 </div>
+              </div>
             </>
           ) : null}
 

@@ -25,6 +25,28 @@ export default function ViewContent() {
   const appURL = import.meta.env.VITE_APP_URL;
   const navigate = useNavigate();
 
+  const [staticContent] = useState([
+    {
+      _id: "speech",
+      name: "Word Exercises!",
+      category: "Speech Therapy",
+      image: "https://cdn-icons-png.flaticon.com/512/13731/13731426.png",
+    },
+    {
+      _id: "assistspeech",
+      name: "Machine Learning: Assistive Speech",
+      category: "Machine Learning",
+      image:
+        "https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=",
+    },
+    {
+      _id: "facespeech",
+      name: "Machine Learning: Assistive Face Diagnostic Tool",
+      category: "Machine Learning",
+      image: "https://deeplobe.ai/wp-content/uploads/2022/02/Main-1.jpg",
+    },
+  ]);
+
   // Fetch clinician data
   useEffect(() => {
     const fetchClinicianData = async () => {
@@ -71,6 +93,7 @@ export default function ViewContent() {
 
         const data = await response.json();
         setContentData(data);
+        setFilteredContent([...staticContent, ...data]);
         setFilteredContent(data);
         setLoading(false);
       } catch (error) {
@@ -82,20 +105,20 @@ export default function ViewContent() {
     fetchContentData();
   }, [accessToken, appURL]);
 
-  //Search/Filter
-  useEffect(() => {
+   // Search/Filter
+   useEffect(() => {
     if (searchTerm === "") {
-      setFilteredContent(contentData);
+      setFilteredContent([...staticContent, ...contentData]);
     } else {
       setFilteredContent(
-        contentData.filter(
+        [...staticContent, ...contentData].filter(
           (content) =>
             content.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
             content.category.toLowerCase().includes(searchTerm.toLowerCase())
         )
       );
     }
-  }, [searchTerm, contentData]);
+  }, [searchTerm, contentData, staticContent]);
 
   const handleCardClick = (id) => {
     navigate(`/content/exercises/${id}`);
@@ -158,7 +181,7 @@ export default function ViewContent() {
                   >
                     <div className="row row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 row-cols-1 mx-auto my-3">
                       {/* Static Exercise Card: Run*/}
-                      <div
+                      {/* <div
                         className="col"
                         onClick={() => handleCardClick("speech")} // Replace with actual ID logic if needed
                       >
@@ -176,10 +199,10 @@ export default function ViewContent() {
                             <p>Speech Therapy</p>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* Static Exercise Card: Speech*/}
-                      <div
+                      {/* <div
                         className="col"
                         onClick={() => handleCardClick("assistspeech")} // Replace with actual ID logic if needed
                       >
@@ -197,10 +220,10 @@ export default function ViewContent() {
                             <p>Machine Learning</p>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
 
                       {/* Static Exercise Card: Face*/}
-                      <div
+                      {/* <div
                         className="col"
                         onClick={() => handleCardClick("facespeech")} 
                       >
@@ -218,7 +241,7 @@ export default function ViewContent() {
                             <p>Machine Learning</p>
                           </div>
                         </div>
-                      </div>
+                      </div> */}
 
                       {filteredContent.map((content) => (
                         <div

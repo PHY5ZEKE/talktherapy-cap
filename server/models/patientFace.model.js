@@ -3,10 +3,7 @@ const Schema = mongoose.Schema;
 
 const faceAssessmentSchema = new Schema({
   patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },
-  // capturedImage: {
-  //   type: String, // Store the base64 encoded image
-  //   required: false,
-  // },
+
   topPredictions: [
     {
       label: String,
@@ -14,14 +11,18 @@ const faceAssessmentSchema = new Schema({
     },
   ],
   recordedData: [
-    {
-      type: [Number],
-    },
+    [
+      {
+        label: { type: String, required: true },
+        probability: { type: Number, required: true },
+      },
+    ],
   ],
   createdAt: {
     type: Date,
     default: Date.now,
   },
+  
 });
 
 module.exports = mongoose.model("FaceAssessment", faceAssessmentSchema);

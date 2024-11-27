@@ -11,10 +11,16 @@ import { AuthContext } from "../../utils/AuthContext";
 export default function AssistFace() {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
+
   const [patientData, setPatientData] = useState(null);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [isCaptured, setIsCaptured] = useState(false); 
+  const [timer, setTimer] = useState(5);
+  const [showHelpModal, setShowHelpModal] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
   const navigate = useNavigate();
 
   const canvasRef = useRef(null);
@@ -67,10 +73,10 @@ export default function AssistFace() {
       return;
     }
   
-    // Construct the progress object to send
-    const progress = {       // The captured image in base64 format
-      recordedData,         // The recorded data (probabilities) over time
-      topPredictions,       // The top predictions (array of top 2 predictions)
+    
+    const progress = {       
+      recordedData,         
+      topPredictions,       
     };
   
     console.log("Sending face results to backend:", progress);
@@ -96,7 +102,7 @@ export default function AssistFace() {
         console.error('Error saving face results:', error);
       });
   }
-  // Assign the save function to window so it's accessible globally
+
     useEffect(() => {
       window.saveFaceResultsToDatabase = saveFaceResultsToDatabase;
 
@@ -107,16 +113,30 @@ export default function AssistFace() {
 
 
   const handleCaptureAndRecord = () => {
-    // Capture the photo and start recording capturedImage, 
+    setIsTimerActive(true);
+    setTimer(5);
     capturePhotoAndRecord((recordedData, topPredictions) => {
-      console.log("Data captured and recorded, ready to save to database.");
+      setIsCaptured(true); 
       
-      // Now call saveFaceResultsToDatabase with the necessary data
       if (window.saveFaceResultsToDatabase) {
         window.saveFaceResultsToDatabase(recordedData, topPredictions);
       }
     });
   };
+
+  const toggleHelpModal = () => {
+    setShowHelpModal(!showHelpModal);
+  };
+
+ useEffect(() => {
+  if (isTimerActive && timer > 0) {
+    const intervalId = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(intervalId);
+  }
+}, [isTimerActive, timer]);
 
   return (
     <div
@@ -130,34 +150,75 @@ export default function AssistFace() {
             <h5 className="title" id="offcanvasDiagnosticToolLabel">
               Assistive Diagnostic Tool
             </h5>
+            <span
+              className="help-btn ml-2"
+              data-bs-toggle="modal"
+              data-bs-target="#helpModal"
+            >
+              (?)
+            </span>
           </div>
         </div>
 
+
+        {/* Help Modal */}
+          <div
+            className="modal fade assistive-help"
+            id="helpModal"
+            tabIndex="-1"
+            aria-labelledby="helpModalLabel"
+            aria-hidden="true"
+          >
+            <div className="modal-dialog">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h5 className="modal-title" id="helpModalLabel">Help</h5>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                  ></button>
+                </div>
+                <div className="modal-body">
+                  <p>
+                    Press <strong>Capture and Record</strong> and try to hold your pose for 5 seconds.
+                  </p>
+                  <p>
+                    The <strong>Reload Page</strong> button is used to ensure the model resets properly when you want to capture another confidence graph.
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-primary" data-bs-dismiss="modal">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
         {/* Main Content Section */}
         <div className="row flex-grow-1 justify-content-center">
-          {/* Webcam and video display */}
           <div className="col-12 col-md-8 col-lg-6">
             <div className="card shadow-lg rounded-lg mb-4 mx-auto">
               <div className="card-body text-center">
-                <div
-                  id="webcam-container"
-                  className="d-flex justify-content-center align-items-center"
-                >
-                  {/* Webcam feed will be appended here by the face.js model */}
-                </div>
-                <button 
-                  className="btn btn-primary mt-3" 
-                  onClick={handleCaptureAndRecord} // Attach the updated handler
-                >
-                  Capture and Record
-                </button>
-                {/* Reload button */}
-                <button 
-                  className="btn btn-danger mt-3" 
-                  onClick={() => window.location.reload()} // Trigger page reload
-                >
-                  Reload Page
-                </button>
+                <div id="webcam-container" className="d-flex justify-content-center align-items-center"></div>
+                
+                {/* Capture Button or Reload based on isCaptured */}
+                {!isCaptured ? (
+                  <button className="btn btn-primary mt-3" onClick={handleCaptureAndRecord}>
+                    Capture and Record
+                  </button>
+                ) : (
+                  <button className="btn btn-danger mt-3" onClick={() => window.location.reload()}>
+                    Reload Page
+                  </button>
+                )}
+
+                {/* Timer for Reload Button */}
+                {isTimerActive && timer > 0 && (
+                  <p className="mt-2">Loading model: {timer}s</p>
+                )}
               </div>
             </div>
           </div>

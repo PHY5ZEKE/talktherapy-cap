@@ -1,11 +1,11 @@
-const URL = "http://localhost:5173/src/machinelearning/face_model/";
+const URL = "https://talktherapy.site/src/machinelearning/face_model/";
 import * as tf from "@tensorflow/tfjs";
 import Chart from "chart.js/auto";
 
 let model, webcam, labelContainer, maxPredictions, chartInstance, classLabels;
 let isRecording = false;
-let recordedData = []; // Store probabilities over 10 seconds
-let topPredictions = []; // Track top predictions
+let recordedData = []; 
+let topPredictions = []; 
 
 // Initialize the model
 export async function createModel() {
@@ -16,11 +16,9 @@ export async function createModel() {
   const modelURL = URL + "model.json";
   const metadataURL = URL + "metadata.json";
 
-  // Load the model and metadata
   model = await window.tmImage.load(modelURL, metadataURL);
   const metadata = await fetch(metadataURL).then((res) => res.json());
 
-  // Extract class labels from metadata
   classLabels = metadata.labels;
   maxPredictions = classLabels.length;
 
@@ -33,7 +31,6 @@ export async function createModel() {
   document.getElementById("webcam-container").appendChild(webcam.canvas);
   labelContainer = document.getElementById("label-container");
 
-  // Create a chart instance to visualize the live predictions
   const ctx = document.getElementById("outputChart").getContext("2d");
   chartInstance = new Chart(ctx, {
     type: "bar",
@@ -61,27 +58,29 @@ export async function createModel() {
   });
 }
 
-// Continuous loop for live predictions
 async function loop() {
   webcam.update();
   await predict();
   window.requestAnimationFrame(loop);
 }
 
-// Run predictions on the webcam feed
 async function predict() {
   const prediction = await model.predict(webcam.canvas);
 
-  // Update live chart
   const predictionData = prediction.map((p) => p.probability);
   chartInstance.data.datasets[0].data = predictionData;
   chartInstance.update();
 
-  // Record data during active recording
-  if (isRecording) {
-    recordedData.push(prediction.map((p) => p.probability));
 
-    // Keep track of top predictions
+  if (isRecording) {
+    recordedData.push(
+      prediction.map((p, idx) => ({
+        label: classLabels[idx], 
+        probability: p.probability, 
+      }))
+    );
+
+    
     const currentTopPredictions = prediction
       .map((p, idx) => ({
         label: classLabels[idx],
@@ -96,7 +95,6 @@ async function predict() {
 
 // Capture a photo and start recording predictions for 10 seconds
 export function capturePhotoAndRecord(callback) {
-  // Capture photo
   const capturedImage = webcam.canvas.toDataURL(); 
   document.getElementById("captured-image").src = capturedImage; 
 
@@ -113,13 +111,12 @@ export function capturePhotoAndRecord(callback) {
 
 
     if (callback) {
-      console.log("Callback called with recordedData:", recordedData, "topPredictions:", topPredictions);
-      callback(recordedData, topPredictions); // Pass data to the callback
+      callback(recordedData, topPredictions); 
     }
   }, 5000);
 }
 
-// Display top 2 scores from the recorded data
+
 export function displayTopScores() {
   const topScoresElement = document.getElementById("top-scores");
   if (topPredictions.length === 0) {
@@ -135,18 +132,16 @@ export function displayTopScores() {
     .join("");
 }
 
-// Plot the recorded data over 10 seconds
+
+
 export function plotRecordedGraph() {
   const canvasElement = document.getElementById("scoreGraph");
 
-  // Check if canvas exists in the DOM
   if (!canvasElement) {
     console.error("Canvas element with ID 'scoreGraph' not found.");
     return;
   }
-
   const ctx = canvasElement.getContext("2d");
-  
   ctx.clearRect(0, 0, canvasElement.width, canvasElement.height);
 
     if (canvasElement.chart) {
@@ -164,7 +159,7 @@ export function plotRecordedGraph() {
 
   const datasets = classLabels.map((label, idx) => ({
     label,
-    data: recordedData.map((scores) => scores[idx]), // Map scores for this label
+    data: recordedData.map((timeStep) => timeStep.find((data) => data.label === label)?.probability || 0),
     borderColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 1)`,
     backgroundColor: `rgba(${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, ${Math.floor(Math.random() * 255)}, 0.3)`,
     borderWidth: 1,
@@ -174,7 +169,6 @@ export function plotRecordedGraph() {
     Chart.instances.forEach((instance) => instance.destroy());
   }
 
-  //const ctx = document.getElementById("scoreGraph").getContext("2d");
   new Chart(ctx, {
     type: "line",
     data: {
