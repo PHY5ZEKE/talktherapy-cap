@@ -113,7 +113,8 @@ export function capturePhotoAndRecord(callback) {
 
     // Now call saveFaceResultsToDatabase and pass the necessary data
     if (callback) {
-      callback(capturedImage, recordedData, topPredictions); // Pass data to the callback
+      console.log("Callback called with recordedData:", recordedData, "topPredictions:", topPredictions);
+      callback(recordedData, topPredictions); // Pass data to the callback
     }
   }, 5000);
 }

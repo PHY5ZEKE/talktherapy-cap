@@ -5,7 +5,7 @@ const FaceAssessment = require("../models/patientFace.model.js");
 // Save Face Assessment data
 const saveFaceAssessment = async (req, res) => {
   try {
-    const { capturedImage, topPredictions, recordedData } = req.body; // Extract data from the request body
+    const { topPredictions, recordedData } = req.body; // Extract data from the request body capturedImage,
     const patientId = req.user.id;  // Get patient ID from the authenticated user (e.g., using JWT)
 
     // Ensure topPredictions is an array with at least 2 predictions
@@ -22,7 +22,7 @@ const saveFaceAssessment = async (req, res) => {
     const assessment = await FaceAssessment.findOneAndUpdate(
       { patient: patientId },  // Match by the patient's ID
       { 
-        capturedImage,          // Store the captured image (base64 string)
+        // capturedImage,          // Store the captured image (base64 string)
         topPredictions,         // Store the top 2 predictions
         recordedData,           // Store the recorded probabilities data
         date: Date.now(),       // Store the current date

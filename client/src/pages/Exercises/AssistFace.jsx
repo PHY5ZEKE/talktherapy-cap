@@ -60,7 +60,7 @@ export default function AssistFace() {
     }
   }, [accessToken, appURL, authState?.userRole]);
 
-  function saveFaceResultsToDatabase(capturedImage, recordedData, topPredictions) {
+  function saveFaceResultsToDatabase( recordedData, topPredictions) {
     const appURL = import.meta.env.VITE_APP_URL;
     if (!accessToken) {
       console.error("Access token is missing");
@@ -68,8 +68,7 @@ export default function AssistFace() {
     }
   
     // Construct the progress object to send
-    const progress = {
-      capturedImage,        // The captured image in base64 format
+    const progress = {       // The captured image in base64 format
       recordedData,         // The recorded data (probabilities) over time
       topPredictions,       // The top predictions (array of top 2 predictions)
     };
@@ -109,12 +108,12 @@ export default function AssistFace() {
 
   const handleCaptureAndRecord = () => {
     // Capture the photo and start recording capturedImage, 
-    capturePhotoAndRecord((capturedImage, recordedData, topPredictions) => {
+    capturePhotoAndRecord((recordedData, topPredictions) => {
       console.log("Data captured and recorded, ready to save to database.");
       
       // Now call saveFaceResultsToDatabase with the necessary data
       if (window.saveFaceResultsToDatabase) {
-        window.saveFaceResultsToDatabase(capturedImage, recordedData, topPredictions);
+        window.saveFaceResultsToDatabase(recordedData, topPredictions);
       }
     });
   };

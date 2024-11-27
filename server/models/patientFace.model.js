@@ -3,10 +3,10 @@ const Schema = mongoose.Schema;
 
 const faceAssessmentSchema = new Schema({
   patient: { type: mongoose.Schema.Types.ObjectId, ref: "Patient", required: true },
-  capturedImage: {
-    type: String, // Store the base64 encoded image
-    required: false,
-  },
+  // capturedImage: {
+  //   type: String, // Store the base64 encoded image
+  //   required: false,
+  // },
   topPredictions: [
     {
       label: String,
