@@ -184,6 +184,24 @@ export default function ExerFace() {
     }
   }, [accessToken, appURL, id]); 
 
+   // Define the YouTube video URL
+   const videoUrl = "https://www.youtube.com/watch?v=wBuA589kfMg&t"; 
+
+   // Extract the YouTube video ID and construct the embed URL
+   const videoID = extractYouTubeID(videoUrl);
+   const embedUrl = videoID ? `https://www.youtube.com/embed/${videoID}` : null;
+
+   const sanitizedHtml = DOMPurify.sanitize(`
+     <div style="font-family: Arial, sans-serif; border: 2px solid #ccc; border-radius: 15px; padding: 20px; background-color: #fff; color: #333; line-height: 1.6; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+      <p style="text-align: justify;">
+        <strong style="color: #4CAF50;">This Assistive Diagnostic Tool</strong> utilizes advanced <em>Machine Learning</em> models, powered by TensorFlow, to analyze facial structures and assign a confidence score based on its predictions. It serves as a groundbreaking method for supporting assessments by recognizing and categorizing facial patterns with precision.
+      </p>
+      <p style="text-align: justify;">
+        However, <span style="color: #e74c3c; font-weight: bold;">this tool is not intended as a definitive diagnostic resource</span>. While it leverages state-of-the-art algorithms, it remains susceptible to inaccuracies due to factors such as variability in input quality and the limitations of current machine learning models. Users are encouraged to consult licensed professionals for a formal diagnosis.
+      </p>
+    </div>
+  `);
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="container-fluid p-0 vw-100 vh-100">
@@ -197,9 +215,9 @@ export default function ExerFace() {
             <div className="row bg-white border-bottom">
               <div className="col">
                 {loading ? (
-                  <p>Loading...</p> // Display loading message while fetching data
+                  <p>Loading...</p> 
                 ) : error ? (
-                  <p>{error}</p> // Show the error message if there was an issue fetching data
+                  <p>{error}</p> 
                 ) : patientData ? (
                   <>
                     <p className="mb-0 mt-3">Hello,</p>
@@ -243,7 +261,7 @@ export default function ExerFace() {
                     <div
                       className="col bg-white border rounded-4 p-3 overflow-auto content-column"
                       style={{
-                        maxHeight: "75vh", // Set max height for the scrollable area
+                        maxHeight: "75vh", 
                       }}
                     >
                       {/* Image */}
@@ -254,7 +272,7 @@ export default function ExerFace() {
                         }}
                       >
                         <img
-                          src="https://www.example.com/image.jpg" // Static image URL
+                          src="https://www.researchgate.net/profile/Paula-Costa-2/publication/260982653/figure/fig3/AS:667595799814160@1536178650829/ocalic-context-dependent-visemes-The-i-2-viseme-is-not-part-of-the-simple-visemes.png" // Static image URL
                           alt="Exercise Image"
                           className="border rounded-3"
                           style={{
@@ -262,17 +280,19 @@ export default function ExerFace() {
                             width: "100%",
                             height: "auto",
                             objectFit: "cover",
-                            aspectRatio: "16 / 10", // Maintain aspect ratio
+                            aspectRatio: "16 / 10", 
                           }}
                         />
                       </div>
-                      <div
-                        className="ql-editor"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize("This speech exercise uses a set scope of words that help you on pronunciation etc."), // Static description
-                        }}
-                      />
+                      <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
                     </div>
+                  </div>
+                  <div
+                    className="mb-3 fw-bold text-button border mx-auto"
+                    onClick={() => navigate("/content/warn/face")}
+                    style={{ cursor: "pointer" }}
+                  >
+                    Perform
                   </div>
                 </div>
 
@@ -288,22 +308,25 @@ export default function ExerFace() {
                   <div className="row p-3">
                     <div
                       className="col bg-white border rounded-4 p-3 overflow-auto"
-                      style={{ maxHeight: "75vh" }} // Larger height for video column
+                      style={{ maxHeight: "75vh" }} 
                     >
                       <div className="mb-3">
-                        {/* VIDEO CAM */}
-                        <video
-                          className="w-100"
-                          controls
-                          style={{
-                            aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
-                            width: "100%",
-                            objectFit: "cover", // Ensures the video covers the container without distortion
-                          }}
-                        >
-                          <source src="https://www.example.com/video.mp4" type="video/mp4" /> {/* Static video URL */}
-                          Your browser does not support the video tag.
-                        </video>
+                          {embedUrl ? (
+                          <iframe
+                            width="100%"
+                            height="315"
+                            src={embedUrl}
+                            title="YouTube Video"
+                            frameBorder="0"
+                            allowFullScreen
+                            style={{
+                              aspectRatio: "16 / 9", 
+                              objectFit: "cover", 
+                            }}
+                          ></iframe>
+                        ) : (
+                          <p>Invalid YouTube URL</p> 
+                        )}
                       </div>
                     </div>
                   </div>

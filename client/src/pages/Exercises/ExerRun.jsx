@@ -197,6 +197,20 @@ export default function ExerRun() {
   const videoID = extractYouTubeID(videoUrl);
   const embedUrl = videoID ? `https://www.youtube.com/embed/${videoID}` : null;
 
+  const sanitizedHtml = DOMPurify.sanitize(`
+    <div style="font-family: Arial, sans-serif; border: 2px solid #ccc; border-radius: 15px; padding: 20px; background-color: #fff; color: #333; line-height: 1.6; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+      <p style="text-align: justify;">
+        <strong style="color: #4CAF50;">This is a word speech exercise!</strong> It utilizes the free Web Speech API for voice recognition and a differential model to help you practice and improve your pronunciation. Simply speak and try to match the displayed word or phrase to enhance your speaking ability. Your progress is saved on your profile for easy tracking.
+      </p>
+      <p style="text-align: justify;">
+        Our exercises are designed for English words, but we also offer an experimental exercise for Tagalog words. Please note that the Tagalog exercise works only in Google Chrome.
+      </p>
+      <p style="text-align: justify;">
+        <span style="color: #e74c3c; font-weight: bold;">Important:</span> This tool is based on a machine learning model that may be susceptible to inaccuracies. Factors like pronunciation variations, background noise, and microphone quality may affect the results. It is always recommended to consult a speech professional for more accurate assessments.
+      </p>
+    </div>
+  `);
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="container-fluid p-0 vw-100 vh-100">
@@ -267,7 +281,7 @@ export default function ExerRun() {
                       }}
                     >
                       <img
-                        src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
+                        src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
                         alt="Exercise Image"
                         className="border rounded-3"
                         style={{
@@ -279,12 +293,7 @@ export default function ExerRun() {
                         }}
                       />
                     </div>
-                    <div
-                      className="ql-editor"
-                      dangerouslySetInnerHTML={{
-                        __html: DOMPurify.sanitize("This speech exercise uses a set scope of words that help you on pronunciation. It uses homophones differential mapping and phonemes recognition for words you utter."), // Static description
-                      }}
-                    />
+                    <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
                   </div>
                 </div>
                   <div

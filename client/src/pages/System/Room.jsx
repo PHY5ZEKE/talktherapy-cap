@@ -544,6 +544,49 @@ export default function Room() {
     handleConfirmCall();
   };
 
+  const [assessmentData, setAssessmentData] = useState(null);
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+    // Function to fetch the patient's speech assessment
+    const fetchPatientAssessment = async () => {
+      try {
+        const patientId = appointmentDetails?.patientId._id;  
+        if (!patientId) {
+          setError('Patient ID is missing');
+          return;
+        }
+  
+        setIsLoading(true);
+        const response = await fetch(`${appURL}/${route.patient.getAssessment}/${patientId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+          },
+        });
+  
+        if (!response.ok) {
+          console.log("Failed to fetch patient assessment");
+          setError('Failed to fetch assessment');
+        } else {
+          const data = await response.json();
+          setAssessmentData(data);
+        }
+      } catch (error) {
+        console.error(error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      if (appointmentDetails) {
+        fetchPatientAssessment();
+      }
+    }, [appointmentDetails, appURL, accessToken]);
+
   return (
     <>
       {confirmCall && (
@@ -680,17 +723,62 @@ export default function Room() {
                         <a
                           role="button"
                           className="dropdown-item"
-                          data-bs-toggle="offcanvas"
-                          data-bs-target="#offcanvasDiagnosticTool"
-                          aria-controls="offcanvasDiagnosticTool"
+                          data-bs-toggle="modal"
+                          data-bs-target="#diagnosticToolModal"
                         >
-                          Diagnostic Tool
+                          Diagnostic Tools
                         </a>
                       </li>
                     </>
                   )}
                 </ul>
               </div>
+
+              {/* Modal for Diagnostic Tool of patient */}
+                <div
+                  className="modal fade"
+                  id="diagnosticToolModal"
+                  tabIndex="-1"
+                  aria-labelledby="diagnosticToolModalLabel"
+                  aria-hidden="true"
+                >
+                  <div className="modal-dialog">
+                    <div className="modal-content shadow-lg border-0 rounded-3">
+                      <div className="modal-header border-bottom-0">
+                        <h5 className="modal-title text-primary" id="diagnosticToolModalLabel">
+                          Assistive Diagnostic Tool
+                        </h5>
+                        <button
+                          type="button"
+                          className="btn-close"
+                          data-bs-dismiss="modal"
+                          aria-label="Close"
+                        ></button>
+                      </div>
+                      <div className="modal-body">
+                        <p className="text-muted mb-4">
+                          Choose between Speech or Face diagnostic tools to start the assessment.
+                        </p>
+
+                        {/* Buttons for Speech and Face tools */}
+                        <div className="d-flex justify-content-center gap-3">
+                          <button
+                            className="btn btn-outline-primary btn-lg px-4 py-2"
+                            onClick={() => window.open('/content/warn/speech', '_blank')}
+                          >
+                            Speech Tool
+                          </button>
+                          <button
+                            className="btn btn-outline-primary btn-lg px-4 py-2"
+                            onClick={() => window.open('/content/warn/face', '_blank')}
+                          >
+                            Face Tool
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
               {/* CANVAS FOR MESSAGES */}
               <div
@@ -765,11 +853,8 @@ export default function Room() {
                 aria-labelledby="offcanvasDiagnosticToolLabel"
               >
                 <div className="offcanvas-header">
-                  <h5
-                    className="offcanvas-title"
-                    id="offcanvasDiagnosticToolLabel"
-                  >
-                    Assistive Diagnostic Tool Experimental
+                  <h5 className="offcanvas-title" id="offcanvasDiagnosticToolLabel">
+                    Assistive Diagnostic Tool
                   </h5>
                   <button
                     type="button"
@@ -778,74 +863,49 @@ export default function Room() {
                     aria-label="Close"
                   ></button>
                 </div>
+
                 <div className="offcanvas-body">
-                  {/* Diagnostic Tool Content */}
-                  <div className="button-container">
-                    {userRole === "patientslp" && (
+                  {/* Display loading state */}
+                  {isLoading ? (
+                    <p>Loading assessment data...</p>
+                  ) : error ? (
+                    <p className="text-danger">{error}</p>
+                  ) : (
+                    <>
+                      {/* Display patient's speech assessment */}
+                      {assessmentData ? (
+                        <div>
+                          {/* Speech assessment results */}
+                          <div>
+                            <h6>Top 3 Results:</h6>
+                            <ul>
+                              {assessmentData.top3Results.map((result, index) => (
+                                <li key={index}>
+                                  {result.label}: {result.score.toFixed(2)}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <strong>Overall Score:</strong> {assessmentData.score}
+                          </div>
+                          <div>
+                            <strong>Assessment Date:</strong> {new Date(assessmentData.date).toLocaleDateString()}
+                          </div>
+                        </div>
+                      ) : (
+                        <p>No speech assessment data found.</p>
+                      )}
+
+                      {/* Refresh button to reload the assessment */}
                       <button
-                        className="text-button border"
-                        onClick={() =>
-                          startVoiceRecognitionHandler(userRole, socket.current)
-                        }
+                        className="btn btn-primary"
+                        onClick={fetchPatientAssessment}
                       >
-                        Start Voice Recognition
+                        Refresh Assessment Data
                       </button>
-                    )}
-                  </div>
-
-                  <div className="chart-container">
-                    <div
-                      id="chartContainer"
-                      className={
-                        userRole === "patientslp" ? "visually-hidden" : ""
-                      }
-                    >
-                      <canvas id="outputChart"></canvas>
-                    </div>
-                  </div>
-
-                  <div>
-                    <div
-                      className={
-                        userRole === "patientslp" ? "visually-hidden" : ""
-                      }
-                    >
-                      If you are seeing this, the Diagnostic Tool is not working
-                      for now, try it on Exercise!
-                    </div>
-                  </div>
-
-                  <div className="controls-container">
-                    <div className="cardbox">
-                      <div
-                        id="output"
-                        dangerouslySetInnerHTML={{
-                          __html: recognitionResults,
-                        }}
-                      ></div>
-                      <span
-                        id="action"
-                        className={
-                          userRole === "patientslp" ? "visually-hidden" : ""
-                        }
-                      ></span>
-                    </div>
-                  </div>
-
-                  <div id="phoneme-container">
-                    <div id="comment" className="text-muted"></div>
-                  </div>
-
-                  <div
-                    id="score-container"
-                    className={
-                      userRole === "patientslp" ? "visually-hidden" : ""
-                    }
-                  >
-                    <div id="score-output"></div>
-                  </div>
-
-                  <div id="label-container" className="visually-hidden"></div>
+                    </>
+                  )}
                 </div>
               </div>
             </>

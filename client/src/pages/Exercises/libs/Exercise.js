@@ -693,15 +693,6 @@ function initializeExercise(loadedProgress = null) {
                 console.warn('webkitSpeechRecognition is not supported in this browser.');
                 return; 
             }
-            // var recognition;
-            //     if (typeof window.SpeechRecognition !== 'undefined') {
-            //         recognition = new window.SpeechRecognition(); // Standard SpeechRecognition
-            //     } else if (typeof window.webkitSpeechRecognition !== 'undefined') {
-            //         recognition = new window.webkitSpeechRecognition(); // WebKit-based SpeechRecognition
-            //     } else {
-            //         $recognition.innerHTML('SpeechRecognition is not supported in this browser.');
-            //         return; 
-            //     }
             var recognition = new webkitSpeechRecognition(); 
             var chunks, userAudio;
     
@@ -734,9 +725,6 @@ function initializeExercise(loadedProgress = null) {
             function startRecord(event) {
                 resetRecognitionStyles();
                 event.stopImmediatePropagation();
-
-                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
-                var recognition = new window.SpeechRecognition(); 
     
                 if (event.type !== 'touchstart' && event.type === 'mousedown' && event.which !== 1) return;
     

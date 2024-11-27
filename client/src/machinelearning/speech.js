@@ -165,6 +165,11 @@ function outputTopResults(topScores) {
     commentDiv.innerHTML = comment;
 
     assignScore(topScores);
+    
+    const finalScore = assignScore(topScores);  
+    if (window.saveSpeechResultsToDatabase) {
+        window.saveSpeechResultsToDatabase(topScores, finalScore); 
+    }
 
 }
 
@@ -229,6 +234,9 @@ function assignScore(topScores) {
 
     score = Math.max(0, Math.min(100, score));
     scoreOutputDiv.innerHTML = `<div><strong>Score:</strong> ${score}</div>`;
+    return score;
 }
+
+
 
 

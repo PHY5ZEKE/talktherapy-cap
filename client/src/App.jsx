@@ -64,7 +64,7 @@ import PublicRoute from "./pages/Authorization/PublicRoute";
 // Teleconference
 const Room = lazy(() => import("./pages/System/Room"));
 
-//Test Exercises
+//Exercises
 const WordStart = lazy(() => import("./pages/Exercises/WordStart"));
 const AssistSpeech = lazy(() => import("./pages/Exercises/AssistSpeech"));
 const ExerciseContent = lazy(() => import("./pages/Exercises/ExerciseContent"));
@@ -72,6 +72,8 @@ const ExerRun = lazy(() => import("./pages/Exercises/ExerRun"));
 const ExerSpeech = lazy(() => import("./pages/Exercises/ExerSpeech"));
 const ExerFace = lazy(() => import("./pages/Exercises/ExerFace"));
 const AssistFace = lazy(() => import("./pages/Exercises/AssistFace"));
+const ContentWarnSpeech = lazy(() => import("./pages/Exercises/ContentWarnSpeech"));
+const ContentWarnFace = lazy(() => import("./pages/Exercises/ContentWarnFace"));
 
 // Error Handlers
 const NotFound = lazy(() => import("./pages/System/NotFound"));
@@ -111,13 +113,19 @@ const routes = (
         />
 
         {/* Exercises */}
-        <Route path="/exercise" element={<WordStart />} />
-        <Route path="/assist/speech" element={<AssistSpeech />} />
         <Route path="/content/exercises/:id" element={<ExerciseContent />} />
+        <Route path="/exercise" element={<WordStart />} />
+
+        <Route path="/assist/speech" element={<AssistSpeech />} />
+        <Route path="/assist/face" element={<AssistFace/>} />
+
+        <Route path="/content/warn/speech" element={<ContentWarnSpeech />} />
+        <Route path="/content/warn/face" element={<ContentWarnFace />} />
+
         <Route path="/content/exercises/speech" element={<ExerRun />} />
         <Route path="/content/exercises/assistspeech" element={<ExerSpeech />} />
         <Route path="/content/exercises/facespeech" element={<ExerFace />} />
-        <Route path="/assist/face" element={<AssistFace/>} />
+
 
         {/* TO DO: Create a page for landing instead of login */}
         <Route

@@ -1,11 +1,22 @@
-import { useEffect } from "react";
+import { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from './libs/speechml.module.css';  // Import CSS Module
-import { init } from "../../machinelearning/speech.js";
-import { startVoiceRecognitionHandler } from '../../machinelearning/speech.js';
+import styles from './libs/speechml.module.css'; 
+
+import { init, startVoiceRecognitionHandler } from "../../machinelearning/speech.js";
+
+import { route } from "../../utils/route";
+import { AuthContext } from "../../utils/AuthContext";
 
 export default function AssistSpeech() {
+  const { authState } = useContext(AuthContext);
+  const accessToken = authState.accessToken;
+  const [patientData, setPatientData] = useState(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+
+  const appURL = import.meta.env.VITE_APP_URL;
 
   useEffect(() => {
     const initializeModel = async () => {
@@ -13,6 +24,83 @@ export default function AssistSpeech() {
     };
     initializeModel();
   }, []);
+
+  // Fetch patient data
+  useEffect(() => {
+    if (authState?.userRole === "patientslp") {
+      const fetchPatientData = async () => {
+        try {
+          const response = await fetch(`${appURL}/${route.patient.fetch}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          });
+  
+          if (!response.ok) {
+            console.error("Failed to fetch patient data");
+            setLoading(false);
+            return;
+          }
+          const data = await response.json();
+          setPatientData(data.patient);
+          setLoading(false);
+  
+        } catch (error) {
+          setError(error.message);
+          setLoading(false);
+        }
+      };
+  
+      fetchPatientData();
+    }
+  }, [accessToken, appURL, authState?.userRole]);
+
+  // Function to send speech results to the backend
+  function saveSpeechResultsToDatabase(top3Results, finalScore) {
+    const appURL = import.meta.env.VITE_APP_URL;
+    if (!accessToken) {
+      console.error("Access token is missing");
+      return;
+    }
+
+    const progress = {
+      top3Results, 
+      score: finalScore, 
+    };
+
+    console.log("Sending speech results to backend:", progress);
+    fetch(`${appURL}/${route.patient.saveAssessment}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + accessToken,
+      },
+      body: JSON.stringify(progress),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to save speech results');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('Speech results saved successfully:', data);
+      })
+      .catch((error) => {
+        console.error('Error saving speech results:', error);
+      });
+  }
+
+  useEffect(() => {
+    window.saveSpeechResultsToDatabase = saveSpeechResultsToDatabase;
+
+    return () => {
+      delete window.saveSpeechResultsToDatabase;
+    };
+  }, [accessToken]);
+
 
   return (
     <div

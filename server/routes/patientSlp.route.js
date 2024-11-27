@@ -17,6 +17,15 @@ const {
   getProgress,
 } = require("../controllers/patientProgress.controller");
 
+const {
+  saveAssessment,
+  getAssessment,
+} = require("../controllers/patientAssessment.controller");
+
+const {
+  saveFaceAssessment,
+} = require("../controllers/patientFace.controller");
+
 const verifyToken = require("../middleware/verifyToken");
 
 // Create SLP Patient Account
@@ -42,5 +51,13 @@ router.get("/load-progress", verifyToken, loadProgress);
 router.get("/show-progress", verifyToken, showProgress);
 
 router.get("/get-progress/:patientId", verifyToken, getProgress);
+
+// Save speech assessment results for a patient
+router.post("/speech-assessment", verifyToken, saveAssessment);
+
+router.get("/get-assessment/:patientId", verifyToken, getAssessment);
+
+// Save face assessment results for a patient
+router.post("/face-assessment", verifyToken, saveFaceAssessment);
 
 module.exports = router;

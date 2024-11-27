@@ -164,7 +164,7 @@ export default function ViewContent() {
                       >
                         <div className="mx-1 my-3 card exercise-container exercise-child border">
                           <img
-                            src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
+                            src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
                             className="card-img-top border-bottom"
                             alt="Speech Exercise 1"
                             style={{ height: "200px", objectFit: "cover" }}
@@ -185,7 +185,7 @@ export default function ViewContent() {
                       >
                         <div className="mx-1 my-3 card exercise-container exercise-child border">
                           <img
-                            src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
+                            src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL
                             className="card-img-top border-bottom"
                             alt="Speech Exercise 2"
                             style={{ height: "200px", objectFit: "cover" }}

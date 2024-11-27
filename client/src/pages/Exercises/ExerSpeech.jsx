@@ -185,11 +185,22 @@ export default function ExerSpeech() {
   }, [accessToken, appURL, id]); 
 
     // Define the YouTube video URL
-    const videoUrl = "https://www.youtube.com/watch?v=hq0NpbQbtXY"; // Example YouTube URL
+    const videoUrl = "https://www.youtube.com/watch?v=hq0NpbQbtXY"; 
 
     // Extract the YouTube video ID and construct the embed URL
     const videoID = extractYouTubeID(videoUrl);
     const embedUrl = videoID ? `https://www.youtube.com/embed/${videoID}` : null;
+
+    const sanitizedHtml = DOMPurify.sanitize(`
+       <div style="font-family: Arial, sans-serif; border: 2px solid #ccc; border-radius: 15px; padding: 20px; background-color: #fff; color: #333; line-height: 1.6; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <p style="text-align: justify;">
+          <strong style="color: #4CAF50;">This Assistive Diagnostic Tool</strong> utilizes advanced <em>Machine Learning</em> models, powered by TensorFlow, to process sound recognition data captured through a microphone. It analyzes audio input to identify phonemes, and sound characteristics, assigning confidence scores to its predictions. This tool provides innovative support for speech assessment and pronunciation training.
+        </p>
+        <p style="text-align: justify;">
+          However, <span style="color: #e74c3c; font-weight: bold;">this tool is not intended as a definitive diagnostic resource</span>. While it leverages cutting-edge algorithms, it remains susceptible to inaccuracies due to variations in audio quality, background noise, and the limitations of current machine learning models. Users are advised to consult qualified professionals for formal assessments.
+        </p>
+      </div>
+    `);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>
@@ -204,9 +215,9 @@ export default function ExerSpeech() {
             <div className="row bg-white border-bottom">
               <div className="col">
                 {loading ? (
-                  <p>Loading...</p> // Display loading message while fetching data
+                  <p>Loading...</p> 
                 ) : error ? (
-                  <p>{error}</p> // Show the error message if there was an issue fetching data
+                  <p>{error}</p> 
                 ) : patientData ? (
                   <>
                     <p className="mb-0 mt-3">Hello,</p>
@@ -250,7 +261,7 @@ export default function ExerSpeech() {
                     <div
                       className="col bg-white border rounded-4 p-3 overflow-auto content-column"
                       style={{
-                        maxHeight: "75vh", // Set max height for the scrollable area
+                        maxHeight: "75vh", 
                       }}
                     >
                       {/* Image */}
@@ -261,7 +272,7 @@ export default function ExerSpeech() {
                         }}
                       >
                         <img
-                          src="https://cdn-icons-png.flaticon.com/512/13731/13731426.png" // Static image URL
+                          src="https://media.istockphoto.com/id/1456205703/vector/woman-lips-animation-cartoon-female-lip-sync-animated-phonemes-cute-girl-open-mouth.jpg?s=170667a&w=0&k=20&c=f1uxqui3B00hnYhIj7crW3s5YtSRprjOKNn3JXdAYt0=" // Static image URL 
                           alt="Exercise Image"
                           className="border rounded-3"
                           style={{
@@ -269,21 +280,16 @@ export default function ExerSpeech() {
                             width: "100%",
                             height: "auto",
                             objectFit: "cover",
-                            aspectRatio: "16 / 10", // Maintain aspect ratio
+                            aspectRatio: "16 / 10", 
                           }}
                         />
                       </div>
-                      <div
-                        className="ql-editor"
-                        dangerouslySetInnerHTML={{
-                          __html: DOMPurify.sanitize("Uses machine learning to help you pronounce your phonomes and word sounds!"), // Static description
-                        }}
-                      />
+                      <div dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />
                     </div>
                   </div>
                   <div
                     className="mb-3 fw-bold text-button border mx-auto"
-                    onClick={() => navigate("/assist/speech")}
+                    onClick={() => navigate("/content/warn/speech")}
                     style={{ cursor: "pointer" }}
                   >
                     Perform
@@ -302,7 +308,7 @@ export default function ExerSpeech() {
                   <div className="row p-3">
                     <div
                       className="col bg-white border rounded-4 p-3 overflow-auto"
-                      style={{ maxHeight: "75vh" }} // Larger height for video column
+                      style={{ maxHeight: "75vh" }} 
                     >
                       <div className="mb-3">
                           {embedUrl ? (
@@ -314,12 +320,12 @@ export default function ExerSpeech() {
                             frameBorder="0"
                             allowFullScreen
                             style={{
-                              aspectRatio: "16 / 9", // Maintain 16:9 aspect ratio
-                              objectFit: "cover", // Ensures the video covers the container without distortion
+                              aspectRatio: "16 / 9", 
+                              objectFit: "cover", 
                             }}
                           ></iframe>
                         ) : (
-                          <p>Invalid YouTube URL</p> // Handle invalid URL
+                          <p>Invalid YouTube URL</p> 
                         )}
                       </div>
                     </div>
