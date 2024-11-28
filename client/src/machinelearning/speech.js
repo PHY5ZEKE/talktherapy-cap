@@ -115,62 +115,73 @@ async function timedRecognition(recognizer, classLabels, chart, labelContainer) 
 function outputTopResults(topScores) {
     if (topScores.length === 0) return;
 
-
     const outputDiv = document.getElementById("output");
     const commentDiv = document.getElementById("comment");
-    
+
     let resultHTML = "<strong>Recognized Sounds:</strong><br>";
     resultHTML += `1st: ${topScores[0].label} - ${topScores[0].score.toFixed(2)}<br>`;
     if (topScores[1]) resultHTML += `2nd: ${topScores[1].label} - ${topScores[1].score.toFixed(2)}<br>`;
     if (topScores[2]) resultHTML += `3rd: ${topScores[2].label} - ${topScores[2].score.toFixed(2)}<br>`;
-    
+
     outputDiv.innerHTML = resultHTML;
 
     let comment = "Did you say the right sound? If yes, good job! ";
 
-    if (topScores[0].label === "AH") {
-        comment += "If you're trying to say AH, it might sound like OH. Keep trying!";
-    } else if (topScores[0].label === "EE") {
-        comment += "If you're trying to say EE, it could sound like AY. Focus on clarity!";
-    } else if (topScores[0].label === "OH") {
-        comment += "If you're trying to say OH, it might sound like AH. Keep practicing!";
-    } else if (topScores[0].label === "EH") {
-        comment += "If you're trying to say EH, it could sound like EE. Keep working on your pronunciation!";
-    } else if (topScores[0].label === "KK") {
-        comment += "If you're trying to say KK, focus on the hard K sound.";
-    } else if (topScores[0].label === "LL") {
-        comment += "If you're trying to say LL, make sure to emphasize the 'L' sound clearly.";
-    } else if (topScores[0].label === "MM") {
-        comment += "If you're trying to say MM, make sure your lips are closed while pronouncing it.";
-    } else if (topScores[0].label === "OO") {
-        comment += "If you're trying to say OO, try rounding your lips more.";
-    } else if (topScores[0].label === "RR") {
-        comment += "If you're trying to say RR, ensure that you're rolling the sound properly.";
-    } else if (topScores[0].label === "TT") {
-        comment += "If you're trying to say TT, make sure the T sound is clear and crisp.";
+    switch (topScores[0].label) {
+        case "/iː/ - EE":
+            comment += "If you're trying to say EE, it could sound like EH. Focus on clarity!";
+            break;
+        case "/uː/ - OO":
+            comment += "If you're trying to say OO, try rounding your lips more.";
+            break;
+        case "/æ/ - AH":
+            comment += "If you're trying to say AH, it might sound like EH or OH. Keep practicing!";
+            break;
+        case "/ɛ/ - EH":
+            comment += "If you're trying to say EH, it might sound like EE. Focus on emphasizing the EH sound.";
+            break;
+        case "/ʃ/ - SH":
+            comment += "If you're trying to say SH, ensure it doesn't sound like TH. Focus on the sharp SH sound.";
+            break;
+        case "/θ/ - TH":
+            comment += "If you're trying to say TH, make sure it doesn't sound like SH. Focus on the soft TH sound.";
+            break;
+        case "dʒ":
+            comment += "If you're trying to say dʒ, make sure the J sound is clear and voiced.";
+            break;
     }
 
-    if (topScores[0].label === "EE" && topScores[1] && topScores[1].label === "EH" && topScores[1].score >= 0.10) {
+    if (
+        (topScores[0].label === "/ʃ/ - SH" && topScores[1]?.label === "/θ/ - TH") ||
+        (topScores[0].label === "/θ/ - TH" && topScores[1]?.label === "/ʃ/ - SH")
+    ) {
+        comment += " <br> It sounds like you're confusing SH and TH. Focus on differentiating the sharpness of SH from the softness of TH.";
+    }
+
+    if (
+        topScores[0].label === "/iː/ - EE" &&
+        topScores[1]?.label === "/ɛ/ - EH" &&
+        topScores[1].score >= 0.10
+    ) {
         comment += " <br> It sounds like you might be confusing EE with EH.";
     }
 
-    if (topScores[0].label === "AH" && topScores[1] && topScores[1].label === "OH" && topScores[1].score >= 0.10) {
-        comment += " <br> It sounds like you might be confusing AH with OH.";
-    }
-
-    if (topScores[0].label === "BB" && topScores[1] && topScores[1].label === "MM" && topScores[1].score >= 0.10) {
-        comment += " <br> It sounds like you might be confusing BB with MM.";
+    if (
+        topScores[0].label === "/æ/ - AH" &&
+        topScores[1]?.label === "/ɛ/ - EH" &&
+        topScores[1].score >= 0.10
+    ) {
+        comment += " <br> It sounds like you might be confusing AH with EH.";
     }
 
     commentDiv.innerHTML = comment;
 
     assignScore(topScores);
-    
-    const finalScore = assignScore(topScores);  
-    if (window.saveSpeechResultsToDatabase) {
-        window.saveSpeechResultsToDatabase(topScores, finalScore); 
-    }
 
+    const finalScore = assignScore(topScores);
+    if (window.saveSpeechResultsToDatabase) {
+        window.saveSpeechResultsToDatabase(topScores, finalScore);
+    }
 }
 
 
@@ -189,47 +200,23 @@ function assignScore(topScores) {
     score = Math.floor(topScoreValue * 100);
 
     if (
-        topPrediction.label === "EE" &&
-        topScores[1] && topScores[1].label === "EH" &&
+        (topPrediction.label === "/ʃ/ - SH" && topScores[1]?.label === "/θ/ - TH") ||
+        (topPrediction.label === "/θ/ - TH" && topScores[1]?.label === "/ʃ/ - SH") &&
         topScores[1].score >= 0.10
     ) {
         score -= 10; 
     } else if (
-        topPrediction.label === "AH" &&
-        topScores[1] && topScores[1].label === "OH" &&
+        topPrediction.label === "/iː/ - EE" &&
+        topScores[1]?.label === "/ɛ/ - EH" &&
         topScores[1].score >= 0.10
     ) {
         score -= 10;
     } else if (
-        topPrediction.label === "OH" &&
-        topScores[1] && topScores[1].label === "OO" &&
+        topPrediction.label === "/æ/ - AH" &&
+        topScores[1]?.label === "/ɛ/ - EH" &&
         topScores[1].score >= 0.10
     ) {
-        score -= 10; 
-    } else if (
-        topPrediction.label === "BB" &&
-        topScores[1] && topScores[1].label === "MM" &&
-        topScores[1].score >= 0.10
-    ) {
-        score -= 10; 
-    } else if (
-        topPrediction.label === "RR" &&
-        topScores[1] && topScores[1].label === "TT" &&
-        topScores[1].score >= 0.10
-    ) {
-        score -= 10; 
-    } else if (
-        topPrediction.label === "LL" &&
-        topScores[1] && topScores[1].label === "RR" &&
-        topScores[1].score >= 0.10
-    ) {
-        score -= 10; 
-    } else if (
-        topPrediction.label === "OO" &&
-        topScores[1] && topScores[1].label === "OH" &&
-        topScores[1].score >= 0.10
-    ) {
-        score -= 10; 
+        score -= 10;
     }
 
     score = Math.max(0, Math.min(100, score));
