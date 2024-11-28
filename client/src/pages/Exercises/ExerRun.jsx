@@ -203,7 +203,7 @@ export default function ExerRun() {
         <strong style="color: #4CAF50;">This is a word speech exercise!</strong> It utilizes the free Web Speech API for voice recognition and a differential model to help you practice and improve your pronunciation. Simply speak and try to match the displayed word or phrase to enhance your speaking ability. Your progress is saved on your profile for easy tracking.
       </p>
       <p style="text-align: justify;">
-        Our exercises are designed for English words, but we also offer an experimental exercise for Tagalog words. Please note that the Tagalog exercise works only in Google Chrome.
+        Our exercises are designed for English words. Use chrome for a better recognition model. Android is not working for now! 
       </p>
       <p style="text-align: justify;">
         <span style="color: #e74c3c; font-weight: bold;">Important:</span> This tool is based on a machine learning model that may be susceptible to inaccuracies. Factors like pronunciation variations, background noise, and microphone quality may affect the results. It is always recommended to consult a speech professional for more accurate assessments.
