@@ -61,7 +61,7 @@ export default function ChangeProfilePicture({
         closeModal();
       } else {
         failNotify(
-          "Invalid Upload. File limit is 1MB and only JPEG, JPG, and PNG are allowed."
+          "Invalid Upload. File limit is 5MB and only JPEG, JPG, and PNG are allowed."
         );
       }
     } catch (error) {
@@ -91,6 +91,10 @@ export default function ChangeProfilePicture({
           >
             Upload Picture
           </button>
+          <small className="form-text text-muted">
+            Accepted file formats: JPG, JPEG, PNG <br />
+          </small>
+          <small className="form-text text-muted">File Size: 5 MB Limit</small>
         </div>
       </Modal.Body>
       <Modal.Footer>
