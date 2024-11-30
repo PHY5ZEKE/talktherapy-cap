@@ -107,7 +107,9 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
           <form onSubmit={handleSubmit}>
             <div className="container row text-center scrollable-table">
               <div className="col">
-                <p className="mb-0">Day</p>
+                <p className="mb-0">
+                  Day <span className="text-required">*</span>
+                </p>
                 <select
                   className="schedule-options rounded-3 p-3"
                   value={selectedWeekday}
@@ -122,7 +124,9 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
               </div>
 
               <div className="col">
-                <p className="mb-0">Start Time</p>
+                <p className="mb-0">
+                  Start Time<span className="text-required"> *</span>
+                </p>
                 <input
                   className="schedule-time rounded-3 p-3"
                   type="time"
@@ -130,7 +134,9 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
                   onChange={handleStartTimeChange}
                   required
                 />
-                <p className="mb-0">End Time</p>
+                <p className="mb-0">
+                  End Time<span className="text-required"> *</span>
+                </p>
                 <input
                   className="schedule-time rounded-3 p-3"
                   type="time"

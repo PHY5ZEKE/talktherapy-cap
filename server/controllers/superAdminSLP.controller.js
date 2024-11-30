@@ -655,11 +655,6 @@ exports.editSuperAdmin = [
         .status(400)
         .json({ error: true, message: "First name is required." });
     }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
-    }
     if (!lastName) {
       return res
         .status(400)
@@ -875,11 +870,6 @@ exports.editAdmin = [
       return res
         .status(400)
         .json({ error: true, message: "First name is required." });
-    }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
     }
     if (!lastName) {
       return res

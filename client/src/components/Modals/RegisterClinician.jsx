@@ -64,7 +64,7 @@ export default function RegisterClinician({ openModal, admin, onWebSocket }) {
         setError(false);
         setMessage(data.message);
 
-        emailRegister(email)
+        emailRegister(email);
 
         setEmail(""); // Clear the input field on success
       }
@@ -82,13 +82,15 @@ export default function RegisterClinician({ openModal, admin, onWebSocket }) {
           <div className="d-flex flex-column text-center">
             <h5 className="fw-bold">Register Clinician</h5>
             <p className="mb-0">Please verify your inputs before proceeding.</p>
-            <p>Enter the email of authorized clinicians only!</p>
+            <p>Enter the email of authorized clinicians only! </p>
           </div>
 
           <div className="container-fluid">
             <div className="row">
               <div className="col">
-                <p className="fw-bold mb-0 text-center">Valid Email Address</p>
+                <p className="fw-bold mb-0 text-center">
+                  Valid Email Address <span className="text-required">*</span>
+                </p>
                 <input
                   type="email"
                   className="form-control"

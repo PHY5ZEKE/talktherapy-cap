@@ -51,7 +51,7 @@ export default function RegisterAdmin({ openModal, onFetch }) {
         setError(false);
         setMessage(data.message);
 
-        emailRegister(email)
+        emailRegister(email);
 
         setEmail(""); // Clear the input field on success
       }
@@ -74,7 +74,9 @@ export default function RegisterAdmin({ openModal, onFetch }) {
           <div className="container-fluid">
             <div className="row">
               <div className="col">
-                <p className="fw-bold mb-0 text-center">Valid Email Address</p>
+                <p className="fw-bold mb-0 text-center">
+                  Valid Email Address <span className="text-required">*</span>
+                </p>
                 <input
                   type="email"
                   className="form-control"

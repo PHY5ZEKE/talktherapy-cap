@@ -83,8 +83,8 @@ export default function ConsentForm({ handleModal }) {
           <h2>Consent</h2>
 
           <p>
-            By clicking yes to the consent, you agree to the terms and
-            conditions of the usage of TalkTherapy.
+            By ticking the checkbox, you agree to the terms and conditions of
+            the usage of TalkTherapy.
           </p>
         </div>
 

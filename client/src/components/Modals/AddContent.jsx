@@ -36,12 +36,16 @@ export default function AddContent({ closeModal, onSubmit }) {
     // Validate that all fields are filled
     if (!name || !description || !category || !image) {
       toast.error("All fields are required");
+      setIsSubmitting(false);
+      setIsDisabled(false);
       return; // Prevent form submission if any field is missing
     }
 
     // Validate name (must not exceed 250 characters)
     if (name.length > 250) {
       toast.error("Name must not exceed 250 characters");
+      setIsSubmitting(false);
+      setIsDisabled(false);
       return;
     }
 
@@ -49,7 +53,28 @@ export default function AddContent({ closeModal, onSubmit }) {
     const urlRegex = /^(https?|chrome|www):\/\/[^\s$.?#].[^\s]*$/;
     if (videoUrl && !urlRegex.test(videoUrl)) {
       toast.error("Invalid video URL format");
+      setIsSubmitting(false);
+      setIsDisabled(false);
       return;
+    }
+
+    // Validate image size (must not exceed 5 MB) and type (must be JPEG, JPG, or PNG)
+    if (image) {
+      const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!validImageTypes.includes(image.type)) {
+        toast.error(
+          "Invalid image format. Only JPG, JPEG, and PNG are allowed."
+        );
+        setIsSubmitting(false);
+        setIsDisabled(false);
+        return;
+      }
+      if (image.size > 5 * 1024 * 1024) {
+        toast.error("Image must not exceed 5 MB");
+        setIsSubmitting(false);
+        setIsDisabled(false);
+        return;
+      }
     }
 
     // Prepare form data
@@ -80,11 +105,18 @@ export default function AddContent({ closeModal, onSubmit }) {
   // Handle file selection
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size > 5 * 1024 * 1024) {
-      // Check if file size exceeds 5 MB
-      toast.error("Image must not exceed 5 MB");
-      setImage(null); // Reset image input
-      return;
+    if (file) {
+      const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!validImageTypes.includes(file.type)) {
+        toast.error(
+          "Invalid image format. Only JPG, JPEG, and PNG are allowed."
+        );
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must not exceed 5 MB");
+        return;
+      }
     }
     setImage(file);
   };
@@ -92,13 +124,15 @@ export default function AddContent({ closeModal, onSubmit }) {
   return (
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-items-center">
-        <h3 className="fw-bold">Add Content</h3>
+        <h3 className="fw-bold">Add Content </h3>
         <p>Please fill up the form accordingly.</p>
 
         <div className="container row text-center">
           <div className="col">
             <div className="form-group">
-              <label className="mb-0 fw-bold">Name</label>
+              <label className="mb-0 fw-bold">
+                Name <span className="text-required">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -109,7 +143,9 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0 fw-bold">Description</label>
+              <label className="mb-0 fw-bold">
+                Description <span className="text-required">*</span>
+              </label>
               <div className="quill-editor" style={{ maxHeight: "300px" }}>
                 <ReactQuill
                   value={description}
@@ -151,7 +187,9 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0 fw-bold">Category</label>
+              <label className="mb-0 fw-bold">
+                Category <span className="text-required">*</span>
+              </label>
               <select
                 className="form-control"
                 value={category}
@@ -175,13 +213,21 @@ export default function AddContent({ closeModal, onSubmit }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0 fw-bold">Upload Image</label>
+              <label className="mb-0 fw-bold">
+                Upload Image <span className="text-required">*</span>
+              </label>
               <input
                 type="file"
                 className="form-control"
                 accept="image/*"
                 onChange={handleImageChange}
               />
+              <small className="form-text text-muted">
+                Accepted file formats: JPG, JPEG, PNG <br />
+              </small>
+              <small className="form-text text-muted">
+                File Size: 5 MB Limit
+              </small>
             </div>
           </div>
         </div>

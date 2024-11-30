@@ -98,7 +98,6 @@ const signupPatient = async (req, res) => {
 
   const requiredFields = {
     firstName: "First name is required.",
-    middleName: "Middle name is required.",
     lastName: "Last name is required.",
     mobile: "Mobile number is required.",
     birthday: "Date of birth is required.",
@@ -128,7 +127,7 @@ const signupPatient = async (req, res) => {
         "First name must be a string of letters and not exceed 35 characters.",
     });
   }
-  if (!nameRegex.test(middleName)) {
+  if (middleName && !nameRegex.test(middleName)) {
     return res.status(400).json({
       error: true,
       message:
@@ -166,6 +165,32 @@ const signupPatient = async (req, res) => {
     return res.status(400).json({ error: true, message: passwordError });
   }
 
+  // Validate birthday (minimum 3 years of age and not in the future)
+  const today = new Date();
+  const birthDate = new Date(birthday);
+  const age = today.getFullYear() - birthDate.getFullYear();
+  const monthDifference = today.getMonth() - birthDate.getMonth();
+  if (
+    age < 3 ||
+    (age === 3 && monthDifference < 0) ||
+    (age === 3 &&
+      monthDifference === 0 &&
+      today.getDate() < birthDate.getDate())
+  ) {
+    return res.status(400).json({
+      error: true,
+      message: "User must be at least 3 years of age.",
+    });
+  }
+
+  // Check if birthday is in the future
+  if (birthDate > today) {
+    return res.status(400).json({
+      error: true,
+      message: "Birthday cannot be in the future.",
+    });
+  }
+
   const createdOn = req.body.createdOn || new Date().getTime();
 
   // Check if email already exists in SuperAdmin, Admin, Clinician, or Patient schemas
@@ -190,7 +215,7 @@ const signupPatient = async (req, res) => {
 
   const patientSlp = new PatientSlp({
     firstName: encrypt(firstName),
-    middleName: encrypt(middleName),
+    middleName: middleName ? encrypt(middleName) : "", // Encrypt middle name if provided
     lastName: encrypt(lastName),
     mobile: encrypt(mobile),
     birthday: birthday,
@@ -221,7 +246,7 @@ const signupPatient = async (req, res) => {
       `Patient with email ${email} signed up successfully`
     );
   } catch (error) {
-    console.error("Error creating audit log:", error); // Log the error details
+    console.error("Error creating audit log or sending email:", error); // Log the error details
   }
 
   return res.json({
@@ -248,7 +273,7 @@ const getPatient = async (req, res) => {
 
     // Decrypt sensitive information before sending the response
     patient.firstName = decrypt(patient.firstName);
-    patient.middleName = decrypt(patient.middleName);
+    patient.middleName = patient.middleName ? decrypt(patient.middleName) : ""; // Decrypt only if middle name exists
     patient.lastName = decrypt(patient.lastName);
     patient.mobile = decrypt(patient.mobile);
     patient.diagnosis = decrypt(patient.diagnosis);
@@ -422,11 +447,6 @@ const editPatient = [
         .status(400)
         .json({ error: true, message: "First name is required." });
     }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
-    }
     if (!lastName) {
       return res
         .status(400)
@@ -450,7 +470,7 @@ const editPatient = [
 
       // Update the patient's information
       patient.firstName = encrypt(firstName);
-      patient.middleName = encrypt(middleName);
+      patient.middleName = middleName ? encrypt(middleName) : ""; // Encrypt only if middle name is provided
       patient.lastName = encrypt(lastName);
       patient.mobile = encrypt(mobile);
 

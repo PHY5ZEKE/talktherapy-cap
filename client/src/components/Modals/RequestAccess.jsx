@@ -22,12 +22,11 @@ export default function RequestAccess({
       autoClose: 2000,
     });
 
-    const failNotify = (message) =>
-      toast.error(message, {
-        transition: Slide,
-        autoClose: 2000,
-      });
-
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -36,6 +35,11 @@ export default function RequestAccess({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!reason) {
+      failNotify("Reason is required");
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -63,7 +67,7 @@ export default function RequestAccess({
         reason: reason,
         show_to: ["admin"],
       };
-      
+
       if (!response.ok) {
         console.error(data.message || "Failed to request access");
         throw new Error(data.message || "Failed to request access");
@@ -88,7 +92,9 @@ export default function RequestAccess({
 
         <div className="d-flex justify-content-center">
           <form className="container w-100" onSubmit={handleSubmit}>
-            <p className="fw-bold text-center mb-1">State Reason</p>
+            <p className="fw-bold text-center mb-1">
+              State Reason <span className="text-required">*</span>
+            </p>
             <textarea
               className="form-control"
               aria-label="With textarea"

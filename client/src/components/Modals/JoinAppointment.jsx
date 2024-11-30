@@ -148,17 +148,40 @@ export default function JoinAppointment({
             <div className="col">
               <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3">
-                  <Form.Label className="fw-bold">Medical Diagnosis</Form.Label>
+                  <Form.Label className="fw-bold">
+                    Medical Diagnosis <span className="text-required">*</span>
+                  </Form.Label>
                   <Form.Control
-                    type="text"
-                    placeholder="Ex. Aphasia"
+                    as="select"
                     value={medicalDiagnosis}
                     onChange={(e) => setMedicalDiagnosis(e.target.value)}
-                  />
+                  >
+                    <option value="Autism Spectrum Disorder">
+                      Autism Spectrum Disorder
+                    </option>
+                    <option value="Attention-Deficit Hyperactivity Disorder">
+                      Attention-Deficit Hyperactivity Disorder
+                    </option>
+                    <option value="Global Developmental Delay">GDD</option>
+                    <option value="Cerebral Palsy">Cerebral Palsy</option>
+                    <option value="Down Syndrome">Down Syndrome</option>
+                    <option value="Hearing Impairment">
+                      Hearing Impairment
+                    </option>
+                    <option value="Cleft Lip and/or Palate">
+                      Cleft Lip and/or Palate
+                    </option>
+                    <option value="Stroke">Stroke</option>
+                    <option value="Stuttering">Stuttering</option>
+                    <option value="Aphasia">Aphasia</option>
+                    <option value="Others">Others</option>
+                  </Form.Control>
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label className="fw-bold">Referral</Form.Label>
+                  <Form.Label className="fw-bold">
+                    Referral <span className="text-required">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Source of referral"
@@ -169,7 +192,8 @@ export default function JoinAppointment({
 
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-bold">
-                    Reason for Consultation
+                    Reason for Consultation{" "}
+                    <span className="text-required">*</span>
                   </Form.Label>
                   <FloatingLabel
                     controlId="floatingTextarea"
@@ -186,11 +210,20 @@ export default function JoinAppointment({
                 </Form.Group>
 
                 <Form.Group controlId="formFile" className="mb-3">
-                  <Form.Label className="fw-bold">Referral Upload</Form.Label>
+                  <Form.Label className="fw-bold">
+                    Referral Upload <span className="text-required">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="file"
                     onChange={(e) => setReferralUpload(e.target.files[0])}
                   />
+                  <small className="form-text text-muted">
+                    Accepted file formats: PDF, JPG, JPEG, PNG <br />
+                  </small>
+
+                  <small className="form-text text-muted">
+                    File Size: 5 MB Limit
+                  </small>
                 </Form.Group>
 
                 <div className="d-flex justify-content-center mt-3 gap-3">

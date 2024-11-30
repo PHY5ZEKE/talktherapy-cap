@@ -130,9 +130,7 @@ exports.clinicianSignup = async (req, res) => {
 
   const requiredFields = {
     firstName: "First name is required.",
-    middleName: "Middle name is required.",
     lastName: "Last name is required.",
-    mobile: "Mobile number is required.",
     birthday: "Date of birth is required.",
     address: "Clinic address is required.",
     specialization: "Specialization is required.",
@@ -155,7 +153,7 @@ exports.clinicianSignup = async (req, res) => {
         "First name must be a string of letters and not exceed 35 characters.",
     });
   }
-  if (!nameRegex.test(middleName)) {
+  if (middleName && !nameRegex.test(middleName)) {
     return res.status(400).json({
       error: true,
       message:
@@ -170,9 +168,9 @@ exports.clinicianSignup = async (req, res) => {
     });
   }
 
-  // Validate mobile number (Philippine 11-digit format)
+  // Validate mobile number (Philippine 11-digit format) if provided
   const mobileRegex = /^09\d{9}$/;
-  if (!mobileRegex.test(mobile)) {
+  if (mobile && !mobileRegex.test(mobile)) {
     return res.status(400).json({
       error: true,
       message: "Mobile number must be a valid Philippine 11-digit format.",
@@ -193,6 +191,16 @@ exports.clinicianSignup = async (req, res) => {
     return res.status(400).json({ error: true, message: passwordError });
   }
 
+  // Validate birthday (not a future date)
+  const today = new Date();
+  const birthDate = new Date(birthday);
+  if (birthDate > today) {
+    return res.status(400).json({
+      error: true,
+      message: "Birthday cannot be in the future.",
+    });
+  }
+
   const existingClinician = await Clinician.findOne({ email });
 
   if (!existingClinician) {
@@ -211,9 +219,9 @@ exports.clinicianSignup = async (req, res) => {
   const hashedPassword = await hashPassword(password);
 
   existingClinician.firstName = firstName;
-  existingClinician.middleName = middleName;
+  existingClinician.middleName = middleName || ""; // Allow empty middle name
   existingClinician.lastName = lastName;
-  existingClinician.mobile = mobile;
+  existingClinician.mobile = mobile || ""; // Allow empty mobile number
   existingClinician.birthday = birthday;
   existingClinician.address = address;
   existingClinician.specialization = specialization;
@@ -284,11 +292,11 @@ exports.getAllPatients = [
       const patients = await Patient.find({});
       return res.status(200).json({
         error: false,
-        message: "Patient retrieved successfully.",
+        message: "Patients retrieved successfully.",
         patients: patients.map((patient) => ({
           _id: patient._id,
           firstName: decrypt(patient.firstName),
-          middleName: decrypt(patient.middleName),
+          middleName: patient.middleName ? decrypt(patient.middleName) : "", // Decrypt only if middle name exists
           lastName: decrypt(patient.lastName),
           email: patient.email,
           mobile: decrypt(patient.mobile),
@@ -325,7 +333,7 @@ exports.getPatientById = [
       if (!patient) {
         return res.status(404).json({
           error: true,
-          message: "Clinician not found.",
+          message: "Patient not found.",
         });
       }
 
@@ -335,6 +343,7 @@ exports.getPatientById = [
         patient: {
           _id: patient._id,
           firstName: decrypt(patient.firstName),
+          middleName: patient.middleName ? decrypt(patient.middleName) : "", // Decrypt only if middle name exists
           lastName: decrypt(patient.lastName),
           email: patient.email,
           mobile: decrypt(patient.mobile),
@@ -366,11 +375,7 @@ exports.editClinician = [
         .status(400)
         .json({ error: true, message: "First name is required." });
     }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
-    }
+
     if (!lastName) {
       return res
         .status(400)
@@ -380,11 +385,6 @@ exports.editClinician = [
       return res
         .status(400)
         .json({ error: true, message: "Clinic address is required." });
-    }
-    if (!mobile) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Contact number is required." });
     }
 
     try {
@@ -591,7 +591,7 @@ exports.getAssignedPatients = async (req, res) => {
       return {
         _id: patient._id,
         firstName: safeDecrypt(patient.firstName),
-        middleName: safeDecrypt(patient.middleName),
+        middleName: patient.middleName ? safeDecrypt(patient.middleName) : "", // Decrypt only if middle name exists
         lastName: safeDecrypt(patient.lastName),
         email: patient.email,
         mobile: safeDecrypt(patient.mobile),

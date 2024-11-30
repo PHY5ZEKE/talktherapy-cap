@@ -5,37 +5,62 @@ import "react-quill/dist/quill.snow.css";
 import "./modal.css";
 
 export default function EditContent({ closeModal, onSubmit, content }) {
-
   // Initialize form state with existing content data
   const [name, setName] = useState(content.name || "");
   const [description, setDescription] = useState(content.description || "");
   const [category, setCategory] = useState(content.category || "");
-  const [image, setImage] = useState(null); 
-  const [videoUrl, setVideoUrl] = useState(content.videoUrl || ""); 
+  const [image, setImage] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(content.videoUrl || "");
   const [error, setError] = useState(null);
 
   const handleChange = (value) => {
     setDescription(value);
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Validate that all required fields are filled
+    if (!name || !description || !category) {
+      toast.error("Name, description, and category are required");
+      return;
+    }
+
+    // Validate name (must not exceed 250 characters)
+    if (name.length > 250) {
+      toast.error("Name must not exceed 250 characters");
+      return;
+    }
+
+    // Validate video URL (must be a valid URL)
+    const urlRegex = /^(https?|chrome|www):\/\/[^\s$.?#].[^\s]*$/;
+    if (videoUrl && !urlRegex.test(videoUrl)) {
+      toast.error("Invalid video URL format");
+      return;
+    }
+
+    // Validate image size (must not exceed 5 MB) and type (must be JPEG, JPG, or PNG)
+    if (image) {
+      const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!validImageTypes.includes(image.type)) {
+        toast.error(
+          "Invalid image format. Only JPG, JPEG, and PNG are allowed."
+        );
+        return;
+      }
+      if (image.size > 5 * 1024 * 1024) {
+        toast.error("Image must not exceed 5 MB");
+        return;
+      }
+    }
 
     // Prepare form data
     const formData = new FormData();
     formData.append("name", name);
     formData.append("description", description);
     formData.append("category", category);
-    formData.append("videoUrl", videoUrl); 
-    if (image) formData.append("image", image); 
-
-    //console logging
-    // for (let [key, value] of formData.entries()) {
-    //   console.log(`${key}:`, value);
-    // }
-    // console.log("Submitting form data:", { name, description, category, image, videoUrl });
-    
+    formData.append("videoUrl", videoUrl);
+    if (image) formData.append("image", image);
 
     try {
       await onSubmit(content._id, formData); // Pass formData to parent
@@ -47,16 +72,13 @@ export default function EditContent({ closeModal, onSubmit, content }) {
     }
   };
 
-
   const handleImageChange = (e) => {
     setImage(e.target.files[0]);
   };
 
-
   const handleVideoUrlChange = (e) => {
     setVideoUrl(e.target.value);
   };
-
 
   const handleClose = (e) => {
     e.preventDefault();
@@ -66,13 +88,15 @@ export default function EditContent({ closeModal, onSubmit, content }) {
   return (
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-items-center">
-        <h3 className="fw-bold">Edit Content</h3>
+        <h3 className="fw-bold">Edit Content </h3>
         <p>Edit the fields below to update the content.</p>
 
         <div className="container row text-center">
           <div className="col">
             <div className="form-group">
-              <label className="mb-0 fw-bold">Name</label>
+              <label className="mb-0 fw-bold">
+                Name <span className="text-required">*</span>
+              </label>
               <input
                 type="text"
                 className="form-control"
@@ -83,9 +107,10 @@ export default function EditContent({ closeModal, onSubmit, content }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0 fw-bold">Description</label>
-              <div className="quill-editor"
-              style={{maxHeight: "300px"}}>
+              <label className="mb-0 fw-bold">
+                Description <span className="text-required">*</span>
+              </label>
+              <div className="quill-editor" style={{ maxHeight: "300px" }}>
                 <ReactQuill
                   value={description}
                   onChange={handleChange}
@@ -126,7 +151,9 @@ export default function EditContent({ closeModal, onSubmit, content }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0 fw-bold">Category</label>
+              <label className="mb-0 fw-bold">
+                Category <span className="text-required">*</span>
+              </label>
               <select
                 className="form-control"
                 value={category}
@@ -150,13 +177,21 @@ export default function EditContent({ closeModal, onSubmit, content }) {
             </div>
 
             <div className="form-group">
-              <label className="mb-0 fw-bold">Upload New Image (Optional)</label>
+              <label className="mb-0 fw-bold">
+                Upload New Image (Optional)
+              </label>
               <input
                 type="file"
                 className="form-control"
                 accept="image/*"
                 onChange={handleImageChange}
               />
+              <small className="form-text text-muted">
+                Accepted file formats: JPG, JPEG, PNG <br />
+              </small>
+              <small className="form-text text-muted">
+                File Size: 5 MB Limit
+              </small>
             </div>
           </div>
         </div>

@@ -72,15 +72,11 @@ export default function EditProfile({
       failNotify("First name is required.");
       return;
     }
-    if (!middleName.trim()) {
-      failNotify("Middle name is required.");
-      return;
-    }
     if (!lastName.trim()) {
       failNotify("Last name is required.");
       return;
     }
-    if (!mobile.trim()) {
+    if (userRole !== "clinician" && !mobile.trim()) {
       failNotify("Mobile number is required.");
       return;
     }
@@ -93,7 +89,7 @@ export default function EditProfile({
       );
       return;
     }
-    if (!nameRegex.test(middleName)) {
+    if (middleName && !nameRegex.test(middleName)) {
       failNotify(
         "Middle name must be a string of letters and not exceed 35 characters."
       );
@@ -106,9 +102,9 @@ export default function EditProfile({
       return;
     }
 
-    // Validate mobile number (Philippine 11-digit format)
+    // Validate mobile number (Philippine 11-digit format) if provided
     const mobileRegex = /^09\d{9}$/;
-    if (!mobileRegex.test(mobile)) {
+    if (mobile && !mobileRegex.test(mobile)) {
       failNotify("Mobile number must be a valid Philippine 11-digit format.");
       return;
     }
@@ -169,7 +165,9 @@ export default function EditProfile({
         <form onSubmit={handleEditProfileSubmit}>
           <h3>Basic Information</h3>
           <div className="form-group">
-            <p className="mb-0">First Name</p>
+            <p className="mb-0">
+              First Name <span className="text-required">*</span>
+            </p>
             <input
               type="text"
               className="form-control"
@@ -191,7 +189,9 @@ export default function EditProfile({
           </div>
 
           <div className="form-group">
-            <p className="mb-0">Last Name</p>
+            <p className="mb-0">
+              Last Name <span className="text-required">*</span>
+            </p>
             <input
               type="text"
               className="form-control"
@@ -204,7 +204,12 @@ export default function EditProfile({
           {isOwner && (
             <>
               <div className="form-group">
-                <p className="mb-0">Contact Number</p>
+                <p className="mb-0">
+                  Contact Number{" "}
+                  {userRole !== "clinician" && (
+                    <span className="text-required">*</span>
+                  )}
+                </p>
                 <input
                   type="text"
                   className="form-control"
@@ -218,7 +223,9 @@ export default function EditProfile({
 
           {whatRole !== "patientslp" && (
             <div className="form-group">
-              <p className="mb-0">Clinic Address</p>
+              <p className="mb-0">
+                Clinic Address <span className="text-required">*</span>
+              </p>
               <input
                 type="text"
                 className="form-control"

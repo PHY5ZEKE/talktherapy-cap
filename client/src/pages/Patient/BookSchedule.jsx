@@ -480,9 +480,6 @@ export default function BookSchedule() {
                         value={selectedSpecialization}
                         onChange={handleSpecializationChange}
                       >
-                        <option value="default" selected>
-                          All Specializations
-                        </option>
                         <option value="Autism Spectrum Disorder">
                           Autism Spectrum Disorder
                         </option>

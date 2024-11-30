@@ -33,6 +33,10 @@ export default function AddComment({ handleModal, recordId }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async () => {
+    if (!comment) {
+      failNotify("Comment is required");
+      return;
+    }
     setIsDisabled(true);
     setIsSubmitting(true);
     try {
@@ -49,7 +53,6 @@ export default function AddComment({ handleModal, recordId }) {
       );
 
       if (!response.ok) {
-        failNotify("Failed to add comment. Try again.");
         throw new Error("Failed to add comment");
       }
 
@@ -75,7 +78,9 @@ export default function AddComment({ handleModal, recordId }) {
         <div className="container-fluid">
           <div className="row">
             <div className="col">
-              <p className="fw-bold mb-0 text-center">Enter your comment.</p>
+              <p className="fw-bold mb-0 text-center">
+                Enter your comment. <span className="text-required">*</span>
+              </p>
               <textarea
                 type="text"
                 className="form-control"
@@ -94,11 +99,7 @@ export default function AddComment({ handleModal, recordId }) {
             onClick={handleSubmit}
             disabled={isDisabled || isSubmitting}
           >
-            {isSubmitting ? (
-             `SUBMITTING...`
-            ) : (
-              `SUBMIT`
-            )}
+            {isSubmitting ? `SUBMITTING...` : `SUBMIT`}
           </button>
           <button
             className="text-button border fw-bold"

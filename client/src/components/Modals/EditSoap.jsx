@@ -44,6 +44,12 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
     openModal();
   };
 
+  const stripHtmlTags = (html) => {
+    const div = document.createElement("div");
+    div.innerHTML = html;
+    return div.textContent || div.innerText || "";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -51,27 +57,27 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
       failNotify("Session Date is required");
       return;
     }
-    if (!activityPlan) {
+    if (!activityPlan || stripHtmlTags(activityPlan).trim() === "") {
       failNotify("Activity Plan is required");
       return;
     }
-    if (!sessionType) {
+    if (!sessionType || stripHtmlTags(sessionType).trim() === "") {
       failNotify("Session Type is required");
       return;
     }
-    if (!subjective) {
+    if (!subjective || stripHtmlTags(subjective).trim() === "") {
       failNotify("Subjective is required");
       return;
     }
-    if (!objective) {
+    if (!objective || stripHtmlTags(objective).trim() === "") {
       failNotify("Objective/Goals are required");
       return;
     }
-    if (!assessment) {
+    if (!assessment || stripHtmlTags(assessment).trim() === "") {
       failNotify("Assessment is required");
       return;
     }
-    if (!recommendation) {
+    if (!recommendation || stripHtmlTags(recommendation).trim() === "") {
       failNotify("Recommendation is required");
       return;
     }
@@ -101,14 +107,14 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Server response:", errorData); // Log the server response
+        console.error("Server response:", errorData);
         throw new Error("Failed to update SOAP record");
       }
 
       const data = await response.json();
       onFetch();
       notify("Edited SOAP successfully.");
-      openModal(); // Close the modal after successful submission
+      openModal();
     } catch (error) {
       failNotify("Failed to edit SOAP.");
       console.log(error);
@@ -151,7 +157,9 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="container text-center">
                 <div className="row">
                   <div className="col mb-3">
-                    <p className="fw-bold mb-0">Activity Plan</p>
+                    <p className="fw-bold mb-0">
+                      Activity Plan <span className="text-required">*</span>
+                    </p>
                     <ReactQuill
                       value={activityPlan}
                       onChange={setActivityPlan}
@@ -165,7 +173,9 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="container text-center">
                 <div className="row">
                   <div className="col mb-3">
-                    <p className="fw-bold mb-0">Session Type</p>
+                    <p className="fw-bold mb-0">
+                      Session Type <span className="text-required">*</span>
+                    </p>
                     <ReactQuill
                       value={sessionType}
                       onChange={setSessionType}
@@ -179,7 +189,9 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="container text-center">
                 <div className="row">
                   <div className="col mb-3">
-                    <p className="fw-bold mb-0">Subjective</p>
+                    <p className="fw-bold mb-0">
+                      Subjective<span className="text-required">*</span>
+                    </p>
                     <ReactQuill
                       value={subjective}
                       onChange={setSubjective}
@@ -193,7 +205,9 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="container text-center">
                 <div className="row">
                   <div className="col mb-3">
-                    <p className="fw-bold mb-0">Objective/Goals</p>
+                    <p className="fw-bold mb-0">
+                      Objective/Goals<span className="text-required">*</span>
+                    </p>
                     <ReactQuill
                       value={objective}
                       onChange={setObjective}
@@ -207,7 +221,9 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="container text-center">
                 <div className="row">
                   <div className="col mb-3">
-                    <p className="fw-bold mb-0">Assessment</p>
+                    <p className="fw-bold mb-0">
+                      Assessment<span className="text-required">*</span>
+                    </p>
                     <ReactQuill
                       value={assessment}
                       onChange={setAssessment}
@@ -221,7 +237,9 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
               <div className="container text-center">
                 <div className="row">
                   <div className="col mb-3">
-                    <p className="fw-bold mb-0">Recommendation</p>
+                    <p className="fw-bold mb-0">
+                      Recommendation<span className="text-required">*</span>
+                    </p>
                     <ReactQuill
                       value={recommendation}
                       onChange={setRecommendation}

@@ -22,7 +22,7 @@ export default function PatientRegister() {
     mobile: "",
     birthday: "",
     diagnosis: "",
-    consent: "",
+    consent: "no", // Default value is "no"
   });
 
   const [passwordValidationMessages, setPasswordValidationMessages] = useState({
@@ -63,10 +63,10 @@ export default function PatientRegister() {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      [name]: type === "checkbox" ? (checked ? "yes" : "no") : value,
     }));
 
     if (name === "password") {
@@ -282,7 +282,9 @@ export default function PatientRegister() {
                   <h5 className="fw-bold">Basic Information</h5>
 
                   <div className="">
-                    <p className="mb-0">First Name</p>
+                    <p className="mb-0">
+                      First Name <span className="text-required">*</span>
+                    </p>
                     <input
                       type="text"
                       className="form-control rounded-2"
@@ -307,7 +309,9 @@ export default function PatientRegister() {
                     />
                   </div>
                   <div className="">
-                    <p className="mb-0">Last Name</p>
+                    <p className="mb-0">
+                      Last Name <span className="text-required">*</span>
+                    </p>
                     <input
                       type="text"
                       aria-label="Last name"
@@ -320,7 +324,9 @@ export default function PatientRegister() {
                   </div>
 
                   <div className="">
-                    <p className="mb-0">Phone Number</p>
+                    <p className="mb-0">
+                      Phone Number <span className="text-required">*</span>
+                    </p>
                     <input
                       type="text"
                       aria-label="Phone Number"
@@ -333,7 +339,9 @@ export default function PatientRegister() {
                   </div>
 
                   <div className="">
-                    <p className="mb-0">Birthday</p>
+                    <p className="mb-0">
+                      Birthday <span className="text-required">*</span>
+                    </p>
                     <input
                       aria-label="Date"
                       type="date"
@@ -345,7 +353,9 @@ export default function PatientRegister() {
                   </div>
 
                   <div className="">
-                    <p className="mb-0">Medical Diagnosis</p>
+                    <p className="mb-0">
+                      Medical Diagnosis <span className="text-required">*</span>
+                    </p>
                     <select
                       className="form-select rounded-2"
                       aria-label="Diagnosis"
@@ -394,7 +404,9 @@ export default function PatientRegister() {
                   <h5 className="mt-3 fw-bold">Credentials</h5>
 
                   <div className="">
-                    <p className="mb-0 fw-bold">Valid Email</p>
+                    <p className="mb-0 fw-bold">
+                      Valid Email <span className="text-required">*</span>
+                    </p>
                     <input
                       type="email"
                       className="form-control rounded-2"
@@ -408,7 +420,9 @@ export default function PatientRegister() {
                   </div>
 
                   <div>
-                    <p className="fw-bold mb-0">Password</p>
+                    <p className="fw-bold mb-0">
+                      Password <span className="text-required">*</span>
+                    </p>
                     <div className="d-flex">
                       <input
                         aria-label="Password"
@@ -443,7 +457,9 @@ export default function PatientRegister() {
                   </div>
 
                   <div className="">
-                    <p className="fw-bold mb-0">Confirm Password</p>
+                    <p className="fw-bold mb-0">
+                      Confirm Password <span className="text-required">*</span>
+                    </p>
 
                     <div className="d-flex">
                       <input
@@ -466,36 +482,23 @@ export default function PatientRegister() {
                     </div>
                   </div>
 
-                  <div className="">
-                    <p className="fw-bold mb-0">
-                      Consent Form{" "}
-                      <span
-                        className="view-consent"
-                        onClick={handleCViewConsentForm}
-                      >
-                        View Consent Form
-                      </span>
-                    </p>
-                    <div className="d-flex">
-                      <input
-                        type="radio"
-                        label="Yes"
-                        name="consent"
-                        value="yes"
-                        checked={formData.consent === "yes"}
-                        onChange={handleChange}
-                      />
-                      <label className="form-check-label mx-2">Yes</label>
-                      <input
-                        type="radio"
-                        label="No"
-                        name="consent"
-                        value="no"
-                        checked={formData.consent === "no"}
-                        onChange={handleChange}
-                      />
-                      <label className="form-check-label mx-2">No</label>
-                    </div>
+                  <div className="form-check mt-3">
+                    <input
+                      className="form-check-input"
+                      type="checkbox"
+                      name="consent"
+                      id="consent"
+                      checked={formData.consent === "yes"}
+                      onChange={handleChange}
+                    />
+
+                    <span
+                      className="view-consent ms-2"
+                      onClick={handleCViewConsentForm}
+                      style={{ cursor: "pointer", color: "blue" }}
+                    >
+                      View Consent Form
+                    </span>
                   </div>
                 </div>
 

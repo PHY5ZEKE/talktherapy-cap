@@ -266,7 +266,9 @@ export default function ClinicianRegister() {
                 <h5 className="fw-bold">Basic Information</h5>
 
                 <div className="">
-                  <p className="mb-0">First Name</p>
+                  <p className="mb-0">
+                    First Name <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     className="form-control rounded-2"
@@ -291,7 +293,9 @@ export default function ClinicianRegister() {
                   />
                 </div>
                 <div className="">
-                  <p className="mb-0">Last Name</p>
+                  <p className="mb-0">
+                    Last Name <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     aria-label="Last name"
@@ -317,7 +321,9 @@ export default function ClinicianRegister() {
                 </div>
 
                 <div className="">
-                  <p className="mb-0">Birthday</p>
+                  <p className="mb-0">
+                    Birthday <span className="text-required">*</span>
+                  </p>
                   <input
                     aria-label="Date"
                     type="date"
@@ -329,7 +335,9 @@ export default function ClinicianRegister() {
                 </div>
 
                 <div>
-                  <p className="mb-0">Clinic Address</p>
+                  <p className="mb-0">
+                    Clinic Address <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     aria-label="Address"
@@ -342,7 +350,10 @@ export default function ClinicianRegister() {
                 </div>
 
                 <div className="">
-                  <p className="mb-0">Medical Specialization</p>
+                  <p className="mb-0">
+                    Medical Specialization{" "}
+                    <span className="text-required">*</span>
+                  </p>
                   <select
                     className="form-select rounded-2"
                     aria-label="Specialization"
@@ -386,7 +397,9 @@ export default function ClinicianRegister() {
                 <h5 className="mt-3 fw-bold">Credentials</h5>
 
                 <div className="">
-                  <p className="mb-0 fw-bold">Valid Email</p>
+                  <p className="mb-0 fw-bold">
+                    Valid Email <span className="text-required">*</span>
+                  </p>
                   <input
                     type="email"
                     className="form-control rounded-2"
@@ -400,7 +413,9 @@ export default function ClinicianRegister() {
                 </div>
 
                 <div>
-                  <p className="fw-bold mb-0">Password</p>
+                  <p className="fw-bold mb-0">
+                    Password <span className="text-required">*</span>
+                  </p>
                   <div className="d-flex">
                     <input
                       aria-label="Password"
@@ -435,7 +450,9 @@ export default function ClinicianRegister() {
                 </div>
 
                 <div className="">
-                  <p className="fw-bold mb-0">Confirm Password</p>
+                  <p className="fw-bold mb-0">
+                    Confirm Password <span className="text-required">*</span>
+                  </p>
 
                   <div className="d-flex">
                     <input

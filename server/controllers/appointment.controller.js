@@ -24,6 +24,20 @@ const upload = multer({
       cb(null, filePath);
     },
   }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB size limit
+  fileFilter: function (req, file, cb) {
+    const filetypes = /pdf|jpg|jpeg|png/;
+    const mimetype = filetypes.test(file.mimetype);
+    const extname = filetypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error("Only .pdf, .jpg, .jpeg, and .png files are allowed!"));
+    }
+  },
 }).single("file");
 
 // Utility Functions

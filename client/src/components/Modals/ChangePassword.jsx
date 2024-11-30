@@ -146,7 +146,9 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
       <Modal.Body>
         <form onSubmit={handleChangePasswordSubmit}>
           <div className="form-group">
-            <p className="mb-0">Current Password</p>
+            <p className="mb-0">
+              Current Password <span className="text-required">*</span>
+            </p>
             <div className="input-group">
               <input
                 type={showCurrentPassword ? "text" : "password"}
@@ -169,7 +171,9 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
           </div>
 
           <div className="form-group">
-            <p className="mb-0">New Password</p>
+            <p className="mb-0">
+              New Password <span className="text-required">*</span>
+            </p>
             <div className="input-group">
               <input
                 type={showNewPassword ? "text" : "password"}
@@ -203,7 +207,9 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
           </div>
 
           <div className="form-group">
-            <p className="mb-0">Confirm New Password</p>
+            <p className="mb-0">
+              Confirm New Password <span className="text-required">*</span>
+            </p>
             <div className="input-group">
               <input
                 type={showConfirmPassword ? "text" : "password"}

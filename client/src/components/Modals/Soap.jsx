@@ -142,8 +142,9 @@ export default function Soap({
   return (
     <>
       <div className="modal-background">
-        <div className="modal-container d-flex flex-column justify-content-center align-content-center"
-        style={{height: "100%"}}
+        <div
+          className="modal-container d-flex flex-column justify-content-center align-content-center"
+          style={{ height: "100%" }}
         >
           <h3 className="fw-bold text-center">Add SOAP</h3>
           <p className="mb-0 text-center">
@@ -158,7 +159,9 @@ export default function Soap({
           <div className="container text-center">
             <div className="row">
               <div className="w-100 mb-3">
-                <p className="fw-bold mb-0">Session Date</p>
+                <p className="fw-bold mb-0">
+                  Session Date <span className="text-required">*</span>
+                </p>
                 <input
                   type="date"
                   className="form-control"
@@ -172,7 +175,9 @@ export default function Soap({
           <div className="container text-center">
             <div className="row">
               <div className="w-100 mb-3">
-                <p className="fw-bold mb-0">Session Plan</p>
+                <p className="fw-bold mb-0">
+                  Session Plan <span className="text-required">*</span>
+                </p>
                 <input
                   type="text"
                   className="form-control"
@@ -186,7 +191,9 @@ export default function Soap({
           <div className="container text-center">
             <div className="row">
               <div className="col mb-3">
-                <p className="fw-bold mb-0">Session Type</p>
+                <p className="fw-bold mb-0">
+                  Session Type <span className="text-required">*</span>
+                </p>
                 <input
                   type="text"
                   className="form-control"
@@ -204,7 +211,9 @@ export default function Soap({
             <div className="container text-center">
               <div className="row">
                 <div className="col mb-3">
-                  <p className="fw-bold mb-0">Subjective</p>
+                  <p className="fw-bold mb-0">
+                    Subjective <span className="text-required">*</span>
+                  </p>
                   <ReactQuill
                     value={subjective}
                     onChange={setSubjective}
@@ -218,7 +227,9 @@ export default function Soap({
             <div className="container text-center">
               <div className="row overflow-auto">
                 <div className="col mb-3">
-                  <p className="fw-bold mb-0">Objective/Goals</p>
+                  <p className="fw-bold mb-0">
+                    Objective/Goals <span className="text-required">*</span>
+                  </p>
                   <ReactQuill
                     value={objective}
                     onChange={setObjective}
@@ -231,7 +242,10 @@ export default function Soap({
             <div className="container text-center">
               <div className="row overflow-auto">
                 <div className="col">
-                  <p className="fw-bold mb-0">Assessment/Performance</p>
+                  <p className="fw-bold mb-0">
+                    Assessment/Performance{" "}
+                    <span className="text-required">*</span>
+                  </p>
                   <ReactQuill
                     value={assessment}
                     onChange={setAssessment}
@@ -245,7 +259,9 @@ export default function Soap({
             <div className="container text-center">
               <div className="row">
                 <div className="col mb-3">
-                  <p className="fw-bold mb-0">Plan/Recommendations</p>
+                  <p className="fw-bold mb-0">
+                    Plan/Recommendations<span className="text-required">*</span>
+                  </p>
                   <ReactQuill
                     value={recommendation}
                     onChange={setRecommendation}

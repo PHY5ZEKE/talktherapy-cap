@@ -97,6 +97,7 @@ export default function AdminRegister() {
       password,
       confPassword,
       mobile,
+      birthday,
     } = formData;
 
     if (password !== confPassword) {
@@ -262,7 +263,9 @@ export default function AdminRegister() {
                 <h5 className="fw-bold">Basic Information</h5>
 
                 <div className="">
-                  <p className="mb-0">First Name</p>
+                  <p className="mb-0">
+                    First Name <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     className="form-control rounded-2"
@@ -287,7 +290,9 @@ export default function AdminRegister() {
                   />
                 </div>
                 <div>
-                  <p className="mb-0">Last Name</p>
+                  <p className="mb-0">
+                    Last Name <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     aria-label="Last name"
@@ -300,7 +305,9 @@ export default function AdminRegister() {
                 </div>
 
                 <div>
-                  <p className="mb-0">Phone Number</p>
+                  <p className="mb-0">
+                    Phone Number <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     aria-label="Phone Number"
@@ -313,7 +320,9 @@ export default function AdminRegister() {
                 </div>
 
                 <div>
-                  <p className="mb-0">Clinic Address</p>
+                  <p className="mb-0">
+                    Clinic Address <span className="text-required">*</span>
+                  </p>
                   <input
                     type="text"
                     aria-label="Clinic address"
@@ -322,18 +331,6 @@ export default function AdminRegister() {
                     name="address"
                     value={formData.address}
                     onChange={handleChange}
-                  />
-                </div>
-
-                <div className="">
-                  <p className="mb-0">Birthday</p>
-                  <input
-                    aria-label="Date"
-                    type="date"
-                    name="birthday"
-                    value={formData.birthday}
-                    onChange={handleChange}
-                    className="form-control rounded"
                   />
                 </div>
               </div>
@@ -348,7 +345,9 @@ export default function AdminRegister() {
                 <h5 className="mt-3 fw-bold">Credentials</h5>
 
                 <div className="">
-                  <p className="mb-0 fw-bold">Valid Email</p>
+                  <p className="mb-0 fw-bold">
+                    Valid Email <span className="text-required">*</span>
+                  </p>
                   <input
                     type="email"
                     className="form-control rounded-2"
@@ -362,7 +361,9 @@ export default function AdminRegister() {
                 </div>
 
                 <div>
-                  <p className="fw-bold mb-0">Password</p>
+                  <p className="fw-bold mb-0">
+                    Password <span className="text-required">*</span>
+                  </p>
                   <div className="d-flex">
                     <input
                       aria-label="Password"
@@ -397,7 +398,9 @@ export default function AdminRegister() {
                 </div>
 
                 <div className="">
-                  <p className="fw-bold mb-0">Confirm Password</p>
+                  <p className="fw-bold mb-0">
+                    Confirm Password <span className="text-required">*</span>
+                  </p>
 
                   <div className="d-flex">
                     <input

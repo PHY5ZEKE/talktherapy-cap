@@ -98,7 +98,6 @@ exports.adminSignup = async (req, res) => {
 
   const requiredFields = {
     firstName: "First name is required.",
-    middleName: "Middle name is required.",
     lastName: "Last name is required.",
     address: "Clinic address is required.",
     mobile: "Contact number is required.",
@@ -121,7 +120,7 @@ exports.adminSignup = async (req, res) => {
         "First name must be a string of letters and not exceed 35 characters.",
     });
   }
-  if (!nameRegex.test(middleName)) {
+  if (middleName && !nameRegex.test(middleName)) {
     return res.status(400).json({
       error: true,
       message:
@@ -179,7 +178,7 @@ exports.adminSignup = async (req, res) => {
   const hashedPassword = await hashPassword(password);
 
   existingAdmin.firstName = firstName;
-  existingAdmin.middleName = middleName;
+  existingAdmin.middleName = middleName || ""; // Allow empty middle name
   existingAdmin.lastName = lastName;
   existingAdmin.address = address;
   existingAdmin.mobile = mobile;
@@ -324,7 +323,7 @@ exports.getAllPatients = [
   async (req, res) => {
     const { id } = req.user;
 
-    // Check if the requester is a SuperAdmin
+    // Check if the requester is an Admin
     const isAdmin = await Admin.findOne({ _id: id });
 
     if (!isAdmin) {
@@ -335,11 +334,11 @@ exports.getAllPatients = [
       const patients = await Patient.find({});
       return res.status(200).json({
         error: false,
-        message: "Patient retrieved successfully.",
+        message: "Patients retrieved successfully.",
         patients: patients.map((patient) => ({
           _id: patient._id,
           firstName: decrypt(patient.firstName),
-          middleName: decrypt(patient.middleName),
+          middleName: patient.middleName ? decrypt(patient.middleName) : "",
           lastName: decrypt(patient.lastName),
           email: patient.email,
           mobile: decrypt(patient.mobile),
@@ -363,7 +362,7 @@ exports.getPatientById = [
     const { id } = req.user;
     const { patientId } = req.params;
 
-    // Check if the admin
+    // Check if the requester is an Admin
     const isAdmin = await Admin.findOne({ _id: id });
 
     if (!isAdmin) {
@@ -386,7 +385,7 @@ exports.getPatientById = [
         patient: {
           _id: patient._id,
           firstName: decrypt(patient.firstName),
-          middleName: decrypt(patient.middleName),
+          middleName: patient.middleName ? decrypt(patient.middleName) : "", // Decrypt only if middle name exists
           lastName: decrypt(patient.lastName),
           email: patient.email,
           mobile: decrypt(patient.mobile),
@@ -417,11 +416,7 @@ exports.editAdmin = [
         .status(400)
         .json({ error: true, message: "First name is required." });
     }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
-    }
+
     if (!lastName) {
       return res
         .status(400)
@@ -627,20 +622,11 @@ exports.editPatient = [
     const { firstName, middleName, lastName, mobile, id } = req.body;
     const adminId = req.user.id; // Extract admin ID from authenticated user
 
-    // Log the request body and admin ID
-    console.log("Request Body:", req.body);
-    console.log("Authenticated Admin ID:", adminId);
-
     // Validate input
     if (!firstName) {
       return res
         .status(400)
         .json({ error: true, message: "First name is required." });
-    }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
     }
     if (!lastName) {
       return res
@@ -663,13 +649,7 @@ exports.editPatient = [
       }
       const adminEmail = admin.email;
 
-      // Log the admin details
-      console.log("Admin Found:", admin);
-
       const patient = await Patient.findOne({ _id: id });
-
-      // Log the patient details
-      console.log("Patient Found:", patient);
 
       if (!patient) {
         return res
@@ -679,15 +659,12 @@ exports.editPatient = [
 
       // Update the patient's information
       patient.firstName = encrypt(firstName);
-      patient.middleName = encrypt(middleName);
+      patient.middleName = middleName ? encrypt(middleName) : ""; // Encrypt only if middle name is provided
       patient.lastName = encrypt(lastName);
       patient.mobile = encrypt(mobile);
 
       // Save the updated patient information
       await patient.save();
-
-      // Log the updated patient details
-      console.log("Updated Patient:", patient);
 
       // Create an audit log entry
       await createAuditLog(
@@ -696,17 +673,12 @@ exports.editPatient = [
         `${adminEmail} edited the patient account with email ${patient.email}.`
       );
 
-      // Log the audit log creation
-      console.log("Audit Log Created");
-
       return res.json({
         error: false,
         patient,
         message: "Patient information updated successfully.",
       });
     } catch (error) {
-      // Log the error details
-      console.error("Error updating patient information:", error);
       return res.status(500).json({
         error: true,
         message: "An error occurred while updating patient information.",
@@ -727,11 +699,7 @@ exports.editClinician = [
         .status(400)
         .json({ error: true, message: "First name is required." });
     }
-    if (!middleName) {
-      return res
-        .status(400)
-        .json({ error: true, message: "Middle name is required." });
-    }
+
     if (!lastName) {
       return res
         .status(400)

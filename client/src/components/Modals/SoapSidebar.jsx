@@ -125,7 +125,7 @@ export default function SoapSidebar({
       openModal(); // Close the modal after successful submission
     } catch (error) {
       failNotify("Failed to create SOAP diagnosis.");
-    }  finally {
+    } finally {
       setIsSubmitting(false);
       setIsDisabled(false);
     }
@@ -156,7 +156,9 @@ export default function SoapSidebar({
           ></button>
         </div>
 
-        <p className="text-center mb-0">Please verify your inputs before proceeding.</p>
+        <p className="text-center mb-0">
+          Please verify your inputs before proceeding.
+        </p>
 
         <div className="container text-center">
           <div className="row">
@@ -170,7 +172,9 @@ export default function SoapSidebar({
         <div className="container text-center">
           <div className="row">
             <div className="w-100 mb-3">
-              <p className="fw-bold mb-0">Session Date</p>
+              <p className="fw-bold mb-0">
+                Session Date <span className="text-required">*</span>
+              </p>
               <input
                 type="date"
                 className="form-control"
@@ -184,7 +188,9 @@ export default function SoapSidebar({
         <div className="container text-center">
           <div className="row">
             <div className="w-100 mb-3">
-              <p className="fw-bold mb-0">Session Plan</p>
+              <p className="fw-bold mb-0">
+                Session Plan <span className="text-required">*</span>
+              </p>
               <input
                 type="text"
                 className="form-control"
@@ -198,7 +204,9 @@ export default function SoapSidebar({
         <div className="container text-center">
           <div className="row">
             <div className="col mb-3">
-              <p className="fw-bold mb-0">Session Type</p>
+              <p className="fw-bold mb-0">
+                Session Type <span className="text-required">*</span>
+              </p>
               <input
                 type="text"
                 className="form-control"
@@ -213,7 +221,9 @@ export default function SoapSidebar({
           <div className="container text-center">
             <div className="row">
               <div className="col mb-3">
-                <p className="fw-bold mb-0">Subjective</p>
+                <p className="fw-bold mb-0">
+                  Subjective<span className="text-required">*</span>
+                </p>
                 <ReactQuill
                   value={subjective}
                   onChange={setSubjective}
@@ -227,7 +237,9 @@ export default function SoapSidebar({
           <div className="container text-center">
             <div className="row overflow-auto">
               <div className="col mb-3">
-                <p className="fw-bold mb-0">Objective/Goals</p>
+                <p className="fw-bold mb-0">
+                  Objective/Goals <span className="text-required">*</span>
+                </p>
                 <ReactQuill
                   value={objective}
                   onChange={setObjective}
@@ -240,7 +252,10 @@ export default function SoapSidebar({
           <div className="container text-center">
             <div className="row overflow-auto">
               <div className="col">
-                <p className="fw-bold mb-0">Assessment/Performance</p>
+                <p className="fw-bold mb-0">
+                  Assessment/Performance{" "}
+                  <span className="text-required">*</span>
+                </p>
                 <ReactQuill
                   value={assessment}
                   onChange={setAssessment}
@@ -254,7 +269,9 @@ export default function SoapSidebar({
           <div className="container text-center">
             <div className="row">
               <div className="col mb-3">
-                <p className="fw-bold mb-0">Plan/Recommendations</p>
+                <p className="fw-bold mb-0">
+                  Plan/Recommendations <span className="text-required">*</span>
+                </p>
                 <ReactQuill
                   value={recommendation}
                   onChange={setRecommendation}
@@ -273,7 +290,7 @@ export default function SoapSidebar({
             disabled={isDisabled || isSubmitting}
           >
             <p className="fw-bold my-0 status">
-            {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
+              {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
             </p>
           </button>
         </div>

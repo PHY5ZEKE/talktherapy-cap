@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 
 import { route } from "../../utils/route.js";
@@ -15,6 +15,7 @@ export default function ForgotPassword() {
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const appURL = import.meta.env.VITE_APP_URL;
+  const navigate = useNavigate();
 
   const [passwordValidationMessages, setPasswordValidationMessages] = useState({
     length: "Must be at least 8 characters",
@@ -35,7 +36,7 @@ export default function ForgotPassword() {
   };
 
   const [isSending, setIsSending] = useState(false);
-  const [isOtp, setIsOtp] = useState(false)
+  const [isOtp, setIsOtp] = useState(false);
 
   const handlePasswordChange = (e) => {
     const { value } = e.target;
@@ -67,10 +68,10 @@ export default function ForgotPassword() {
       const data = await response.json();
       if (data.error) {
         setMessage(data.message);
-        setIsError(true)
+        setIsError(true);
         setIsSending(false);
       } else {
-        setIsError(false)
+        setIsError(false);
         setMessage("OTP sent to your email.");
         setIsSending(false);
         setStep(2);
@@ -88,13 +89,13 @@ export default function ForgotPassword() {
       });
       const data = await response.json();
       if (data.error) {
-        setIsError(true)
-        setIsOtp(false)
-        setIsSending(false)
+        setIsError(true);
+        setIsOtp(false);
+        setIsSending(false);
         setMessage(data.message);
       } else {
-        setIsError(false)
-        setIsOtp(false)
+        setIsError(false);
+        setIsOtp(false);
         setIsSending(false);
         setMessage("OTP verified. Please enter your new password.");
         setStep(3);
@@ -111,13 +112,17 @@ export default function ForgotPassword() {
       });
       const data = await response.json();
       if (data.error) {
-        setIsError(true)
+        setIsError(true);
         setIsSending(false);
         setMessage(data.message);
       } else {
-        setIsError(false)
+        setIsError(false);
         setIsSending(false);
         setMessage("Password has been reset successfully.");
+        // Redirect to login page after 3 seconds
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
       }
     }
   };

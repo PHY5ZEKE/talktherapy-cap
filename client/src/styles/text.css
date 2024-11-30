@@ -125,6 +125,10 @@
   background-color: #ffdddd;
 }
 
+.text-required {
+  color: #f44336;
+}
+
 .text-success {
   color: #4caf50;
   background-color: #e4ffdd;

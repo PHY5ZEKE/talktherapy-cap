@@ -76,7 +76,9 @@ export default function ChangeProfilePicture({
       </Modal.Header>
       <Modal.Body>
         <div className="form-group d-flex flex-column mb-3">
-          <p className="mb-0">Upload Profile Picture</p>
+          <p className="mb-0">
+            Upload Profile Picture <span className="text-required">*</span>
+          </p>
           <input
             type="file"
             className="form-control"

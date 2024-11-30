@@ -30,12 +30,17 @@ export default function RequestContent({ handleModal, clinicianData }) {
   };
 
   const handleSubmit = () => {
+    if (!request) {
+      failNotify("Request content is required.");
+      return;
+    }
+
     emailRequestContent(clinicianData, request, accessToken)
       .then((response) => {
         notify("Request sent successfully!");
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
         failNotify("Failed to send request. Try again.");
       });
     handleModal();
@@ -57,12 +62,13 @@ export default function RequestContent({ handleModal, clinicianData }) {
             <div className="row">
               <div className="col">
                 <p className="fw-bold mb-0 text-center">
-                  Specify your requested content.
+                  Specify your requested content.{" "}
+                  <span className="text-required">*</span>
                 </p>
                 <textarea
                   type="text"
                   className="form-control"
-                  placeholder="Enter email"
+                  placeholder="Enter desired content here..."
                   value={request}
                   onChange={(e) => setRequest(e.target.value)}
                 />

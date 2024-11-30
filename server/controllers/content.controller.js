@@ -40,6 +40,20 @@ const createContent = [
       let imageUrl = null;
 
       if (req.file) {
+        const validImageTypes = ["image/jpeg", "image/jpg", "image/png"];
+        if (!validImageTypes.includes(req.file.mimetype)) {
+          return res
+            .status(400)
+            .json({
+              message:
+                "Invalid image format. Only JPG, JPEG, and PNG are allowed.",
+            });
+        }
+        if (req.file.size > 5 * 1024 * 1024) {
+          return res
+            .status(400)
+            .json({ message: "Image size should not exceed 5MB" });
+        }
         const fileName = `${Date.now()}_${req.file.originalname}`;
         const uploadParams = {
           Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -52,9 +66,24 @@ const createContent = [
         imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/content-images/${fileName}`;
       }
 
+      const { name, description, category } = req.body;
+
+      if (!name) {
+        return res.status(400).json({ message: "Name is required" });
+      }
+      if (!description) {
+        return res.status(400).json({ message: "Description is required" });
+      }
+      if (!category) {
+        return res.status(400).json({ message: "Category is required" });
+      }
+      if (!imageUrl) {
+        return res.status(400).json({ message: "Image is required" });
+      }
+
       const content = await Content.create({
         ...req.body,
-        image: imageUrl || null,
+        image: imageUrl,
       });
 
       // Create an audit log entry
