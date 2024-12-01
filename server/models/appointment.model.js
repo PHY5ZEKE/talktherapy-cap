@@ -7,6 +7,10 @@ const appointmentSchema = new mongoose.Schema(
       ref: "PatientSlp",
       required: true,
     },
+    medicalDiagnosis: {
+      type: String,
+      required: true,
+    },
     sourceOfReferral: {
       type: String,
       required: true,

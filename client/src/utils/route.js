@@ -72,8 +72,7 @@ export const route = {
     getEmailAdmins: "api/super-admin-slp/email-admins",
   },
   appointment: {
-    createFile: "api/appointments-slp/create-appointment/file",
-    createJSON: "api/appointments-slp/create-appointment/json",
+    createAppointment: "api/appointments-slp/create-appointment",
     getAll: "api/appointments-slp/get-all-appointments",
     get: "api/appointments-slp/get-appointment",
     edit: "api/appointments-slp/edit-appointment/:appointmentId",

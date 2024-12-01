@@ -239,6 +239,8 @@ export default function AppointmentDetails({
               </div>
 
               <div className="col">
+                <p className="fw-bold mb-0">Medical Diagnosis</p>
+                <p>{appointment.medicalDiagnosis || "N/A"}</p>
                 <p className="fw-bold mb-0">Chief Complaint</p>
                 <p>{appointment.chiefComplaint || "N/A"}</p>
                 <p className="fw-bold mb-0">Source of Referral</p>

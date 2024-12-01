@@ -47,9 +47,7 @@ export default function PatientViewAppointment({
                   Clinician
                 </label>
                 <div>
-                  <p className="">
-                    {clinicianName || "N/A"}
-                  </p>
+                  <p className="">{clinicianName || "N/A"}</p>
                 </div>
 
                 <div>
@@ -61,6 +59,10 @@ export default function PatientViewAppointment({
               </div>
 
               <div className="col">
+                <label className="fw-bold mb-0" htmlFor="chiefComplaint">
+                  Medical Diagnosis
+                </label>
+                <p>{appointment.medicalDiagnosis || "N/A"}</p>
                 <label className="fw-bold mb-0" htmlFor="chiefComplaint">
                   Chief Complaint
                 </label>

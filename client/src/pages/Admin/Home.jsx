@@ -380,6 +380,8 @@ export default function Home() {
               {user.firstName} {user.middleName} {user.lastName}
             </p>
             <p className="mb-0">{user.email}</p>
+            <p className="mb-0">{user.diagnosis}</p>
+            <p className="mb-0">{user.specialization}</p>
             <p className="mb-0">{user.address}</p>
             <p className="mb-3">{user.mobile}</p>
             <div className="d-flex gap-3">

@@ -5,15 +5,9 @@ const verifyToken = require("../middleware/verifyToken");
 
 // Route to create a new appointment
 router.post(
-  "/create-appointment/file",
+  "/create-appointment",
   verifyToken,
   appointmentController.createAppointment
-);
-
-router.post(
-  "/create-appointment/json",
-  verifyToken,
-  appointmentController.createAppointmentJSON
 );
 
 router.get("/get-all-appointments", appointmentController.getAllAppointments);

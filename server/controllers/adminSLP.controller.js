@@ -304,6 +304,7 @@ exports.getClinicianById = [
           email: clinician.email,
           address: clinician.address,
           mobile: clinician.mobile,
+          specialization: clinician.specialization,
           active: clinician.active,
           createdOn: clinician.createdOn,
           addedOn: clinician.addedOn,
@@ -342,6 +343,7 @@ exports.getAllPatients = [
           lastName: decrypt(patient.lastName),
           email: patient.email,
           mobile: decrypt(patient.mobile),
+          diagnosis: decrypt(patient.diagnosis),
           active: patient.active,
           createdOn: patient.createdOn,
           addedOn: patient.addedOn,
@@ -388,6 +390,7 @@ exports.getPatientById = [
           middleName: patient.middleName ? decrypt(patient.middleName) : "", // Decrypt only if middle name exists
           lastName: decrypt(patient.lastName),
           email: patient.email,
+          diagnosis: decrypt(patient.diagnosis),
           mobile: decrypt(patient.mobile),
           active: patient.active,
           createdOn: patient.createdOn,

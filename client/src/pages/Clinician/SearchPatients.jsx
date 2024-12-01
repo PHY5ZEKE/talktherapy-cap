@@ -298,7 +298,7 @@ export default function ManageSchedule() {
         }
       );
       const data = await response.json();
-  
+
       if (!data.error) {
         setProgressRecords(data); // Assuming data is an array of progress items
       } else {
@@ -680,33 +680,42 @@ export default function ManageSchedule() {
                       </div>
                     ) : viewMode === VIEW_MODES.PROGRESS ? (
                       <>
-                      <h5 className="fw-bold text-center">Progress Records</h5>
-                      {progressRecords.length > 0 ? (
-                        progressRecords.map((record) => {
-                          const correctCount = record.correctCount || 0; 
-                          const totalPhrases = record.totalPhrases || 1; 
-                          const progressPercentage = ((correctCount / totalPhrases) * 100).toFixed(2); 
-                          const completionStatus = record.completed ? "Completed" : "Not Completed";
-                    
-                          return (
-                            <ViewProgress
-                              key={record._id}
-                              header={record.textName} 
-                              details={
-                                <>
-                                  <div>Correct Count: {correctCount}</div>
-                                  <div>Progress: {progressPercentage}%</div>
-                                  <div>Status: {completionStatus}</div>
-                                </>
-                              }
-                              role={userRole}
-                            />
-                          );
-                        })
-                      ) : (
-                        <h5 className="mb-0 fw-bold text-center">No progress records available.</h5>
-                      )}
-                    </>
+                        <h5 className="fw-bold text-center">
+                          Progress Records
+                        </h5>
+                        {progressRecords.length > 0 ? (
+                          progressRecords.map((record) => {
+                            const correctCount = record.correctCount || 0;
+                            const totalPhrases = record.totalPhrases || 1;
+                            const progressPercentage = (
+                              (correctCount / totalPhrases) *
+                              100
+                            ).toFixed(2);
+                            const completionStatus = record.completed
+                              ? "Completed"
+                              : "Not Completed";
+
+                            return (
+                              <ViewProgress
+                                key={record._id}
+                                header={record.textName}
+                                details={
+                                  <>
+                                    <div>Correct Count: {correctCount}</div>
+                                    <div>Progress: {progressPercentage}%</div>
+                                    <div>Status: {completionStatus}</div>
+                                  </>
+                                }
+                                role={userRole}
+                              />
+                            );
+                          })
+                        ) : (
+                          <h5 className="mb-0 fw-bold text-center">
+                            No progress records available.
+                          </h5>
+                        )}
+                      </>
                     ) : (
                       <h5 className="mb-0 fw-bold text-center">
                         Select an option to view related information.

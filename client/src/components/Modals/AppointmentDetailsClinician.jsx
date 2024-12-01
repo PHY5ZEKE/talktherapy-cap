@@ -136,9 +136,7 @@ export default function AppointmentDetailsClinician({
               <div className="col">
                 <p className="fw-bold mb-0">Clinician</p>
                 <div>
-                  <p className="">
-                  {`${clinicianName}`|| "N/A"}
-                  </p>
+                  <p className="">{`${clinicianName}` || "N/A"}</p>
                 </div>
 
                 <div>
@@ -148,6 +146,8 @@ export default function AppointmentDetailsClinician({
               </div>
 
               <div className="col">
+                <p className="fw-bold mb-0">Medical Diagnosis</p>
+                <p>{appointment.medicalDiagnosis || "N/A"}</p>
                 <p className="fw-bold mb-0">Chief Complaint</p>
                 <p>{appointment.chiefComplaint || "N/A"}</p>
                 <p className="fw-bold mb-0">Source of Referral</p>

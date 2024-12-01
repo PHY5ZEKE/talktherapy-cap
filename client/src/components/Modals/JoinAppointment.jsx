@@ -23,6 +23,8 @@ export default function JoinAppointment({
   const [sourceOfReferral, setSourceOfReferral] = useState("");
   const [chiefComplaint, setChiefComplaint] = useState("");
   const [referralUpload, setReferralUpload] = useState(null);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const appURL = import.meta.env.VITE_APP_URL;
 
   const notify = (message) =>
@@ -42,13 +44,16 @@ export default function JoinAppointment({
     closeModal();
   };
 
-  const [isDisabled, setIsDisabled] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple submissions
+
     setIsDisabled(true);
     setIsSubmitting(true);
+
+    console.log(patientId);
+    console.log(selectedClinician);
+    console.log(selectedSchedule);
 
     if (
       !medicalDiagnosis ||
@@ -64,45 +69,17 @@ export default function JoinAppointment({
 
     const formData = new FormData();
     formData.append("patientId", patientId);
+    formData.append("medicalDiagnosis", medicalDiagnosis);
     formData.append("sourceOfReferral", sourceOfReferral);
     formData.append("chiefComplaint", chiefComplaint);
     formData.append("selectedClinician", selectedClinician._id);
     formData.append("selectedSchedule", selectedSchedule);
     formData.append("file", referralUpload);
 
-    const formJson = {
-      patientId: patientId,
-      sourceOfReferral: sourceOfReferral,
-      chiefComplaint: chiefComplaint,
-      selectedClinician: selectedClinician._id,
-      selectedSchedule: selectedSchedule,
-    };
-
     try {
-      // Send JSON to Server
+      // Send JSON and File to Server
       const response = await fetch(
-        `${appURL}/${route.appointment.createJSON}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`, // Include the Bearer token in the headers
-          },
-          body: JSON.stringify(formJson),
-        }
-      );
-
-      const data = await response.json();
-
-      formData.append("appointmentId", data.appointmentId);
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create appointment");
-      }
-
-      // Send File to Server
-      const fileResponse = await fetch(
-        `${appURL}/${route.appointment.createFile}`,
+        `${appURL}/${route.appointment.createAppointment}`,
         {
           method: "POST",
           headers: {
@@ -112,9 +89,10 @@ export default function JoinAppointment({
         }
       );
 
-      const fileData = await fileResponse.json();
-      if (!fileResponse.ok) {
-        throw new Error(fileData.message || "Failed to create appointment");
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create appointment");
       }
 
       const userUpdate = {
@@ -123,11 +101,10 @@ export default function JoinAppointment({
       onWebSocket(userUpdate);
 
       notify(toastMessage.success.book);
-      // window.location.reload(); // Reload the page on success
       closeModal();
     } catch (error) {
       console.error(error);
-      failNotify(toastMessage.fail.error);
+      failNotify(error.message);
     } finally {
       setIsSubmitting(false);
       setIsDisabled(false);
@@ -156,6 +133,9 @@ export default function JoinAppointment({
                     value={medicalDiagnosis}
                     onChange={(e) => setMedicalDiagnosis(e.target.value)}
                   >
+                    <option value="" disabled>
+                      Select Medical Diagnosis
+                    </option>
                     <option value="Autism Spectrum Disorder">
                       Autism Spectrum Disorder
                     </option>
