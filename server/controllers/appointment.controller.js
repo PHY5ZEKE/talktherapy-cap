@@ -978,3 +978,55 @@ exports.joinRoomAudit = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+//for rejected appoinments
+exports.updateAppointment = async (req, res) => {
+  try {
+    const { appointmentId, selectedScheduleId, selectedClinicianId } = req.body;
+
+    console.log("Received update request:");
+    console.log("Appointment ID:", appointmentId);
+    console.log("Selected Schedule ID:", selectedScheduleId);
+    console.log("Selected Clinician ID:", selectedClinicianId);
+
+    // Find the appointment by appointmentId
+    const appointment = await Appointment.findById(appointmentId);
+
+    if (!appointment) {
+      console.log("Appointment not found");
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Validate the new schedule
+    const newSchedule = await Schedule.findById(selectedScheduleId);
+    if (!newSchedule) {
+      console.log("Invalid new schedule selected");
+      return res.status(400).json({ message: "Invalid new schedule selected" });
+    }
+
+    // Validate the new clinician
+    const newClinician = await ClinicianSLP.findById(selectedClinicianId);
+    if (!newClinician) {
+      console.log("Invalid new clinician selected");
+      return res
+        .status(400)
+        .json({ message: "Invalid new clinician selected" });
+    }
+
+    // Update the appointment with the new schedule and clinician
+    appointment.selectedSchedule = selectedScheduleId;
+    appointment.selectedClinician = selectedClinicianId;
+    appointment.status = "Pending";
+
+    await appointment.save();
+
+    console.log("Appointment updated successfully:", appointment);
+
+    res.status(200).json({
+      message: "Appointment updated successfully",
+      appointment,
+    });
+  } catch (error) {
+    console.error("Error updating appointment:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

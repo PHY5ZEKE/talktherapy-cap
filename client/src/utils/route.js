@@ -85,6 +85,7 @@ export const route = {
     endSession: "api/appointments-slp/end-session-status",
     affectedAppointment: "api/appointments-slp/get-affected-appointment",
     roomAudit: "api/appointments-slp/join-room",
+    updateAppointment: "api/appointments-slp/update-appointment",
   },
   schedule: {
     create: "api/schedule-slp/add-schedule",

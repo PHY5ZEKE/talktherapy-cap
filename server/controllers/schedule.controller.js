@@ -167,7 +167,10 @@ exports.getClinicianSched = async (req, res) => {
                 clinician.lastName = decrypt(clinician.lastName);
               }
             } catch (decryptError) {
-              console.error("Error decrypting clinician details:", decryptError);
+              console.error(
+                "Error decrypting clinician details:",
+                decryptError
+              );
             }
 
             return {
@@ -194,7 +197,9 @@ exports.getClinicianSched = async (req, res) => {
       })
     );
 
-    const validSchedules = schedulesWithSpecialization.filter(schedule => schedule !== null);
+    const validSchedules = schedulesWithSpecialization.filter(
+      (schedule) => schedule !== null
+    );
     res.status(200).json(validSchedules);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });

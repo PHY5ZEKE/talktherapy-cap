@@ -62,4 +62,10 @@ router.post(
 
 router.post("/join-room", verifyToken, appointmentController.joinRoomAudit);
 
+router.put(
+  "/update-appointment",
+  verifyToken,
+  appointmentController.updateAppointment
+);
+
 module.exports = router;

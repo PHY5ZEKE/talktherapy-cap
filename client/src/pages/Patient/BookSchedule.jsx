@@ -12,6 +12,7 @@ import ConfirmReschedule from "../../components/Modals/ConfirmReschedule";
 import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 import TemporaryRescheduleConfirmation from "../../components/Modals/TemporaryRescheduleConfirmation";
 import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
+import SuggestedSchedules from "../../components/Modals/SuggestedSchedules";
 
 // DatePicker
 import {
@@ -76,7 +77,8 @@ export default function BookSchedule() {
   const [appointmentToReschedule, setAppointmentToReschedule] = useState(null);
   const [isTemporaryReschedule, setIsTemporaryReschedule] = useState(false);
   const [clinicianIdForReschedule, setClinicianIdForReschedule] =
-    useState(null); // New state
+    useState(null);
+  const [isSuggestedSchedules, setIsSuggestedSchedules] = useState(false);
 
   const handleModal = (clinician, schedule) => {
     setSelectedClinician(clinician);
@@ -154,6 +156,16 @@ export default function BookSchedule() {
     setAppointmentToReschedule(appointment);
     setClinicianIdForReschedule(appointment.selectedClinician);
     setIsTemporaryReschedule(true);
+  };
+
+  const openSuggestedSchedulesModal = (appointment) => {
+    setSelectedAppointment(appointment);
+    setIsSuggestedSchedules(true);
+  };
+
+  const closeSuggestedSchedulesModal = () => {
+    setIsSuggestedSchedules(false);
+    setSelectedAppointment(null);
   };
 
   const socket = useRef(null);
@@ -426,6 +438,19 @@ export default function BookSchedule() {
           openModal={handleAppointmentClick}
           appointment={selectedAppointment}
           closeModal={closeViewAppointmentModal}
+        />
+      )}
+
+      {/* Suggested Schedules Modal */}
+      {isSuggestedSchedules && (
+        <SuggestedSchedules
+          closeModal={closeSuggestedSchedulesModal}
+          medicalDiagnosis={selectedAppointment.medicalDiagnosis}
+          onScheduleSelect={onScheduleSelect}
+          onWebSocket={webSocketNotification}
+          patientName={`${patientData?.firstName} ${patientData?.lastName}`}
+          currentScheduleId={selectedAppointment.selectedSchedule._id}
+          appointmentId={selectedAppointment._id}
         />
       )}
 
@@ -742,7 +767,26 @@ export default function BookSchedule() {
                           )}
                           {/* IF REJECTED */}
                           {appointment.status === "Rejected" && (
-                            <div className="my-3 text-cancelled">Rejected</div>
+                            <div className="row mt-2">
+                              <div className="d-flex justify-content-between flex-wrap gap-3">
+                                <div className="mb-3 text-cancelled">
+                                  REJECTED
+                                </div>
+                                <div className="d-flex gap-3">
+                                  <div
+                                    className="mb-3 fw-bold text-button border"
+                                    onClick={() =>
+                                      openSuggestedSchedulesModal(appointment)
+                                    }
+                                  >
+                                    See Suggested Schedules
+                                  </div>
+                                  <div className="mb-3 fw-bold text-button border">
+                                    Delete Request
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </div>
                       ))
