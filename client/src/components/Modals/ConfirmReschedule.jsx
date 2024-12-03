@@ -21,7 +21,8 @@ export default function ConfirmReschedule({
               Are you sure you want to change schedule?
             </h3>
             <p className="mb-0">
-              The requested schedule will be subject for approval
+              The requested schedule will be subject for approval. This will
+              also forfeit your current schedule when Rejected
             </p>
             <p>Please verify your transaction before proceeding.</p>
           </div>

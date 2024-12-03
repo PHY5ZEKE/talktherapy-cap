@@ -13,6 +13,7 @@ import ChooseSchedule from "../../components/Modals/ChooseSchedule";
 import TemporaryRescheduleConfirmation from "../../components/Modals/TemporaryRescheduleConfirmation";
 import TemporarySchedule from "../../components/Modals/TemporaryReshedule";
 import SuggestedSchedules from "../../components/Modals/SuggestedSchedules";
+import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
 
 // DatePicker
 import {
@@ -53,7 +54,7 @@ export default function BookSchedule() {
   const [selectedDate, setSelectedDate] = useState(null);
 
   const [allSched, setAllSchedule] = useState([]);
-  const [selectedSpecialization, setSelectedSpecialization] = useState("");
+  const [selectedSpecialization, setSelectedSpecialization] = useState(null);
 
   const [hasBooked, setHasBooked] = useState(false);
 
@@ -74,15 +75,17 @@ export default function BookSchedule() {
   const [isChoose, setIsChoose] = useState(false);
   const [isViewAppointment, setIsViewAppointment] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState(null);
+  const [showConfirmationDialog, setShowConfirmationDialog] = useState(false);
   const [appointmentToReschedule, setAppointmentToReschedule] = useState(null);
   const [isTemporaryReschedule, setIsTemporaryReschedule] = useState(false);
   const [clinicianIdForReschedule, setClinicianIdForReschedule] =
     useState(null);
   const [isSuggestedSchedules, setIsSuggestedSchedules] = useState(false);
 
-  const handleModal = (clinician, schedule) => {
+  const handleModal = (clinician, schedule, specialization) => {
     setSelectedClinician(clinician);
     setSelectedSchedule(schedule);
+    setSelectedSpecialization(specialization);
     setIsOpen(true);
   };
 
@@ -163,9 +166,51 @@ export default function BookSchedule() {
     setIsSuggestedSchedules(true);
   };
 
+  const handleDeleteRequestClick = (appointment) => {
+    setSelectedAppointment(appointment);
+    setShowConfirmationDialog(true);
+  };
+
+  const handleCloseConfirmationDialog = () => {
+    setShowConfirmationDialog(false);
+    setSelectedAppointment(null);
+  };
+
   const closeSuggestedSchedulesModal = () => {
     setIsSuggestedSchedules(false);
     setSelectedAppointment(null);
+  };
+
+  const handleDeleteAppointment = async () => {
+    try {
+      const response = await fetch(
+        `${appURL}/${route.appointment.deleteAppointment}/${selectedAppointment._id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete appointment");
+      }
+
+      const data = await response.json();
+      toast.success("Appointment deleted successfully", {
+        transition: Slide,
+        autoClose: 2000,
+      });
+
+      // Refresh the page to fetch the latest appointments
+      window.location.reload();
+    } catch (error) {
+      toast.error("Error deleting appointment: " + error.message, {
+        transition: Slide,
+        autoClose: 3000,
+      });
+    }
   };
 
   const socket = useRef(null);
@@ -386,6 +431,7 @@ export default function BookSchedule() {
           openModal={handleModal}
           selectedClinician={selectedClinician}
           selectedSchedule={selectedSchedule}
+          selectedSpecialization={selectedSpecialization}
           patientId={patientData?._id}
           closeModal={closeModal} // Pass the closeModal function
           onWebSocket={webSocketNotification}
@@ -451,6 +497,15 @@ export default function BookSchedule() {
           patientName={`${patientData?.firstName} ${patientData?.lastName}`}
           currentScheduleId={selectedAppointment.selectedSchedule._id}
           appointmentId={selectedAppointment._id}
+        />
+      )}
+
+      {showConfirmationDialog && (
+        <ConfirmationDialog
+          header="Delete Appointment"
+          body="Are you sure you want to delete this appointment?"
+          handleModal={handleCloseConfirmationDialog}
+          confirm={handleDeleteAppointment} // Pass the handleDeleteAppointment function
         />
       )}
 
@@ -602,19 +657,22 @@ export default function BookSchedule() {
                               {schedule.email}
                             </p>
 
-                            {schedule.status !== "Booked" && !hasBooked && (
-                              <button
-                                className="mt-3 fw-bold text-button border"
-                                onClick={() =>
-                                  handleModal(
-                                    schedule.clinicianId,
-                                    schedule._id
-                                  )
-                                }
-                              >
-                                Book
-                              </button>
-                            )}
+                            {schedule.status !== "Booked" &&
+                              schedule.status !== "Requested" &&
+                              !hasBooked && (
+                                <button
+                                  className="mt-3 fw-bold text-button border"
+                                  onClick={() =>
+                                    handleModal(
+                                      schedule.clinicianId,
+                                      schedule._id,
+                                      schedule.specialization
+                                    )
+                                  }
+                                >
+                                  Book
+                                </button>
+                              )}
                           </div>
                         </div>
                       ))
@@ -781,7 +839,12 @@ export default function BookSchedule() {
                                   >
                                     See Suggested Schedules
                                   </div>
-                                  <div className="mb-3 fw-bold text-button border">
+                                  <div
+                                    className="mb-3 fw-bold text-button border"
+                                    onClick={() =>
+                                      handleDeleteRequestClick(appointment)
+                                    }
+                                  >
                                     Delete Request
                                   </div>
                                 </div>

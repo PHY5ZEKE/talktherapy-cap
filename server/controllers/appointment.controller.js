@@ -6,6 +6,7 @@ const Patient = require("../models/patientSlp.model");
 const Schedule = require("../models/schedule.model");
 const multer = require("multer");
 const path = require("path");
+const mongoose = require("mongoose");
 const s3 = require("../config/aws");
 const multerS3 = require("multer-s3");
 const { createAuditLog } = require("../middleware/auditLog");
@@ -90,6 +91,10 @@ const handlePendingStatus = async (appointment, status) => {
       });
       await clinicianPatient.save();
     }
+  } else if (status === "Rejected") {
+    appointment.selectedSchedule.status = "Available";
+    await appointment.selectedSchedule.save();
+    appointment.roomId = "errorRoomId";
   } else {
     appointment.roomId = "errorRoomId";
   }
@@ -124,8 +129,10 @@ const handleScheduleChangeRequest = async (appointment, status) => {
     appointment.status = "Rejected";
     const oldSchedule = appointment.selectedSchedule;
     oldSchedule.status = "Available";
+    appointment.newSchedule.status = "Available";
 
     await oldSchedule.save();
+    await appointment.newSchedule.save();
   }
 };
 
@@ -142,8 +149,13 @@ const handleTemporaryRescheduleRequest = async (appointment, status) => {
     await temporaryReschedule.save();
   } else if (status === "Rejected") {
     appointment.status = "Accepted";
+    const temporaryReschedule = appointment.temporaryReschedule;
+    temporaryReschedule.status = "Available";
+
+    await temporaryReschedule.save(); // Save the temporaryReschedule object
   }
 };
+
 const handleTemporarilyRescheduled = async (appointment) => {
   appointment.status = "Accepted";
   const temporaryReschedule = appointment.temporaryReschedule;
@@ -197,99 +209,129 @@ function generateRoomId() {
 }
 
 exports.createAppointment = async (req, res) => {
-  upload(req, res, async function (err) {
-    if (err) {
-      return res.status(400).json({ message: err.message });
-    }
-    try {
-      const {
-        patientId,
-        medicalDiagnosis,
-        sourceOfReferral,
-        chiefComplaint,
-        selectedClinician,
-        selectedSchedule,
-      } = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-      console.log("Extracted fields from request body:", {
-        patientId,
-        medicalDiagnosis,
-        sourceOfReferral,
-        chiefComplaint,
-        selectedClinician,
-        selectedSchedule,
-      });
-
-      // Validate the extracted fields
-      if (!selectedClinician) {
-        return res.status(400).json({ message: "Clinician ID is required" });
+  try {
+    upload(req, res, async function (err) {
+      if (err) {
+        console.error("Error during file upload:", err.message);
+        return res.status(400).json({ message: err.message });
       }
-
-      // Check if the clinician exists
-      const clinician = await ClinicianSLP.findById(selectedClinician);
-      if (!clinician) {
-        return res.status(400).json({ message: "Invalid clinician selected" });
-      }
-
-      // Check if the schedule exists
-      const schedule = await Schedule.findById(selectedSchedule);
-      if (!schedule) {
-        return res.status(400).json({ message: "Invalid schedule selected" });
-      }
-
-      // Check if the patient exists
-      const patient = await Patient.findById(patientId);
-      if (!patient) {
-        return res.status(400).json({ message: "Invalid patient selected" });
-      }
-
-      // Check if patient has an existing appointment
-      const existingAppointment = await Appointment.find({
-        patientId: patientId,
-        status: { $nin: ["Completed", "Rejected"] },
-      });
-
-      if (existingAppointment.length > 0) {
-        return res
-          .status(400)
-          .json({ message: "Patient already has an appointment" });
-      }
-
-      // Save the appointment with file upload to DB
-      const newAppointment = new Appointment({
-        patientId,
-        medicalDiagnosis,
-        sourceOfReferral,
-        chiefComplaint,
-        selectedClinician,
-        selectedSchedule,
-        referralUpload: req.file ? req.file.location : null,
-        status: "Pending",
-      });
-
-      await newAppointment.save();
-
       try {
-        const { day, startTime, endTime } = schedule;
+        const {
+          patientId,
+          medicalDiagnosis,
+          sourceOfReferral,
+          chiefComplaint,
+          selectedClinician,
+          selectedSchedule,
+        } = req.body;
 
-        await createAuditLog(
-          "createAppointment",
-          patient.email,
-          `Patient ${patient.email} has booked a session with clinician ${clinician.email} on ${day} from ${startTime} to ${endTime}`
+        console.log("Request Body:", req.body);
+
+        if (!selectedSchedule) {
+          console.error("Schedule ID is required but not provided");
+          return res.status(400).json({ error: "Schedule ID is required" });
+        }
+
+        // Validate the extracted fields
+        if (!selectedClinician) {
+          console.error("Clinician ID is required but not provided");
+          return res.status(400).json({ message: "Clinician ID is required" });
+        }
+
+        // Check if the clinician exists
+        const clinician = await ClinicianSLP.findById(selectedClinician);
+        if (!clinician) {
+          console.error(`Invalid clinician selected: ${selectedClinician}`);
+          return res
+            .status(400)
+            .json({ message: "Invalid clinician selected" });
+        }
+
+        // Check if the schedule exists and is available
+        const schedule = await Schedule.findById(selectedSchedule).session(
+          session
         );
-      } catch (auditLogError) {
-        console.error("Error creating audit log:", auditLogError);
-      }
+        if (!schedule) {
+          console.error(`Invalid schedule selected: ${selectedSchedule}`);
+          return res.status(400).json({ message: "Invalid schedule selected" });
+        }
 
-      res.status(201).json({
-        message: "Appointment created successfully",
-        appointment: newAppointment,
-      });
-    } catch (error) {
-      console.error("Error:", error);
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
+        if (schedule.status !== "Available") {
+          console.error(`Schedule is not available: ${selectedSchedule}`);
+          return res.status(400).json({ message: "Schedule is not available" });
+        }
+
+        // Check if the patient exists
+        const patient = await Patient.findById(patientId);
+        if (!patient) {
+          console.error(`Invalid patient selected: ${patientId}`);
+          return res.status(400).json({ message: "Invalid patient selected" });
+        }
+
+        // Check if patient has an existing appointment
+        const existingAppointment = await Appointment.find({
+          patientId: patientId,
+          status: { $nin: ["Completed", "Rejected"] },
+        });
+
+        if (existingAppointment.length > 0) {
+          console.error(`Patient already has an appointment: ${patientId}`);
+          return res
+            .status(400)
+            .json({ message: "Patient already has an appointment" });
+        }
+
+        // Update the status of the selected schedule to "Requested"
+        schedule.status = "Requested";
+        await schedule.save({ session });
+
+        // Save the appointment with file upload to DB
+        const newAppointment = new Appointment({
+          patientId,
+          medicalDiagnosis,
+          sourceOfReferral,
+          chiefComplaint,
+          selectedClinician,
+          selectedSchedule,
+          referralUpload: req.file ? req.file.location : null,
+          status: "Pending",
+        });
+
+        await newAppointment.save({ session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        try {
+          const { day, startTime, endTime } = schedule;
+
+          await createAuditLog(
+            "createAppointment",
+            patient.email,
+            `Patient ${patient.email} has booked a session with clinician ${clinician.email} on ${day} from ${startTime} to ${endTime}`
+          );
+        } catch (auditLogError) {
+          console.error("Error creating audit log:", auditLogError);
+        }
+
+        res.status(201).json({
+          message: "Appointment created successfully",
+          appointment: newAppointment,
+        });
+      } catch (error) {
+        await session.abortTransaction();
+        session.endSession();
+        console.error("Error during appointment creation:", error);
+        res.status(500).json({ message: "Internal server error" });
+      }
+    });
+  } catch (error) {
+    console.error("Error starting transaction:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 exports.getAllAppointments = async (req, res) => {
@@ -818,6 +860,10 @@ exports.requestScheduleChange = async (req, res) => {
       return res.status(400).json({ message: "Invalid new schedule selected" });
     }
 
+    // Update the status of the new schedule to "Requested"
+    newSchedule.status = "Requested";
+    await newSchedule.save();
+
     // Update the appointment with the new schedule and reason
     appointment.newSchedule = newScheduleId;
     appointment.changeReason = reason;
@@ -878,6 +924,10 @@ exports.requestTemporaryReschedule = async (req, res) => {
     if (!newSchedule) {
       return res.status(400).json({ message: "Invalid new schedule selected" });
     }
+
+    // Update the status of the new schedule to "Requested"
+    newSchedule.status = "Requested";
+    await newSchedule.save();
 
     // Update the appointment with the new schedule and reason
     appointment.temporaryReschedule = newScheduleId;
@@ -1027,6 +1077,30 @@ exports.updateAppointment = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating appointment:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+exports.deleteAppointment = async (req, res) => {
+  try {
+    const { appointmentId } = req.params;
+
+    // Find the appointment by appointmentId
+    const appointment = await Appointment.findById(appointmentId);
+
+    if (!appointment) {
+      console.log("Appointment not found");
+      return res.status(404).json({ message: "Appointment not found" });
+    }
+
+    // Delete the appointment
+    await Appointment.deleteOne({ _id: appointmentId });
+
+    console.log("Appointment deleted successfully");
+
+    res.status(200).json({ message: "Appointment deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting appointment:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };

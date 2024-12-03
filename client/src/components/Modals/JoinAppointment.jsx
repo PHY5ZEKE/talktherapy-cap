@@ -12,6 +12,7 @@ import { toast, Slide } from "react-toastify";
 export default function JoinAppointment({
   selectedClinician,
   selectedSchedule,
+  selectedSpecialization,
   patientId,
   closeModal,
   onWebSocket,
@@ -53,7 +54,7 @@ export default function JoinAppointment({
 
     console.log(patientId);
     console.log(selectedClinician);
-    console.log(selectedSchedule);
+    console.log(`Selected Schedule ID = ${selectedSchedule}`);
 
     if (
       !medicalDiagnosis ||
@@ -62,6 +63,16 @@ export default function JoinAppointment({
       !referralUpload
     ) {
       failNotify("All fields are required.");
+      setIsSubmitting(false);
+      setIsDisabled(false);
+      return;
+    }
+
+    // Check if the medicalDiagnosis matches the specialization in the selected schedule
+    if (medicalDiagnosis !== selectedSpecialization) {
+      failNotify(
+        "The selected medical diagnosis does not match the schedule's specialization."
+      );
       setIsSubmitting(false);
       setIsDisabled(false);
       return;
