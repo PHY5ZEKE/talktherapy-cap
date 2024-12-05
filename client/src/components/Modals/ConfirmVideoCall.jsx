@@ -55,7 +55,6 @@ export default function ConfirmVideoCall({ close, confirm, user, room }) {
     } else {
       confirm(selectedVideoDevice, selectedAudioDevice);
     }
-
   };
 
   const handleClose = (e) => {
@@ -127,7 +126,7 @@ export default function ConfirmVideoCall({ close, confirm, user, room }) {
               >
                 <p className="fw-bold my-0 status">CONFIRM</p>
               </button>
-              <button className="text-button border" onClick={handleClose}>
+              <button className="text-button-red border" onClick={handleClose}>
                 <p className="fw-bold my-0 status">CANCEL</p>
               </button>
             </div>

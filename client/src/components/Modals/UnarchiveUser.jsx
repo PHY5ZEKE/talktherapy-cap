@@ -85,10 +85,10 @@ export default function UnarchiveUser({ handleModal, userDetails, onFetch }) {
                 className="text-button border"
                 onClick={handleConfirm}
               >
-                <p className="fw-bold my-0 status">CONFIRM</p>
+                <p className="fw-bold my-0 status">Confirm</p>
               </button>
-              <button className="text-button border" onClick={handleClose}>
-                <p className="fw-bold my-0 status">CANCEL</p>
+              <button className="text-button-red border" onClick={handleClose}>
+                <p className="fw-bold my-0 status">Cancel</p>
               </button>
             </div>
           </div>

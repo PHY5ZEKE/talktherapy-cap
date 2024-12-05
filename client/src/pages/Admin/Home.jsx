@@ -123,6 +123,7 @@ export default function Home() {
       if (message.type === "notification") {
         fetchAppointments();
         fetchNotifications();
+        console.log("Notifcation");
       }
 
       if (message.type === "fetch-action") {

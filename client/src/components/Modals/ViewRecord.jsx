@@ -71,7 +71,8 @@ export default function ViewRecord({
             <strong>Date:</strong> {new Date(details.date).toLocaleDateString()}
           </p>
           <div>
-            <strong>Activity Plan:</strong> {renderContent(details.activityPlan)}
+            <strong>Activity Plan:</strong>{" "}
+            {renderContent(details.activityPlan)}
           </div>
           <div>
             <strong>Session Type:</strong> {renderContent(details.sessionType)}
@@ -86,10 +87,12 @@ export default function ViewRecord({
             <strong>Assessment:</strong> {renderContent(details.assessment)}
           </div>
           <div>
-            <strong>Recommendation:</strong> {renderContent(details.recommendation)}
+            <strong>Recommendation:</strong>{" "}
+            {renderContent(details.recommendation)}
           </div>
           <div>
-            <strong>Comment From Admin:</strong> {renderContent(details.comment)}
+            <strong>Comment From Admin:</strong>{" "}
+            {renderContent(details.comment)}
           </div>
         </div>
 
@@ -111,7 +114,7 @@ export default function ViewRecord({
               Edit
             </p>
             <p
-              className="fw-bold mt-3 mb-0 text-button border"
+              className="fw-bold mt-3 mb-0 text-button-red border"
               onClick={handleConfirmationDialog}
             >
               Delete

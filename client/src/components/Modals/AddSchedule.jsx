@@ -160,11 +160,11 @@ export default function AddSchedule({ closeModal, onScheduleAdded }) {
                 disabled={isDisabled || isSubmitting}
               >
                 <p className="fw-bold my-0 status">
-                  {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
+                  {isSubmitting ? `Submitting` : `Submit`}
                 </p>
               </button>
-              <button onClick={handleClose} className="text-button border">
-                <p className="fw-bold my-0 status">CANCEL</p>
+              <button onClick={handleClose} className="text-button-red border">
+                <p className="fw-bold my-0 status">Cancel</p>
               </button>
             </div>
           </form>

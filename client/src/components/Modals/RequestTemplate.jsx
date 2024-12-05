@@ -30,7 +30,6 @@ export default function RequestContent() {
     e.preventDefault();
   };
 
-
   return (
     <>
       <div className="modal-background">
@@ -44,7 +43,9 @@ export default function RequestContent() {
           <div className="container-fluid">
             <div className="row">
               <div className="col">
-                <p className="fw-bold mb-0 text-center">Please specify your requested content.</p>
+                <p className="fw-bold mb-0 text-center">
+                  Please specify your requested content.
+                </p>
                 <textarea
                   type="text"
                   className="form-control"
@@ -64,7 +65,7 @@ export default function RequestContent() {
               Submit
             </div>
             <div
-              className="text-button border fw-bold"
+              className="text-button-red border fw-bold"
               style={{ cursor: "pointer" }}
               onClick={handleClose}
             >

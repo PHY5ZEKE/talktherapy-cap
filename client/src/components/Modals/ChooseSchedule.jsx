@@ -180,7 +180,10 @@ export default function ChooseSchedule({
                 <button type="submit" className="text-button border">
                   <p className="fw-bold my-0 status">Submit</p>
                 </button>
-                <button onClick={handleClose} className="text-button border">
+                <button
+                  onClick={handleClose}
+                  className="text-button-red border"
+                >
                   <p className="fw-bold my-0 status">Cancel</p>
                 </button>
               </div>

@@ -53,7 +53,7 @@ export default function ConfirmReschedule({
             <button onClick={handleResched} className="text-button border">
               <p className="fw-bold my-0">Reschedule</p>
             </button>
-            <button onClick={closeModal} className="text-button border">
+            <button onClick={closeModal} className="text-button-red border">
               <p className="fw-bold my-0">Cancel</p>
             </button>
           </div>

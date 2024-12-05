@@ -82,10 +82,13 @@ export default function BookSchedule() {
     useState(null);
   const [isSuggestedSchedules, setIsSuggestedSchedules] = useState(false);
 
-  const handleModal = (clinician, schedule, specialization) => {
+  const [scheduleDetails, setScheduleDetails] = useState(null);
+
+  const handleModal = (clinician, schedule, specialization, details) => {
     setSelectedClinician(clinician);
     setSelectedSchedule(schedule);
     setSelectedSpecialization(specialization);
+    setScheduleDetails(details);
     setIsOpen(true);
   };
 
@@ -203,8 +206,7 @@ export default function BookSchedule() {
         autoClose: 2000,
       });
 
-      // Refresh the page to fetch the latest appointments
-      window.location.reload();
+      fetchAppointments();
     } catch (error) {
       toast.error("Error deleting appointment: " + error.message, {
         transition: Slide,
@@ -260,29 +262,6 @@ export default function BookSchedule() {
       }
     };
 
-    const fetchAppointments = async () => {
-      try {
-        const response = await fetch(`${appURL}/${route.appointment.get}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch appointments");
-        }
-
-        const data = await response.json();
-        setHasBooked(isBooked(data));
-        setAppointments(data);
-      } catch (error) {
-        failNotify(toastMessage.fail.error);
-        setError(error.message);
-      }
-    };
-
     fetchPatientData();
     fetchAll();
     fetchAppointments();
@@ -310,6 +289,29 @@ export default function BookSchedule() {
       socket.current.close();
     };
   }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const response = await fetch(`${appURL}/${route.appointment.get}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch appointments");
+      }
+
+      const data = await response.json();
+      setHasBooked(isBooked(data));
+      setAppointments(data);
+    } catch (error) {
+      failNotify(toastMessage.fail.error);
+      setError(error.message);
+    }
+  };
 
   const webSocketNotification = async (message) => {
     const response = JSON.stringify(message);
@@ -435,6 +437,8 @@ export default function BookSchedule() {
           patientId={patientData?._id}
           closeModal={closeModal} // Pass the closeModal function
           onWebSocket={webSocketNotification}
+          appointment={scheduleDetails}
+          patient={patientData}
         />
       )}
 
@@ -497,6 +501,8 @@ export default function BookSchedule() {
           patientName={`${patientData?.firstName} ${patientData?.lastName}`}
           currentScheduleId={selectedAppointment.selectedSchedule._id}
           appointmentId={selectedAppointment._id}
+          appointment={selectedAppointment}
+          patientId={patientData?._id}
         />
       )}
 
@@ -627,7 +633,13 @@ export default function BookSchedule() {
                           <div className="w-100">
                             <h5 className="fw-bold d-flex gap-2 align-items-center">
                               {schedule.startTime} - {schedule.endTime}{" "}
-                              <p className="fw-medium mb-0 status-booked">
+                              <p
+                                className={`fw-medium mb-0 ${
+                                  schedule.status === "Available"
+                                    ? "status-available"
+                                    : "status-booked"
+                                }`}
+                              >
                                 {schedule.status}
                               </p>
                             </h5>
@@ -666,7 +678,8 @@ export default function BookSchedule() {
                                     handleModal(
                                       schedule.clinicianId,
                                       schedule._id,
-                                      schedule.specialization
+                                      schedule.specialization,
+                                      schedule
                                     )
                                   }
                                 >
@@ -826,18 +839,18 @@ export default function BookSchedule() {
                           {/* IF REJECTED */}
                           {appointment.status === "Rejected" && (
                             <div className="row mt-2">
+                              <div className="mb-3 ms-3 text-cancelled">
+                                REJECTED
+                              </div>
                               <div className="d-flex justify-content-between flex-wrap gap-3">
-                                <div className="mb-3 text-cancelled">
-                                  REJECTED
-                                </div>
-                                <div className="d-flex gap-3">
+                                <div className="d-flex align-items-center gap-3">
                                   <div
                                     className="mb-3 fw-bold text-button border"
                                     onClick={() =>
                                       openSuggestedSchedulesModal(appointment)
                                     }
                                   >
-                                    See Suggested Schedules
+                                    Suggested Schedules
                                   </div>
                                   <div
                                     className="mb-3 fw-bold text-button border"

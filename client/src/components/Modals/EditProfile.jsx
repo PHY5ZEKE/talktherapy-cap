@@ -157,7 +157,7 @@ export default function EditProfile({
   };
 
   return (
-    <Modal show={showModal} onHide={handleCloseModal} centered>
+    <Modal show={showModal} onHide={handleCloseModal} className="p-3" centered>
       <Modal.Header>
         <Modal.Title>Edit Information</Modal.Title>
       </Modal.Header>
@@ -236,13 +236,16 @@ export default function EditProfile({
             </div>
           )}
 
-          <button type="submit" className="text-button border mt-3 w-100">
+          <button
+            type="submit"
+            className="text-button fw-bold border mt-3 w-100"
+          >
             Save
           </button>
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <button className="text-button fw-bold" onClick={handleCloseModal}>
+        <button className="text-button-red fw-bold" onClick={handleCloseModal}>
           Close
         </button>
       </Modal.Footer>

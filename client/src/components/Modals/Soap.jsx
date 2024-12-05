@@ -142,10 +142,7 @@ export default function Soap({
   return (
     <>
       <div className="modal-background">
-        <div
-          className="modal-container d-flex flex-column justify-content-center align-content-center"
-          style={{ height: "100%" }}
-        >
+        <div className="modal-container d-flex flex-column justify-content-center align-content-center">
           <h3 className="fw-bold text-center">Add SOAP</h3>
           <p className="mb-0 text-center">
             Please verify your inputs before proceeding.
@@ -280,11 +277,11 @@ export default function Soap({
               disabled={isDisabled || isSubmitting}
             >
               <p className="fw-bold my-0 status">
-                {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
+                {isSubmitting ? `Submitting` : `Submit`}
               </p>
             </button>
-            <button className="text-button border" onClick={handleClose}>
-              <p className="fw-bold my-0 status">CANCEL</p>
+            <button className="text-button-red border" onClick={handleClose}>
+              <p className="fw-bold my-0 status">Cancel</p>
             </button>
           </div>
         </div>

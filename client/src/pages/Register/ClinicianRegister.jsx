@@ -7,6 +7,7 @@ import { toast, Slide } from "react-toastify";
 import { toastMessage } from "../../utils/toastHandler";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 
+import { emailSuccessRegister } from "../../utils/emailSuccessRegister.jsx";
 export default function ClinicianRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
@@ -137,6 +138,7 @@ export default function ClinicianRegister() {
       const result = await response.json();
 
       if (response.ok) {
+        emailSuccessRegister(email);
         notify(toastMessage.success.register);
         navigate("/login"); // Redirect to login or another page
       } else {
@@ -221,7 +223,7 @@ export default function ClinicianRegister() {
         </div>
       </nav>
 
-      <div className="d-flex flex-column p-3 blob-3">
+      <div className="d-flex flex-column p-4 blob-3">
         <div
           style={{ minHeight: "80vh", height: "100%" }}
           className="row row-cols-sm-4 row-cols-1 d-flex flex-wrap align-items-center"

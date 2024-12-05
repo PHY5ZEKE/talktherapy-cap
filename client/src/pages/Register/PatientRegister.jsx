@@ -8,6 +8,7 @@ import { toastMessage } from "../../utils/toastHandler";
 import ConsentForm from "../../components/Modals/ConsentForm.jsx";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
 
+import { emailSuccessRegister } from "../../utils/emailSuccessRegister.jsx";
 export default function PatientRegister() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfPassword, setShowConfPassword] = useState(false);
@@ -138,6 +139,7 @@ export default function PatientRegister() {
       const result = await response.json();
 
       if (response.ok) {
+        emailSuccessRegister(email);
         setError(false);
         notify(toastMessage.success.register);
         navigate("/login");
@@ -238,7 +240,7 @@ export default function PatientRegister() {
             </div>
           </div>
         </nav>
-        <div className="d-flex flex-column p-3 blob-3">
+        <div className="d-flex flex-column p-5 blob-3">
           <div
             className="row row-cols-sm-4 row-cols-1 align-items-center"
             style={{ minHeight: "80vh", height: "100%" }}

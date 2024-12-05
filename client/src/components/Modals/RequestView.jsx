@@ -24,13 +24,12 @@ export default function RequestView({
       autoClose: 2000,
     });
 
-    const failNotify = (message) =>
-      toast.error(message, {
-        transition: Slide,
-        autoClose: 2000,
-      });
+  const failNotify = (message) =>
+    toast.error(message, {
+      transition: Slide,
+      autoClose: 2000,
+    });
 
-      
   const handleStatusChange = async (status) => {
     setLoading(true);
     try {
@@ -54,7 +53,9 @@ export default function RequestView({
 
       const userUpdate = {
         notif: "appointmentRequestAccess",
-        body: `${headerClinician} request record access for ${headerPatient} has been ${status != "Assigned" ? "rejected" : "granted permission"}.`,
+        body: `${headerClinician} request record access for ${headerPatient} has been ${
+          status != "Assigned" ? "rejected" : "granted permission"
+        }.`,
         show_to: [clinicianId],
       };
 
@@ -71,7 +72,9 @@ export default function RequestView({
 
   return (
     <details className="accordion mb-3 border border rounded-3">
-      <summary className="open:bg-danger p-3 rounded-top-3">{headerClinician} is requesting access for {headerPatient}</summary>
+      <summary className="open:bg-danger p-3 rounded-top-3">
+        {headerClinician} is requesting access for {headerPatient}
+      </summary>
 
       <p className="px-3 mt-3">{details}</p>
 
@@ -84,7 +87,7 @@ export default function RequestView({
           Accept
         </p>
         <p
-          className="fw-bold mt-3 mb-0 text-button border"
+          className="fw-bold mt-3 mb-0 text-button-red border"
           onClick={() => handleStatusChange("Denied")}
           disabled={loading}
         >

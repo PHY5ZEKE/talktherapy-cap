@@ -106,7 +106,7 @@ export default function RegisterAdmin({ openModal, onFetch }) {
               Submit
             </div>
             <div
-              className="text-button fw-bold border"
+              className="text-button-red fw-bold border"
               style={{ cursor: "pointer" }}
               onClick={handleClose}
             >

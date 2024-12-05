@@ -254,7 +254,10 @@ export default function EditSoap({ openModal, soapRecord, onFetch }) {
                 <button type="submit" className="text-button border">
                   <p className="fw-bold my-0 status">SUBMIT</p>
                 </button>
-                <button className="text-button border" onClick={handleClose}>
+                <button
+                  className="text-button-red border"
+                  onClick={handleClose}
+                >
                   <p className="fw-bold my-0 status">CANCEL</p>
                 </button>
               </div>

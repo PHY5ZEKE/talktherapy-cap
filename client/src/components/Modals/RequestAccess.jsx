@@ -105,10 +105,10 @@ export default function RequestAccess({
             ></textarea>
             <div className="d-flex justify-content-center mt-3 gap-3">
               <button type="submit" className="text-button border">
-                <p className="fw-bold my-0 status">SUBMIT</p>
+                <p className="fw-bold my-0 status">Submit</p>
               </button>
-              <button className="text-button border" onClick={handleClose}>
-                <p className="fw-bold my-0 status">CANCEL</p>
+              <button className="text-button-red border" onClick={handleClose}>
+                <p className="fw-bold my-0 status">Cancel</p>
               </button>
             </div>
           </form>

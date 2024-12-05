@@ -99,14 +99,14 @@ export default function AddComment({ handleModal, recordId }) {
             onClick={handleSubmit}
             disabled={isDisabled || isSubmitting}
           >
-            {isSubmitting ? `SUBMITTING...` : `SUBMIT`}
+            {isSubmitting ? `Submitting` : `Submit`}
           </button>
           <button
-            className="text-button border fw-bold"
+            className="text-button-red border fw-bold"
             style={{ cursor: "pointer" }}
             onClick={handleClose}
           >
-            CANCEL
+            Cancel
           </button>
         </div>
       </div>

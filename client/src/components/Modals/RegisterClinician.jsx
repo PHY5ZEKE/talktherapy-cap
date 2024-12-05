@@ -120,7 +120,7 @@ export default function RegisterClinician({ openModal, admin, onWebSocket }) {
               Submit
             </div>
             <div
-              className="text-button border fw-bold"
+              className="text-button-red border fw-bold"
               style={{ cursor: "pointer" }}
               onClick={handleClose}
             >

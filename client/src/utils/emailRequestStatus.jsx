@@ -2,7 +2,12 @@ const appURL = import.meta.env.VITE_APP_URL;
 
 import { route } from "./route";
 
-export const emailRequestStatus = async (clinicianEmail, patientEmail, status, data) => {
+export const emailRequestStatus = async (
+  clinicianEmail,
+  patientEmail,
+  status,
+  data
+) => {
   // Add conditional to check status and update email content
   // Check if Accepted, Rejected, Revert, Completed
   let content = "";
@@ -35,7 +40,7 @@ export const emailRequestStatus = async (clinicianEmail, patientEmail, status, d
       data.selectedSchedule.startTime,
       data.selectedSchedule.endTime,
       content,
-    ]
+    ],
   };
 
   const sendEmail = await fetch(`${appURL}/${route.system.email}`, {

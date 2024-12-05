@@ -142,7 +142,7 @@ export default function PatientViewAppointment({
           </div>
 
           <div className="d-flex justify-content-center mt-3 gap-3">
-            <button onClick={handleClose} className="text-button border">
+            <button onClick={handleClose} className="text-button-red border">
               <p className="fw-bold my-0 status">Close</p>
             </button>
           </div>

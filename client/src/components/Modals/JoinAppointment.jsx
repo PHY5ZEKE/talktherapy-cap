@@ -9,6 +9,7 @@ import { route } from "../../utils/route";
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
 
+import { emailCreateAppointment } from "../../utils/emailCreateAppointment";
 export default function JoinAppointment({
   selectedClinician,
   selectedSchedule,
@@ -16,6 +17,7 @@ export default function JoinAppointment({
   patientId,
   closeModal,
   onWebSocket,
+  appointment,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -51,10 +53,6 @@ export default function JoinAppointment({
 
     setIsDisabled(true);
     setIsSubmitting(true);
-
-    console.log(patientId);
-    console.log(selectedClinician);
-    console.log(`Selected Schedule ID = ${selectedSchedule}`);
 
     if (
       !medicalDiagnosis ||
@@ -109,8 +107,19 @@ export default function JoinAppointment({
       const userUpdate = {
         notif: "appointmentJoin",
       };
-      onWebSocket(userUpdate);
 
+      // Send Email
+      const { clinicianName, day, startTime, endTime } = appointment;
+      let appointmentData = { clinicianName, day, startTime, endTime };
+
+      emailCreateAppointment(
+        appointment.clinicianId._id,
+        patientId,
+        "Pending",
+        appointmentData
+      );
+
+      onWebSocket(userUpdate);
       notify(toastMessage.success.book);
       closeModal();
     } catch (error) {
@@ -229,7 +238,10 @@ export default function JoinAppointment({
                       <p className="fw-bold my-0 status">BOOK</p>
                     )}
                   </button>
-                  <button onClick={handleClose} className="text-button border">
+                  <button
+                    onClick={handleClose}
+                    className="text-button-red border"
+                  >
                     <p className="fw-bold my-0 status">CANCEL</p>
                   </button>
                 </div>

@@ -124,127 +124,132 @@ export default function AddContent({ closeModal, onSubmit }) {
   return (
     <div className="modal-background">
       <div className="modal-container d-flex flex-column justify-content-center align-items-center">
-        <h3 className="fw-bold">Add Content </h3>
-        <p>Please fill up the form accordingly.</p>
+        <div
+          className="mx-auto text-center w-100"
+          style={{ maxHeight: "75vh" }}
+        >
+          <h3 className="fw-bold">Add Content </h3>
+          <p>Please fill up the form accordingly.</p>
 
-        <div className="container row text-center">
-          <div className="col">
-            <div className="form-group">
-              <label className="mb-0 fw-bold">
-                Name <span className="text-required">*</span>
-              </label>
-              <input
-                type="text"
-                className="form-control"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Enter content name"
-              />
-            </div>
-
-            <div className="form-group">
-              <label className="mb-0 fw-bold">
-                Description <span className="text-required">*</span>
-              </label>
-              <div className="quill-editor" style={{ maxHeight: "300px" }}>
-                <ReactQuill
-                  value={description}
-                  onChange={handleChange}
-                  placeholder="Enter content description"
-                  theme="snow" // theme of the editor
-                  modules={{
-                    toolbar: [
-                      [{ header: "1" }, { header: "2" }, { font: [] }],
-                      [{ list: "ordered" }, { list: "bullet" }],
-                      ["bold", "italic", "underline"],
-                      ["link"],
-                      ["blockquote", "code-block"],
-                      [{ align: [] }],
-                      [{ size: ["small", "medium", "large", "huge"] }],
-                      [{ color: [] }, { background: [] }],
-                      ["image"],
-                      ["clean"], // for clearing the formatting
-                    ],
-                  }}
-                  formats={[
-                    "header",
-                    "font",
-                    "list",
-                    "bold",
-                    "italic",
-                    "underline",
-                    "align",
-                    "link",
-                    "blockquote",
-                    "code-block",
-                    "image",
-                    "size",
-                    "color",
-                    "background",
-                  ]}
+          <div className="container row text-center">
+            <div className="col">
+              <div className="form-group">
+                <label className="mb-0 fw-bold">
+                  Name <span className="text-required">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter content name"
                 />
               </div>
-            </div>
 
-            <div className="form-group">
-              <label className="mb-0 fw-bold">
-                Category <span className="text-required">*</span>
-              </label>
-              <select
-                className="form-control"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="">Select Category</option>
-                <option value="Children">Children</option>
-                <option value="Adult">Adult</option>
-              </select>
-            </div>
+              <div className="form-group">
+                <label className="mb-0 fw-bold">
+                  Description <span className="text-required">*</span>
+                </label>
+                <div className="quill-editor" style={{ maxHeight: "300px" }}>
+                  <ReactQuill
+                    value={description}
+                    onChange={handleChange}
+                    placeholder="Enter content description"
+                    theme="snow" // theme of the editor
+                    modules={{
+                      toolbar: [
+                        [{ header: "1" }, { header: "2" }, { font: [] }],
+                        [{ list: "ordered" }, { list: "bullet" }],
+                        ["bold", "italic", "underline"],
+                        ["link"],
+                        ["blockquote", "code-block"],
+                        [{ align: [] }],
+                        [{ size: ["small", "medium", "large", "huge"] }],
+                        [{ color: [] }, { background: [] }],
+                        ["image"],
+                        ["clean"], // for clearing the formatting
+                      ],
+                    }}
+                    formats={[
+                      "header",
+                      "font",
+                      "list",
+                      "bold",
+                      "italic",
+                      "underline",
+                      "align",
+                      "link",
+                      "blockquote",
+                      "code-block",
+                      "image",
+                      "size",
+                      "color",
+                      "background",
+                    ]}
+                  />
+                </div>
+              </div>
 
-            <div className="form-group">
-              <label className="mb-0 fw-bold">Video URL (Optional)</label>
-              <input
-                type="text"
-                className="form-control"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="Enter video URL (optional)"
-              />
-            </div>
+              <div className="form-group">
+                <label className="mb-0 fw-bold">
+                  Category <span className="text-required">*</span>
+                </label>
+                <select
+                  className="form-control"
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                >
+                  <option value="">Select Category</option>
+                  <option value="Children">Children</option>
+                  <option value="Adult">Adult</option>
+                </select>
+              </div>
 
-            <div className="form-group">
-              <label className="mb-0 fw-bold">
-                Upload Image <span className="text-required">*</span>
-              </label>
-              <input
-                type="file"
-                className="form-control"
-                accept="image/*"
-                onChange={handleImageChange}
-              />
-              <small className="form-text text-muted">
-                Accepted file formats: JPG, JPEG, PNG <br />
-              </small>
-              <small className="form-text text-muted">
-                File Size: 5 MB Limit
-              </small>
+              <div className="form-group">
+                <label className="mb-0 fw-bold">Video URL (Optional)</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="Enter video URL (optional)"
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="mb-0 fw-bold">
+                  Upload Image <span className="text-required">*</span>
+                </label>
+                <input
+                  type="file"
+                  className="form-control"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                />
+                <small className="form-text text-muted">
+                  Accepted file formats: JPG, JPEG, PNG <br />
+                </small>
+                <small className="form-text text-muted">
+                  File Size: 5 MB Limit
+                </small>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div className="d-flex justify-content-center mt-3 gap-3">
-          <button
-            onClick={handleSubmit}
-            className="text-button border"
-            disabled={isDisabled || isSubmitting}
-          >
-            <p className="fw-bold my-0">
-              {isSubmitting ? `SUBMITTING..` : `SUBMIT`}
-            </p>
-          </button>
-          <button onClick={handleClose} className="text-button border">
-            <p className="fw-bold my-0">CANCEL</p>
-          </button>
+          <div className="d-flex justify-content-center mt-3 gap-3 pb-3">
+            <button
+              onClick={handleSubmit}
+              className="text-button border"
+              disabled={isDisabled || isSubmitting}
+            >
+              <p className="fw-bold my-0">
+                {isSubmitting ? `Submitting` : `Submit`}
+              </p>
+            </button>
+            <button onClick={handleClose} className="text-button-red border">
+              <p className="fw-bold my-0">Cancel</p>
+            </button>
+          </div>
         </div>
       </div>
     </div>

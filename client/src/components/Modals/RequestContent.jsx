@@ -85,7 +85,7 @@ export default function RequestContent({ handleModal, clinicianData }) {
               Submit
             </div>
             <div
-              className="text-button border fw-bold"
+              className="text-button-red border fw-bold"
               style={{ cursor: "pointer" }}
               onClick={handleClose}
             >

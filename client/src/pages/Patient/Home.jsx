@@ -255,7 +255,7 @@ export default function Home() {
                                   ? appointment.temporaryReschedule.day
                                   : appointment.selectedSchedule.day}
                               </h5>
-                              <div className="text-accepted">
+                              <div className="text-pending">
                                 {appointment.status.toUpperCase()}
                               </div>
                             </div>
@@ -294,29 +294,29 @@ export default function Home() {
                                   </div>
                                 </div>
                               </div>
-                            ) : appointment.status ===
-                              "Temporarily Rescheduled" ? (
-                              <div className="d-flex justify-content-between flex-wrap gap-3">
-                                <div className="mb-3 text-accepted">
-                                  {appointment.status}
-                                </div>
+                            ) : (
+                              appointment.status ===
+                                "Temporarily Rescheduled" && (
+                                <div className="d-flex justify-content-between flex-wrap gap-3">
+                                  <div className="mb-3 text-accepted">
+                                    {appointment.status}
+                                  </div>
 
-                                <div className="d-flex gap-3">
-                                  <div
-                                    className="mb-3 fw-bold text-button border"
-                                    onClick={() =>
-                                      joinMeeting(
-                                        appointment.roomId,
-                                        appointment
-                                      )
-                                    }
-                                  >
-                                    Join
+                                  <div className="d-flex gap-3">
+                                    <div
+                                      className="mb-3 fw-bold text-button border"
+                                      onClick={() =>
+                                        joinMeeting(
+                                          appointment.roomId,
+                                          appointment
+                                        )
+                                      }
+                                    >
+                                      Join
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                            ) : (
-                              <div className="mb-3 text-pending">PENDING</div>
+                              )
                             )}
                           </div>
                         </div>

@@ -70,7 +70,7 @@ export default function ChangeProfilePicture({
   };
 
   return (
-    <Modal show={true} onHide={closeModal} centered>
+    <Modal show={true} onHide={closeModal} className="p-3" centered>
       <Modal.Header>
         <Modal.Title>Change Profile Picture</Modal.Title>
       </Modal.Header>
@@ -86,7 +86,7 @@ export default function ChangeProfilePicture({
           />
           <button
             type="button"
-            className="text-button border w-100 mt-3"
+            className="text-button fw-bold border w-100 mt-3"
             onClick={handleProfilePictureUpload}
           >
             Upload Picture
@@ -98,7 +98,7 @@ export default function ChangeProfilePicture({
         </div>
       </Modal.Body>
       <Modal.Footer>
-        <Button className="text-button fw-bold" onClick={closeModal}>
+        <Button className="text-button-red fw-bold" onClick={closeModal}>
           Close
         </Button>
       </Modal.Footer>

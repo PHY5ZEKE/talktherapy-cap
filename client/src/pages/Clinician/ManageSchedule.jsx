@@ -342,7 +342,13 @@ export default function ManageSchedule() {
                           <div className="w-100">
                             <h5 className="fw-bold mb-0 d-flex gap-2 align-items-center">
                               {schedule.day}
-                              <span className="fw-medium mb-0 status-booked">
+                              <span
+                                className={`fw-medium mb-0 ${
+                                  schedule.status === "Available"
+                                    ? "status-available"
+                                    : "status-booked"
+                                }`}
+                              >
                                 {schedule.status}
                               </span>
                             </h5>
@@ -408,7 +414,13 @@ export default function ManageSchedule() {
                           <div className="w-100">
                             <h5 className="fw-bold mb-0 d-flex gap-2 align-items-center">
                               {schedule.day}
-                              <span className="fw-medium mb-0 status-booked">
+                              <span
+                                className={`fw-medium mb-0 ${
+                                  schedule.status === "Available"
+                                    ? "status-available"
+                                    : "status-booked"
+                                }`}
+                              >
                                 {schedule.status}
                               </span>
                             </h5>

@@ -78,14 +78,14 @@
   padding: 0.4em;
   text-align: center;
   border-radius: 25px;
-  color: #f44336;
-  background-color: #ffdddd;
-  border-color: #c1c1c1 !important;
+  color: #ffdddd;
+  background-color: #f44336;
+  border-color: #ffdddd !important;
   cursor: pointer;
 }
 
 .text-button-red:hover {
-  background-color: #f44336;
+  background-color: #97261e;
   color: #ffdddd;
 }
 
@@ -175,12 +175,26 @@
   display: flex;
   align-items: center;
   font-size: 0.5em !important;
-  background-color: #ececec;
+  background-color: #f3665c;
+  color: #fff;
   width: min-content;
   padding: 3px;
   padding-left: 10px;
   padding-right: 10px;
-  border: 1px solid #000;
+  border: 1px solid #ffdddd;
+  border-radius: 1em;
+}
+
+.status-available {
+  display: flex;
+  align-items: center;
+  font-size: 0.5em !important;
+  background-color: #9df092;
+  width: min-content;
+  padding: 3px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border: 1px solid #97c791;
   border-radius: 1em;
 }
 

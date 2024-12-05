@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 
+import { emailCreateAppointment } from "../../utils/emailCreateAppointment";
 export default function SuggestedSchedules({
   closeModal,
   medicalDiagnosis,
@@ -10,6 +11,8 @@ export default function SuggestedSchedules({
   patientName,
   currentScheduleId, // Add currentScheduleId to props
   appointmentId,
+  appointment,
+  patientId,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
@@ -55,8 +58,6 @@ export default function SuggestedSchedules({
         }
       );
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
         const errorData = await response.json();
         console.error("Error response data:", errorData);
@@ -64,8 +65,19 @@ export default function SuggestedSchedules({
       }
 
       const data = await response.json();
-      console.log("Response data:", data);
       onScheduleSelect(data.appointment);
+
+      // Send Email
+      const { clinicianName, day, startTime, endTime } =
+        appointment.selectedSchedule;
+      let appointmentData = { clinicianName, day, startTime, endTime };
+      emailCreateAppointment(
+        appointment.selectedClinician._id,
+        appointment.patientId._id,
+        "Pending",
+        appointmentData
+      );
+
       setSuccessMessage("Appointment updated successfully");
 
       const userUpdate = {
@@ -175,7 +187,7 @@ export default function SuggestedSchedules({
             >
               Submit
             </button>
-            <button onClick={handleClose} className="text-button border">
+            <button onClick={handleClose} className="text-button-red border">
               Cancel
             </button>
           </div>

@@ -276,6 +276,12 @@ exports.sendNotification = async (req, res) => {
       "utf8"
     );
     htmlContent = htmlTemplate.replace("${email}", email);
+  } else if (type === "account-success") {
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/account-success.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate.replace("${email}", email);
   } else if (type === "request-records-access") {
     const [
       clinicianFirstName,
@@ -337,6 +343,34 @@ exports.sendNotification = async (req, res) => {
     );
     htmlContent = htmlTemplate
       .replace("${patientName}", `${patientFirstName} ${patientLastName}`)
+      .replace("${clinicianName}", clinicianName)
+      .replace("${date}", `${day} ${startTime} - ${endTime}`)
+      .replace("${status}", content);
+
+    // Get Email Address of Clinician using ID
+    const clinician = await Clinician.findById(email[0]);
+    const patient = await Patient.findById(email[1]);
+
+    if (clinician && patient) {
+      statusEmail = [clinician.email, patient.email];
+    }
+  } else if (type === "appointment-book") {
+    const [clinicianName, day, startTime, endTime, content] = details;
+
+    // Get Patient First and Last Name by Id
+    const patientName = await Patient.findById(email[1]).select(
+      "firstName lastName"
+    );
+
+    const decryptedFirstName = safeDecrypt(patientName.firstName);
+    const decryptedLastName = safeDecrypt(patientName.lastName);
+
+    const htmlTemplate = fs.readFileSync(
+      path.join(__dirname, "../email-template/appointment-book.html"),
+      "utf8"
+    );
+    htmlContent = htmlTemplate
+      .replace("${patientName}", `${decryptedFirstName} ${decryptedLastName}`)
       .replace("${clinicianName}", clinicianName)
       .replace("${date}", `${day} ${startTime} - ${endTime}`)
       .replace("${status}", content);

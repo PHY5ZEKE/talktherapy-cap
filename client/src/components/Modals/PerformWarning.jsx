@@ -47,7 +47,7 @@ export default function ConfirmationDialog({
               >
                 <p className="fw-bold my-0 status">CONFIRM</p>
               </button>
-              <button className="text-button border" onClick={handleClose}>
+              <button className="text-button-red border" onClick={handleClose}>
                 <p className="fw-bold my-0 status">CANCEL</p>
               </button>
             </div>

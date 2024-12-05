@@ -75,7 +75,7 @@ export default function Login() {
     }
   };
   return (
-    <div className="mw-100">
+    <div className="vw-100">
       <nav className="navbar navbar-expand-lg">
         <div className="container-fluid">
           <Link className="navbar-brand text-logo fw-bold" to="/">
@@ -144,56 +144,64 @@ export default function Login() {
         </div>
       </nav>
 
-      <div className="row row-cols-sm-2 row-cols-1 d-flex flex-wrap align-items-center"
-      style={{minHeight: "80vh", height: "100%"}}
-      >
-        <div className="col landing-paragraph my-3 p-3 text-center">
-          <h2 className="fw-bold mb-0">Register to</h2>
-          <h1 className="text-blue text-landing" style={{ fontWeight: "900" }}>
-            TalkTherapy
-          </h1>
-          <h4>Speech service in your hands.</h4>
+      <div className="d-flex flex-column p-3 blob-3">
+        <div
+          className="row row-cols-sm-4 row-cols-1 d-flex flex-wrap align-items-center"
+          style={{ minHeight: "80vh", height: "100%" }}
+        >
+          <div className="col"></div>
 
-          <p className="mb-0">
-            Skilled doctors, personalized exercises and feedback system.
-          </p>
-          <p>All-in-one go with TalkTherapy!</p>
-        </div>
+          <div className="col landing-paragraph my-3 p-3 text-center">
+            <h2 className="fw-bold mb-0">Login to</h2>
+            <h1
+              className="text-blue text-landing"
+              style={{ fontWeight: "900" }}
+            >
+              TalkTherapy
+            </h1>
+            <h4>Speech service in your hands.</h4>
 
-        <form className="col p-4">
-          <div
-            id="formTabContent"
-            className="tab-content d-flex bg-white shadow rounded-4 mx-auto p-3 shadow flex-column"
-          >
-            <h3 className="text-center fw-bold">Hello there!</h3>
-            <p className="text-center mb-3">Enter your valid credentials to get started.</p>
-            {error && (
-              <p
-                className={`text-${
-                  error ? "danger" : "success"
-                } p-2 rounded-2 mb-2`}
-              >
-                {error}
+            <p className="mb-0">
+              Skilled doctors, personalized exercises and feedback system.
+            </p>
+            <p>All-in-one go with TalkTherapy!</p>
+          </div>
+
+          <form className="col p-4">
+            <div
+              id="formTabContent"
+              className="tab-content d-flex bg-white shadow rounded-4 mx-auto p-3 shadow flex-column"
+            >
+              <h3 className="text-center fw-bold">Hello there!</h3>
+              <p className="text-center mb-3">
+                Enter your valid credentials to get started.
               </p>
-            )}
+              {error && (
+                <p
+                  className={`text-${
+                    error ? "danger" : "success"
+                  } p-2 rounded-2 mb-2`}
+                >
+                  {error}
+                </p>
+              )}
 
-            <div className="row">
-              <p className="fw-bold mb-2 text-center">Email</p>
-              <div className="input-group mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="youremail@gmail.com"
-                  aria-label="Email"
-                  aria-describedby="basic-addon2"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
+              <div className="row">
+                <p className="fw-bold mb-2 text-center">Email</p>
+                <div className="input-group mb-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="youremail@gmail.com"
+                    aria-label="Email"
+                    aria-describedby="basic-addon2"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
               </div>
-            </div>
 
-
-            <div className="row">
+              <div className="row">
                 <p className="fw-bold mb-2 text-center">Password</p>
                 <div className="input-group">
                   <input
@@ -216,20 +224,21 @@ export default function Login() {
                 </div>
               </div>
 
-            <div className="col-sm d-flex flex-column align-items-center justify-content-center">
-              <button
-                className="text-button fw-bold border rounded-5 my-3"
-                type="submit"
-                onClick={handleLogin}
-              >
-                Submit
-              </button>
-              <Link to="/forgot" className="fw-bold">
-                Forgot Password?
-              </Link>
+              <div className="col-sm d-flex flex-column align-items-center justify-content-center">
+                <button
+                  className="text-button fw-bold border rounded-5 my-3"
+                  type="submit"
+                  onClick={handleLogin}
+                >
+                  Submit
+                </button>
+                <Link to="/forgot" className="fw-bold">
+                  Forgot Password?
+                </Link>
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -139,7 +139,12 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
   };
 
   return (
-    <Modal show={showPasswordModal} onHide={handleCloseModal} centered>
+    <Modal
+      show={showPasswordModal}
+      onHide={handleCloseModal}
+      className="p-3"
+      centered
+    >
       <Modal.Header>
         <Modal.Title>Change Password</Modal.Title>
       </Modal.Header>
@@ -161,7 +166,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="text-button border"
+                  className="text-button fw-bold border"
                   onClick={() => setShowCurrentPassword(!showCurrentPassword)}
                 >
                   {showCurrentPassword ? "Hide" : "Show"}
@@ -186,7 +191,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="text-button border"
+                  className="text-button fw-bold border"
                   onClick={() => setShowNewPassword(!showNewPassword)}
                 >
                   {showNewPassword ? "Hide" : "Show"}
@@ -222,7 +227,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
               <div className="input-group-append">
                 <button
                   type="button"
-                  className="text-button border"
+                  className="text-button fw-bold border"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   {showConfirmPassword ? "Hide" : "Show"}
@@ -231,13 +236,13 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
             </div>
           </div>
 
-          <button type="submit" className="text-button w-100 mt-3">
+          <button type="submit" className="text-button fw-bold w-100 mt-3">
             Save
           </button>
         </form>
       </Modal.Body>
       <Modal.Footer>
-        <Button className="text-button fw-bold" onClick={handleCloseModal}>
+        <Button className="text-button-red fw-bold" onClick={handleCloseModal}>
           Close
         </Button>
       </Modal.Footer>
