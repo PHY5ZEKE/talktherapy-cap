@@ -502,7 +502,6 @@ export default function BookSchedule() {
           currentScheduleId={selectedAppointment.selectedSchedule._id}
           appointmentId={selectedAppointment._id}
           appointment={selectedAppointment}
-          patientId={patientData?._id}
         />
       )}
 

@@ -176,7 +176,7 @@ exports.getClinicianSched = async (req, res) => {
             return {
               ...schedule.toObject(),
               clinicianId: {
-                ...clinician.toObject(),
+                _id: clinician._id,
                 firstName: clinician.firstName,
                 middleName: clinician.middleName,
                 lastName: clinician.lastName,

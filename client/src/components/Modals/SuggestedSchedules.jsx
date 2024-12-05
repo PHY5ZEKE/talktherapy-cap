@@ -12,7 +12,6 @@ export default function SuggestedSchedules({
   currentScheduleId, // Add currentScheduleId to props
   appointmentId,
   appointment,
-  patientId,
 }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
