@@ -184,6 +184,27 @@ export default function ExerciseContent() {
     }
   }, [accessToken, appURL, id]); 
 
+  if (loading) {
+    return (
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div className="container-fluid p-0 vw-100 vh-100">

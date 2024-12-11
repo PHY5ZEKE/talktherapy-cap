@@ -96,12 +96,33 @@ export default function ContentWarnFace() {
   };
 
   const handleImageClick = (imgSrc) => {
-    setModalImage(imgSrc); // Set the image for the modal
+    setModalImage(imgSrc); 
   };
 
   const closeModal = () => {
-    setModalImage(null); // Close the modal
+    setModalImage(null); 
   };
+
+  if (loading) {
+    return (
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

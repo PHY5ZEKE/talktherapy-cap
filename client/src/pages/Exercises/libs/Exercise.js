@@ -365,6 +365,22 @@ function initializeExercise(loadedProgress = null) {
 
                 loadProgressForTextId(this.id);
                 setupNavigationListeners();
+
+                // Close the modal
+                var pageOption = document.querySelector('#page-text-selector');
+                if (pageOption) {
+                    pageOption.style.display = 'none'; 
+                }
+
+                var pageStart = document.querySelector('#page-start');
+                if (pageStart) {
+                    pageStart.style.display = 'none'; 
+                }
+
+                var pageMain = document.querySelector('#page-main');
+                if (pageMain) {
+                    pageMain.style.display = 'block'; 
+                }
             });
     
             var $view = document.createElement('div');

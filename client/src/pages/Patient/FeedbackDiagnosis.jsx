@@ -149,6 +149,27 @@ export default function FeedbackDiagnosis() {
       diagnosis.recommendation.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="d-flex align-items-center justify-content-center vh-100">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <>
       <div className="container-fluid p-0 vh-100 vw-100">

@@ -262,6 +262,27 @@ export default function WordStart() {
       }
     };
   }, [progress]);
+
+    if (loading) {
+      return (
+        <div className="d-flex align-items-center justify-content-center vh-100">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="d-flex align-items-center justify-content-center vh-100">
+          <div className="alert alert-danger" role="alert">
+            {error}
+          </div>
+        </div>
+      );
+    }
+
   
 
   
@@ -439,9 +460,6 @@ export default function WordStart() {
                   <div className="content d-flex">
                     <input type="text" id="filter-input" placeholder="Find an Exercise"></input><br></br>
                     <div id="texts" className="me-3"></div>
-                    {/* <div id="text-wrapper" className="flex-grow-1">
-                      <div id="text" autoComplete="off" className="border p-2" style={{ height: '100%', overflowY: 'auto' }}></div>
-                    </div> */}
                   </div>
                 </div>
               </div>
