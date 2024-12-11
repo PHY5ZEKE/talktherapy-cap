@@ -13,6 +13,7 @@ export default function AssistSpeech() {
   const [patientData, setPatientData] = useState(null);
 
   const [loading, setLoading] = useState(true);
+  const [buttonText, setButtonText] = useState("Start Voice Recognition");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
@@ -101,25 +102,25 @@ export default function AssistSpeech() {
     };
   }, [accessToken]);
 
-  if (loading) {
-    return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="d-flex align-items-center justify-content-center vh-100">
+  //       <div className="spinner-border text-primary" role="status">
+  //         <span className="visually-hidden">Loading...</span>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="d-flex align-items-center justify-content-center vh-100">
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="d-flex align-items-center justify-content-center vh-100">
+  //       <div className="alert alert-danger" role="alert">
+  //         {error}
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
 
 
@@ -155,11 +156,13 @@ export default function AssistSpeech() {
             <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}>
               <div className={`card-body text-center ${styles.cardBody}`}>
                 <button
-                  className="btn btn-primary btn-lg w-100 py-3"
-                  onClick={startVoiceRecognitionHandler}
-                >
-                  Start Voice Recognition
-                </button>
+                className="btn btn-primary btn-lg w-100 py-3"
+                onClick={() =>
+                  startVoiceRecognitionHandler(setButtonText)
+                }
+              >
+                {buttonText}
+              </button>
               </div>
             </div>
           </div>

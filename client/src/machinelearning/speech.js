@@ -64,12 +64,30 @@ export async function init() {
 }
 
 
-export const startVoiceRecognitionHandler = () => {
-    timedRecognition(window.recognizer, window.classLabels, window.chart, window.labelContainer);
+export const startVoiceRecognitionHandler = (updateButtonText) => {
+    if (!updateButtonText) return;
+
+    updateButtonText("Listening...");
+
+    const onComplete = (success) => {
+        if (success) {
+            updateButtonText("Start Voice Recognition");
+        } else {
+            updateButtonText("Try Again");
+        }
+    };
+
+    timedRecognition(
+        window.recognizer,
+        window.classLabels,
+        window.chart,
+        window.labelContainer,
+        onComplete // Pass the callback for completion
+    );
 };
 
 
-async function timedRecognition(recognizer, classLabels, chart, labelContainer) {
+async function timedRecognition(recognizer, classLabels, chart, labelContainer, onComplete) {
     const recognitionDuration = 3000;  
     const threshold = 0.80;
     const startTime = Date.now();
@@ -96,6 +114,8 @@ async function timedRecognition(recognizer, classLabels, chart, labelContainer) 
         if (top3Scores[0].score >= threshold || Date.now() - startTime >= recognitionDuration) {
             recognizer.stopListening();
             outputTopResults(bestScores);
+            const success = bestScores.length > 0 && bestScores[0].score >= 0.5;
+            onComplete(success);
         }
     }, {
         includeSpectrogram: true,
@@ -107,6 +127,8 @@ async function timedRecognition(recognizer, classLabels, chart, labelContainer) 
     setTimeout(() => {
         recognizer.stopListening();
         outputTopResults(bestScores);
+        const success = bestScores.length > 0 && bestScores[0].score >= 0.5;
+        onComplete(success);
     }, recognitionDuration);
 }
 

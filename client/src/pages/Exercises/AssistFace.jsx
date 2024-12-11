@@ -138,25 +138,25 @@ export default function AssistFace() {
   }
 }, [isTimerActive, timer]);
 
-if (loading) {
-  return (
-    <div className="d-flex align-items-center justify-content-center vh-100">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  );
-}
+// if (loading) {
+//   return (
+//     <div className="d-flex align-items-center justify-content-center vh-100">
+//       <div className="spinner-border text-primary" role="status">
+//         <span className="visually-hidden">Loading...</span>
+//       </div>
+//     </div>
+//   );
+// }
 
-if (error) {
-  return (
-    <div className="d-flex align-items-center justify-content-center vh-100">
-      <div className="alert alert-danger" role="alert">
-        {error}
-      </div>
-    </div>
-  );
-}
+// if (error) {
+//   return (
+//     <div className="d-flex align-items-center justify-content-center vh-100">
+//       <div className="alert alert-danger" role="alert">
+//         {error}
+//       </div>
+//     </div>
+//   );
+// }
 
 
   return (
@@ -171,13 +171,14 @@ if (error) {
             <h5 className="title" id="offcanvasDiagnosticToolLabel">
               Assistive Diagnostic Tool
             </h5>
-            <span
-              className="help-btn ml-2"
+            {/* Help Button */}
+            <button
+              className="btn btn-info btn-sm ml-2"
               data-bs-toggle="modal"
               data-bs-target="#helpModal"
             >
-              (?)
-            </span>
+              Help
+            </button>
           </div>
         </div>
 
@@ -261,9 +262,20 @@ if (error) {
             <div className="card shadow-lg rounded-lg mb-4 mx-auto">
               <div className="card-body text-center">
                 <h5>Captured Photo and Top Predictions:</h5>
-                <img id="captured-image" className="img-fluid mb-3" alt="Captured Image" />
+                <img id="captured-image" className="img-fluid mb-3" alt="Captured Image" src="https://static.vecteezy.com/system/resources/previews/009/292/244/non_2x/default-avatar-icon-of-social-media-user-vector.jpg"/>
                 <div id="top-scores" className="mb-3"></div>
-                <canvas id="scoreGraph" ref={canvasRef} className="w-100"></canvas>
+                 {/* Placeholder text */}
+                  {!isCaptured && (
+                    <p className="text-muted">
+                      Your captured image and score graph will show here after 5 seconds upon pressing the button.
+                    </p>
+                  )}
+                {/* Score Graph */}
+                  <canvas
+                    id="scoreGraph"
+                    ref={canvasRef}
+                    className={isCaptured ? "w-100" : "d-none"}
+                  ></canvas>
               </div>
             </div>
           </div>
