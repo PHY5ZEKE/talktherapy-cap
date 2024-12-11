@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import "./modal.css";
@@ -9,6 +9,7 @@ import { toast, Slide } from "react-toastify";
 export default function UnarchiveUser({ handleModal, userDetails, onFetch }) {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -31,25 +32,33 @@ export default function UnarchiveUser({ handleModal, userDetails, onFetch }) {
       id: userDetails._id,
     };
 
-    // PUT Method
-    const response = await fetch(`${appURL}/${route.sudo.unarchiveUser}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    try {
+      // PUT Method
+      setIsSubmitting(true);
+      const response = await fetch(`${appURL}/${route.sudo.unarchiveUser}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
+      setIsSubmitting(false);
 
-    if (response.ok) {
-      onFetch();
-      notify("Account is now archived and disabled.");
-      handleModal();
-    } else {
+      if (response.ok) {
+        onFetch();
+        notify("Account is now archived and disabled.");
+        handleModal();
+      } else {
+        failNotify("Failed to archive and disable account.");
+        console.error("Error sending notification:", data.message);
+      }
+    } catch (err) {
+      console.error(err);
       failNotify("Failed to archive and disable account.");
-      console.error("Error sending notification:", data.message);
+      setIsSubmitting(false);
     }
   };
 
@@ -85,7 +94,17 @@ export default function UnarchiveUser({ handleModal, userDetails, onFetch }) {
                 className="text-button border"
                 onClick={handleConfirm}
               >
-                <p className="fw-bold my-0 status">Confirm</p>
+                <p className="fw-bold my-0 status">
+                  {isSubmitting ? (
+                    <>
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    </>
+                  ) : (
+                    "Confirm"
+                  )}
+                </p>
               </button>
               <button className="text-button-red border" onClick={handleClose}>
                 <p className="fw-bold my-0 status">Cancel</p>

@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import "./modal.css";
@@ -24,6 +24,8 @@ export default function ArchiveUser({ handleModal, userDetails, onFetch }) {
       autoClose: 2000,
     });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const handleConfirm = async (e) => {
     e.preventDefault();
 
@@ -32,27 +34,35 @@ export default function ArchiveUser({ handleModal, userDetails, onFetch }) {
     };
 
     // PUT Method
-    const response = await fetch(`${appURL}/${route.sudo.archiveUser}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-      body: JSON.stringify(payload),
-    });
+    try {
+      setIsSubmitting(true);
+      const response = await fetch(`${appURL}/${route.sudo.archiveUser}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-    const data = await response.json();
+      const data = await response.json();
 
-    if (response.ok) {
+      setIsSubmitting(false);
+      if (response.ok) {
+        onFetch();
+        notify("Account is now archived and disabled.");
+        handleModal();
+      } else {
+        failNotify("Failed to archive and disable account.");
+        console.error("Error sending notification:", data.message);
+      }
       onFetch();
-      notify("Account is now archived and disabled.");
       handleModal();
-    } else {
+    } catch (err) {
+      console.error("Error sending notification:", err);
       failNotify("Failed to archive and disable account.");
-      console.error("Error sending notification:", data.message);
+      setIsSubmitting(false);
     }
-    onFetch();
-    handleModal();
   };
 
   const handleClose = (e) => {
@@ -79,7 +89,17 @@ export default function ArchiveUser({ handleModal, userDetails, onFetch }) {
                 className="text-button border"
                 onClick={handleConfirm}
               >
-                <p className="fw-bold my-0 status">Confirm</p>
+                <p className="fw-bold my-0 status">
+                  {isSubmitting ? (
+                    <>
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                    </>
+                  ) : (
+                    "Confirm"
+                  )}
+                </p>
               </button>
               <button className="text-button-red border" onClick={handleClose}>
                 <p className="fw-bold my-0 status">Cancel</p>

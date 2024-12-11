@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { toast, Slide } from "react-toastify";
 
 export default function exportPatientData(patientData, soapRecords) {
   // format html tags
@@ -99,7 +100,9 @@ export default function exportPatientData(patientData, soapRecords) {
   // column width set to fit
   const colWidths = headers.map((header, index) => {
     if (index === 0) {
-      const maxLength = Math.max(...rowData.map(row => (row[index] || "").length));
+      const maxLength = Math.max(
+        ...rowData.map((row) => (row[index] || "").length)
+      );
       return { wch: maxLength };
     }
     return { wch: header.length + 2 };
@@ -108,7 +111,9 @@ export default function exportPatientData(patientData, soapRecords) {
 
   // data row set to fit
   const rowHeights = rowData.map((row) => {
-    const maxLength = Math.max(...row.map(cell => (cell || "").toString().length));
+    const maxLength = Math.max(
+      ...row.map((cell) => (cell || "").toString().length)
+    );
     return { hpt: Math.max(15, maxLength * 1) }; // Example heuristic
   });
   ws["!rows"] = rowHeights;
@@ -121,6 +126,11 @@ export default function exportPatientData(patientData, soapRecords) {
     wb,
     `${patientData.firstName}_${patientData.lastName}_data.xlsx`
   );
+  toast.success("Patient SOAP data exported successfully!", {
+    position: "top-right",
+    autoClose: 3000,
+    transition: Slide,
+  });
 }
 
 export function exportArchivedUsers(users) {
@@ -163,8 +173,11 @@ export function exportArchivedUsers(users) {
 
   // column width set to fit
   const colWidths = headers.map((header, index) => {
-    if (index === 2) { // Index of the "Email" column
-      const maxLength = Math.max(...rowData.map(row => (row[index] || "").length));
+    if (index === 2) {
+      // Index of the "Email" column
+      const maxLength = Math.max(
+        ...rowData.map((row) => (row[index] || "").length)
+      );
       return { wch: maxLength };
     }
     return { wch: header.length };
@@ -176,4 +189,9 @@ export function exportArchivedUsers(users) {
 
   // save file
   XLSX.writeFile(wb, `archived_users_data.xlsx`);
+  toast.success("Archived users data exported successfully!", {
+    position: "top-right",
+    autoClose: 3000,
+    transition: Slide,
+  });
 }

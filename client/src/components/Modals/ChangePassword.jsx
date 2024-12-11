@@ -24,6 +24,8 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [passwordValidationMessages, setPasswordValidationMessages] = useState({
     length: "Must be at least 8 characters",
     lowercase: "Must have one lowercase letter",
@@ -91,6 +93,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
     }
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(`${appURL}/${editPasswordAPI}`, {
         method: "PUT",
         headers: {
@@ -109,6 +112,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
         throw new Error("Unexpected response format");
       }
 
+      setIsSubmitting(false);
       if (response.ok) {
         notify(toastMessage.success.edit);
         handleCloseModal();
@@ -120,6 +124,7 @@ export default function ChangePassword({ editPasswordAPI, closeModal }) {
         }
       }
     } catch (error) {
+      setIsSubmitting(false);
       failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
 

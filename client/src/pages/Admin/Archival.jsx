@@ -181,7 +181,9 @@ export default function Archival() {
                     </p>
                   </>
                 ) : (
-                  <p>Fetching data.</p>
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
                 )}
               </div>
 
@@ -277,13 +279,13 @@ export default function Archival() {
                                   </button>
                                 </td>
                                 <td>
-                                <input
-                                  className="mx-auto w-100"
-                                  type="checkbox"
-                                  checked={tickBox.includes(user)}
-                                  onChange={() => handleCheckboxChange(user)}
-                                />
-                              </td>
+                                  <input
+                                    className="mx-auto w-100"
+                                    type="checkbox"
+                                    checked={tickBox.includes(user)}
+                                    onChange={() => handleCheckboxChange(user)}
+                                  />
+                                </td>
                               </tr>
                             ))}
                       </tbody>

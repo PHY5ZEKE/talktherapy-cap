@@ -237,7 +237,6 @@ export default function Home() {
     );
   };
 
-
   return (
     <>
       {/* EDIT MODAL */}
@@ -295,7 +294,9 @@ export default function Home() {
                     </p>
                   </>
                 ) : (
-                  <p>Fetching data.</p>
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
                 )}
               </div>
 
@@ -364,13 +365,14 @@ export default function Home() {
                                     ? "Restore"
                                     : "Archive"}
                                 </div>
-                                
                               </div>
                             </div>
                           ))}
                       </>
                     ) : (
-                      <p>Fetching data.</p>
+                      <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                      </div>
                     )}
                   </div>
                 </div>

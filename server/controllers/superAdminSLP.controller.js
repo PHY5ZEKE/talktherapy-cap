@@ -133,45 +133,40 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
+  if (!email || !password) {
+    return res
+      .status(401)
+      .json({ message: "Cannot login invalid credentials." });
   }
 
-  if (!password) {
-    return res.status(400).json({ message: "Password is required" });
-  }
+  const roles = [
+    { model: SuperAdmin, role: "superAdmin" },
+    { model: Admin, role: "admin" },
+    { model: Clinician, role: "clinician" },
+    { model: Patient, role: "patientslp" },
+  ];
 
-  let userInfo;
-  let userRole;
+  let userInfo = null;
+  let userRole = null;
 
-  // Check each collection for the user
-  userInfo = await SuperAdmin.findOne({ email: email });
-  if (userInfo) {
-    userRole = "superAdmin";
-  } else {
-    userInfo = await Admin.findOne({ email: email });
+  // Traverse through each collection to find the user
+  for (const { model, role } of roles) {
+    userInfo = await model.findOne({ email: email });
     if (userInfo) {
-      userRole = "admin";
-    } else {
-      userInfo = await Clinician.findOne({ email: email });
-      if (userInfo) {
-        userRole = "clinician";
-      } else {
-        userInfo = await Patient.findOne({ email: email });
-        if (userInfo) {
-          userRole = "patientslp";
-        }
-      }
+      userRole = role;
+      break;
     }
   }
 
   if (!userInfo) {
-    return res.status(400).json({ message: "User not found" });
+    return res
+      .status(404)
+      .json({ message: "Authentication failed. Enter valid credentials." });
   }
 
   // Check if the user is active
   if (userInfo.active === false) {
-    return res.status(403).json({ message: "User account is inactive" });
+    return res.status(401).json({ message: "User account is inactive" });
   }
 
   const isPasswordValid = await verifyPassword(userInfo.password, password);
@@ -200,9 +195,9 @@ exports.login = async (req, res) => {
       userRole,
     });
   } else {
-    return res.status(400).json({
+    return res.status(401).json({
       error: true,
-      message: "Invalid email or password",
+      message: "Authentication failed. Invalid credentials.",
     });
   }
 };

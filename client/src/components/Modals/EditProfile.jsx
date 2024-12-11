@@ -1,16 +1,15 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 
 import { toast, Slide } from "react-toastify";
 
 import Modal from "react-bootstrap/Modal";
-import Button from "react-bootstrap/Button";
 import { toastMessage } from "../../utils/toastHandler";
 
 // FOR SUDO, ADMIN, AND PATIENT
 export default function EditProfile({
   editProfileAPI,
-  userDetails,
+  userDetails = {},
   closeModal,
   isOwner,
   whatRole,
@@ -21,13 +20,9 @@ export default function EditProfile({
   const accessToken = authState.accessToken;
   const userRole = authState.userRole;
 
-  const [userData, setUserData] = useState(userDetails);
-
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [showModal, setShowModal] = useState(true);
-
-  const [profilePicture, setProfilePicture] = useState(null);
 
   const notify = (message) =>
     toast.success(message, {
@@ -42,21 +37,20 @@ export default function EditProfile({
     });
 
   // Form Inputs
-  const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [address, setAddress] = useState("");
-  const [mobile, setMobile] = useState("");
+  const [form, setForm] = useState({
+    firstName: userDetails?.firstName || "",
+    middleName: userDetails?.middleName || "",
+    lastName: userDetails?.lastName || "",
+    address: userDetails?.address || "",
+    mobile: userDetails?.mobile || "",
+  });
 
-  useEffect(() => {
-    if (userData) {
-      setFirstName(userData.firstName || "");
-      setMiddleName(userData.middleName || "");
-      setLastName(userData.lastName || "");
-      setAddress(userData.address || "");
-      setMobile(userData.mobile || "");
-    }
-  }, [userData, userDetails]);
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   // Close Modal
   const handleCloseModal = () => {
@@ -64,38 +58,40 @@ export default function EditProfile({
     closeModal();
   };
 
+  const [isSubmit, setIsSubmit] = useState(false);
+
   const handleEditProfileSubmit = async (e) => {
     e.preventDefault();
 
     // Check for empty fields
-    if (!firstName.trim()) {
+    if (!form.firstName.trim()) {
       failNotify("First name is required.");
       return;
     }
-    if (!lastName.trim()) {
+    if (!form.lastName.trim()) {
       failNotify("Last name is required.");
       return;
     }
-    if (userRole !== "clinician" && !mobile.trim()) {
+    if (userRole !== "clinician" && !form.mobile.trim()) {
       failNotify("Mobile number is required.");
       return;
     }
 
     // Validate firstName, middleName, and lastName
     const nameRegex = /^[A-Za-z\s]{1,35}$/;
-    if (!nameRegex.test(firstName)) {
+    if (!nameRegex.test(form.firstName)) {
       failNotify(
         "First name must be a string of letters and not exceed 35 characters."
       );
       return;
     }
-    if (middleName && !nameRegex.test(middleName)) {
+    if (form.middleName && !nameRegex.test(form.middleName)) {
       failNotify(
         "Middle name must be a string of letters and not exceed 35 characters."
       );
       return;
     }
-    if (!nameRegex.test(lastName)) {
+    if (!nameRegex.test(form.lastName)) {
       failNotify(
         "Last name must be a string of letters and not exceed 35 characters."
       );
@@ -104,18 +100,19 @@ export default function EditProfile({
 
     // Validate mobile number (Philippine 11-digit format) if provided
     const mobileRegex = /^09\d{9}$/;
-    if (mobile && !mobileRegex.test(mobile)) {
+    if (form.mobile && !mobileRegex.test(form.mobile)) {
       failNotify("Mobile number must be a valid Philippine 11-digit format.");
       return;
     }
 
     // Validate address (must not exceed 250 characters)
-    if (address.length > 250) {
+    if (form.address.length > 250) {
       failNotify("Address must not exceed 250 characters.");
       return;
     }
 
     try {
+      setIsSubmit(true);
       const response = await fetch(`${appURL}/${editProfileAPI}`, {
         method: "PUT",
         headers: {
@@ -123,16 +120,18 @@ export default function EditProfile({
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          firstName,
-          middleName,
-          lastName,
-          address,
-          mobile,
-          id: userData._id,
+          firstName: form.firstName,
+          middleName: form.middleName,
+          lastName: form.lastName,
+          address: form.address,
+          mobile: form.mobile,
+          id: userDetails._id,
         }),
       });
 
       const data = await response.json();
+
+      setIsSubmit(false);
 
       if (response.ok) {
         notify(toastMessage.success.edit);
@@ -140,8 +139,8 @@ export default function EditProfile({
         if (!isOwner) {
           const userUpdate = {
             notif: "higherAccountEdit",
-            user: `${firstName} ${middleName} ${lastName}`,
-            id: userData._id,
+            user: `${form.firstName} ${form.middleName} ${form.lastName}`,
+            id: userDetails._id,
           };
           onWebSocket(userUpdate);
         }
@@ -151,8 +150,9 @@ export default function EditProfile({
         failNotify(toastMessage.fail.edit);
       }
     } catch (error) {
+      setIsSubmit(false);
       failNotify(toastMessage.fail.error);
-      console.log(error);
+      console.error("Error sending notification:", error);
     }
   };
 
@@ -172,8 +172,8 @@ export default function EditProfile({
               type="text"
               className="form-control"
               name="firstName"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              value={form.firstName}
+              onChange={handleChange}
             />
           </div>
 
@@ -183,8 +183,8 @@ export default function EditProfile({
               type="text"
               className="form-control"
               name="middleName"
-              value={middleName}
-              onChange={(e) => setMiddleName(e.target.value)}
+              value={form.middleName}
+              onChange={handleChange}
             />
           </div>
 
@@ -196,8 +196,8 @@ export default function EditProfile({
               type="text"
               className="form-control"
               name="lastName"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
+              value={form.lastName}
+              onChange={handleChange}
             />
           </div>
 
@@ -214,8 +214,8 @@ export default function EditProfile({
                   type="text"
                   className="form-control"
                   name="mobile"
-                  value={mobile}
-                  onChange={(e) => setMobile(e.target.value)}
+                  value={form.mobile}
+                  onChange={handleChange}
                 />
               </div>
             </>
@@ -230,8 +230,8 @@ export default function EditProfile({
                 type="text"
                 className="form-control"
                 name="address"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
+                value={form.address}
+                onChange={handleChange}
               />
             </div>
           )}
@@ -240,7 +240,15 @@ export default function EditProfile({
             type="submit"
             className="text-button fw-bold border mt-3 w-100"
           >
-            Save
+            {isSubmit ? (
+              <>
+                <div class="mx-auto spinner-border text-primary" role="status">
+                  <span class="sr-only mb-0">Loading...</span>
+                </div>
+              </>
+            ) : (
+              "Save"
+            )}
           </button>
         </form>
       </Modal.Body>

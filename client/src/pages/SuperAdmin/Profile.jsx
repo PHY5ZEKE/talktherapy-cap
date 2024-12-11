@@ -163,12 +163,20 @@ export default function Profile() {
           <div className="container-fluid bg-white w-100 h-auto border overflow-auto">
             <div className="row bg-white border-bottom">
               <div className="col">
-                <p className="mb-0 mt-3">Hello,</p>
-                <p className="fw-bold">
-                  {" "}
-                  {userDetails?.firstName} {userDetails?.middleName}{" "}
-                  {userDetails?.lastName}
-                </p>
+                {error ? (
+                  <p>{error}</p>
+                ) : userDetails ? (
+                  <>
+                    <p className="mb-0 mt-3">Hello,</p>
+                    <p className="fw-bold">
+                      {userDetails.firstName} {userDetails.lastName}
+                    </p>
+                  </>
+                ) : (
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                )}
               </div>
 
               <MenuDropdown />

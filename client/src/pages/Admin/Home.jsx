@@ -518,7 +518,9 @@ export default function Home() {
                     </p>
                   </>
                 ) : (
-                  <p>Fetching data.</p>
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
                 )}
               </div>
 

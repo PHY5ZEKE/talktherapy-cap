@@ -15,6 +15,8 @@ export default function ChangeProfilePicture({
 
   const [profilePicture, setProfilePicture] = useState(null);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const notify = (message) =>
     toast.success(message, {
       transition: Slide,
@@ -45,6 +47,7 @@ export default function ChangeProfilePicture({
     formData.append("profilePicture", profilePicture);
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(`${appURL}/${editPictureAPI}`, {
         method: "PUT",
         headers: {
@@ -55,6 +58,7 @@ export default function ChangeProfilePicture({
 
       const data = await response.json();
 
+      setIsSubmitting(false);
       if (response.ok) {
         notify(toastMessage.success.edit);
         onFetch();
@@ -66,6 +70,7 @@ export default function ChangeProfilePicture({
       }
     } catch (error) {
       failNotify(toastMessage.fail.error);
+      setIsSubmitting(false);
     }
   };
 

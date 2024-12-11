@@ -1,7 +1,9 @@
 import { useState, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { EyeFill, EyeSlashFill } from "react-bootstrap-icons";
+
 import axios from "axios";
+
 import { Slide, toast } from "react-toastify";
 import { toastMessage } from "../../utils/toastHandler.js";
 
@@ -14,12 +16,22 @@ const appURL = import.meta.env.VITE_APP_URL;
 
 export default function Login() {
   const { setAuthInfo } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setForm((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
+  };
 
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const handleTogglePassword = () => {
     setShowPassword(!showPassword);
@@ -33,12 +45,11 @@ export default function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
 
     try {
       const response = await axios.post(`${appURL}/${route.system.login}`, {
-        email,
-        password,
+        email: form.email,
+        password: form.password,
       });
 
       if (response.data.error) {
@@ -195,8 +206,8 @@ export default function Login() {
                     placeholder="youremail@gmail.com"
                     aria-label="Email"
                     aria-describedby="basic-addon2"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    name="email"
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -210,8 +221,8 @@ export default function Login() {
                     placeholder="********"
                     aria-label="Password"
                     aria-describedby="basic-addon2"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    name="password"
+                    onChange={handleChange}
                   />
                   <span
                     className="input-group-text"

@@ -198,7 +198,9 @@ export default function Archival() {
                     </p>
                   </>
                 ) : (
-                  <p>Fetching data.</p>
+                  <div class="spinner-border" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
                 )}
               </div>
 
@@ -241,9 +243,15 @@ export default function Archival() {
                         <tr>
                           <th scope="col">Last Active</th>
                           <th scope="col">Email Address</th>
-                          <th scope="col" className="d-none d-md-table-cell">First Name</th>
-                          <th scope="col" className="d-none d-md-table-cell">Last Name</th>
-                          <th scope="col" className="d-none d-md-table-cell">Role</th>
+                          <th scope="col" className="d-none d-md-table-cell">
+                            First Name
+                          </th>
+                          <th scope="col" className="d-none d-md-table-cell">
+                            Last Name
+                          </th>
+                          <th scope="col" className="d-none d-md-table-cell">
+                            Role
+                          </th>
                           <th scope="col">
                             <p className="text-center mb-0">Action</p>
                           </th>
@@ -267,9 +275,15 @@ export default function Archival() {
                                 ).toLocaleDateString()}
                               </th>
                               <td>{user.email}</td>
-                              <td className="d-none d-md-table-cell">{user.firstName}</td>
-                              <td className="d-none d-md-table-cell">{user.lastName}</td>
-                              <td className="d-none d-md-table-cell">{user.userRole}</td>
+                              <td className="d-none d-md-table-cell">
+                                {user.firstName}
+                              </td>
+                              <td className="d-none d-md-table-cell">
+                                {user.lastName}
+                              </td>
+                              <td className="d-none d-md-table-cell">
+                                {user.userRole}
+                              </td>
                               <td className="mx-auto">
                                 <button
                                   className="fw-bold mx-auto w-100 text-button px-3 border"

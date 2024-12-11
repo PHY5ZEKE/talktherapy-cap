@@ -10,6 +10,7 @@ export default function RegisterAdmin({ openModal, onFetch }) {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const notify = (message) =>
     toast.success(message, {
@@ -32,6 +33,7 @@ export default function RegisterAdmin({ openModal, onFetch }) {
     e.preventDefault();
 
     try {
+      setIsSubmitting(true);
       const response = await fetch(`${appURL}/${route.admin.addAdmin}`, {
         method: "POST",
         headers: {
@@ -42,6 +44,7 @@ export default function RegisterAdmin({ openModal, onFetch }) {
 
       const data = await response.json();
 
+      setIsSubmitting(false);
       if (data.error) {
         setError(true);
         setMessage(data.message);
@@ -56,6 +59,7 @@ export default function RegisterAdmin({ openModal, onFetch }) {
         setEmail(""); // Clear the input field on success
       }
     } catch (err) {
+      setIsSubmitting(false);
       setError(true);
       failNotify(toastMessage.fail.error);
     }
@@ -103,7 +107,15 @@ export default function RegisterAdmin({ openModal, onFetch }) {
               style={{ cursor: "pointer" }}
               onClick={handleSubmit}
             >
-              Submit
+              {isSubmitting ? (
+                <>
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                  </div>
+                </>
+              ) : (
+                "Submit"
+              )}
             </div>
             <div
               className="text-button-red fw-bold border"
