@@ -9,13 +9,10 @@ import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { useNavigate } from "react-router-dom";
 
 export default function FeedbackDiagnosis() {
   const appURL = import.meta.env.VITE_APP_URL;
-
-  const navigate = useNavigate();
-  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
@@ -37,12 +34,6 @@ export default function FeedbackDiagnosis() {
           },
         });
 
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
-
         if (!response.ok) {
           throw new Error("Failed to fetch patient data");
         }
@@ -53,6 +44,7 @@ export default function FeedbackDiagnosis() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch patient data", error);
       }
     };
 
@@ -73,12 +65,6 @@ export default function FeedbackDiagnosis() {
           }
         );
 
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
-
         if (!response.ok) {
           throw new Error("Failed to fetch diagnosis data");
         }
@@ -87,6 +73,7 @@ export default function FeedbackDiagnosis() {
         setDiagnosisData(data);
       } catch (error) {
         setError(error.message);
+        throw new Error("Failed to fetch diagnosis data", error);
       }
     };
 
@@ -109,14 +96,8 @@ export default function FeedbackDiagnosis() {
           }
         );
 
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
-
         if (!response.ok) {
-          console.log("Failed to fetch patient progress");
+          throw new Error("Failed to fetch patient progress");
         }
 
         const data = await response.json();
@@ -124,6 +105,7 @@ export default function FeedbackDiagnosis() {
       } catch (error) {
         setError(error.message);
         setPatientProgress([]);
+        throw new Error("Failed to fetch patient progress", error);
       }
     };
 

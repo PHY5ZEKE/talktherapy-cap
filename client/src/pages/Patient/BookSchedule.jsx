@@ -40,7 +40,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function BookSchedule() {
-  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   // DatePicker Instance
@@ -213,6 +213,7 @@ export default function BookSchedule() {
         transition: Slide,
         autoClose: 3000,
       });
+      throw new Error("Failed to delete appointment", error);
     }
   };
 
@@ -228,13 +229,8 @@ export default function BookSchedule() {
           },
         });
 
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
         if (!response.ok) {
-          throw new Error("Failed to fetch admin data");
+          throw new Error("Failed to fetch patient data");
         }
 
         const data = await response.json();
@@ -243,6 +239,7 @@ export default function BookSchedule() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch patient data", error);
       }
     };
 
@@ -256,12 +253,6 @@ export default function BookSchedule() {
           },
         });
 
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
-
         if (!response.ok) {
           throw new Error("Failed to fetch schedules");
         }
@@ -271,6 +262,7 @@ export default function BookSchedule() {
       } catch (error) {
         failNotify(toastMessage.fail.error);
         setError(error.message);
+        throw new Error("Failed to fetch schedules", error);
       }
     };
 
@@ -312,12 +304,6 @@ export default function BookSchedule() {
         },
       });
 
-      if (response.status === 401) {
-        clearOnLogOut();
-        navigate("/login");
-        throw new Error("Unauthorized");
-      }
-
       if (!response.ok) {
         throw new Error("Failed to fetch appointments");
       }
@@ -328,6 +314,7 @@ export default function BookSchedule() {
     } catch (error) {
       failNotify(toastMessage.fail.error);
       setError(error.message);
+      throw new Error("Failed to fetch appointments", error);
     }
   };
 
@@ -377,6 +364,7 @@ export default function BookSchedule() {
       if (!response.ok) {
         throw new Error("Failed to send notification");
       }
+
       const result = await response.json();
 
       // Notify WebSocket server
@@ -386,7 +374,7 @@ export default function BookSchedule() {
         socket.current.send(JSON.stringify(resultWithNotif));
       }
     } catch (error) {
-      console.error("Error sending notification:", error);
+      throw new Error("Failed to send notification", error);
     }
   };
 

@@ -41,6 +41,8 @@ export default function Home() {
       try {
         const response = await fetch(`${appURL}/${route.notification.get}`);
         if (!response.ok) {
+          clearOnLogOut();
+          navigate("/login");
           throw new Error("Failed to fetch notif");
         }
         const data = await response.json();
@@ -48,6 +50,7 @@ export default function Home() {
         setNotifications(data.decryptedNotifications);
       } catch (error) {
         console.error("Error fetch notif", error);
+        throw new Error("Error fetching notifications", error);
       }
     };
 
@@ -96,13 +99,8 @@ export default function Home() {
         }),
       ]);
 
-      if (patientRes.status === 401 || appointmentsRes.status === 401) {
-        clearOnLogOut();
-        navigate("/login");
-        throw new Error("Unauthorized");
-      }
-
       if (!patientRes.ok || !appointmentsRes.ok) {
+        console.log("Unauthorized", patientRes, appointmentsRes);
         throw new Error("Failed to fetch data");
       }
 
@@ -116,6 +114,7 @@ export default function Home() {
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      throw new Error("Error fetching data", error);
     }
   };
 
@@ -140,6 +139,7 @@ export default function Home() {
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      throw new Error("Error fetching content data", error);
     }
   };
 

@@ -63,11 +63,17 @@ export default function Home() {
           },
         }
       );
+
+      if (!response.data) {
+        throw new Error("Failed to update profile");
+      }
+
       // Handle the response as needed
       notify(toastMessage.success.edit);
     } catch (error) {
       failNotify(toastMessage.fail.error);
       setError("Error updating profile", error);
+      throw new Error("Error updating profile", error);
     }
   };
 
@@ -76,36 +82,23 @@ export default function Home() {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    // Fetch Admin List
-    const fetchAdmins = async () => {
-      try {
-        const response = await axios.get(
-          `${appURL}/${route.sudo.getAllAdmins}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-        setAdmins(response.data.admins);
-      } catch (error) {
-        setError("An error occurred while retrieving admins.", error);
-      }
-    };
-
+    fetchSuperAdmin();
     fetchAdmins();
 
     // Get Notifications from MongoDB
     const fetchNotifications = async () => {
       try {
         const response = await fetch(`${appURL}/${route.notification.get}`);
+
         if (!response.ok) {
           throw new Error("Failed to fetch notif");
         }
         const data = await response.json();
+
         setNotifications(data.decryptedNotifications);
       } catch (error) {
         console.error("Error fetch notif", error);
+        throw new Error("Error fetching notifications", error);
       }
     };
 
@@ -175,6 +168,7 @@ export default function Home() {
       SocketFetch(socket);
     } catch (error) {
       console.error("Error sending notification:", error);
+      throw new Error("Error sending notification:", error);
     }
   };
 
@@ -182,42 +176,53 @@ export default function Home() {
     SocketFetch(socket);
   };
 
-  //Super Admin
-  useEffect(() => {
-    const fetchSuperAdmin = async () => {
-      if (!accessToken) {
-        setError("No token found. Please log in.");
-        return;
+  // Fetch Super Admin
+  const fetchSuperAdmin = async () => {
+    if (!accessToken) {
+      setError("No token found. Please log in.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`${appURL}/${route.sudo.fetch}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch super admin data");
       }
 
-      try {
-        const response = await fetch(`${appURL}/${route.sudo.fetch}`, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
+      const data = await response.json();
+      setSuperAdmin(data.superAdmin);
+    } catch (error) {
+      setError("Error fetching super admin data", error);
+      throw new Error("Error fetching super admin data", error);
+    }
+  };
 
-        if (response.ok) {
-          const data = await response.json();
-          setSuperAdmin(data.superAdmin);
-        } else if (response.status === 401) {
-          setError("Unauthorized. Please log in again.");
-        } else {
-          const errorText = await response.text();
-          failNotify(toastMessage.fail.fetch);
-          setError("Failed to fetch super admin data", errorText);
-        }
-      } catch (error) {
-        failNotify(toastMessage.fail.fetch);
-        failNotify(toastMessage.fail.error);
-        setError("Error fetching super admin data", error);
+  // Fetch Admins List
+  const fetchAdmins = async () => {
+    try {
+      const response = await axios.get(`${appURL}/${route.sudo.getAllAdmins}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.data) {
+        throw new Error("Failed to fetch admins");
       }
-    };
 
-    fetchSuperAdmin();
-  }, []);
+      setAdmins(response.data.admins);
+    } catch (error) {
+      setError("An error occurred while retrieving admins.", error);
+      throw new Error("Error fetching admin list.", error);
+    }
+  };
 
   // Archive/Soft Deletion Modal
   const [isArchive, setArchive] = useState(false);

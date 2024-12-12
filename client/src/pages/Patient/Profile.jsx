@@ -39,6 +39,10 @@ export default function Profile() {
     setIsProfilePictureModalOpen(!isProfilePictureModalOpen);
   };
 
+  useEffect(() => {
+    fetchPatientData();
+  }, []);
+
   const fetchPatientData = async () => {
     try {
       const response = await fetch(`${appURL}/${route.patient.fetch}`, {
@@ -48,12 +52,6 @@ export default function Profile() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
-
-      if (response.status === 401) {
-        clearOnLogOut();
-        navigate("/login");
-        throw new Error("Unauthorized");
-      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch patient data");
@@ -65,12 +63,9 @@ export default function Profile() {
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      throw new Error("Failed to fetch patient data", error);
     }
   };
-
-  useEffect(() => {
-    fetchPatientData();
-  }, []);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);

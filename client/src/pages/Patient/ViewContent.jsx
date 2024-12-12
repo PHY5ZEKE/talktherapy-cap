@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBookmark, faStar } from "@fortawesome/free-solid-svg-icons";
 
 export default function ViewContent() {
-  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
@@ -61,12 +61,6 @@ export default function ViewContent() {
           },
         });
 
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
-
         if (!response.ok) {
           throw new Error("Failed to fetch patient data");
         }
@@ -77,6 +71,7 @@ export default function ViewContent() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch patient data");
       }
     };
 
@@ -94,13 +89,6 @@ export default function ViewContent() {
             Authorization: `Bearer ${accessToken}`,
           },
         });
-
-        if (response.status === 401) {
-          clearOnLogOut();
-          navigate("/login");
-          throw new Error("Unauthorized");
-        }
-
         if (!response.ok) {
           throw new Error("Failed to fetch content data");
         }
@@ -113,6 +101,7 @@ export default function ViewContent() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch content data");
       }
     };
 
