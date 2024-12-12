@@ -281,7 +281,7 @@ export default function Home() {
                                   ? appointment.temporaryReschedule.day
                                   : appointment.selectedSchedule.day}
                               </h5>
-                              <div className="text-pending">
+                              <div className="text-accepted">
                                 {appointment.status.toUpperCase()}
                               </div>
                             </div>
