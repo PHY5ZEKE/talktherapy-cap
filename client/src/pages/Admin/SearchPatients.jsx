@@ -82,10 +82,11 @@ export default function ManageSchedule() {
           setPatients(data.patients);
         } else {
           failNotify(toastMessage.fail.fetch);
+          throw new Error("Failed to fetch patients.");
         }
       } catch (error) {
-        failNotify(toastMessage.fail.fetch);
         failNotify(toastMessage.fail.error);
+        throw new Error("Failed to fetch patients.", error);
       }
     };
 
@@ -144,6 +145,7 @@ export default function ManageSchedule() {
       setAdminData(data.admin);
     } catch (error) {
       setError(error.message);
+      throw new Error("Fetching admin data failed.", error);
     }
   };
 
@@ -166,10 +168,11 @@ export default function ManageSchedule() {
         patientRef.current.scrollIntoView({ behavior: "smooth" });
       } else {
         failNotify(toastMessage.fail.fetch);
+        throw new Error("Failed to fetch patient details.");
       }
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch patient details.", error);
     } finally {
       setIsLoading(false);
     }
@@ -191,10 +194,11 @@ export default function ManageSchedule() {
         setSoapRecords(Array.isArray(data) ? data : []);
       } else {
         failNotify(toastMessage.fail.fetch);
+        throw new Error("Failed to fetch SOAP records.");
       }
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch SOAP records.", error);
     }
   };
 
@@ -214,10 +218,11 @@ export default function ManageSchedule() {
         setProgressRecords(data); // Assuming data is an array of progress items
       } else {
         failNotify(toastMessage.fail.fetch);
+        throw new Error("Failed to fetch patient progress.");
       }
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch patient progress.", error);
     }
   };
 
@@ -269,7 +274,6 @@ export default function ManageSchedule() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

@@ -10,11 +10,9 @@ import MenuDropdown from "../../components/Layout/PatientMenu";
 
 // Utils
 import { route } from "../../utils/route";
-import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
-  const { authState, clearOnLogOut } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
   const role = authState.userRole;
 

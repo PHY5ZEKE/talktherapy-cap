@@ -158,6 +158,7 @@ export default function ViewContent() {
       setPatientData({ ...patientData, bookmarkedContent: updatedBookmarks });
     } catch (error) {
       setError(error.message);
+      throw new Error("Failed to update bookmarks", error);
     }
   };
 

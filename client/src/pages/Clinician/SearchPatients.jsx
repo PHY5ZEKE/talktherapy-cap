@@ -110,10 +110,11 @@ export default function ManageSchedule() {
           setPatients(data.patients);
         } else {
           failNotify(toastMessage.fail.fetch);
+          throw new Error("Failed to fetch patients", data.error);
         }
       } catch (error) {
-        failNotify(toastMessage.fail.fetch);
         failNotify(toastMessage.fail.error);
+        throw new Error("Failed to fetch patients", error);
       }
     };
 
@@ -139,10 +140,11 @@ export default function ManageSchedule() {
           setAssignedPatients(data.assignedPatients);
         } else {
           failNotify(toastMessage.fail.fetch);
+          throw new Error("Failed to fetch assigned patients", data.error);
         }
       } catch (error) {
-        failNotify(toastMessage.fail.fetch);
         failNotify(toastMessage.fail.error);
+        throw new Error("Failed to fetch assigned patients", error);
       }
     };
 
@@ -221,6 +223,7 @@ export default function ManageSchedule() {
       }
     } catch (error) {
       console.error("Error sending notification:", error);
+      throw new Error("Failed to send notification", error);
     }
   };
 
@@ -246,6 +249,7 @@ export default function ManageSchedule() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch clinician data.", error);
       }
     };
 
@@ -280,8 +284,8 @@ export default function ManageSchedule() {
         failNotify(toastMessage.fail.fetch);
       }
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch patient details", error);
     } finally {
       setIsLoading(false);
     }

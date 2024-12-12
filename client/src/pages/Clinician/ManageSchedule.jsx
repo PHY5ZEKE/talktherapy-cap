@@ -100,6 +100,7 @@ export default function ManageSchedule() {
     } catch (error) {
       failNotify(toastMessage.fail.error);
       setError(error.message);
+      throw new Error(error.message);
     }
   }, []);
 
@@ -125,6 +126,7 @@ export default function ManageSchedule() {
         failNotify(toastMessage.fail.error);
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch clinician data", error);
       }
     };
 
@@ -147,6 +149,7 @@ export default function ManageSchedule() {
       } catch (error) {
         failNotify(toastMessage.fail.error);
         setError(error.message);
+        throw new Error("Failed to fetch schedules", error);
       }
     };
 

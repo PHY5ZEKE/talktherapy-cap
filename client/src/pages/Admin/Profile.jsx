@@ -102,6 +102,7 @@ export default function Profile() {
       if (!response.ok) {
         throw new Error("Failed to send notification");
       }
+
       const result = await response.json();
 
       const resultWithNotif = { ...result, type: "notification" };
@@ -112,6 +113,7 @@ export default function Profile() {
       }
     } catch (error) {
       console.error("Error sending notification:", error);
+      throw new Error("Failed to send notification", error);
     }
   };
 
@@ -137,10 +139,10 @@ export default function Profile() {
       setAdminData(data.admin);
       setLoading(false);
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
       setError(error.message);
       setLoading(false);
+      throw new Error("Fetching admin data failed.", error);
     }
   };
 
@@ -162,6 +164,7 @@ export default function Profile() {
       setPendingRequests(data.pendingRequests);
     } catch (error) {
       failNotify("Failed to fetch pending requests");
+      throw new Error("Fetching pending requests failed.", error);
     }
   };
 
@@ -197,7 +200,6 @@ export default function Profile() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

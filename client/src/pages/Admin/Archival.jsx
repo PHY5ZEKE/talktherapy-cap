@@ -5,7 +5,6 @@ import { route } from "../../utils/route";
 
 import { toastMessage } from "../../utils/toastHandler";
 import { toast, Slide } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 
 // Components
 import Sidebar from "../../components/Sidebar/SidebarAdmin";
@@ -18,15 +17,15 @@ import { exportArchivedUsers } from "../../utils/exportData";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function Archival() {
-  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
-  const nav = useNavigate();
   const [adminData, setAdminData] = useState(null);
   const [error, setError] = useState(null);
   const appURL = import.meta.env.VITE_APP_URL;
 
   const [archivedUsers, setArchivedUsers] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const notify = (message) =>
     toast.success(message, {
@@ -58,13 +57,18 @@ export default function Archival() {
       });
 
       if (!response.ok) {
+        failNotify(toastMessage.fail.fetch);
+        setLoading(false);
         throw new Error("Failed to fetch admin data");
       }
 
       const data = await response.json();
+      setLoading(false);
       setAdminData(data.admin);
     } catch (error) {
       setError(error.message);
+      setLoading(false);
+      throw new Error("Failed to fetch admin data", error);
     }
   };
 
@@ -87,25 +91,20 @@ export default function Archival() {
         }
       );
 
-      if (response.ok) {
-        const data = await response.json();
-        setArchivedUsers(data.users);
-      } else if (response.status === 401) {
-        setError("Unauthorized. Please log in again.");
-        clearOnLogOut();
-        failNotify(toastMessage.fail.unauthorized);
-        nav("/unauthorized");
-      } else {
-        const errorText = await response.text();
-        failNotify(toastMessage.fail.error);
+      if (!response.ok) {
+        setLoading(false);
         failNotify(toastMessage.fail.fetch);
-        setError("Failed to fetch data.", errorText);
-        console.log(error);
+        throw new Error("Failed to fetch archived users data");
       }
+
+      setLoading(false);
+      const data = await response.json();
+      setArchivedUsers(data.users);
     } catch (err) {
+      setLoading(false);
       failNotify(toastMessage.fail.error);
       setError("Error in fetching data.");
-      console.log(err);
+      throw new Error("Failed to fetch archived users data", err);
     }
   };
 
@@ -168,7 +167,6 @@ export default function Archival() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

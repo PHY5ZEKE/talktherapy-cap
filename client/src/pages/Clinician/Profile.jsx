@@ -9,7 +9,6 @@ import EditProfile from "../../components/Modals/EditProfile";
 import ChangePassword from "../../components/Modals/ChangePassword";
 import ChangeProfilePicture from "../../components/Modals/ChangeProfilePicture";
 import MenuDropdown from "../../components/Layout/ClinicianMenu";
-import ConfirmationDialog from "../../components/Modals/ConfirmationDialog";
 import RequestContent from "../../components/Modals/RequestContent";
 
 // Utils
@@ -93,6 +92,7 @@ export default function Profile() {
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      throw new Error("Failed to fetch clinician data.", error);
     }
   };
 

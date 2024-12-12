@@ -11,7 +11,7 @@ import MenuDropdown from "../../components/Layout/ClinicianMenu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function ViewContent() {
-  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [clinicianData, setClinicianData] = useState(null);
@@ -69,6 +69,7 @@ export default function ViewContent() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch clinician data.", error);
       }
     };
 
@@ -99,14 +100,15 @@ export default function ViewContent() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch content data.", error);
       }
     };
 
     fetchContentData();
   }, [accessToken, appURL]);
 
-   // Search/Filter
-   useEffect(() => {
+  // Search/Filter
+  useEffect(() => {
     if (searchTerm === "") {
       setFilteredContent([...staticContent, ...contentData]);
     } else {
@@ -288,7 +290,6 @@ export default function ViewContent() {
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>

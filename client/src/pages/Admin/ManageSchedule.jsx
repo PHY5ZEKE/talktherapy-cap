@@ -51,6 +51,7 @@ export default function ManageSchedule() {
         });
 
         if (!response.ok) {
+          setLoading(false);
           throw new Error("Failed to fetch admin data");
         }
 
@@ -60,6 +61,7 @@ export default function ManageSchedule() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Fetching admin data failed.", error);
       }
     };
 
@@ -83,11 +85,11 @@ export default function ManageSchedule() {
           setClinicians(data.clinicians);
         } else {
           failNotify(toastMessage.fail.fetch);
-          failNotify(toastMessage.fail.error);
+          throw new Error("Fetching clinicians failed.", data.error);
         }
       } catch (error) {
-        failNotify(toastMessage.fail.fetch);
         failNotify(toastMessage.fail.error);
+        throw new Error("Fetching clinicians failed.", error);
       }
     };
 
@@ -103,6 +105,7 @@ export default function ManageSchedule() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
       const data = await response.json();
 
       if (!data.error) {
@@ -114,11 +117,12 @@ export default function ManageSchedule() {
       } else {
         console.error(data);
         failNotify(toastMessage.fail.fetch);
+        throw new Error("Fetching clinician schedule failed.", data.error);
       }
     } catch (error) {
       console.error(error);
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error("Fetching clinician schedule failed.", error);
     }
   };
 
@@ -141,7 +145,6 @@ export default function ManageSchedule() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

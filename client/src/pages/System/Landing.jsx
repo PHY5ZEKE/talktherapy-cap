@@ -198,7 +198,7 @@ export default function Landing() {
                 </div>
               </div>
 
-              <div className="d-flex flex-column justify-content-center">
+              <div className="d-flex flex-column justify-content-center px-sm-3 px-3">
                 <details className="mx-auto landing-accordion p-0 mb-3 border border rounded-3">
                   <summary className="open:bg-danger p-3 rounded-top-3">
                     What is the process for booking an appointment?

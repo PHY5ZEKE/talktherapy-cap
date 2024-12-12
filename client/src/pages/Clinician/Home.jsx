@@ -83,8 +83,8 @@ export default function Home() {
       setSelectedAppointment(response.data);
       setIsViewAppointment(true);
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch appointment details", error);
     }
   };
 
@@ -122,6 +122,7 @@ export default function Home() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Fetching clinician data failed.", error);
       }
     };
 
@@ -148,8 +149,8 @@ export default function Home() {
         const data = await response.json();
         setAppointments(data);
       } catch (error) {
-        failNotify(toastMessage.fail.fetch);
         failNotify(toastMessage.fail.error);
+        throw new Error("Fetching appointments failed.", error);
       }
     };
 
@@ -162,11 +163,13 @@ export default function Home() {
         if (!response.ok) {
           throw new Error("Failed to fetch notif");
         }
+
         const data = await response.json();
 
         setNotifications(data.decryptedNotifications);
       } catch (error) {
         console.error("Error fetch notif", error);
+        throw new Error("Failed to fetch notifications", error);
       }
     };
 
@@ -230,6 +233,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error sending notification:", error);
+      throw new Error("Failed to send notification", error);
     }
   };
 

@@ -69,6 +69,7 @@ export default function AdminContent() {
     } catch (error) {
       setError(error.message);
       setLoading(false);
+      throw new Error("Failed to fetch content data.", error);
     }
   };
 
@@ -124,6 +125,7 @@ export default function AdminContent() {
       } catch (error) {
         setError(error.message);
         setLoading(false);
+        throw new Error("Failed to fetch admin data.", error);
       }
     };
 
@@ -154,6 +156,7 @@ export default function AdminContent() {
       setIsAddModalOpen(false);
     } catch (error) {
       setError(error.message);
+      throw new Error("Failed to add content.", error);
     }
   };
 
@@ -177,6 +180,7 @@ export default function AdminContent() {
       setIsEditModalOpen(false);
     } catch (error) {
       setError(error.message);
+      throw new Error("Failed to edit content.", error);
     }
   };
 
@@ -201,6 +205,7 @@ export default function AdminContent() {
       );
     } catch (error) {
       setError(error.message);
+      throw new Error("Failed to delete content.", error);
     }
   };
 
@@ -223,7 +228,6 @@ export default function AdminContent() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

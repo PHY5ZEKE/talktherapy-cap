@@ -41,6 +41,7 @@ export default function Home() {
   const [selectedAppointment, setSelectedAppointment] = useState(null);
 
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [loading, setLoading] = useState(true);
 
   const { authState } = useContext(AuthContext);
 
@@ -92,8 +93,8 @@ export default function Home() {
       setSelectedAppointment(response.data);
       setIsConfirm(true);
     } catch (error) {
-      failNotify(toastMessage.fail.fetch);
       failNotify(toastMessage.fail.error);
+      throw new Error(error);
     }
   };
 
@@ -184,6 +185,7 @@ export default function Home() {
       if (!response.ok) {
         throw new Error("Failed to send notification");
       }
+
       const result = await response.json();
 
       // Notify WebSocket server
@@ -194,6 +196,7 @@ export default function Home() {
       }
     } catch (error) {
       console.error("Error sending notification:", error);
+      throw new Error("Error sending notification.", error);
     }
   };
 
@@ -213,14 +216,18 @@ export default function Home() {
       });
 
       if (!response.ok) {
+        setLoading(false);
         throw new Error("Failed to fetch appointments");
       }
+
       const data = await response.json();
+      setLoading(false);
       setAppointments(data);
     } catch (error) {
+      setLoading(false);
       failNotify(toastMessage.fail.fetch);
       setError(error.message);
-      console.log("Error fetch appointments :", error);
+      throw new Error("Fetching appointments failed.", error);
     }
   };
 
@@ -228,14 +235,19 @@ export default function Home() {
   const fetchNotifications = async () => {
     try {
       const response = await fetch(`${appURL}/${route.notification.get}`);
+
       if (!response.ok) {
+        setLoading(false);
         throw new Error("Failed to fetch notif");
       }
-      const data = await response.json();
 
+      const data = await response.json();
+      setLoading(false);
       setNotifications(data.decryptedNotifications);
     } catch (error) {
+      setLoading(false);
       console.error("Error fetch notif", error);
+      throw new Error("Failed to fetch notifications", error);
     }
   };
 
@@ -250,13 +262,17 @@ export default function Home() {
       });
 
       if (!response.ok) {
+        setLoading(false);
         throw new Error("Failed to fetch admin data");
       }
 
       const data = await response.json();
+      setLoading(false);
       setAdminData(data.admin);
     } catch (error) {
+      setLoading(false);
       setError(error.message);
+      throw new Error("Failed to fetch admin data", error);
     }
   };
 
@@ -270,16 +286,22 @@ export default function Home() {
           },
         }
       );
+
       const data = await response.json();
+      setLoading(false);
 
       if (!data.error) {
+        setLoading(false);
         setClinicians(data.clinicians);
       } else {
+        setLoading(false);
         failNotify(toastMessage.fail.fetch);
+        throw new Error("Failed to fetch clinicians.");
       }
     } catch (error) {
+      setLoading(false);
       failNotify(toastMessage.fail.fetch);
-      failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch clinicians", error);
     }
   };
 
@@ -290,16 +312,22 @@ export default function Home() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
       const data = await response.json();
+      setLoading(false);
 
       if (!data.error) {
+        setLoading(false);
         setPatients(data.patients);
       } else {
+        setLoading(false);
         failNotify(toastMessage.fail.fetch);
+        throw new Error("Failed to fetch patients.");
       }
     } catch (error) {
+      setLoading(false);
       failNotify(toastMessage.fail.fetch);
-      failNotify(toastMessage.fail.error);
+      throw new Error("Failed to fetch patients", error);
     }
   };
 
@@ -473,7 +501,6 @@ export default function Home() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>
