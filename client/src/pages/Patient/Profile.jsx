@@ -10,9 +10,11 @@ import MenuDropdown from "../../components/Layout/PatientMenu";
 
 // Utils
 import { route } from "../../utils/route";
+import { useNavigate } from "react-router-dom";
 
 export default function Profile() {
-  const { authState } = useContext(AuthContext);
+  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const navigate = useNavigate();
   const accessToken = authState.accessToken;
   const role = authState.userRole;
 
@@ -46,6 +48,12 @@ export default function Profile() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
+      if (response.status === 401) {
+        clearOnLogOut();
+        navigate("/login");
+        throw new Error("Unauthorized");
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch patient data");
@@ -92,7 +100,6 @@ export default function Profile() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

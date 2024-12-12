@@ -17,7 +17,7 @@ import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 export default function Home() {
   const appURL = import.meta.env.VITE_APP_URL;
 
-  const { authState, setUserId } = useContext(AuthContext);
+  const { authState, setUserId, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
@@ -95,6 +95,12 @@ export default function Home() {
           },
         }),
       ]);
+
+      if (patientRes.status === 401 || appointmentsRes.status === 401) {
+        clearOnLogOut();
+        navigate("/login");
+        throw new Error("Unauthorized");
+      }
 
       if (!patientRes.ok || !appointmentsRes.ok) {
         throw new Error("Failed to fetch data");
@@ -196,7 +202,6 @@ export default function Home() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>

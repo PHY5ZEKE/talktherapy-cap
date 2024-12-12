@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import { AuthContext } from "../../utils/AuthContext";
 import { route } from "../../utils/route";
 
+import { useNavigate } from "react-router-dom";
 import { emailCreateAppointment } from "../../utils/emailCreateAppointment";
 export default function SuggestedSchedules({
   closeModal,
@@ -13,7 +14,8 @@ export default function SuggestedSchedules({
   appointmentId,
   appointment,
 }) {
-  const { authState } = useContext(AuthContext);
+  const { authState, clearOnLogOut } = useContext(AuthContext);
+  const navigate = useNavigate();
   const accessToken = authState.accessToken;
 
   const [schedules, setSchedules] = useState([]);
@@ -38,9 +40,6 @@ export default function SuggestedSchedules({
     }
 
     try {
-      console.log("Submitting schedule change request...");
-      console.log("Selected Schedule:", selectedSchedule);
-
       const response = await fetch(
         `${appURL}/${route.appointment.updateAppointment}`,
         {
@@ -56,6 +55,12 @@ export default function SuggestedSchedules({
           }),
         }
       );
+
+      if (response.status === 401) {
+        clearOnLogOut();
+        navigate("/login");
+        throw new Error("Unauthorized");
+      }
 
       if (!response.ok) {
         const errorData = await response.json();

@@ -61,6 +61,12 @@ export default function ViewContent() {
           },
         });
 
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
+
         if (!response.ok) {
           throw new Error("Failed to fetch patient data");
         }
@@ -88,6 +94,12 @@ export default function ViewContent() {
             Authorization: `Bearer ${accessToken}`,
           },
         });
+
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
 
         if (!response.ok) {
           throw new Error("Failed to fetch content data");
@@ -183,7 +195,6 @@ export default function ViewContent() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>
@@ -307,7 +318,6 @@ export default function ViewContent() {
                         </div>
                       </div> */}
 
-
                       {filteredContent.map((content) => (
                         <div
                           key={content._id}
@@ -326,7 +336,9 @@ export default function ViewContent() {
                                 {content.name}
                               </h5>
                               <p>{content.category}</p>
-                              {!staticContent.some((staticItem) => staticItem._id === content._id) ? (
+                              {!staticContent.some(
+                                (staticItem) => staticItem._id === content._id
+                              ) ? (
                                 <FontAwesomeIcon
                                   icon={faBookmark}
                                   onClick={(e) => {
@@ -335,9 +347,12 @@ export default function ViewContent() {
                                   }}
                                   style={{
                                     cursor: "pointer",
-                                    color: patientData?.bookmarkedContent.includes(content._id)
-                                      ? "blue"
-                                      : "black",
+                                    color:
+                                      patientData?.bookmarkedContent.includes(
+                                        content._id
+                                      )
+                                        ? "blue"
+                                        : "black",
                                   }}
                                 />
                               ) : (

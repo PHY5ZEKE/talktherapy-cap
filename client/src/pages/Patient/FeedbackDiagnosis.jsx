@@ -9,11 +9,13 @@ import Sidebar from "../../components/Sidebar/SidebarPatient";
 import MenuDropdown from "../../components/Layout/PatientMenu";
 
 import "react-datepicker/dist/react-datepicker.css";
+import { useNavigate } from "react-router-dom";
 
 export default function FeedbackDiagnosis() {
   const appURL = import.meta.env.VITE_APP_URL;
 
-  const { authState } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const { authState, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   const [patientData, setPatientData] = useState(null);
@@ -21,7 +23,7 @@ export default function FeedbackDiagnosis() {
   const [error, setError] = useState(null);
   const [diagnosisData, setDiagnosisData] = useState([]);
   const [selectedDiagnosis, setSelectedDiagnosis] = useState(null);
-  const [patientProgress, setPatientProgress] = useState([]); 
+  const [patientProgress, setPatientProgress] = useState([]);
   const [filter, setFilter] = useState("all");
 
   useEffect(() => {
@@ -34,6 +36,12 @@ export default function FeedbackDiagnosis() {
             Authorization: `Bearer ${accessToken}`,
           },
         });
+
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
 
         if (!response.ok) {
           throw new Error("Failed to fetch patient data");
@@ -51,7 +59,6 @@ export default function FeedbackDiagnosis() {
     fetchPatientData();
   }, [appURL, accessToken]);
 
-
   useEffect(() => {
     const fetchDiagnosisData = async () => {
       try {
@@ -65,6 +72,12 @@ export default function FeedbackDiagnosis() {
             },
           }
         );
+
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
 
         if (!response.ok) {
           throw new Error("Failed to fetch diagnosis data");
@@ -82,18 +95,25 @@ export default function FeedbackDiagnosis() {
     }
   }, [patientData, appURL, accessToken]);
 
-
-  
   useEffect(() => {
     const fetchPatientProgress = async () => {
       try {
-        const response = await fetch(`${appURL}/${route.patient.showProgress}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
+        const response = await fetch(
+          `${appURL}/${route.patient.showProgress}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
 
         if (!response.ok) {
           console.log("Failed to fetch patient progress");
@@ -112,18 +132,17 @@ export default function FeedbackDiagnosis() {
     }
   }, [patientData, appURL, accessToken]);
 
-
   const filteredProgress = patientProgress
     .filter((progress) => {
       if (filter === "completed") return progress.completed;
       if (filter === "in-progress") return !progress.completed;
-      return true; 
+      return true;
     })
     .sort((a, b) => {
       if (filter === "in-progress") {
         const aCompletion = a.correctCount / a.totalPhrases;
         const bCompletion = b.correctCount / b.totalPhrases;
-        return bCompletion - aCompletion; 
+        return bCompletion - aCompletion;
       }
       return 0;
     });
@@ -168,7 +187,6 @@ export default function FeedbackDiagnosis() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>
@@ -297,7 +315,8 @@ export default function FeedbackDiagnosis() {
                     Completed
                   </button>
                   <button
-                    className={`btn text-button border ${ filter === "in-progress" ? "btn-primary" : "btn-secondary"
+                    className={`btn text-button border ${
+                      filter === "in-progress" ? "btn-primary" : "btn-secondary"
                     }`}
                     onClick={() => setFilter("in-progress")}
                   >

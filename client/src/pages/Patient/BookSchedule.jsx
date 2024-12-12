@@ -40,7 +40,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 export default function BookSchedule() {
-  const { authState } = useContext(AuthContext);
+  const { authState, clearOnLogOut } = useContext(AuthContext);
   const accessToken = authState.accessToken;
 
   // DatePicker Instance
@@ -201,6 +201,7 @@ export default function BookSchedule() {
       }
 
       const data = await response.json();
+
       toast.success("Appointment deleted successfully", {
         transition: Slide,
         autoClose: 2000,
@@ -227,6 +228,11 @@ export default function BookSchedule() {
           },
         });
 
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
         if (!response.ok) {
           throw new Error("Failed to fetch admin data");
         }
@@ -249,6 +255,12 @@ export default function BookSchedule() {
             Authorization: `Bearer ${accessToken}`,
           },
         });
+
+        if (response.status === 401) {
+          clearOnLogOut();
+          navigate("/login");
+          throw new Error("Unauthorized");
+        }
 
         if (!response.ok) {
           throw new Error("Failed to fetch schedules");
@@ -299,6 +311,12 @@ export default function BookSchedule() {
           Authorization: `Bearer ${accessToken}`,
         },
       });
+
+      if (response.status === 401) {
+        clearOnLogOut();
+        navigate("/login");
+        throw new Error("Unauthorized");
+      }
 
       if (!response.ok) {
         throw new Error("Failed to fetch appointments");
@@ -444,7 +462,6 @@ export default function BookSchedule() {
   //     </div>
   //   );
   // }
-
 
   return (
     <>
