@@ -150,33 +150,43 @@ export default function SuggestedSchedules({
                   </tr>
                 </thead>
                 <tbody>
-                  {schedules.map(
-                    (schedule, index) =>
-                      schedule.status === "Available" && (
-                        <tr
-                          key={index}
-                          className={
-                            selectedSchedule &&
-                            selectedSchedule._id === schedule._id
-                              ? "table-active"
-                              : ""
-                          }
-                        >
-                          <td>{`${schedule.clinicianId.firstName} ${schedule.clinicianId.lastName}`}</td>
-                          <th scope="row">{schedule.day}</th>
-                          <td>
-                            {schedule.startTime} - {schedule.endTime}
-                          </td>
-                          <td>
-                            <button
-                              className="text-button-table border"
-                              onClick={() => setSelectedSchedule(schedule)}
-                            >
-                              Select
-                            </button>
-                          </td>
-                        </tr>
-                      )
+                  {schedules.filter(
+                    (schedule) => schedule.status === "Available"
+                  ).length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="text-center">
+                        You have an on-going appointment.
+                      </td>
+                    </tr>
+                  ) : (
+                    schedules.map(
+                      (schedule, index) =>
+                        schedule.status === "Available" && (
+                          <tr
+                            key={index}
+                            className={
+                              selectedSchedule &&
+                              selectedSchedule._id === schedule._id
+                                ? "table-active"
+                                : ""
+                            }
+                          >
+                            <td>{`${schedule.clinicianId.firstName} ${schedule.clinicianId.lastName}`}</td>
+                            <th scope="row">{schedule.day}</th>
+                            <td>
+                              {schedule.startTime} - {schedule.endTime}
+                            </td>
+                            <td>
+                              <button
+                                className="text-button-table border"
+                                onClick={() => setSelectedSchedule(schedule)}
+                              >
+                                Select
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                    )
                   )}
                 </tbody>
               </table>

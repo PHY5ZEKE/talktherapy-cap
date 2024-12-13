@@ -277,6 +277,7 @@ export default function ViewContent() {
                               className="card-img-top border-bottom"
                               alt={content.name}
                               style={{ height: "200px", objectFit: "cover" }}
+                              loading="lazy"
                             />
                             <div className="card-body p-3">
                               <h5 className="card-title fw-bold mb-0 text-truncate">

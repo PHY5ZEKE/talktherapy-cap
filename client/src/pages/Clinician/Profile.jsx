@@ -206,6 +206,7 @@ export default function Profile() {
                         className="card-img-top"
                         alt="Profile picture"
                         style={{ maxHeight: "320px", objectFit: "cover" }}
+                        loading="lazy"
                       />
                       <div className="card-body">
                         <h5 className="fw-bold">

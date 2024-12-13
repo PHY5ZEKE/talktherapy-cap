@@ -165,14 +165,13 @@ export default function ManageSchedule() {
 
       if (!data.error) {
         setSelectedPatient(data.patient);
-        patientRef.current.scrollIntoView({ behavior: "smooth" });
       } else {
         failNotify(toastMessage.fail.fetch);
-        throw new Error("Failed to fetch patient details.");
+        throw new Error("Failed to fetch patient details: " + data.error);
       }
     } catch (error) {
       failNotify(toastMessage.fail.error);
-      throw new Error("Failed to fetch patient details.", error);
+      throw new Error("Failed to fetch patient details: " + error.message);
     } finally {
       setIsLoading(false);
     }
@@ -231,6 +230,7 @@ export default function ManageSchedule() {
     setSoapRecords(fetchSoapRecords(patient._id));
     setViewMode(VIEW_MODES.NONE);
     fetchPatientDetails(patient._id);
+    patientRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleViewRecords = () => {
@@ -359,7 +359,6 @@ export default function ManageSchedule() {
                     style={{ maxHeight: "75vh" }}
                   >
                     <span ref={patientRef}></span>
-
                     {isLoading ? (
                       <h5 className="mb-0 fw-bold text-center">
                         Loading data.

@@ -343,9 +343,8 @@ export default function ManageSchedule() {
     setSelectedPatient(patient);
     setSoapRecords(fetchSoapRecords(patient._id));
     setViewMode(VIEW_MODES.NONE);
-    patientRef.current.scrollIntoView({ behavior: "smooth" });
-
     fetchPatientDetails(patient._id);
+    patientRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const handleViewRecords = () => {
@@ -579,12 +578,13 @@ export default function ManageSchedule() {
                     className="col bg-white border rounded-4 p-3 overflow-auto"
                     style={{ maxHeight: "75vh" }}
                   >
+                    <span ref={patientRef}></span>
                     {isLoading ? (
                       <h5 className="mb-0 fw-bold text-center">
                         Loading data.
                       </h5>
                     ) : selectedPatient ? (
-                      <div className="card" ref={patientRef}>
+                      <div className="card">
                         <img
                           src={selectedPatient?.profilePicture}
                           className="card-img-top"
