@@ -138,26 +138,6 @@ export default function AssistFace() {
   }
 }, [isTimerActive, timer]);
 
-// if (loading) {
-//   return (
-//     <div className="d-flex align-items-center justify-content-center vh-100">
-//       <div className="spinner-border text-primary" role="status">
-//         <span className="visually-hidden">Loading...</span>
-//       </div>
-//     </div>
-//   );
-// }
-
-// if (error) {
-//   return (
-//     <div className="d-flex align-items-center justify-content-center vh-100">
-//       <div className="alert alert-danger" role="alert">
-//         {error}
-//       </div>
-//     </div>
-//   );
-// }
-
 
   return (
     <div
@@ -207,7 +187,7 @@ export default function AssistFace() {
                     Press <strong>Capture and Record</strong> and try to hold your pose for 5 seconds.
                   </p>
                   <p>
-                    The <strong>Reload Page</strong> button is used to ensure the model resets properly when you want to capture another confidence graph.
+                    The <strong>Reload Page</strong> button is used to ensure the model resets properly when you want to capture another analysis.
                   </p>
                 </div>
                 <div className="modal-footer">
@@ -225,7 +205,7 @@ export default function AssistFace() {
             <div className="card shadow-lg rounded-lg mb-4 mx-auto">
               <div className="card-body text-center">
                 <div id="webcam-container" className="d-flex justify-content-center align-items-center"></div>
-                
+
                 {/* Capture Button or Reload based on isCaptured */}
                 {!isCaptured ? (
                   <button className="btn btn-primary mt-3" onClick={handleCaptureAndRecord}>
