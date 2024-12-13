@@ -5,8 +5,8 @@ import './libs/faceml.css';
 
 import { init, capturePhotoAndRecord, plotRecordedGraph } from "../../machinelearning/face.js";
 
-import { route } from "../../utils/route";
-import { AuthContext } from "../../utils/AuthContext";
+import { route } from "../../utils/route.js";
+import { AuthContext } from "../../utils/AuthContext.jsx";
 
 export default function AssistFace() {
   const { authState } = useContext(AuthContext);

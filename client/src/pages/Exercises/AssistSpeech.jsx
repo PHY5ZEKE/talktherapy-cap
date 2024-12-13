@@ -1,6 +1,7 @@
 import { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './libs/speechml.module.css'; 
+import useLoadTensorFlow from '../../pages/Exercises/libs/useLoadTensorFlow.js';
 
 import { init, startVoiceRecognitionHandler } from "../../machinelearning/speech.js";
 
@@ -16,6 +17,7 @@ export default function AssistSpeech() {
   const [buttonText, setButtonText] = useState("Start Voice Recognition");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+    useLoadTensorFlow(true); 
 
   const appURL = import.meta.env.VITE_APP_URL;
 

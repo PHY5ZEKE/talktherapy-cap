@@ -1,5 +1,5 @@
-const URL = "http://localhost:5173/src/machinelearning/audio_model/";
-import * as tf from '@tensorflow/tfjs'; 
+const URL = "https://talktherapy.site/src/machinelearning/audio_model/";
+//import * as tf from '@tensorflow/tfjs'; 
 import Chart from 'chart.js/auto';
 
 let recognizer = null;

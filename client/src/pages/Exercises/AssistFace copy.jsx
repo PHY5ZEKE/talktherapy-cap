@@ -1,16 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
-import FaceFrame from "../../assets/imgs/faceframe.png";
 import "./libs/faceml.css";
 import * as faceapi from "face-api.js";
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title } from "chart.js";
 
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title);
 
 export default function AssistFace() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
-  const [showLandmarks, setShowLandmarks] = useState(false);
-  const [isFrameVisible, setIsFrameVisible] = useState(false);
   const [loadingModels, setLoadingModels] = useState(true);
+  const [emotionData, setEmotionData] = useState({
+    RoundedLips: 0,
+    WideSmile: 0,
+    OpenMouth: 0,
+    DroopyLips: 0,
+    Neutral: 0,
+  });
 
   useEffect(() => {
     const loadModels = async () => {
@@ -48,97 +55,87 @@ export default function AssistFace() {
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-  
+
     if (!video || !canvas) return;
-  
+
     const handlePlay = () => {
-      // Ensure canvas matches video size
       const displaySize = { width: video.videoWidth, height: video.videoHeight };
       canvas.width = displaySize.width;
       canvas.height = displaySize.height;
-  
+
       const intervalId = setInterval(async () => {
         const detections = await faceapi
           .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
           .withFaceLandmarks()
-          .withFaceExpressions()
-          .withAgeAndGender();
-  
+          .withFaceExpressions();
+
         if (!detections.length) {
           console.log("No faces detected.");
           return;
         }
-  
+
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
-  
+
         const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear previous frame
-  
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         resizedDetections.forEach((detection) => {
-          // Draw bounding box and details
-          const { age, gender, expressions } = detection;
-          const { x, y, width, height } = detection.detection.box;
-  
-          ctx.strokeStyle = "cyan";
-          ctx.lineWidth = 2;
-          ctx.strokeRect(x, y, width, height);
-  
-          ctx.fillStyle = "white";
-          ctx.font = "16px Arial";
-          ctx.fillText(`${Math.round(age)} yrs`, x + 5, y - 10);
-          ctx.fillText(gender, x + 5, y + 20);
-  
-          const expression = getModifiedExpression(expressions);
-          ctx.fillText(expression, x + 5, y + 40);
+          const { expressions } = detection;
+          updateEmotionData(expressions);
         });
       }, 100);
-  
+
       return () => clearInterval(intervalId);
     };
-  
+
     video.addEventListener("play", handlePlay);
-  
+
     return () => {
       video.removeEventListener("play", handlePlay);
     };
-  }, [showLandmarks]);
+  });
 
-  const getModifiedExpression = (expressions) => {
-    if (expressions.happy > 0.5) return "Wide Smile";
-    if (expressions.surprised > 0.5) return "Rounded Lips";
-    if (expressions.angry > 0.5) return "Open Mouth";
-    if (expressions.sad > 0.5) return "Droopy Lips";
-    return "Neutral";
+  const updateEmotionData = (expressions) => {
+    setEmotionData({
+      RoundedLips: expressions.surprised || 0,
+      WideSmile: expressions.happy || 0,
+      OpenMouth: expressions.angry || 0,
+      DroopyLips: expressions.sad || 0,
+      Neutral: 1 - (expressions.surprised + expressions.happy + expressions.angry + expressions.sad),
+    });
+  };
+
+  const chartData = {
+    labels: ["Rounded Lips", "Wide Smile", "Open Mouth", "Droopy Lips", "Neutral"],
+    datasets: [
+      {
+        label: "Emotions",
+        data: Object.values(emotionData),
+        backgroundColor: ["#4FC3F7", "#29B6F6", "#0288D1", "#0277BD", "#01579B"],
+        borderRadius: 5,
+      },
+    ],
   };
 
   return (
     <div className="assist-face">
-      <div className="webcam-container">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          className="webcam-video"
-        ></video>
-        <canvas ref={canvasRef} className="webcam-overlay" />
-        {isFrameVisible && (
-          <img
-            src={FaceFrame}
-            alt="Face Frame Overlay"
-            className="frame-overlay"
-          />
-        )}
+      <h1 className="title">Assistive Facial Exercise Tool</h1>
+      <div className="webcam-card">
+        <div className="webcam-container">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            className="webcam-video"
+          ></video>
+          <canvas ref={canvasRef} className="webcam-overlay" />
+        </div>
       </div>
-      <div className="controls">
-        <button onClick={() => setIsFrameVisible((prev) => !prev)}>
-          {isFrameVisible ? "Hide Frame Overlay" : "Show Frame Overlay"}
-        </button>
-        <button onClick={() => setShowLandmarks((prev) => !prev)}>
-          {showLandmarks ? "Hide Landmarks" : "Show Landmarks"}
-        </button>
+      {loadingModels && <p className="loading">Loading face-api.js models...</p>}
+      <div className="chart-container">
+        <Bar data={chartData} options={{ responsive: true, plugins: { legend: { display: false } } }} />
       </div>
-      {loadingModels && <p>Loading face-api.js models...</p>}
     </div>
   );
 }
