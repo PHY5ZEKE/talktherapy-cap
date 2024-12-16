@@ -5,9 +5,12 @@ import * as faceapi from "face-api.js";
 export default function AssistFace() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const captureCanvasRef = useRef(null);
 
   const [loadingModels, setLoadingModels] = useState(true);
   const [showHelpModal, setShowHelpModal] = useState(true);
+  const [latestDetails, setLatestDetails] = useState(null);
+  const [hasCaptured, setHasCaptured] = useState(false);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -45,56 +48,54 @@ export default function AssistFace() {
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
-  
+
     if (!video || !canvas) return;
-  
+
     const handlePlay = () => {
-      // Ensure canvas matches video size
       const displaySize = { width: video.videoWidth, height: video.videoHeight };
       canvas.width = displaySize.width;
       canvas.height = displaySize.height;
-  
+
       const intervalId = setInterval(async () => {
         const detections = await faceapi
           .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
           .withFaceLandmarks()
           .withFaceExpressions()
           .withAgeAndGender();
-  
+
         if (!detections.length) {
           console.log("No faces detected.");
           return;
         }
-  
+
         const resizedDetections = faceapi.resizeResults(detections, displaySize);
-  
+
         const ctx = canvas.getContext("2d");
-        ctx.clearRect(0, 0, canvas.width, canvas.height); 
-  
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         resizedDetections.forEach((detection) => {
-          // Draw bounding box and details
           const { age, gender, expressions } = detection;
           const { x, y, width, height } = detection.detection.box;
-  
+
           ctx.strokeStyle = "cyan";
           ctx.lineWidth = 2;
           ctx.strokeRect(x, y, width, height);
-  
+
           ctx.fillStyle = "white";
           ctx.font = "16px Arial";
           ctx.fillText(`${Math.round(age)} yrs`, x + 5, y - 10);
           ctx.fillText(gender, x + 5, y + 20);
-  
+
           const expression = getModifiedExpression(expressions);
           ctx.fillText(expression, x + 5, y + 40);
         });
       }, 100);
-  
+
       return () => clearInterval(intervalId);
     };
-  
+
     video.addEventListener("play", handlePlay);
-  
+
     return () => {
       video.removeEventListener("play", handlePlay);
     };
@@ -109,6 +110,43 @@ export default function AssistFace() {
   };
 
   const closeHelpModal = () => setShowHelpModal(false);
+
+  const captureFrame = async () => {
+    const video = videoRef.current;
+    const canvas = captureCanvasRef.current;
+
+    if (!video || !canvas) return;
+
+    const displaySize = { width: video.videoWidth, height: video.videoHeight };
+    canvas.width = displaySize.width;
+    canvas.height = displaySize.height;
+
+    const detections = await faceapi
+      .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+      .withFaceLandmarks()
+      .withFaceExpressions()
+      .withAgeAndGender();
+
+    if (detections.length) {
+      const detection = detections[0];
+      const { age, gender, expressions } = detection;
+      const expression = getModifiedExpression(expressions);
+
+      setLatestDetails({
+        age: Math.round(age),
+        gender,
+        expression,
+      });
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      setHasCaptured(true);
+    } else {
+      console.log("No faces detected on capture.");
+      setLatestDetails(null);
+      setHasCaptured(false);
+    }
+  };
 
   return (
     <div className="assist-face">
@@ -139,7 +177,21 @@ export default function AssistFace() {
         ></video>
         <canvas ref={canvasRef} className="webcam-overlay" />
       </div>
+
       {loadingModels && <p>Loading face models...</p>}
+
+      <button onClick={captureFrame} className="capture-button">Capture</button>
+
+      <canvas ref={captureCanvasRef} className={`capture-canvas ${hasCaptured ? "visible" : ""}`}/>
+
+      {latestDetails && (
+        <div className="capture-details">
+          <h3>Picture</h3>
+          <p>Age: {latestDetails.age}</p>
+          <p>Gender: {latestDetails.gender}</p>
+          <p>Expression: {latestDetails.expression}</p>
+        </div>
+      )}
     </div>
   );
 }
