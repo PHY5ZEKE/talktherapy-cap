@@ -1,7 +1,6 @@
 import { useEffect, useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from './libs/speechml.module.css'; 
-import useLoadTensorFlow from '../../pages/Exercises/libs/useLoadTensorFlow.js';
 
 import { init, startVoiceRecognitionHandler } from "../../machinelearning/speech.js";
 
@@ -14,10 +13,10 @@ export default function AssistSpeech() {
   const [patientData, setPatientData] = useState(null);
 
   const [loading, setLoading] = useState(true);
-  const [buttonText, setButtonText] = useState("Start Voice Recognition");
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-    useLoadTensorFlow(true); 
+
+  const [buttonText, setButtonText] = useState("Start Voice Recognition");
 
   const appURL = import.meta.env.VITE_APP_URL;
 
@@ -26,6 +25,18 @@ export default function AssistSpeech() {
       await init();
     };
     initializeModel();
+  }, []);
+
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs";
+    script.async = true;
+    document.body.appendChild(script);
+  
+    return () => {
+      // Cleanup global script when no longer needed
+      document.body.removeChild(script);
+    };
   }, []);
 
   // Fetch patient data
@@ -124,19 +135,17 @@ export default function AssistSpeech() {
   //   );
   // }
 
-
-
   return (
     <div
       id="offcanvasDiagnosticTool"
       aria-labelledby="offcanvasDiagnosticToolLabel"
-      className={styles.container} // Apply scoped container styles
+      className={styles.container} 
     >
       <div className="container-fluid min-vh-100 d-flex flex-column">
         {/* Header Section */}
         <div className="row justify-content-center py-4">
           <div className="col-12 text-center">
-            <h5 className={styles.title} id="offcanvasDiagnosticToolLabel"> {/* Apply scoped title styles */}
+            <h5 className={styles.title} id="offcanvasDiagnosticToolLabel"> 
               Assistive Diagnostic Tool
             </h5>
           </div>
@@ -145,9 +154,9 @@ export default function AssistSpeech() {
         {/* Main Content Section */}
         <div className="row flex-grow-1 justify-content-center">
           <div className="col-12 col-md-10">
-            <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}> {/* Apply scoped card styles */}
-              <div className={`card-body text-center ${styles.cardBody}`}> {/* Apply scoped card body styles */}
-                <div className={styles.chartContainer}> {/* Apply scoped chart container styles */}
+            <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}> 
+              <div className={`card-body text-center ${styles.cardBody}`}> 
+                <div className={styles.chartContainer}> 
                   <canvas id="outputChart" className="w-100"></canvas>
                 </div>
               </div>

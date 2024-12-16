@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./libs/faceml.css";
 import * as faceapi from "face-api.js";
-import useLoadTensorFlow from '../../pages/Exercises/libs/useLoadTensorFlow.js';
 
 export default function AssistFace() {
   const videoRef = useRef(null);
@@ -9,7 +8,6 @@ export default function AssistFace() {
 
   const [loadingModels, setLoadingModels] = useState(true);
   const [showHelpModal, setShowHelpModal] = useState(true);
-  useLoadTensorFlow(false); 
 
   useEffect(() => {
     const loadModels = async () => {
@@ -107,7 +105,7 @@ export default function AssistFace() {
     if (expressions.surprised > 0.5) return "Rounded Lips";
     if (expressions.angry > 0.5) return "Open Mouth";
     if (expressions.sad > 0.5) return "Droopy Lips";
-    return "Neutral";
+    return "Lips Together";
   };
 
   const closeHelpModal = () => setShowHelpModal(false);
@@ -141,7 +139,7 @@ export default function AssistFace() {
         ></video>
         <canvas ref={canvasRef} className="webcam-overlay" />
       </div>
-      {loadingModels && <p>Loading face-api.js models...</p>}
+      {loadingModels && <p>Loading face models...</p>}
     </div>
   );
 }
