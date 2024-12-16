@@ -11,6 +11,7 @@ export default function AssistFace() {
   const [showHelpModal, setShowHelpModal] = useState(true);
   const [latestDetails, setLatestDetails] = useState(null);
   const [hasCaptured, setHasCaptured] = useState(false);
+  const [showHoldPoseMessage, setShowHoldPoseMessage] = useState(false);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -117,6 +118,14 @@ export default function AssistFace() {
 
     if (!video || !canvas) return;
 
+    // Show "Hold your pose" message
+    setShowHoldPoseMessage(true);
+
+    // Hide the message after 5 seconds or after capturing
+    setTimeout(() => {
+      setShowHoldPoseMessage(false);
+    }, 5000);
+
     const displaySize = { width: video.videoWidth, height: video.videoHeight };
     canvas.width = displaySize.width;
     canvas.height = displaySize.height;
@@ -181,6 +190,10 @@ export default function AssistFace() {
       {loadingModels && <p>Loading face models...</p>}
 
       <button onClick={captureFrame} className="capture-button">Capture</button>
+
+      {showHoldPoseMessage && (
+        <p className="hold-pose-message">Hold your pose until the picture is taken for better accuracy!</p>
+      )}
 
       <canvas ref={captureCanvasRef} className={`capture-canvas ${hasCaptured ? "visible" : ""}`}/>
 
