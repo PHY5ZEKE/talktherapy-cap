@@ -15,10 +15,10 @@ cron.schedule("0 0 * * *", () => {
   archiveInactiveUsers();
 });
 
-// Deletion of old notifications 
+// Deletion of old notifications
 cron.schedule("0 0 * * *", () => {
   console.log("Running archiveInactiveUsers task...");
-  archiveInactiveUsers();
+  deleteOldNotifications();
 });
 
-console.log("Running scheduled tasks...")
+console.log("Running scheduled tasks...");
