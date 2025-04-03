@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./libs/faceml.css";
 import * as faceapi from "face-api.js";
 
@@ -12,6 +13,21 @@ export default function AssistFace() {
   const [latestDetails, setLatestDetails] = useState(null);
   const [hasCaptured, setHasCaptured] = useState(false);
   const [showHoldPoseMessage, setShowHoldPoseMessage] = useState(false);
+  const navigate = useNavigate();
+
+  const handleBack = () => {
+    // Stop webcam stream
+    const stream = videoRef.current?.srcObject;
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+  
+    navigate(-2);
+    setTimeout(() => {
+      window.location.reload(); 
+    }, 100); 
+  };  
 
   useEffect(() => {
     const loadModels = async () => {
@@ -159,50 +175,71 @@ export default function AssistFace() {
 
   return (
     <div className="assist-face">
+      {/* Back Button */}
+      <button
+        onClick={handleBack}
+        className="back-btn"
+      >
+        <i className="fas fa-arrow-left"></i>
+      </button>
+  
+      {/* Title */}
       <h1 className="title">Assistive Facial Exercise Tool</h1>
-
+  
       {/* Help Modal */}
       {showHelpModal && (
         <div className="help-modal">
           <div className="modal-content">
             <h2>How to Use</h2>
             <p>
-              Keep your face within the entire canvas frame and ensure good lighting for the model to recognize your face. 
-              If detected, a box will appear over your face along with the appropriate facial expression detection. 
-              Note: Wearing glasses may affect the model's accuracy.
+              Keep your face within the webcam frame and ensure good lighting.
+              A box will appear over your face along with detected expressions.
+              Avoid glasses for better accuracy.
             </p>
             <button onClick={closeHelpModal}>Got it</button>
           </div>
         </div>
       )}
-
-      <div className="webcam-container">
-        <video
-          ref={videoRef}
-          autoPlay
-          muted
-          playsInline
-          className="webcam-video"
-        ></video>
-        <canvas ref={canvasRef} className="webcam-overlay" />
+  
+      {/* Webcam Feed with Overlay */}
+      <div className="webcam-card">
+        <div className="webcam-container">
+          <video
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            className="webcam-video"
+          />
+          <canvas ref={canvasRef} className="webcam-overlay" />
+        </div>
       </div>
-
-      {loadingModels && <p>Loading face models...</p>}
-
-      <button onClick={captureFrame} className="capture-button">Capture</button>
-
+  
+      {/* Capture Button */}
+      <button onClick={captureFrame} className="capture-button">
+        Capture
+      </button>
+  
+      {/* Hold Pose Message */}
       {showHoldPoseMessage && (
-        <p className="hold-pose-message">Hold your pose until the picture is taken for better accuracy!</p>
+        <p className="hold-pose-message">
+          Hold your pose for a few seconds for better accuracy!
+        </p>
       )}
-
-      <canvas ref={captureCanvasRef} className={`capture-canvas ${hasCaptured ? "visible" : ""}`}/>
-
+  
+      {/* Captured Frame */}
+      <canvas
+        ref={captureCanvasRef}
+        className={`capture-canvas ${hasCaptured ? "visible" : ""}`}
+      />
+  
+      {/* Captured Details */}
       {latestDetails && (
         <div className="capture-details">
-          <h3>Picture</h3>
-          <p>Age: {latestDetails.age}</p>
-          <p>Gender: {latestDetails.gender}</p>
-          <p>Expression: {latestDetails.expression}</p>
+          <h3>Detection Summary</h3>
+          <p><strong>Age:</strong> {latestDetails.age}</p>
+          <p><strong>Gender:</strong> {latestDetails.gender}</p>
+          <p><strong>Expression:</strong> {latestDetails.expression}</p>
         </div>
       )}
     </div>

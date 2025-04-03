@@ -7,11 +7,27 @@ import { init, startVoiceRecognitionHandler } from "../../machinelearning/speech
 import { route } from "../../utils/route";
 import { AuthContext } from "../../utils/AuthContext";
 
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.body.appendChild(script);
+  });
+}
+
 export default function AssistSpeech() {
   const { authState } = useContext(AuthContext);
   const accessToken = authState.accessToken;
   const [patientData, setPatientData] = useState(null);
 
+  const [hasRecognized, setHasRecognized] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
@@ -20,24 +36,81 @@ export default function AssistSpeech() {
 
   const appURL = import.meta.env.VITE_APP_URL;
 
-  useEffect(() => {
-    const initializeModel = async () => {
-      await init();
-    };
-    initializeModel();
-  }, []);
+  const handleBack = () => {
+    if (window.recognizer?.isListening()) {
+      window.recognizer.stopListening();
+    }
+
+    if (window.chart) {
+      window.chart.destroy();
+      window.chart = null; 
+    }
+
+    const tfScript = document.querySelector('script[src*="tfjs"]');
+    if (tfScript) tfScript.remove();
+  
+    const speechCommandScript = document.querySelector('script[src*="speech-commands"]');
+    if (speechCommandScript) speechCommandScript.remove();
+  
+    navigate(-2);
+    setTimeout(() => {
+      window.location.reload(); 
+    }, 100); 
+  };
+  
 
   useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs";
-    script.async = true;
-    document.body.appendChild(script);
+    const loadAllScriptsAndInit = async () => {
+      try {
+        await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs");
   
-    return () => {
-      // Cleanup global script when no longer needed
-      document.body.removeChild(script);
+        // ✅ Ensure TensorFlow.js is fully loaded and initialized
+        const waitForTF = () =>
+          new Promise((resolve) => {
+            const check = () => {
+              if (window.tf && window.tf.engine) resolve();
+              else setTimeout(check, 50);
+            };
+            check();
+          });
+  
+        await waitForTF(); // Wait for tf to be ready
+  
+        await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0/dist/speech-commands.min.js");
+  
+        // Wait until the DOM is ready to mount Chart
+        const chartReady = () => !!document.getElementById("outputChart");
+        while (!chartReady()) {
+          await new Promise((res) => setTimeout(res, 100));
+        }
+  
+        const { init } = await import("../../machinelearning/speech.js");
+        await init();
+      } catch (err) {
+        console.error("Speech model load/init error:", err);
+      }
     };
+  
+    loadAllScriptsAndInit();
   }, []);
+
+  // useEffect(() => {
+  //   const initializeSpeech = async () => {
+  //     try {
+  //       await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs");
+  //       await loadScript("https://cdn.jsdelivr.net/npm/@tensorflow-models/speech-commands@0.4.0/dist/speech-commands.min.js");
+  
+  //       // Only now that tf and speechCommands are available, import speech.js
+  //       const { init } = await import("../../machinelearning/speech.js");
+  //       await init();
+  //     } catch (err) {
+  //       console.error("Speech model load error:", err);
+  //     }
+  //   };
+  
+  //   initializeSpeech();
+  // }, []);
+
 
   // Fetch patient data
   useEffect(() => {
@@ -139,46 +212,70 @@ export default function AssistSpeech() {
     <div
       id="offcanvasDiagnosticTool"
       aria-labelledby="offcanvasDiagnosticToolLabel"
-      className={styles.container} 
+      className={styles.container}
     >
+      <button
+        onClick={handleBack}
+        className="btn btn-primary position-absolute top-0 start-0 m-3 d-flex align-items-center justify-content-center"
+        style={{
+          width: '50px',
+          height: '50px',
+          borderRadius: '50%',
+          fontSize: '20px',
+          backgroundColor: '#007bff',
+          color: 'white',
+          borderColor: '#007bff',
+          zIndex: 9999
+        }}
+      >
+        <i className="fas fa-arrow-left"></i>
+      </button>
+  
       <div className="container-fluid min-vh-100 d-flex flex-column">
-        {/* Header Section */}
+        {/* Header */}
         <div className="row justify-content-center py-4">
           <div className="col-12 text-center">
-            <h5 className={styles.title} id="offcanvasDiagnosticToolLabel"> 
+            <h5 className={styles.title} id="offcanvasDiagnosticToolLabel">
               Assistive Diagnostic Tool
             </h5>
           </div>
         </div>
-
-        {/* Main Content Section */}
+  
+        {/* Main */}
         <div className="row flex-grow-1 justify-content-center">
+          {/* Chart */}
           <div className="col-12 col-md-10">
-            <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}> 
-              <div className={`card-body text-center ${styles.cardBody}`}> 
-                <div className={styles.chartContainer}> 
+            <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}>
+              <div className={`card-body text-center ${styles.cardBody}`}>
+                <div className={styles.chartContainer}>
                   <canvas id="outputChart" className="w-100"></canvas>
                 </div>
               </div>
             </div>
           </div>
-
+  
+          {/* Control Button */}
           <div className="col-12 col-md-6">
             <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}>
               <div className={`card-body text-center ${styles.cardBody}`}>
                 <button
-                className="btn btn-primary btn-lg w-100 py-3"
-                onClick={() =>
-                  startVoiceRecognitionHandler(setButtonText)
-                }
-              >
-                {buttonText}
-              </button>
+                  className="btn btn-primary btn-lg w-100 py-3"
+                  onClick={() => {
+                    setButtonText("Listening...");
+                    startVoiceRecognitionHandler((status) => {
+                      setButtonText(status ? "Start Voice Recognition" : "Try Again");
+                      if (status) setHasRecognized(true);
+                    });
+                  }}
+                >
+                  {buttonText}
+                </button>
               </div>
             </div>
           </div>
-
-          <div className="col-12 col-md-10">
+  
+          {/* After Recognition */}
+          <div className={`col-12 col-md-10 ${hasRecognized ? 'fade-in' : 'invisible'}`}>
             <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}>
               <div className={`card-body ${styles.cardBody}`}>
                 <div id="output" className="mb-3"></div>
@@ -186,8 +283,8 @@ export default function AssistSpeech() {
               </div>
             </div>
           </div>
-
-          <div className="col-12 col-md-10">
+  
+          <div className={`col-12 col-md-10 ${hasRecognized ? 'fade-in' : 'invisible'}`}>
             <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}>
               <div className={`card-body ${styles.cardBody}`}>
                 <div id="phoneme-container" className="mb-3">
@@ -196,18 +293,18 @@ export default function AssistSpeech() {
               </div>
             </div>
           </div>
-
-          <div className="col-12 col-md-10">
+  
+          <div className={`col-12 col-md-10 ${hasRecognized ? 'fade-in' : 'invisible'}`}>
             <div className={`card shadow-lg rounded-lg mb-4 ${styles.card}`}>
               <div className={`card-body ${styles.cardBody}`}>
-                <h6 className="mb-3">Speech Assessment Scores:</h6>
+                <h6 className="mb-3 text-primary fw-bold">Speech Assessment Scores</h6>
                 <div id="score-output" className="d-flex justify-content-between text-center"></div>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Hidden Label Container */}
+  
+        {/* Hidden Labels */}
         <div id="label-container" className="visually-hidden"></div>
       </div>
     </div>

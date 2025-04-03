@@ -75,3 +75,77 @@
     height: 200px; /* Smaller height for mobile */
   }
 }
+
+
+/* Smooth Fade */
+.fade-in {
+  animation: fadeIn 0.5s ease-in forwards;
+}
+.invisible {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Consistent Heights for Sections */
+#output,
+#phoneme-container,
+#score-output {
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* New: Improve card headings and feedback */
+.card h5 {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+}
+
+/* Modern responsive layout tweaks */
+@media (max-width: 768px) {
+  .cardBody {
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Button hover improvement */
+.btn-primary:hover {
+  background-color: #0056b3;
+  transform: scale(1.02);
+  transition: all 0.2s ease-in-out;
+}
+
+/* For smoother fade-in effect */
+.card {
+  animation: fadeInUp 0.4s ease forwards;
+  opacity: 0;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

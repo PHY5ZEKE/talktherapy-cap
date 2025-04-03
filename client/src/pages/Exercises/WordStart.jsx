@@ -263,13 +263,25 @@ export default function WordStart() {
     };
   }, [progress]);
 
+  const handleBack = () => {
+    // Stop microphone activity
+    if (window.recognizer?.isListening()) {
+      window.recognizer.stopListening();
+    }
+  
+    navigate(-1);
+    setTimeout(() => {
+      window.location.reload(); 
+    }, 100); 
+  };
+
     
   
   return (
   <div className="d-flex align-items-center justify-content-center vh-100">
 
         <button 
-          onClick={() => navigate(-1)} 
+          onClick={handleBack}  
           className="btn btn-primary position-absolute top-0 start-0 m-3 d-flex align-items-center justify-content-center"
           style={{
             width: '50px',

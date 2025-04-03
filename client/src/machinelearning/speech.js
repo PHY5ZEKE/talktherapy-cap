@@ -1,8 +1,10 @@
 // const URL = "https://talktherapy.site/src/machinelearning/audio_model/";
+const URL = "http://localhost:5173/src/machinelearning/audio_model/";
 import Chart from 'chart.js/auto';
 
 let recognizer = null;
 let isListening = false;
+let chart = null;
 
 export async function createModel() {
     if (recognizer) return recognizer;  
@@ -33,7 +35,12 @@ export async function init() {
     }
 
     const ctx = document.getElementById('outputChart').getContext('2d');
-    const chart = new Chart(ctx, {
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    chart = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: ['1st', '2nd', '3rd'],
@@ -63,25 +70,13 @@ export async function init() {
 }
 
 
-export const startVoiceRecognitionHandler = (updateButtonText) => {
-    if (!updateButtonText) return;
-
-    updateButtonText("Listening...");
-
-    const onComplete = (success) => {
-        if (success) {
-            updateButtonText("Start Voice Recognition");
-        } else {
-            updateButtonText("Try Again");
-        }
-    };
-
+export const startVoiceRecognitionHandler = (onComplete) => {
     timedRecognition(
         window.recognizer,
         window.classLabels,
         window.chart,
         window.labelContainer,
-        onComplete // Pass the callback for completion
+        onComplete 
     );
 };
 
@@ -91,6 +86,21 @@ async function timedRecognition(recognizer, classLabels, chart, labelContainer, 
     const threshold = 0.80;
     const startTime = Date.now();
     let bestScores = [];
+
+    if (!recognizer) {
+        console.error("Recognizer not ready.");
+        onComplete(false);
+        return;
+    }
+
+    if (!classLabels || !Array.isArray(classLabels)) {
+        console.error("classLabels is not defined or invalid");
+        if (recognizer?.isListening()) {
+            recognizer.stopListening();
+          }
+        onComplete(false);
+        return;
+      }
 
     recognizer.listen(result => {
         const scores = result.scores;
@@ -111,7 +121,9 @@ async function timedRecognition(recognizer, classLabels, chart, labelContainer, 
         chart.update();
         bestScores = top3Scores;
         if (top3Scores[0].score >= threshold || Date.now() - startTime >= recognitionDuration) {
-            recognizer.stopListening();
+            if (recognizer.isListening()) {
+                recognizer.stopListening();
+              }
             outputTopResults(bestScores);
             const success = bestScores.length > 0 && bestScores[0].score >= 0.5;
             onComplete(success);
@@ -124,7 +136,9 @@ async function timedRecognition(recognizer, classLabels, chart, labelContainer, 
     });
 
     setTimeout(() => {
-        recognizer.stopListening();
+        if (recognizer.isListening()) {
+            recognizer.stopListening();
+          }
         outputTopResults(bestScores);
         const success = bestScores.length > 0 && bestScores[0].score >= 0.5;
         onComplete(success);
@@ -138,6 +152,12 @@ function outputTopResults(topScores) {
 
     const outputDiv = document.getElementById("output");
     const commentDiv = document.getElementById("comment");
+    const scoreOutputDiv = document.getElementById("score-output");
+  
+    if (!outputDiv || !commentDiv || !scoreOutputDiv) {
+      console.warn("DOM elements not available yet.");
+      return;
+    }
 
     let resultHTML = "<strong>Recognized Sounds:</strong><br>";
     resultHTML += `1st: ${topScores[0].label} - ${topScores[0].score.toFixed(2)}<br>`;

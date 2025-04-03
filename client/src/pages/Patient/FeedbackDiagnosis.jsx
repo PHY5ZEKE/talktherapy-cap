@@ -276,29 +276,29 @@ export default function FeedbackDiagnosis() {
             {/* Patient Progress with Filter */}
             <div className="row p-3">
               <div className="col bg-white border rounded-4 p-3">
-                <p className="mb-0 fw-bold">Patient Progress</p>
+                <p className="mb-3 fw-bold fs-5">Patient Progress</p>
 
                 {/* Filter Buttons */}
-                <div className="mb-3">
+                <div className="mb-4 d-flex flex-wrap gap-2">
                   <button
-                    className={`btn text-button border me-2 ${
-                      filter === "all" ? "btn-primary" : "btn-secondary"
+                    className={`btn btn-sm rounded-pill ${
+                      filter === "all" ? "btn-primary" : "btn-outline-primary"
                     }`}
                     onClick={() => setFilter("all")}
                   >
                     All
                   </button>
                   <button
-                    className={`btn text-button border me-2 ${
-                      filter === "completed" ? "btn-primary" : "btn-secondary"
+                    className={`btn btn-sm rounded-pill ${
+                      filter === "completed" ? "btn-primary" : "btn-outline-primary"
                     }`}
                     onClick={() => setFilter("completed")}
                   >
                     Completed
                   </button>
                   <button
-                    className={`btn text-button border ${
-                      filter === "in-progress" ? "btn-primary" : "btn-secondary"
+                    className={`btn btn-sm rounded-pill ${
+                      filter === "in-progress" ? "btn-primary" : "btn-outline-primary"
                     }`}
                     onClick={() => setFilter("in-progress")}
                   >
@@ -306,28 +306,53 @@ export default function FeedbackDiagnosis() {
                   </button>
                 </div>
 
-                {/* Filtered Progress List */}
-                {filteredProgress.length > 0 ? (
-                  <div>
-                    {filteredProgress.map((progress) => {
+                {/* Scrollable List */}
+                <div
+                  style={{ maxHeight: "250px", overflowY: "auto" }}
+                  className="border rounded-3 p-3"
+                >
+                  {filteredProgress.length > 0 ? (
+                    filteredProgress.map((progress) => {
                       const completionPercentage =
                         (progress.correctCount / progress.totalPhrases) * 100;
                       return (
-                        <div key={progress.textId} className="mb-2">
-                          <span>{progress.textName}:</span>
-                          <span className="ms-2">
-                            {completionPercentage.toFixed(2)}%
-                          </span>
-                          <span className="ms-2">
-                            {progress.completed ? "Completed" : "In Progress"}
-                          </span>
+                        <div
+                          key={progress.textId}
+                          className="mb-3 p-2 border-bottom"
+                          style={{ fontSize: "0.95rem" }}
+                        >
+                          <div className="d-flex justify-content-between align-items-center fw-semibold">
+                            <span>{progress.textName}</span>
+                            <span
+                              className={`badge ${
+                                progress.completed ? "bg-success" : "bg-warning text-dark"
+                              }`}
+                            >
+                              {progress.completed ? "Completed" : "In Progress"}
+                            </span>
+                          </div>
+                          <div className="progress mt-2" style={{ height: "6px" }}>
+                            <div
+                              className={`progress-bar ${
+                                completionPercentage >= 100 ? "bg-success" : "bg-info"
+                              }`}
+                              role="progressbar"
+                              style={{ width: `${completionPercentage}%` }}
+                              aria-valuenow={completionPercentage}
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                            />
+                          </div>
+                          <div className="text-muted mt-1">
+                            {completionPercentage.toFixed(2)}% accurate
+                          </div>
                         </div>
                       );
-                    })}
-                  </div>
-                ) : (
-                  <p>No progress data available.</p>
-                )}
+                    })
+                  ) : (
+                    <p className="text-muted">No progress data available.</p>
+                  )}
+                </div>
               </div>
             </div>
           </div>
