@@ -1,14 +1,24 @@
 import type { ThemeOptions } from "@mui/material/styles";
-import { createTheme } from "@mui/material/styles";
-
-const themeOptions: ThemeOptions = {
+import { createTheme, responsiveFontSizes } from "@mui/material/styles";
+import { grey } from "@mui/material/colors";
+export const themeOptions: ThemeOptions = {
   palette: {
     mode: "light",
     primary: {
-      main: "#2790ff",
+      main: "#4872de",
+      contrastText: "#fafafa",
     },
     secondary: {
-      main: "#272727",
+      main: "#ffca46",
+      contrastText: "#041420",
+    },
+    text: {
+      primary: grey[900],
+      secondary: "rgba(4, 20, 32, 0.6)",
+      disabled: "rgba(4, 20, 32, 0.38)",
+    },
+    background: {
+      default: "#fafafa",
     },
   },
   typography: {
@@ -17,6 +27,7 @@ const themeOptions: ThemeOptions = {
   },
 };
 
-const theme = createTheme(themeOptions);
+let theme = createTheme(themeOptions);
+theme = responsiveFontSizes(theme);
 
 export default theme;

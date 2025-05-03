@@ -6,6 +6,7 @@
 /build/
 
 # Backup
+/backup/
 /backup/node_modules/
 /backup/.DS_Store
 /backup/build/

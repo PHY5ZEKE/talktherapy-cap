@@ -1,72 +1,154 @@
-import { Box, Container, Grid, Typography } from "@mui/material";
+import { grey, blue, yellow } from "@mui/material/colors";
+import { Box, Container, Grid, Stack, Typography } from "@mui/material";
+import {
+  ForumRounded,
+  CalendarMonthRounded,
+  MedicalServicesRounded,
+} from "@mui/icons-material";
+
+const iconStyles = { fontSize: "2.25em", color: "white" };
+const ServicesList = [
+  {
+    id: 1,
+    icon: <ForumRounded sx={iconStyles} />,
+    title: "Speech Therapy",
+    description:
+      "By connecting patients with licensed therapists through online consultations, the platform eliminates the need for travel and physical resources. It also uses advanced technologies like facial, lip, and voice recognition to provide personalized feedback and progress tracking.",
+  },
+  {
+    id: 2,
+    icon: <CalendarMonthRounded sx={iconStyles} />,
+    title: "Appointment",
+    description:
+      "With TalkTherapy, you can book sessions with speech-language pathologists at your convenience, all from the comfort of your home. Our user-friendly platform lets you select preferred day and time, and view therapist availability.",
+  },
+  {
+    id: 3,
+    icon: <MedicalServicesRounded sx={iconStyles} />,
+    title: "Teleconference",
+    description:
+      "Whether you're at home or on the go, you can access professional guidance and personalized exercises designed to meet your communication needs.",
+  },
+];
+
+const ServiceBlock = ({
+  icon,
+  title,
+  description,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+}) => {
+  return (
+    <Grid
+      size={{ xs: 12, md: 4 }}
+      sx={{
+        alignItems: "stretch",
+        backgroundColor: "#424242",
+        padding: 2,
+        borderRadius: 6,
+        borderColor: grey[700],
+        borderWidth: 1,
+      }}
+    >
+      <Box
+        sx={{
+          bgcolor: grey[900],
+          width: 70,
+          height: 70,
+          borderRadius: 5,
+          borderColor: grey[900],
+          borderWidth: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {icon}
+      </Box>
+      <Typography
+        component="h3"
+        variant="h5"
+        color="#fff"
+        fontWeight={600}
+        sx={{ marginTop: 2, marginBottom: 2 }}
+      >
+        {title}
+      </Typography>
+      <Typography
+        color="#fff"
+        variant="body1"
+        fontWeight={400}
+        sx={{ marginBottom: 2 }}
+      >
+        {description}
+      </Typography>
+    </Grid>
+  );
+};
 
 export default function LandingServices() {
   return (
-    <Container maxWidth="lg" sx={{ padding: 4 }}>
+    <Container
+      maxWidth="lg"
+      sx={{
+        padding: 3,
+        backgroundColor: grey[900],
+        borderRadius: 10,
+      }}
+    >
       <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Typography variant="h3" fontWeight={700} sx={{ marginBottom: 2 }}>
-          Services
-        </Typography>
-        <Typography variant="body1" fontWeight={400} sx={{ marginBottom: 2 }}>
-          We prioritize your health by offering tailored services in speech
-          therapy, online appointments, and teleconferencing consultations. Our
-          highly qualified clinicians are here to guide you in choosing the best
-          treatment options to meet your individual health needs. Let us help
-          you find the right path to recovery.
-        </Typography>
+        <Stack
+          direction={{ xs: "column", md: "row" }}
+          spacing={2}
+          sx={{
+            alignItems: "center",
+          }}
+        >
+          <Box
+            sx={{
+              bgcolor: grey[900],
+              padding: 2,
+              width: "min-content",
+              borderRadius: 6,
+              borderColor: grey[800],
+              borderWidth: 1,
+            }}
+          >
+            <Typography
+              component="h2"
+              variant="h4"
+              fontWeight={600}
+              color="#fff"
+            >
+              Services
+            </Typography>
+          </Box>
+          <Typography
+            variant="body1"
+            color="#fff"
+            fontWeight={400}
+            textAlign={{ xs: "center", md: "right" }}
+            sx={{ width: "auto" }}
+          >
+            We prioritize your health by offering tailored services in speech
+            therapy, online appointments, and teleconferencing consultations.
+            Let us help you find the right path to recovery.
+          </Typography>
+        </Stack>
 
-        <Services />
+        <Grid container spacing={2}>
+          {ServicesList.map((item) => (
+            <ServiceBlock
+              key={item.id}
+              icon={item.icon}
+              title={item.title}
+              description={item.description}
+            />
+          ))}
+        </Grid>
       </Box>
     </Container>
   );
 }
-
-const Services = () => {
-  return (
-    <Grid container spacing={2}>
-      <Grid size={{ xs: 12, md: 4 }}>
-        <Typography variant="h3" fontWeight={700} sx={{ marginBottom: 2 }}>
-          Speech Therapy
-        </Typography>
-        <Typography variant="body1" fontWeight={400} sx={{ marginBottom: 2 }}>
-          TalkTherapy is a web application designed to make speech therapy
-          accessible and affordable for individuals with speech and
-          communication challenges, especially in underserved areas of the
-          Philippines. By connecting patients with licensed therapists through
-          online consultations, the platform eliminates the need for travel and
-          physical resources. It also uses advanced technologies like facial,
-          lip, and voice recognition to provide personalized feedback and
-          progress tracking.
-        </Typography>
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 4 }}>
-        <Typography variant="h3" fontWeight={700} sx={{ marginBottom: 2 }}>
-          Appointment
-        </Typography>
-        <Typography variant="body1" fontWeight={400} sx={{ marginBottom: 2 }}>
-          Scheduling speech therapy appointments has never been easier. With
-          TalkTherapy, you can book sessions with speech-language pathologists
-          at your convenience, all from the comfort of your home. Our
-          user-friendly platform lets you select preferred day and time, and
-          view therapist availability. TalkTherapy ensures a hassle-free
-          process, so you can focus on improving your communication skills.
-        </Typography>
-      </Grid>
-
-      <Grid size={{ xs: 12, md: 4 }}>
-        <Typography variant="h3" fontWeight={700} sx={{ marginBottom: 2 }}>
-          Teleconference
-        </Typography>
-        <Typography variant="body1" fontWeight={400} sx={{ marginBottom: 2 }}>
-          TalkTherapy brings speech therapy right to your fingertips through
-          secure and reliable teleconferencing. Our platform connects you with
-          speech-language pathologists for live, one-on-one sessions,
-          eliminating the need for long commutes or physical visits. Whether
-          you're at home or on the go, you can access professional guidance and
-          personalized exercises designed to meet your communication needs.
-        </Typography>
-      </Grid>
-    </Grid>
-  );
-};

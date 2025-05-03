@@ -12,6 +12,7 @@ import "./app.css";
 
 import theme from "./config/theme";
 import { ThemeProvider } from "@mui/material/styles";
+import { CssBaseline } from "@mui/material";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -47,6 +48,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
+      <CssBaseline enableColorScheme />
       <Outlet />
     </ThemeProvider>
   );
