@@ -1,5 +1,6 @@
 import type { Route } from "./+types/landing";
-import Landing from "pages/landing";
+import { Box } from "@mui/material";
+import Landing from "modules/landing";
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -9,5 +10,9 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function RootRoute() {
-  return <Landing />;
+  return (
+    <Box component={"main"} sx={{ padding: 2 }}>
+      <Landing />
+    </Box>
+  );
 }

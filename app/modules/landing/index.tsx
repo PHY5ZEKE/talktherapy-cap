@@ -1,13 +1,10 @@
+import React from "react";
+
+import { Box, Fab, Zoom, useScrollTrigger } from "@mui/material";
+import { KeyboardArrowUpRounded } from "@mui/icons-material";
 import LandingHero from "./LandingHero";
 import LandingServices from "./LandingServices";
 import LandingFaq from "./LandingFaq";
-import React from "react";
-import Toolbar from "@mui/material/Toolbar";
-import useScrollTrigger from "@mui/material/useScrollTrigger";
-import Box from "@mui/material/Box";
-import Fab from "@mui/material/Fab";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import Zoom from "@mui/material/Zoom";
 
 function ScrollTop(props: { children: React.ReactElement }) {
   const { children } = props;
@@ -45,13 +42,13 @@ function ScrollTop(props: { children: React.ReactElement }) {
 export default function index() {
   return (
     <>
-      <Toolbar id="back-to-top-anchor" />
+      <span id="back-to-top-anchor" />
       <LandingHero />
       <LandingServices />
       <LandingFaq />
       <ScrollTop>
         <Fab color="primary" size="small" aria-label="scroll back to top">
-          <KeyboardArrowUpIcon />
+          <KeyboardArrowUpRounded />
         </Fab>
       </ScrollTop>
     </>

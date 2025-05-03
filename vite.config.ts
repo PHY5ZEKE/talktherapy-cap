@@ -11,10 +11,10 @@ export default defineConfig({
       assets: "/app/assets",
       components: "/app/components",
       modules: "/app/modules",
-      pages: "/app/pages",
+      types: "/app/types",
       routes: "/app/routes",
       styles: "/app/styles",
       config: "/app/config",
-    }
-  }
+    },
+  },
 });

@@ -74,7 +74,7 @@ const FaqItem = ({
         aria-controls={`panel${id}-content`}
         id={`panel${id}-header`}
       >
-        <Typography component="span" fontWeight={700}>
+        <Typography component="span" fontWeight={600}>
           {question}
         </Typography>
       </AccordionSummary>
@@ -82,11 +82,15 @@ const FaqItem = ({
         {Array.isArray(answer) ? (
           <ul>
             {answer.map((item, index) => (
-              <li key={index}>
-                <Typography variant="body1" fontWeight={400}>
-                  {item}
+              <Typography component="li" key={index}>
+                <Typography
+                  component="span"
+                  sx={{ marginRight: 1, fontWeight: 600 }}
+                >
+                  {index + 1}
                 </Typography>
-              </li>
+                {item}
+              </Typography>
             ))}
           </ul>
         ) : (
@@ -102,7 +106,7 @@ const FaqItem = ({
 export default function LandingFaq() {
   return (
     <Container maxWidth="lg" sx={{ padding: 4 }}>
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
         <Typography variant="h3" fontWeight={700} sx={{ marginBottom: 2 }}>
           FAQ
         </Typography>

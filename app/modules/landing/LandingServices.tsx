@@ -50,6 +50,12 @@ const ServiceBlock = ({
         borderRadius: 6,
         borderColor: grey[700],
         borderWidth: 1,
+        transition: "transform 0.3s ease-in-out",
+        "&:hover": {
+          transform: "scale(1.02)",
+          borderColor: blue[400],
+          boxShadow: `0px 0px 6px 0px ${blue[700]}`,
+        },
       }}
     >
       <Box
@@ -114,6 +120,12 @@ export default function LandingServices() {
               borderRadius: 6,
               borderColor: grey[800],
               borderWidth: 1,
+              transition: "transform 0.3s ease-in-out",
+              "&:hover": {
+                transform: "scale(1.02)",
+                borderColor: grey[400],
+                boxShadow: `0px 0px 6px 0px ${grey[700]}`,
+              },
             }}
           >
             <Typography
