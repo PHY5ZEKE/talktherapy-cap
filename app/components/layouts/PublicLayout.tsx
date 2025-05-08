@@ -22,7 +22,7 @@ const Navigation = () => {
           <Link to="/login">Login</Link>
         </Button>
         <Button variant="text">
-          <Link to="/register">Register</Link>
+          <Link to="/signup">Sign Up</Link>
         </Button>
       </Box>
     </Stack>
@@ -49,7 +49,7 @@ const Footer = () => {
           <Link to="/login">Login</Link>
         </Button>
         <Button variant="text">
-          <Link to="/register">Register</Link>
+          <Link to="/signup">Sign Up</Link>
         </Button>
       </Box>
     </Stack>

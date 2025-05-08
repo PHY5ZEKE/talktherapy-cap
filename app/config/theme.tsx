@@ -1,15 +1,15 @@
 import type { ThemeOptions } from "@mui/material/styles";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
-import { grey, blue } from "@mui/material/colors";
+import { grey, blue, indigo } from "@mui/material/colors";
 export const themeOptions: ThemeOptions = {
   palette: {
     mode: "light",
     primary: {
-      main: blue[700],
+      main: blue["A700"],
       contrastText: "#fafafa",
     },
     secondary: {
-      main: "#ffca46",
+      main: indigo["A400"],
       contrastText: "#041420",
     },
     text: {

@@ -1,10 +1,9 @@
-import { Container, Stack } from "@mui/material";
-
-import LoginForm from "./LoginForm";
-import { SideUser } from "components/sidecontent";
 import theme from "~/config/theme";
+import { Outlet } from "react-router";
+import { Stack } from "@mui/material";
+import { SideUser } from "components/sidecontent";
 
-export default function index() {
+export default function SignupLayout() {
   return (
     <Stack
       direction="column"
@@ -45,7 +44,8 @@ export default function index() {
           }}
         >
           <SideUser />
-          <LoginForm />
+
+          <Outlet />
         </Stack>
       </Stack>
     </Stack>

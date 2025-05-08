@@ -1,4 +1,4 @@
 import { Card } from "./Card";
-import { SignInContainer } from "./Container";
+import { SignInContainer, SignUpContainer } from "./Container";
 
-export { Card, SignInContainer };
+export { Card, SignInContainer, SignUpContainer };
