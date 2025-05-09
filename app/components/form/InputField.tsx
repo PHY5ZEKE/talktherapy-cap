@@ -10,6 +10,6 @@ export const InputField = styled(TextField)(({ theme }) => ({
   input: {
     background: grey[50],
     borderRadius: 10,
-    height: 10,
+    height: "min-content",
   },
 }));

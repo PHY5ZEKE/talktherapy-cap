@@ -1,3 +1,5 @@
+import PatientSign from "modules/signup/patient";
+
 export default function PatientSignup() {
-  return <div>PatientSignup</div>;
+  return <PatientSign />;
 }

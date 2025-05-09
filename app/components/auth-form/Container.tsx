@@ -24,6 +24,7 @@ export const SignInContainer = styled(Card)(({ theme }) => ({
 export const SignUpContainer = styled(Card)(({ theme }) => ({
   display: "flex",
   flexDirection: "column",
+  alignSelf: "center",
   width: "100%",
   padding: theme.spacing(4),
   gap: theme.spacing(2),

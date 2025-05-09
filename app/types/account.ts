@@ -10,7 +10,7 @@ export type USER = {
   address: string;
   specialization: string;
   diagnosis: string;
-  consent: string;
+  consent: boolean;
 };
 
 export type ADMIN = Pick<

@@ -1,6 +1,6 @@
 import type { LOGIN_PAYLOAD } from "types/credentials";
 
-import { SignInContainer } from "components/login";
+import { SignInContainer } from "components/auth-form";
 import {
   Box,
   Typography,
