@@ -1,7 +1,14 @@
 import type { LOGIN_PAYLOAD } from "types/credentials";
 
 import { SignInContainer } from "components/login";
-import { Box, Typography, Alert, FormControl, FormLabel } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Alert,
+  FormControl,
+  FormLabel,
+  Button,
+} from "@mui/material";
 
 import { InputField } from "components/form";
 import { Link } from "react-router";
@@ -117,11 +124,14 @@ export default function LoginForm() {
         Forgot your password?
       </Typography>
       <Typography sx={{ textAlign: "center" }}>
-        Don't have an account? Sign up
+        Don't have an account?{" "}
+        <Button variant="text" sx={{ fontWeight: 700 }}>
+          Sign up
+        </Button>
       </Typography>
-      <Typography sx={{ textAlign: "center" }}>
+      <Button variant="text" sx={{ textAlign: "center" }}>
         <Link to="/">Go back</Link>
-      </Typography>
+      </Button>
     </SignInContainer>
   );
 }

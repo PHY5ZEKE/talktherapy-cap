@@ -1,6 +1,6 @@
 import React from "react";
 
-import { Box, Fab, Zoom, useScrollTrigger } from "@mui/material";
+import { Box, Fab, Fade, useScrollTrigger } from "@mui/material";
 import { KeyboardArrowUpRounded } from "@mui/icons-material";
 import LandingHero from "./LandingHero";
 import LandingServices from "./LandingServices";
@@ -10,7 +10,7 @@ function ScrollTop(props: { children: React.ReactElement }) {
   const { children } = props;
   const trigger = useScrollTrigger({
     disableHysteresis: true,
-    threshold: 100,
+    threshold: 10,
   });
 
   const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -27,15 +27,15 @@ function ScrollTop(props: { children: React.ReactElement }) {
   };
 
   return (
-    <Zoom in={trigger}>
+    <Fade in={trigger}>
       <Box
         onClick={handleClick}
         role="presentation"
-        sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 1 }}
+        sx={{ position: "fixed", bottom: 16, right: 16, zIndex: 200 }}
       >
         {children}
       </Box>
-    </Zoom>
+    </Fade>
   );
 }
 

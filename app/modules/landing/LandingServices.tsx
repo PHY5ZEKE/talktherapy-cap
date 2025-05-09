@@ -53,8 +53,8 @@ const ServiceBlock = ({
         transition: "transform 0.3s ease-in-out",
         "&:hover": {
           transform: "scale(1.02)",
-          borderColor: blue[400],
-          boxShadow: `0px 0px 6px 0px ${blue[700]}`,
+          borderColor: grey[400],
+          boxShadow: `0px 0px 6px 0px ${grey[700]}`,
         },
       }}
     >
@@ -69,6 +69,11 @@ const ServiceBlock = ({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          "&:hover": {
+            transform: "scale(1.02)",
+            borderColor: grey[400],
+            boxShadow: `0px 0px 6px 0px ${grey[700]}`,
+          },
         }}
       >
         {icon}

@@ -1,20 +1,27 @@
 import { Button, styled } from "@mui/material";
-import { gradientBlue, disabled } from "config/colors";
+import {
+  gradientBlue,
+  primary,
+  secondary,
+  hover,
+  disabled,
+} from "config/colors";
 
 const CustomButton = styled(Button)(({ theme }) => ({
-  backgroundColor: `linear-gradient(180deg,${gradientBlue.top} 5%,${gradientBlue.bottom} 90%)`,
+  // backgroundColor: `linear-gradient(180deg, ${gradientBlue.top} 0%, ${gradientBlue.bottom} 100%)`,
   borderRadius: 10,
   boxShadow: "none",
   color: "white",
   height: 48,
   padding: "0 30px",
   "&:hover": {
-    border: 0,
-    backgroundColor: disabled.indigo,
+    borderColor: secondary[800],
+    boxShadow: `0px 0px 6px 0px ${secondary[600]}`,
+    backgroundColor: hover.secondary,
   },
   "&:disabled": {
     border: 0,
-    backgroundColor: disabled.grey,
+    backgroundColor: disabled.primary,
   },
 }));
 
