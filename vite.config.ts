@@ -1,10 +1,12 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  envDir: "./",
+  envPrefix: "VITE_",
   resolve: {
     alias: {
       "~": "/app",
@@ -16,6 +18,31 @@ export default defineConfig({
       styles: "/app/styles",
       config: "/app/config",
       utils: "/app/utils",
+    },
+  },
+  server: {
+    proxy: {
+      "/ws": {
+        target: "ws://localhost:8080",
+        ws: true,
+      },
+    },
+    port: 5173,
+    host: true,
+    cors: true,
+  },
+  build: {
+    rollupOptions: {
+      input: {
+        server: "app/server.ts",
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          return chunkInfo.name === "server"
+            ? "server/[name].js"
+            : "client/[name].[hash].js";
+        },
+      },
     },
   },
 });
