@@ -15,11 +15,12 @@ export const useLogin = () => {
     setError(null);
     try {
       const response = await login(payload);
-
       showSnackbar(response.data.message as string, "success");
     } catch (error) {
       if (error instanceof AxiosError) {
-        setError(error.response?.data.message);
+        setError(error.response?.data.message || "Login failed");
+      } else if (error instanceof Error) {
+        setError(error.message);
       } else {
         setError("An unknown error occurred");
       }
