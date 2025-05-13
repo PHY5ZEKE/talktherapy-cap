@@ -1,5 +1,4 @@
 import type { Route } from "./+types/login";
-import { Box } from "@mui/material";
 import Login from "modules/login";
 
 export function meta({}: Route.MetaArgs) {
@@ -10,9 +9,5 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function RootRoute() {
-  return (
-    // <Box component={"main"} sx={{ padding: 2 }}>
-    <Login />
-    // </Box>
-  );
+  return <Login />;
 }

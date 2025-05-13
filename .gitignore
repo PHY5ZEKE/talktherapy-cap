@@ -11,3 +11,4 @@
 /backup/.DS_Store
 /backup/build/
 .env
+.env.local

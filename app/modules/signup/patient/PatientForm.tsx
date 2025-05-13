@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { Box, Stepper, Step, StepLabel, Button } from "@mui/material";
+import {
+  Box,
+  Stepper,
+  Step,
+  StepLabel,
+  Button,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 
 import type { PATIENT } from "types/account";
@@ -8,7 +16,11 @@ import PersonalInfoStep from "./PersonalInfoStep";
 import AccountDetailsStep from "./AccountDetailsStep";
 import MedicalInfoStep from "./MedicalInfoStep";
 
+import { useSignup } from "./useSignup";
+
 export default function PatientForm() {
+  const { signup, loading } = useSignup();
+
   const [activeStep, setActiveStep] = useState(0);
   const {
     control,
@@ -55,9 +67,8 @@ export default function PatientForm() {
     }
   };
 
-  const onSubmit = (data: PATIENT) => {
-    console.log(data);
-    // simulate
+  const onSubmit = async (data: PATIENT) => {
+    await signup(data);
   };
 
   const getStepContent = (step: number) => {
@@ -103,7 +114,9 @@ export default function PatientForm() {
             Back
           </Button>
           {activeStep === 2 ? (
-            <Button type="submit">Submit</Button>
+            <Button type="submit" disabled={loading}>
+              Submit
+            </Button>
           ) : (
             <Button
               type="button"

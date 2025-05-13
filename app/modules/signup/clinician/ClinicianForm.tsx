@@ -6,8 +6,11 @@ import type { CLINICIAN } from "types/account";
 
 import PersonalInfoStep from "./PersonalInfoStep";
 import AccountDetailsStep from "./AccountDetailsStep";
+import { useSignup } from "./useSignup";
 
 export default function ClinicianForm() {
+  const { signup, loading } = useSignup();
+
   const [activeStep, setActiveStep] = useState(0);
   const {
     control,
@@ -51,8 +54,7 @@ export default function ClinicianForm() {
   };
 
   const onSubmit = (data: CLINICIAN) => {
-    console.log(data);
-    // simulate
+    signup(data);
   };
 
   const getStepContent = (step: number) => {
@@ -100,6 +102,7 @@ export default function ClinicianForm() {
             <Button
               type="button"
               variant="contained"
+              disabled={loading}
               onClick={(e) => {
                 e.preventDefault();
                 handleNext();

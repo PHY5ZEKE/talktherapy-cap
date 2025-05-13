@@ -5,8 +5,6 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
-  envDir: "./",
-  envPrefix: "VITE_",
   resolve: {
     alias: {
       "~": "/app",
@@ -18,6 +16,9 @@ export default defineConfig({
       styles: "/app/styles",
       config: "/app/config",
       utils: "/app/utils",
+      models: "/app/models",
+      providers: "/app/providers",
+      api: "/app/api",
     },
   },
   server: {

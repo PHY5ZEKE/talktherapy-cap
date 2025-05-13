@@ -1,6 +1,9 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 
+import patientRouter from "../patient/router";
+import clinicianRouter from "../clinician/router";
+
 const router = Router();
 
 // Health check endpoint
@@ -22,12 +25,8 @@ router.get("/ws-status", (req: Request, res: Response) => {
   });
 });
 
-// simple test endpoint
-router.get("/test", (req: Request, res: Response) => {
-  res.json({
-    status: "ok",
-    message: "Hello, world!",
-  });
-});
+// patient routes
+router.use("/patient", patientRouter);
+router.use("/clinician", clinicianRouter);
 
 export default router;

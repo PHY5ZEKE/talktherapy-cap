@@ -5,6 +5,7 @@ import express, {
 } from "express";
 
 import type { WebSocket } from "ws";
+import mongoose from "mongoose";
 
 import { createServer as createHttpServer } from "node:http";
 import { createServer as createViteServer } from "vite";
@@ -16,12 +17,23 @@ import helmet from "helmet";
 import apiRoutes from "./api/routes";
 import wsService from "./websocket";
 
-const PORT = process.env.VITE_PORT || 5173;
+const PORT = process.env.VITE_BASE_API_PORT || 5173;
 const WS_PORT = process.env.VITE_WS_PORT || 8080;
 
 async function startServer() {
   try {
     console.log("Starting API server initialization...");
+
+    // START MONGODB
+    mongoose
+      .connect(process.env.VITE_DB_CONNECTION as string)
+      .then(() => {
+        console.log("Connected to MongoDB");
+      })
+      .catch((err) => {
+        console.error("Error connecting to MongoDB:", err);
+      });
+
     const app = express();
 
     app.use(
@@ -40,13 +52,16 @@ async function startServer() {
 
     app.use(
       cors({
-        origin:
-          process.env.NODE_ENV === "production"
-            ? process.env.ALLOWED_ORIGINS?.split(",")
-            : "*",
+        // origin:
+        // import.meta.env.VITE_NODE_ENV === "production"
+        //   ? import.meta.env.VITE_ALLOWED_ORIGINS?.split(",")
+        //   : "*",
+        origin: true, // Allow all origins in development
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
+        preflightContinue: false,
+        optionsSuccessStatus: 204,
       })
     );
 
@@ -86,7 +101,7 @@ async function startServer() {
       res.status(500).json({
         error: "Internal Server Error",
         message:
-          process.env.NODE_ENV === "development" ? err.message : undefined,
+          process.env.VITE_NODE_ENV === "development" ? err.message : undefined,
       });
     });
 
