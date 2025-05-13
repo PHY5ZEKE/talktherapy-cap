@@ -13,6 +13,17 @@ export type USER = {
   consent: boolean;
 };
 
+export type SUPER_ADMIN = Pick<
+  USER,
+  | "firstName"
+  | "middleName"
+  | "lastName"
+  | "email"
+  | "password"
+  | "confPassword"
+  | "mobile"
+>;
+
 export type ADMIN = Pick<
   USER,
   | "firstName"

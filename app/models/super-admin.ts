@@ -1,8 +1,8 @@
 import mongoose, { Schema } from "mongoose";
-import type { ADMIN } from "types/account";
+import type { SUPER_ADMIN } from "types/account";
 
-const adminSchema = new Schema<
-  Omit<ADMIN, "confPassword"> & {
+const superAdminSchema = new Schema<
+  Omit<SUPER_ADMIN, "confPassword"> & {
     accountStatus: "active" | "inactive" | "deleted";
     createdAt: Date;
     updatedAt: Date;
@@ -31,7 +31,7 @@ const adminSchema = new Schema<
   lastLogin: { type: Date, default: null },
   resetPasswordToken: { type: String, default: null },
   resetPasswordExpires: { type: Date, default: null },
-  role: { type: String, required: true, default: "admin" },
+  role: { type: String, required: true, default: "super-admin" },
   bookmarkedContent: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Content",
@@ -39,6 +39,6 @@ const adminSchema = new Schema<
   },
 });
 
-const Admin = mongoose.model("Admin", adminSchema);
+const SuperAdmin = mongoose.model("SuperAdmin", superAdminSchema);
 
-export default Admin;
+export default SuperAdmin;

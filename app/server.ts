@@ -4,6 +4,7 @@ import express, {
   type NextFunction,
 } from "express";
 
+import cookieParser from "cookie-parser";
 import type { WebSocket } from "ws";
 import mongoose from "mongoose";
 
@@ -36,6 +37,7 @@ async function startServer() {
 
     const app = express();
 
+
     app.use(
       helmet({
         contentSecurityPolicy: {
@@ -65,8 +67,10 @@ async function startServer() {
       })
     );
 
+
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
+    app.use(cookieParser());
 
     // Create Vite server in middleware mode
     console.log("Creating Vite server...");

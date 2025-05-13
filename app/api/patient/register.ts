@@ -4,8 +4,6 @@ import type { Request, Response } from "express";
 import Patient from "models/patient";
 import bcrypt from "bcryptjs";
 
-const router = Router();
-
 export const registerPatient = async (req: Request, res: Response) => {
   try {
     const {
@@ -55,5 +53,3 @@ export const registerPatient = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to register patient" });
   }
 };
-
-export default router;

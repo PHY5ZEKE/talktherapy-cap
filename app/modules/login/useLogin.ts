@@ -1,25 +1,28 @@
 import { useState } from "react";
 import type { LOGIN_PAYLOAD } from "types/credentials";
 
+import { login } from "api/hooks/auth";
+import { AxiosError } from "axios";
+import { useToast } from "providers/ToastProvider";
+
 export const useLogin = () => {
+  const { showSnackbar } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const login = async (payload: LOGIN_PAYLOAD) => {
+  const postLogin = async (payload: LOGIN_PAYLOAD) => {
     setIsLoading(true);
     setError(null);
     try {
-      // simulate login
-      if (payload.email === "test@test.com" && payload.password === "test") {
-        setError(null);
-        return;
-      }
+      const response = await login(payload);
 
-      setError("Your email or password is incorrect.");
+      showSnackbar(response.data.message as string, "success");
     } catch (error) {
-      setError(
-        error instanceof Error ? error.message : "An unknown error occurred"
-      );
+      if (error instanceof AxiosError) {
+        setError(error.response?.data.message);
+      } else {
+        setError("An unknown error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -28,6 +31,6 @@ export const useLogin = () => {
   return {
     isLoading,
     error,
-    login,
+    login: postLogin,
   };
 };

@@ -13,7 +13,8 @@ import "./app.css";
 import theme from "./config/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import ToastProvider from "./providers/ToastProvider";
+import ToastProvider from "providers/ToastProvider";
+import CookieProvider from "providers/CookieProvider";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -51,7 +52,9 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
       <ToastProvider>
-        <Outlet />
+        <CookieProvider>
+          <Outlet />
+        </CookieProvider>
       </ToastProvider>
     </ThemeProvider>
   );

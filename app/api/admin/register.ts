@@ -1,10 +1,7 @@
-import { Router } from "express";
 import type { Request, Response } from "express";
 
 import Admin from "models/admin";
 import bcrypt from "bcryptjs";
-
-const router = Router();
 
 export const registerAdmin = async (req: Request, res: Response) => {
   try {
@@ -43,5 +40,3 @@ export const registerAdmin = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Failed to register admin" });
   }
 };
-
-export default router;

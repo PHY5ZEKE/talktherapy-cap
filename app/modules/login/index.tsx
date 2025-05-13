@@ -1,8 +1,9 @@
-import { Container, Stack } from "@mui/material";
+import { Stack } from "@mui/material";
 
 import LoginForm from "./LoginForm";
 import { SideUser } from "components/sidecontent";
-import theme from "~/config/theme";
+import theme from "config/theme";
+
 
 export default function index() {
   return (

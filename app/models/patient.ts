@@ -10,6 +10,7 @@ const patientSchema = new Schema<
     deletedAt: Date | null;
     resetPasswordToken: string | null;
     resetPasswordExpires: Date | null;
+    role: string;
     bookmarkedContent: {
       type: [mongoose.Schema.Types.ObjectId];
       ref: "Content";
@@ -33,6 +34,7 @@ const patientSchema = new Schema<
   lastLogin: { type: Date, default: null },
   resetPasswordToken: { type: String, default: null },
   resetPasswordExpires: { type: Date, default: null },
+  role: { type: String, required: true, default: "patient" },
   bookmarkedContent: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Content",

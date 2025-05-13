@@ -1,8 +1,11 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 
-import patientRouter from "../patient/router";
-import clinicianRouter from "../clinician/router";
+import patientRouter from "api/patient/router";
+import clinicianRouter from "api/clinician/router";
+import adminRouter from "api/admin/router";
+// import superAdminRouter from "api/super-admin/router";
+import authRouter from "api/auth/router";
 
 const router = Router();
 
@@ -28,5 +31,8 @@ router.get("/ws-status", (req: Request, res: Response) => {
 // patient routes
 router.use("/patient", patientRouter);
 router.use("/clinician", clinicianRouter);
+router.use("/admin", adminRouter);
+// router.use("/super-admin", superAdminRouter);
+router.use("/auth", authRouter);
 
 export default router;
