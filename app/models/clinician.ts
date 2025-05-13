@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import type { CLINICIAN } from "types/account";
 
-const patientSchema = new Schema<
+const clinicianSchema = new Schema<
   Omit<CLINICIAN, "confPassword"> & {
     accountStatus: "active" | "inactive" | "deleted";
     createdAt: Date;
@@ -38,6 +38,6 @@ const patientSchema = new Schema<
   },
 });
 
-const Patient = mongoose.model("Patient", patientSchema);
+const Clinician = mongoose.model("Clinician", clinicianSchema);
 
-export default Patient;
+export default Clinician;
