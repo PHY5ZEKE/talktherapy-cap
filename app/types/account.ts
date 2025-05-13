@@ -22,7 +22,6 @@ export type ADMIN = Pick<
   | "password"
   | "confPassword"
   | "mobile"
-  | "address"
 >;
 
 export type CLINICIAN = Pick<
@@ -34,8 +33,6 @@ export type CLINICIAN = Pick<
   | "password"
   | "confPassword"
   | "mobile"
-  | "birthday"
-  | "address"
   | "specialization"
 >;
 

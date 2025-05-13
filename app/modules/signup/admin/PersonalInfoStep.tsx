@@ -1,16 +1,31 @@
-import { Box, FormControl, FormLabel } from "@mui/material";
+import { Box, FormControl, FormLabel, MenuItem } from "@mui/material";
 import { InputField } from "components/form";
 import { Controller } from "react-hook-form";
 
 import type { Control, FieldErrors } from "react-hook-form";
-import type { PATIENT } from "types/account";
-
-import { validateBirthday } from "utils/validation";
+import type { ADMIN } from "types/account";
 
 interface StepProps {
-  control: Control<PATIENT>;
-  errors: FieldErrors<PATIENT>;
+  control: Control<ADMIN>;
+  errors: FieldErrors<ADMIN>;
 }
+
+const specializations = [
+  { value: "Autism Spectrum Disorder", label: "Autism Spectrum Disorder" },
+  {
+    value: "Attention-Deficit Hyperactivity Disorder",
+    label: "Attention-Deficit Hyperactivity Disorder",
+  },
+  { value: "Global Developmental Delay", label: "GDD" },
+  { value: "Cerebral Palsy", label: "Cerebral Palsy" },
+  { value: "Down Syndrome", label: "Down Syndrome" },
+  { value: "Hearing Impairment", label: "Hearing Impairment" },
+  { value: "Cleft Lip and/or Palate", label: "Cleft Lip and/or Palate" },
+  { value: "Stroke", label: "Stroke" },
+  { value: "Stuttering", label: "Stuttering" },
+  { value: "Aphasia", label: "Aphasia" },
+  { value: "Others", label: "Others" },
+];
 
 const PersonalInfoStep = ({ control, errors }: StepProps) => (
   <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -80,26 +95,6 @@ const PersonalInfoStep = ({ control, errors }: StepProps) => (
             {...field}
             error={!!errors.mobile}
             helperText={errors.mobile?.message}
-          />
-        )}
-      />
-    </FormControl>
-
-    <FormControl>
-      <FormLabel>Birthday</FormLabel>
-      <Controller
-        name="birthday"
-        control={control}
-        rules={{
-          required: "Birthday is required",
-          validate: (value) => validateBirthday(value),
-        }}
-        render={({ field }) => (
-          <InputField
-            {...field}
-            type="date"
-            error={!!errors.birthday}
-            helperText={errors.birthday?.message}
           />
         )}
       />

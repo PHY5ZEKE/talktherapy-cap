@@ -3,13 +3,13 @@ import { InputField } from "components/form";
 import { Controller } from "react-hook-form";
 
 import type { Control, FieldErrors } from "react-hook-form";
-import type { PATIENT } from "types/account";
+import type { ADMIN } from "types/account";
 
 import { validatePassword } from "utils/validation";
 
 interface StepProps {
-  control: Control<PATIENT>;
-  errors: FieldErrors<PATIENT>;
+  control: Control<ADMIN>;
+  errors: FieldErrors<ADMIN>;
 }
 
 const AccountDetailsStep = ({ control, errors }: StepProps) => (

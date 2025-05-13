@@ -1,3 +1,5 @@
+import AdminForm from "modules/signup/admin";
+
 export default function AdminSignup() {
-  return <div>AdminSignup</div>;
+  return <AdminForm />;
 }

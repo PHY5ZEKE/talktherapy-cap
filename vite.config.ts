@@ -15,6 +15,7 @@ export default defineConfig({
       routes: "/app/routes",
       styles: "/app/styles",
       config: "/app/config",
+      utils: "/app/utils",
     },
   },
 });

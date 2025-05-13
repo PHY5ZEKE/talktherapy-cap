@@ -22,7 +22,8 @@
       "types/*": ["./app/types/*"],
       "routes/*": ["./app/routes/*"],
       "styles/*": ["./app/styles/*"],
-      "config/*": ["./app/config/*"]
+      "config/*": ["./app/config/*"],
+      "utils/*": ["./app/utils/*"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,

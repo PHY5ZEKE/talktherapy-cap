@@ -1,3 +1,5 @@
+import ClinicianForm from "modules/signup/clinician";
+
 export default function clinician() {
-  return <div>clinician</div>;
+  return <ClinicianForm />;
 }

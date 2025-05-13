@@ -126,7 +126,7 @@ export default function LoginForm() {
       <Typography sx={{ textAlign: "center" }}>
         Don't have an account?{" "}
         <Button variant="text" sx={{ fontWeight: 700 }}>
-          Sign up
+          <Link to="/signup">Sign up</Link>
         </Button>
       </Typography>
       <Button variant="text" sx={{ textAlign: "center" }}>

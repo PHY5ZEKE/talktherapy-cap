@@ -1,8 +1,7 @@
 import { SignUpContainer } from "components/auth-form";
 import { Typography } from "@mui/material";
 import { Link } from "react-router";
-
-import PatientForm from "./PatientForm";
+import ClinicianForm from "./ClinicianForm";
 
 export default function index() {
   return (
@@ -15,9 +14,9 @@ export default function index() {
           width: "100%",
         }}
       >
-        Patient Registration
+        Clinician Registration
       </Typography>
-      <PatientForm />
+      <ClinicianForm />
       <Typography variant="body2" sx={{ textAlign: "center" }}>
         Already have an account?{" "}
         <Link to="/login" style={{ fontWeight: 600 }}>

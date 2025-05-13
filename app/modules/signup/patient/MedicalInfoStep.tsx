@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   FormControl,
@@ -6,12 +7,14 @@ import {
   Checkbox,
   FormControlLabel,
   Typography,
+  Tooltip,
 } from "@mui/material";
 import { InputField } from "components/form";
 import { Controller } from "react-hook-form";
-import type { Control, FieldErrors } from "react-hook-form";
 
+import type { Control, FieldErrors } from "react-hook-form";
 import type { PATIENT } from "types/account";
+import PatientConsent from "./PatientConsent";
 
 interface StepProps {
   control: Control<PATIENT>;
@@ -42,7 +45,10 @@ const MedicalInfoStep = ({ control, errors }: StepProps) => (
       <Controller
         name="diagnosis"
         control={control}
-        rules={{ required: "Please select a diagnosis" }}
+        defaultValue=""
+        rules={{
+          required: "Please select a diagnosis",
+        }}
         render={({ field }) => (
           <InputField
             {...field}
@@ -60,19 +66,53 @@ const MedicalInfoStep = ({ control, errors }: StepProps) => (
       />
     </FormControl>
 
-    <FormControl>
+    <FormControl fullWidth>
       <FormControlLabel
         control={
           <Controller
             name="consent"
             control={control}
             rules={{ required: "You must provide consent" }}
-            render={({ field }) => (
-              <Checkbox {...field} checked={field.value} />
-            )}
+            render={({ field }) => {
+              const [open, setOpen] = useState(false);
+              const handleClose = () => {
+                setOpen(false);
+              };
+
+              return (
+                <>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                    <Tooltip title="Click 'View Terms and Conditions' to provide consent">
+                      <span>
+                        <Checkbox
+                          checked={field.value}
+                          onChange={(e) => field.onChange(e.target.checked)}
+                          disabled={!field.value && !open}
+                        />
+                      </span>
+                    </Tooltip>
+
+                    <Typography
+                      onClick={() => setOpen(true)}
+                      sx={{ cursor: "pointer" }}
+                    >
+                      View Terms and Conditions
+                    </Typography>
+                  </Box>
+                  <PatientConsent
+                    open={open}
+                    handleClose={handleClose}
+                    handleConsent={() => {
+                      field.onChange(true);
+                      handleClose();
+                    }}
+                  />
+                </>
+              );
+            }}
           />
         }
-        label="I consent to the terms and conditions"
+        label=""
       />
       {errors.consent && (
         <Typography color="error" variant="caption">

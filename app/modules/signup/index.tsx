@@ -129,9 +129,9 @@ export default function index() {
               <RenderRoles roles={patientRoles} />
             </CardContent>
             <CardActions>
-              <SolidButton>
-                <Link to="/signup/patient">Sign Up</Link>
-              </SolidButton>
+              <Link to="/signup/patient" style={{ width: "100%" }}>
+                <SolidButton>Sign Up</SolidButton>
+              </Link>
             </CardActions>
           </StyledCard>
 
@@ -145,9 +145,9 @@ export default function index() {
               <RenderRoles roles={clinicianRoles} />
             </CardContent>
             <CardActions>
-              <SolidButton>
-                <Link to="/signup/clinician">Sign Up</Link>
-              </SolidButton>
+              <Link to="/signup/clinician" style={{ width: "100%" }}>
+                <SolidButton>Sign Up</SolidButton>
+              </Link>
             </CardActions>
           </StyledCard>
 
@@ -161,9 +161,9 @@ export default function index() {
               <RenderRoles roles={adminRoles} />
             </CardContent>
             <CardActions>
-              <SolidButton>
-                <Link to="/signup/admin">Sign Up</Link>
-              </SolidButton>
+              <Link to="/signup/admin" style={{ width: "100%" }}>
+                <SolidButton>Sign Up</SolidButton>
+              </Link>
             </CardActions>
           </StyledCard>
         </Stack>

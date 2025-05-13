@@ -2,37 +2,34 @@ import { useState } from "react";
 import { Box, Stepper, Step, StepLabel, Button } from "@mui/material";
 import { useForm } from "react-hook-form";
 
-import type { PATIENT } from "types/account";
+import type { CLINICIAN } from "types/account";
 
 import PersonalInfoStep from "./PersonalInfoStep";
 import AccountDetailsStep from "./AccountDetailsStep";
-import MedicalInfoStep from "./MedicalInfoStep";
 
-export default function PatientForm() {
+export default function ClinicianForm() {
   const [activeStep, setActiveStep] = useState(0);
   const {
     control,
     handleSubmit,
     trigger,
     formState: { errors },
-  } = useForm<PATIENT>({
+  } = useForm<CLINICIAN>({
     defaultValues: {
       firstName: "",
       middleName: "",
       lastName: "",
-      mobile: "",
-      birthday: "",
       email: "",
       password: "",
       confPassword: "",
-      diagnosis: "",
-      consent: false,
+      mobile: "",
+      specialization: "",
     },
   });
 
   const handleNext = async () => {
-    const fields = getFieldsForStep(activeStep);
-    const isValid = await trigger(fields);
+    const currentStepFields = getFieldsForStep(activeStep);
+    const isValid = await trigger(currentStepFields);
     if (isValid) {
       setActiveStep((prevStep) => prevStep + 1);
     }
@@ -42,20 +39,18 @@ export default function PatientForm() {
     setActiveStep((prevStep) => prevStep - 1);
   };
 
-  const getFieldsForStep = (step: number): (keyof PATIENT)[] => {
+  const getFieldsForStep = (step: number): (keyof CLINICIAN)[] => {
     switch (step) {
       case 0:
-        return ["firstName", "lastName", "mobile", "birthday"];
+        return ["firstName", "lastName", "mobile", "specialization"];
       case 1:
         return ["email", "password", "confPassword"];
-      case 2:
-        return ["diagnosis", "consent"];
       default:
         return [];
     }
   };
 
-  const onSubmit = (data: PATIENT) => {
+  const onSubmit = (data: CLINICIAN) => {
     console.log(data);
     // simulate
   };
@@ -66,8 +61,6 @@ export default function PatientForm() {
         return <PersonalInfoStep control={control} errors={errors} />;
       case 1:
         return <AccountDetailsStep control={control} errors={errors} />;
-      case 2:
-        return <MedicalInfoStep control={control} errors={errors} />;
       default:
         return null;
     }
@@ -80,9 +73,6 @@ export default function PatientForm() {
           <StepLabel>{0}</StepLabel>
         </Step>
         <Step key={1}>
-          <StepLabel>{0}</StepLabel>
-        </Step>
-        <Step key={2}>
           <StepLabel>{0}</StepLabel>
         </Step>
       </Stepper>
@@ -102,8 +92,10 @@ export default function PatientForm() {
           >
             Back
           </Button>
-          {activeStep === 2 ? (
-            <Button type="submit">Submit</Button>
+          {activeStep === 1 ? (
+            <Button type="submit" variant="contained">
+              Submit
+            </Button>
           ) : (
             <Button
               type="button"
