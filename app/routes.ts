@@ -15,13 +15,6 @@ export default [
     route("/", "routes/landing.tsx"),
   ]),
 
-  // layout("components/layouts/SignupLayout.tsx", [
-  //   route("/signup", "routes/signup.tsx"),
-  //   route("/signup/patient", "routes/signup/patient.tsx"),
-  //   route("/signup/admin", "routes/signup/admin.tsx"),
-  //   route("/signup/clinician", "routes/signup/clinician.tsx"),
-  // ]),
-
   ...prefix("signup", [
     index("routes/signup/index.tsx"),
     layout("components/layouts/SignupLayout.tsx", [
@@ -32,4 +25,11 @@ export default [
   ]),
 
   route("/login", "routes/login.tsx"),
+
+  // patient
+  ...prefix("patient", [
+    layout("components/layouts/PrivateLayout.tsx", [
+      route("/", "routes/patient/index.tsx"),
+    ]),
+  ]),
 ] satisfies RouteConfig;

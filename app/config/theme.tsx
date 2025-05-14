@@ -117,6 +117,40 @@ export const themeOptions: ThemeOptions = {
         },
       },
     },
+    // CUSTOM LIST ITEM
+    MuiListItemButton: {
+      styleOverrides: {
+        root: {
+          color: primary[600],
+          borderRadius: 5,
+          "&.Mui-selected": {
+            fontWeight: 600,
+            color: primary[900],
+            backgroundColor: primary[200],
+
+            "& .MuiListItemIcon-root": {
+              color: primary[900],
+            },
+          },
+          "&:hover": {
+            backgroundColor: primary[100],
+          },
+          "& .MuiListItemIcon-root": {
+            color: primary[600],
+          },
+        },
+      },
+    },
+    // CUSTOM LIST ITEM TEXT
+    MuiListItemText: {
+      styleOverrides: {
+        root: {
+          "& .MuiTypography-root": {
+            fontWeight: 500,
+          },
+        },
+      },
+    },
   },
 };
 

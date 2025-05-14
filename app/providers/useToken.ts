@@ -9,10 +9,11 @@ interface TokenResponse {
 }
 
 export const useToken = () => {
+  const [isLoading, setLoading] = useState(false);
   const [token, setToken] = useState<JwtPayload | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   const validateToken = async () => {
+    setLoading(true);
     try {
       const { data } = await http<TokenResponse>(
         "GET",
@@ -32,28 +33,23 @@ export const useToken = () => {
         setToken(null);
       }
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      if (isLoading) {
-        await validateToken();
-        setIsLoading(false);
-      }
-    };
-    initializeAuth();
-  }, [validateToken, isLoading]);
-
-  const logout = useCallback(() => {
+  const clearToken = () => {
     setToken(null);
-  }, []);
+  };
+
+  useEffect(() => {
+    validateToken();
+  }, []); // Run once on mount
 
   return {
     token,
     validateToken,
-    logout,
+    clearToken,
     isLoading,
-    isAuthenticated: !!token,
   };
 };

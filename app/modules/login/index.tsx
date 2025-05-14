@@ -3,8 +3,10 @@ import { Stack } from "@mui/material";
 import LoginForm from "./LoginForm";
 import { SideUser } from "components/sidecontent";
 import theme from "config/theme";
+import { useToken } from "providers/useToken";
 
 export default function index() {
+  const { token } = useToken();
   return (
     <Stack
       direction="column"
@@ -24,6 +26,8 @@ export default function index() {
         },
       ]}
     >
+      {/* check token payload */}
+      <p>Name: {token?.name}</p>
       <Stack
         direction={{ xs: "column-reverse", md: "row" }}
         sx={{

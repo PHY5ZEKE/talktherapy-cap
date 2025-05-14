@@ -5,10 +5,12 @@ import { useToken } from "./useToken";
 
 interface CookieContextType {
   token: JwtPayload | null;
+  isLoading: boolean;
 }
 
 const CookieContext = createContext<CookieContextType>({
   token: null,
+  isLoading: false,
 });
 
 export const useCookie = () => {
@@ -16,11 +18,13 @@ export const useCookie = () => {
 };
 
 export default function CookieProvider({ children }: PropsWithChildren) {
-  const { token } = useToken();
+  const { token, isLoading } = useToken();
+
   return (
     <CookieContext.Provider
       value={{
         token,
+        isLoading,
       }}
     >
       {children}
