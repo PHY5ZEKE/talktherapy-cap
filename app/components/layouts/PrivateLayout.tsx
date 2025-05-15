@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 
-import { alpha, Box, Stack } from "@mui/material";
+import { alpha, Box, Container, Stack, Typography } from "@mui/material";
 
 import { SideMenu } from "components/sidemenu";
 import { Navbar } from "components/navbar";
@@ -47,9 +47,20 @@ export default function PrivateLayout() {
               mt: { xs: 8, md: 0 },
             }}
           >
-            <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
+            <Container
+              maxWidth={false}
+              disableGutters
+              sx={{ margin: 0, padding: 0 }}
+            >
+              <Typography
+                variant="h5"
+                sx={{ fontWeight: 600, my: 2, backgroundColor: "red" }}
+              >
+                Untitled
+                {/* {document?.title || "Untitled"} */}
+              </Typography>
               <Outlet />
-            </Box>
+            </Container>
           </Stack>
         </Box>
       </Box>

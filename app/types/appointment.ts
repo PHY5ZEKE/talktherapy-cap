@@ -1,0 +1,7 @@
+export type APPOINTMENT_STATUS =
+  | "ACCEPTED"
+  | "PENDING"
+  | "REJECTED"
+  | "CANCELLED"
+  | "RESCHEDULED"
+  | "COMPLETED";

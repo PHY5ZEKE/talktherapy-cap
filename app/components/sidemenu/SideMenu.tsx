@@ -5,6 +5,7 @@ import {
   Drawer as MuiDrawer,
   Stack,
   Typography,
+  Button,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { drawerClasses } from "@mui/material/Drawer";
@@ -91,8 +92,9 @@ export default function SideMenu({
             {user.email}
           </Typography>
         </Box>
-        {/* logout button icon */}
-        <LogoutRounded />
+        <Button variant="text">
+          <LogoutRounded />
+        </Button>
       </Stack>
     </Drawer>
   );

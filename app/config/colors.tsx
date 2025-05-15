@@ -45,4 +45,14 @@ const hover = {
   secondary: secondary[800],
 };
 
-export { gradientBlue, disabled, hover, primary, secondary };
+// appointment status colors
+const appointmentStatus = {
+  accepted: "#2ecc71",
+  pending: "#f1c40f",
+  cancelled: "#e74c3c",
+  rescheduled: "#3498db",
+  rejected: "#c0392b",
+  completed: "#27ae60",
+};
+
+export { gradientBlue, disabled, hover, primary, secondary, appointmentStatus };
