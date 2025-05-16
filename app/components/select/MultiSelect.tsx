@@ -12,7 +12,6 @@ import {
   Box,
 } from "@mui/material";
 
-import type { APPOINTMENT_STATUS } from "types/appointment";
 import { UnfoldMoreRounded } from "@mui/icons-material";
 import { primary } from "config/colors";
 
@@ -23,9 +22,9 @@ export default ({
   onChange,
 }: {
   placeholder: string;
-  options: APPOINTMENT_STATUS[];
-  filters: APPOINTMENT_STATUS[];
-  onChange: (filters: APPOINTMENT_STATUS[]) => void;
+  options: string[];
+  filters: string[];
+  onChange: (filters: string[]) => void;
 }) => {
   const handleChange = (event: SelectChangeEvent<typeof filters>) => {
     const {
@@ -33,8 +32,8 @@ export default ({
     } = event;
     const newFilters =
       typeof value === "string"
-        ? (value.split(",") as APPOINTMENT_STATUS[])
-        : (value as APPOINTMENT_STATUS[]);
+        ? (value.split(",") as string[])
+        : (value as string[]);
 
     // uplift selected to parent
     onChange(newFilters);

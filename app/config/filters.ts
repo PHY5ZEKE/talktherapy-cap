@@ -1,0 +1,12 @@
+import type { APPOINTMENT_STATUS } from "types/appointment";
+
+const APPOINTMENT_FILTERS: APPOINTMENT_STATUS[] = [
+  "ACCEPTED",
+  "PENDING",
+  "REJECTED",
+  "CANCELLED",
+  "RESCHEDULED",
+  "COMPLETED",
+];
+
+export { APPOINTMENT_FILTERS };

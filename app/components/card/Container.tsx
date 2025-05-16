@@ -3,12 +3,14 @@ import { Grid, Typography, Card } from "@mui/material";
 export default function Container({
   title,
   children,
+  size = { xs: 12, sm: 6, lg: 4 },
 }: {
   title: string;
   children: React.ReactNode;
+  size?: Partial<{ xs: number; sm: number; lg: number }>;
 }) {
   return (
-    <Grid size={{ xs: 12, sm: 6, lg: 4 }}>
+    <Grid size={size}>
       <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
         {title}
       </Typography>
