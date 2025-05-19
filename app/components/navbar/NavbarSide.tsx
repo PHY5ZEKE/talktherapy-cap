@@ -12,6 +12,7 @@ import { drawerClasses } from "@mui/material/Drawer";
 
 import { MenuContent } from "components/sidemenu";
 import type { USER_TOKEN, NAV_LIST } from "types/providers";
+import { logout } from "api/hooks/auth";
 
 export default function NavbarSide({
   open,
@@ -26,6 +27,10 @@ export default function NavbarSide({
   list: NAV_LIST;
   isLoading: boolean;
 }) {
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <Drawer
       anchor="right"
@@ -81,6 +86,7 @@ export default function NavbarSide({
             fullWidth
             startIcon={<LogoutRoundedIcon />}
             disabled={isLoading}
+            onClick={handleLogout}
           >
             Logout
           </Button>

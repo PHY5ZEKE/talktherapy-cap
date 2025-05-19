@@ -6,7 +6,16 @@ export const signupPatient = async (data: PATIENT) => {
   return response;
 };
 
-export const useGetAppointments = async () => {
-  const response = await http("GET", "/api/patient/appointments");
+export const useGetAllAppointments = async (
+  page?: number,
+  limit?: number,
+  filters?: string[]
+) => {
+  const response = await http(
+    "GET",
+    `/api/patient/appointments?page=${page}&limit=${limit}&filters=${filters?.join(
+      ","
+    )}`
+  );
   return response;
 };

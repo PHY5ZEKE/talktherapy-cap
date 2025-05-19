@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
-import { useGetAppointments } from "~/api/hooks/patient";
+import { useGetAllAppointments } from "api/hooks/patient";
 
 // TODO: Dummy type, needs to be export in types folder
 type APPOINTMENT = {
@@ -12,13 +12,21 @@ type APPOINTMENT = {
 export default function useAppointments() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [appointments, setAppointments] = useState<APPOINTMENT[]>([]);
+  const [appointments, setAppointments] = useState<APPOINTMENT[]>();
 
-  const getAppointments = async () => {
+  const getAppointments = async (
+    page?: number,
+    limit?: number,
+    filters?: string[]
+  ) => {
+    page = page ?? 1;
+    limit = limit ?? 10;
+    filters = filters ?? [];
+
     setIsLoading(true);
     try {
-      const response = await useGetAppointments();
-      setAppointments(response.data as APPOINTMENT[]);
+      const { data } = await useGetAllAppointments(page, limit, filters);
+      setAppointments(data as APPOINTMENT[]);
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.message);
@@ -34,5 +42,5 @@ export default function useAppointments() {
     getAppointments();
   }, []);
 
-  return { isLoading, error, appointments };
+  return { isLoading, error, appointments, getAppointments };
 }

@@ -1,9 +1,10 @@
 import axios, { AxiosError } from "axios";
 import type { AxiosResponse } from "axios";
 import { getCookie } from "./cookie";
+import type { ParsedQs } from "qs";
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: "http://localhost:5174/",
   timeout: 5000,
   withCredentials: true,
   headers: {
@@ -57,4 +58,39 @@ export const http = async <T>(
     }
     throw new Error("An unexpected error occurred");
   }
+};
+
+interface QueryParams {
+  page: number;
+  limit: number;
+  offset: number;
+  filters: string[];
+}
+
+export const parseQueryParams = (query: ParsedQs): QueryParams => {
+  const page = Math.max(1, parseInt(String(query.page || "1")));
+  const limit = Math.min(
+    50,
+    Math.max(1, parseInt(String(query.limit || "10")))
+  );
+  const filters = String(query.filters || "")
+    .split(",")
+    .filter(Boolean);
+
+  return {
+    page,
+    limit,
+    offset: (page - 1) * limit,
+    filters,
+  };
+};
+
+export const buildFilterQuery = (params: string[]) => {
+  if (!params || params.length === 0) return {};
+
+  return {
+    status: {
+      $in: params,
+    },
+  };
 };

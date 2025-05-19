@@ -1,10 +1,14 @@
 import { Router } from "express";
 
-import { getAppointments } from "./getAppointments";
+import { getAllAppointments } from "./appointments";
 
 const patientRouter = Router();
 
-// get all appointments
-patientRouter.get("/appointments", getAppointments);
+// get all appointments with pagination
+// query params: page, limit, filters
+// page: number
+// limit: number
+// filters: string[]
+patientRouter.get("/appointments", getAllAppointments);
 
 export default patientRouter;

@@ -19,6 +19,14 @@ const sampleAppointments = [
   { date: "2023-01-18", name: "Patricia Lane", status: "PENDING" },
   { date: "2023-01-19", name: "Quincy Adams", status: "COMPLETED" },
   { date: "2023-01-20", name: "Rachel Morris", status: "CANCELLED" },
+  { date: "2023-01-21", name: "Samuel Clark", status: "COMPLETED" },
+  { date: "2023-01-22", name: "Tina Morgan", status: "PENDING" },
+  { date: "2023-01-23", name: "Ulysses Grant", status: "ACCEPTED" },
+  { date: "2023-01-24", name: "Valerie Stone", status: "REJECTED" },
+  { date: "2023-01-25", name: "Walter White", status: "COMPLETED" },
+  { date: "2023-01-26", name: "Xander Reed", status: "CANCELLED" },
+  { date: "2023-01-27", name: "Yvonne King", status: "PENDING" },
+  { date: "2023-01-28", name: "Zachary Quinn", status: "COMPLETED" },
 ];
 
 const sampleFavorites = [
