@@ -8,20 +8,24 @@ import {
   Stack,
   TablePagination,
   Button,
+  Skeleton,
 } from "@mui/material";
 
 import { MultiSelect } from "components/select";
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 
 type TableOptionsProps<T extends Record<string, unknown>> = {
   dataList: T[];
   rowHeader: string[];
   actions?: string[];
   filters?: string[];
+  activeFilters?: string[];
+  onFilterChange?: (filters: string[]) => void;
   totalRows?: number;
   page?: number;
   rowsPerPage?: number;
+  isLoading?: boolean;
   onPageChange?: (page: number, limit: number, filters: string[]) => void;
 };
 
@@ -30,20 +34,17 @@ export default function TableOptions<T extends Record<string, unknown>>({
   rowHeader,
   actions,
   filters,
+  activeFilters = [],
+  onFilterChange = () => {},
   totalRows,
-  page: initialPage = 0,
-  rowsPerPage: initialRowsPerPage = 10,
+  page = 0,
+  rowsPerPage = 10,
+  isLoading = false,
   onPageChange,
 }: TableOptionsProps<T>) {
-  const [page, setPage] = useState(initialPage);
-  const [rowsPerPage, setRowsPerPage] = useState(initialRowsPerPage);
-  const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
+  const selectedFilters = activeFilters ?? [];
 
-  // From handleChangePage to resetFilters
-  // refactor to update the state and call onPageChange
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
+  const handleChangePage = (_event: unknown, newPage: number) => {
     if (onPageChange) {
       onPageChange(newPage, rowsPerPage, selectedFilters);
     }
@@ -59,16 +60,14 @@ export default function TableOptions<T extends Record<string, unknown>>({
   };
 
   const handleFilterChange = (newFilters: string[]) => {
-    setSelectedFilters(newFilters);
-    if (onPageChange) {
-      onPageChange(0, rowsPerPage, newFilters);
+    if (onFilterChange) {
+      onFilterChange(newFilters);
     }
   };
 
   const resetFilters = () => {
-    setSelectedFilters([]);
-    if (onPageChange) {
-      onPageChange(0, rowsPerPage, []);
+    if (onFilterChange) {
+      onFilterChange([]);
     }
   };
 
@@ -90,11 +89,7 @@ export default function TableOptions<T extends Record<string, unknown>>({
     });
   }, [dataList, selectedFilters]);
 
-  const visibleRows: T[] = useMemo(
-    () =>
-      filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
-    [page, rowsPerPage, filteredRows]
-  );
+  const visibleRows = filteredRows;
 
   return (
     <>
@@ -131,7 +126,23 @@ export default function TableOptions<T extends Record<string, unknown>>({
           </TableHead>
 
           <TableBody>
-            {visibleRows.length === 0 ? (
+            {isLoading ? (
+              Array.from({ length: 10 }).map((_, idx) => (
+                <TableRow key={`skeleton-row-${idx}`} sx={{ height: 53 }}>
+                  {Array.from({
+                    length: rowHeader.length + (actions?.length ? 1 : 0),
+                  }).map((_, cellIdx) => (
+                    <TableCell key={`skeleton-cell-${idx}-${cellIdx}`}>
+                      <Skeleton
+                        variant="rectangular"
+                        width="100%"
+                        height={24}
+                      />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : visibleRows.length === 0 ? (
               <TableRow>
                 <TableCell
                   colSpan={rowHeader.length + (actions?.length ? 1 : 0)}

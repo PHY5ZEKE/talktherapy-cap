@@ -1,6 +1,6 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
@@ -27,6 +27,18 @@ export default defineConfig({
         target: "ws://localhost:8080",
         ws: true,
       },
+    },
+    watch: {
+      usePolling: true,
+      interval: 1000,
+      ignored: [
+        "!**/node_modules/@react-router/**/*",
+        "!**/node_modules/@vitejs/**/*",
+        "!**/node_modules/vite/**/*",
+        "!**/node_modules/tailwindcss/**/*",
+        "!**/node_modules/react/**/*",
+        "!**/node_modules/react-dom/**/*",
+      ],
     },
     port: 5173,
     host: true,

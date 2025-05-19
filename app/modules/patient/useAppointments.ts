@@ -3,7 +3,15 @@ import { useEffect, useState } from "react";
 import { useGetAllAppointments } from "api/hooks/patient";
 
 // TODO: Dummy type, needs to be export in types folder
+type AppointmentResponse = {
+  data: APPOINTMENT[];
+  total_rows: number;
+  page: number;
+  limit: number;
+};
+
 type APPOINTMENT = {
+  _id: string;
   name: string;
   date: string;
   status: string;
@@ -12,21 +20,26 @@ type APPOINTMENT = {
 export default function useAppointments() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [appointments, setAppointments] = useState<APPOINTMENT[]>();
+  const [appointments, setAppointments] = useState<AppointmentResponse>({
+    data: [],
+    total_rows: 0,
+    page: 1,
+    limit: 10,
+  });
+
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const [filters, setFilters] = useState<string[]>([]);
 
   const getAppointments = async (
-    page?: number,
-    limit?: number,
-    filters?: string[]
+    page: number = 1,
+    limit: number = 10,
+    filters: string[] = []
   ) => {
-    page = page ?? 1;
-    limit = limit ?? 10;
-    filters = filters ?? [];
-
     setIsLoading(true);
     try {
       const { data } = await useGetAllAppointments(page, limit, filters);
-      setAppointments(data as APPOINTMENT[]);
+      setAppointments(data as AppointmentResponse);
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.message);
@@ -38,9 +51,29 @@ export default function useAppointments() {
     }
   };
 
+  const handleQuery = async (
+    newPage: number,
+    newLimit: number,
+    newFilters: string[]
+  ) => {
+    setPage(newPage);
+    setLimit(newLimit);
+    setFilters(newFilters);
+    await getAppointments(newPage + 1, newLimit, newFilters);
+  };
+
   useEffect(() => {
-    getAppointments();
+    handleQuery(0, limit, filters);
   }, []);
 
-  return { isLoading, error, appointments, getAppointments };
+  return {
+    isLoading,
+    error,
+    appointments,
+    page,
+    limit,
+    filters,
+    handleQuery,
+    getAppointments,
+  };
 }

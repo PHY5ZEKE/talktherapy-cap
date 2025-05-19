@@ -18,7 +18,7 @@ import helmet from "helmet";
 import apiRoutes from "./api/routes";
 import wsService from "./websocket";
 
-const PORT = process.env.VITE_BASE_API_PORT || 5173;
+const PORT = process.env.VITE_BACKEND_PORT || 5174;
 const WS_PORT = process.env.VITE_WS_PORT || 8080;
 
 async function startServer() {
@@ -26,17 +26,15 @@ async function startServer() {
     console.log("Starting API server initialization...");
 
     // START MONGODB
-    mongoose
-      .connect(process.env.VITE_DB_CONNECTION as string)
-      .then(() => {
-        console.log("Connected to MongoDB");
-      })
-      .catch((err) => {
-        console.error("Error connecting to MongoDB:", err);
-      });
+    try {
+      await mongoose.connect(process.env.VITE_DB_CONNECTION as string);
+      console.log("Connected to MongoDB");
+    } catch (err) {
+      console.error("Error connecting to MongoDB:", err);
+      process.exit(1);
+    }
 
     const app = express();
-
 
     app.use(
       helmet({
@@ -66,7 +64,6 @@ async function startServer() {
         optionsSuccessStatus: 204,
       })
     );
-
 
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));

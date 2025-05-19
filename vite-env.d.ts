@@ -2,6 +2,8 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
+  readonly VITE_BACKEND_PORT: string;
+  readonly VITE_FRONTEND_PORT: string;
   readonly VITE_API_PORT: string;
   readonly VITE_WS_PORT: string;
   readonly VITE_DB_CONNECTION: string;
