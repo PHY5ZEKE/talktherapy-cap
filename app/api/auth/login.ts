@@ -55,6 +55,7 @@ export const login = async (req: Request, res: Response) => {
     // return user
     return res.status(200).json({
       message: "Login successful!",
+      redirect: `/${user.role}`,
     });
   } catch (error) {
     console.error("Login error:", error);

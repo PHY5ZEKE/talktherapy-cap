@@ -13,7 +13,7 @@ import { drawerClasses } from "@mui/material/Drawer";
 import { LogoutRounded } from "@mui/icons-material";
 
 import MenuContent from "./MenuContent";
-import { logout } from "api/hooks/auth";
+import { useLogout } from "utils/logout";
 
 const drawerWidth = 240;
 
@@ -37,6 +37,8 @@ export default function SideMenu({
   list: { text: string; icon: React.ReactNode }[];
   isLoading: boolean;
 }) {
+  const { logout } = useLogout();
+
   const handleLogout = async () => {
     await logout();
   };

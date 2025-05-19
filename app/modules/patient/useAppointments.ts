@@ -2,25 +2,12 @@ import { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useGetAllAppointments } from "api/hooks/patient";
 
-// TODO: Dummy type, needs to be export in types folder
-type AppointmentResponse = {
-  data: APPOINTMENT[];
-  total_rows: number;
-  page: number;
-  limit: number;
-};
-
-type APPOINTMENT = {
-  _id: string;
-  name: string;
-  date: string;
-  status: string;
-};
+import type { TABLE_LIST_RESPONSE } from "types/response";
 
 export default function useAppointments() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [appointments, setAppointments] = useState<AppointmentResponse>({
+  const [appointments, setAppointments] = useState<TABLE_LIST_RESPONSE>({
     data: [],
     total_rows: 0,
     page: 1,
@@ -39,7 +26,7 @@ export default function useAppointments() {
     setIsLoading(true);
     try {
       const { data } = await useGetAllAppointments(page, limit, filters);
-      setAppointments(data as AppointmentResponse);
+      setAppointments(data as TABLE_LIST_RESPONSE);
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.message);

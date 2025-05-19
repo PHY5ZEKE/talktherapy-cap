@@ -12,8 +12,7 @@ import { drawerClasses } from "@mui/material/Drawer";
 
 import { MenuContent } from "components/sidemenu";
 import type { USER_TOKEN, NAV_LIST } from "types/providers";
-import { logout } from "api/hooks/auth";
-
+import { useLogout } from "utils/logout";
 export default function NavbarSide({
   open,
   toggleDrawer,
@@ -27,6 +26,8 @@ export default function NavbarSide({
   list: NAV_LIST;
   isLoading: boolean;
 }) {
+  const { logout } = useLogout();
+
   const handleLogout = async () => {
     await logout();
   };

@@ -1,29 +1,24 @@
 import { useState } from "react";
-import type { LOGIN_PAYLOAD } from "types/credentials";
 
-import { login } from "api/hooks/auth";
+import { logout } from "api/hooks/auth";
 import { AxiosError } from "axios";
 import { useToast } from "providers/ToastProvider";
-import { useCookie } from "providers/CookieProvider";
 import type { DATA } from "types/response";
-
-export const useLogin = () => {
+export const useLogout = () => {
   const { showSnackbar } = useToast();
-  const { setIsLoggedIn } = useCookie();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const postLogin = async (payload: LOGIN_PAYLOAD) => {
+  const postLogout = async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const { data } = (await login(payload)) as DATA;
+      const { data } = (await logout()) as DATA;
       showSnackbar(data.message, "success");
-      setIsLoggedIn(true);
       window.location.href = data.redirect;
     } catch (error) {
       if (error instanceof AxiosError) {
-        setError(error.response?.data.message || "Login failed");
+        setError(error.response?.data.message || "Logout failed");
       } else if (error instanceof Error) {
         setError(error.message);
       } else {
@@ -37,6 +32,6 @@ export const useLogin = () => {
   return {
     isLoading,
     error,
-    login: postLogin,
+    logout: postLogout,
   };
 };
