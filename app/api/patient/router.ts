@@ -1,9 +1,10 @@
 import { Router } from "express";
 
-import { registerPatient } from "./register";
+import { getAppointments } from "./getAppointments";
 
 const patientRouter = Router();
 
-patientRouter.post("/register", registerPatient);
+// get all appointments
+patientRouter.get("/appointments", getAppointments);
 
 export default patientRouter;

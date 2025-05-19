@@ -6,6 +6,7 @@ import {
   Stack,
   Typography,
   Button,
+  Skeleton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { drawerClasses } from "@mui/material/Drawer";
@@ -29,9 +30,11 @@ const Drawer = styled(MuiDrawer)({
 export default function SideMenu({
   user,
   list,
+  isLoading,
 }: {
   user: { name: string; role: string; email: string };
   list: { text: string; icon: React.ReactNode }[];
+  isLoading: boolean;
 }) {
   return (
     <Drawer
@@ -63,7 +66,16 @@ export default function SideMenu({
           flexDirection: "column",
         }}
       >
-        <MenuContent list={list} />
+        {isLoading ? (
+          <Skeleton
+            variant="rectangular"
+            width={210}
+            height={20}
+            sx={{ mx: "auto", mt: 2 }}
+          />
+        ) : (
+          <MenuContent isLoading={isLoading} list={list} />
+        )}
       </Box>
       <Stack
         direction="row"
@@ -75,24 +87,34 @@ export default function SideMenu({
           borderColor: "divider",
         }}
       >
-        <Avatar
-          sizes="small"
-          alt="Riley Carter"
-          src="https://mui.com/static/images/avatar/1.jpg"
-          sx={{ width: 36, height: 36 }}
-        />
+        {isLoading ? (
+          <Skeleton variant="circular" width={24} height={24} />
+        ) : (
+          <Avatar
+            sizes="small"
+            alt="Riley Carter"
+            src="https://mui.com/static/images/avatar/1.jpg"
+            sx={{ width: 36, height: 36 }}
+          />
+        )}
         <Box sx={{ mr: "auto" }}>
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 500, lineHeight: "16px" }}
-          >
-            {user.name}
-          </Typography>
-          <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            {user.email}
-          </Typography>
+          {isLoading ? (
+            <Skeleton variant="text" width={100} height={24} />
+          ) : (
+            <>
+              <Typography
+                variant="body2"
+                sx={{ fontWeight: 500, lineHeight: "16px" }}
+              >
+                {user.name}
+              </Typography>
+              <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                {user.email}
+              </Typography>
+            </>
+          )}
         </Box>
-        <Button variant="text">
+        <Button variant="text" disabled={isLoading}>
           <LogoutRounded />
         </Button>
       </Stack>

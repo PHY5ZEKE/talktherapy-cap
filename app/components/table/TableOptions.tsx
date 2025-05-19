@@ -14,7 +14,7 @@ import { MultiSelect } from "components/select";
 
 import { useState, useMemo } from "react";
 
-type TableOptionsProps<T extends Record<string, any>> = {
+type TableOptionsProps<T extends Record<string, unknown>> = {
   dataList: T[];
   rowHeader: string[];
   actions?: string[];
@@ -31,7 +31,7 @@ type TableOptionsProps<T extends Record<string, any>> = {
 // ! This must be handled in the server response
 // ! and not in the client side
 
-export default function TableOptions<T extends Record<string, any>>({
+export default function TableOptions<T extends Record<string, unknown>>({
   dataList,
   rowHeader,
   actions,
@@ -124,34 +124,32 @@ export default function TableOptions<T extends Record<string, any>>({
 
           <TableBody>
             {visibleRows.map((data, index) => (
-              <>
-                <TableRow key={index}>
-                  {Object.values(data).map((value, cellIndex) => (
-                    <TableCell key={`${index}-${cellIndex}`}>
-                      {typeof value === "object"
-                        ? JSON.stringify(value)
-                        : String(value)}
-                    </TableCell>
-                  ))}
+              <TableRow key={`row-${index}`}>
+                {Object.values(data).map((value, cellIndex) => (
+                  <TableCell key={`cell-${index}-${cellIndex}`}>
+                    {typeof value === "object"
+                      ? JSON.stringify(value)
+                      : String(value)}
+                  </TableCell>
+                ))}
 
-                  {actions && actions.length > 0 && (
-                    <TableCell>
-                      <Stack direction="row" spacing={2}>
-                        {actions.map((action, index) => (
-                          <Button
-                            key={index}
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                          >
-                            {action}
-                          </Button>
-                        ))}
-                      </Stack>
-                    </TableCell>
-                  )}
-                </TableRow>
-              </>
+                {actions && actions.length > 0 && (
+                  <TableCell>
+                    <Stack direction="row" spacing={2}>
+                      {actions.map((action, actionIndex) => (
+                        <Button
+                          key={`action-${index}-${actionIndex}`}
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                        >
+                          {action}
+                        </Button>
+                      ))}
+                    </Stack>
+                  </TableCell>
+                )}
+              </TableRow>
             ))}
           </TableBody>
         </Table>

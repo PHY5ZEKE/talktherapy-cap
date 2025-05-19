@@ -6,6 +6,8 @@ import clinicianRouter from "api/clinician/router";
 import adminRouter from "api/admin/router";
 // import superAdminRouter from "api/super-admin/router";
 import authRouter from "api/auth/router";
+import { authorizeRoles, validateToken } from "../auth/token";
+import signupRouter from "../signup/router";
 
 const router = Router();
 
@@ -29,10 +31,20 @@ router.get("/ws-status", (req: Request, res: Response) => {
 });
 
 // patient routes
-router.use("/patient", patientRouter);
-router.use("/clinician", clinicianRouter);
-router.use("/admin", adminRouter);
+router.use("/patient", validateToken, authorizeRoles("patient"), patientRouter);
+router.use(
+  "/clinician",
+  validateToken,
+  authorizeRoles("clinician"),
+  clinicianRouter
+);
+router.use("/admin", validateToken, authorizeRoles("admin"), adminRouter);
 // router.use("/super-admin", superAdminRouter);
+
+// auth routes
 router.use("/auth", authRouter);
+
+// signup routes
+router.use("/signup", signupRouter);
 
 export default router;

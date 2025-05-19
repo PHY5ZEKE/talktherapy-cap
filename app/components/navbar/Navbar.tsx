@@ -57,9 +57,11 @@ const MenuButton = styled(Button)({
 export default function Navbar({
   user,
   list,
+  isLoading,
 }: {
   user: USER_TOKEN;
   list: NAV_LIST;
+  isLoading: boolean;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -115,6 +117,7 @@ export default function Navbar({
             toggleDrawer={toggleDrawer}
             user={user}
             list={list}
+            isLoading={isLoading}
           />
         </Stack>
       </Toolbar>

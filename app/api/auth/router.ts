@@ -1,12 +1,12 @@
 import { Router } from "express";
 
 import { login } from "./login";
-import { getCookie, validateToken } from "./cookie";
+import { getToken, validateToken } from "./token";
 
 const authRouter = Router();
 
 authRouter.post("/login", login);
-authRouter.get("/get-cookie", getCookie);
+authRouter.get("/get-cookie", getToken);
 authRouter.get("/validate-token", validateToken);
 
 export default authRouter;

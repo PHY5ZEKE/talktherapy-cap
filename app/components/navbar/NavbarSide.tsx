@@ -5,6 +5,7 @@ import {
   Avatar,
   Divider,
   Button,
+  Skeleton,
 } from "@mui/material";
 import { LogoutRounded as LogoutRoundedIcon } from "@mui/icons-material";
 import { drawerClasses } from "@mui/material/Drawer";
@@ -17,11 +18,13 @@ export default function NavbarSide({
   toggleDrawer,
   user,
   list,
+  isLoading,
 }: {
   open: boolean;
   toggleDrawer: (open: boolean) => () => void;
   user: USER_TOKEN;
   list: NAV_LIST;
+  isLoading: boolean;
 }) {
   return (
     <Drawer
@@ -47,20 +50,29 @@ export default function NavbarSide({
             direction="row"
             sx={{ gap: 1, alignItems: "center", flexGrow: 1, p: 1 }}
           >
-            <Avatar
-              sizes="small"
-              alt={user.name}
-              src="https://mui.com/static/images/avatar/7.jpg"
-              sx={{ width: 24, height: 24 }}
-            />
-            <Typography component="p" variant="h6">
-              {user.name}
-            </Typography>
+            {isLoading ? (
+              <>
+                <Skeleton variant="circular" width={24} height={24} />
+                <Skeleton variant="text" width={100} height={24} />
+              </>
+            ) : (
+              <>
+                <Avatar
+                  sizes="small"
+                  alt={user.name}
+                  src="https://mui.com/static/images/avatar/7.jpg"
+                  sx={{ width: 24, height: 24 }}
+                />
+                <Typography component="p" variant="h6">
+                  {user.name}
+                </Typography>
+              </>
+            )}
           </Stack>
         </Stack>
         <Divider />
         <Stack sx={{ flexGrow: 1 }}>
-          <MenuContent list={list} />
+          <MenuContent isLoading={isLoading} list={list} />
           <Divider />
         </Stack>
         <Stack sx={{ p: 2 }}>
@@ -68,6 +80,7 @@ export default function NavbarSide({
             variant="contained"
             fullWidth
             startIcon={<LogoutRoundedIcon />}
+            disabled={isLoading}
           >
             Logout
           </Button>

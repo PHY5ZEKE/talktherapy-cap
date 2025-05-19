@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+import type { AxiosResponse } from "axios";
 import { getCookie } from "./cookie";
 
 const instance = axios.create({
@@ -19,33 +20,41 @@ instance.interceptors.request.use((config) => {
 });
 
 instance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   (error: AxiosError) => {
-    console.log("error", error);
-    // handle error codes
+    if (error.response?.status === 401) {
+      // handle unauthorized redirect or modal
+      console.error("Unauthorized access");
+    } else if (error.response?.status === 403) {
+      // handle forbidden
+      console.error("Access forbidden");
+    }
     return Promise.reject(error);
   }
 );
 
-export const http = async <T = Record<string, unknown>>(
+export type HttpResponse<T> = {
+  data: T;
+  status: number;
+};
+
+export const http = async <T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
-  data?: Record<string, unknown>
-) => {
+  data?: unknown
+): Promise<HttpResponse<T>> => {
   try {
-    const response = await instance.request<T>({
+    const response = await instance.request<T, AxiosResponse<T>>({
       method,
       url,
       data,
     });
-    // return data and status
     return { data: response.data, status: response.status };
   } catch (error) {
-    // handle error codes
-
-    console.error("HTTP Error:", error);
-    throw error;
+    if (error instanceof AxiosError) {
+      // add specific error handling here
+      throw error;
+    }
+    throw new Error("An unexpected error occurred");
   }
 };

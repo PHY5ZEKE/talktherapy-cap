@@ -1,6 +1,13 @@
 import { Outlet } from "react-router";
 
-import { alpha, Box, Container, Stack, Typography } from "@mui/material";
+import {
+  alpha,
+  Box,
+  Container,
+  Skeleton,
+  Stack,
+  Typography,
+} from "@mui/material";
 
 import { SideMenu } from "components/sidemenu";
 import { Navbar } from "components/navbar";
@@ -10,7 +17,7 @@ import navlist from "config/navlist";
 import type { NAV_LIST, USER_TOKEN } from "types/providers";
 
 export default function PrivateLayout() {
-  const { token } = useCookie();
+  const { token, isLoading } = useCookie();
 
   const user: USER_TOKEN = {
     name: token?.name || "",
@@ -28,8 +35,9 @@ export default function PrivateLayout() {
           display: "flex",
         }}
       >
-        <SideMenu user={user} list={list} />
-        <Navbar user={user} list={list} />
+        <SideMenu isLoading={isLoading} user={user} list={list} />
+        <Navbar isLoading={isLoading} user={user} list={list} />
+
         <Box
           component="main"
           sx={(theme) => ({
@@ -52,12 +60,8 @@ export default function PrivateLayout() {
               disableGutters
               sx={{ margin: 0, padding: 0 }}
             >
-              <Typography
-                variant="h5"
-                sx={{ fontWeight: 600, my: 2, backgroundColor: "red" }}
-              >
-                Untitled
-                {/* {document?.title || "Untitled"} */}
+              <Typography variant="h5" sx={{ fontWeight: 600, my: 2 }}>
+                Overview
               </Typography>
               <Outlet />
             </Container>

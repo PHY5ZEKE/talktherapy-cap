@@ -8,7 +8,7 @@ export default function PatientFavoriteList() {
     <Container size={{ xs: 12, lg: 4 }} title="Favorites">
       <TablePagination
         dataList={sampleFavorites}
-        rowHeader={["Name", "Specialty", "Actions"]}
+        rowHeader={["Name", "Specialty", "Category", "Actions"]}
         actions={["Remove"]}
         filters={[]}
       />
