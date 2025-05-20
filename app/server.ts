@@ -53,8 +53,8 @@ async function startServer() {
     app.use(
       cors({
         // origin:
-        // import.meta.env.VITE_NODE_ENV === "production"
-        //   ? import.meta.env.VITE_ALLOWED_ORIGINS?.split(",")
+        // process.env.VITE_NODE_ENV === "production"
+        //   ? process.env.VITE_ALLOWED_ORIGINS?.split(",")
         //   : "*",
         origin: true, // Allow all origins in development
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],

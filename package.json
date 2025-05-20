@@ -6,7 +6,7 @@
     "build": "react-router build",
     "dev": "react-router dev",
     "dev:server": "tsx watch --env-file=.env app/server.ts",
-    "dev:all": "concurrently --kill-others --raw \"npm:dev\" \"npm:dev:server\"",
+    "dev:all": "concurrently --kill-others --raw \"npm:dev:server\" \"npm:dev\"",
     "start": "node --env-file=.env ./build/server/index.js",
     "typecheck": "react-router typegen && tsc"
   },

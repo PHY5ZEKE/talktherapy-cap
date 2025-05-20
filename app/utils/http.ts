@@ -1,10 +1,13 @@
 import axios, { AxiosError } from "axios";
+
 import type { AxiosResponse } from "axios";
-import { getCookie } from "./cookie";
 import type { ParsedQs } from "qs";
+import type { QueryParams, HttpResponse } from "~/types/response";
+
+import { getCookie } from "./cookie";
 
 const instance = axios.create({
-  baseURL: "http://localhost:5174/",
+  baseURL: import.meta.env?.VITE_SERVER_URL || process.env?.VITE_SERVER_URL,
   timeout: 5000,
   withCredentials: true,
   headers: {
@@ -34,11 +37,6 @@ instance.interceptors.response.use(
   }
 );
 
-export type HttpResponse<T> = {
-  data: T;
-  status: number;
-};
-
 export const http = async <T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
@@ -59,13 +57,6 @@ export const http = async <T>(
     throw new Error("An unexpected error occurred");
   }
 };
-
-interface QueryParams {
-  page: number;
-  limit: number;
-  offset: number;
-  filters: string[];
-}
 
 export const parseQueryParams = (query: ParsedQs): QueryParams => {
   const page = Math.max(1, parseInt(String(query.page || "1")));

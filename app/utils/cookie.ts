@@ -1,21 +1,14 @@
-function getCookie(cname: string) {
-  let name = cname + "=";
-  let decodedCookie = decodeURIComponent(document.cookie);
-  let ca = decodedCookie.split(';');
-  for(let i = 0; i <ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
+function getCookie(name: string): string | undefined {
+  if (typeof document === "undefined") return undefined;
+  const match = document.cookie.match(
+    new RegExp("(?:^|; )" + name + "=([^;]*)")
+  );
+  return match ? decodeURIComponent(match[1]) : undefined;
 }
 
-const deleteCookie = (name: string) => {
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-};
+function deleteCookie(name: string): void {
+  if (typeof document === "undefined") return;
+  document.cookie = name + "=; Max-Age=0; path=/";
+}
 
 export { getCookie, deleteCookie };
