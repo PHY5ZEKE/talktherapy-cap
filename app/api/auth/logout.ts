@@ -5,7 +5,7 @@ export const logout = async (req: Request, res: Response) => {
     res.clearCookie("token");
     return res
       .status(200)
-      .json({ message: "Logged out successfully", redirect: "/login" });
+      .json({ message: "Success! Redirecting...", redirect: "/login" });
   } catch (error) {
     return res.status(500).json({ error: "Failed to logout" });
   }

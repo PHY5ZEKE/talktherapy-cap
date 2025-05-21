@@ -31,7 +31,7 @@ const superAdminSchema = new Schema<
   lastLogin: { type: Date, default: null },
   resetPasswordToken: { type: String, default: null },
   resetPasswordExpires: { type: Date, default: null },
-  role: { type: String, required: true, default: "super-admin" },
+  role: { type: String, required: true, default: "superadmin" },
   bookmarkedContent: {
     type: [mongoose.Schema.Types.ObjectId],
     ref: "Content",

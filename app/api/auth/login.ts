@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import Clinician from "models/clinician";
 import Admin from "models/admin";
-import SuperAdmin from "models/super-admin";
+import SuperAdmin from "~/models/super";
 import Patient from "models/patient";
 
 import jwt from "jsonwebtoken";
@@ -49,6 +49,11 @@ export const login = async (req: Request, res: Response) => {
     res.cookie("token", token, {
       httpOnly: true,
       maxAge: 3 * 60 * 60 * 1000, // 3h
+    });
+
+    // update user last login
+    await user.updateOne({
+      lastLogin: new Date(),
     });
 
     // TODO: add login activity to audit log

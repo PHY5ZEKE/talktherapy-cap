@@ -4,10 +4,12 @@ import type { Request, Response } from "express";
 import patientRouter from "api/patient/router";
 import clinicianRouter from "api/clinician/router";
 import adminRouter from "api/admin/router";
-// import superAdminRouter from "api/super-admin/router";
+import superAdminRouter from "api/super/router";
+
 import authRouter from "api/auth/router";
-import { authorizeRoles, validateToken } from "../auth/token";
 import signupRouter from "../signup/router";
+
+import { authorizeRoles, validateToken } from "../auth/token";
 
 const router = Router();
 
@@ -32,14 +34,25 @@ router.get("/ws-status", (req: Request, res: Response) => {
 
 // patient routes
 router.use("/patient", validateToken, authorizeRoles("patient"), patientRouter);
+
+// clinician routes
 router.use(
   "/clinician",
   validateToken,
   authorizeRoles("clinician"),
   clinicianRouter
 );
+
+// admin routes
 router.use("/admin", validateToken, authorizeRoles("admin"), adminRouter);
-// router.use("/super-admin", superAdminRouter);
+
+// super admin routes
+router.use(
+  "/super",
+  validateToken,
+  authorizeRoles("superadmin"),
+  superAdminRouter
+);
 
 // auth routes
 router.use("/auth", authRouter);

@@ -10,23 +10,6 @@ interface StepProps {
   errors: FieldErrors<ADMIN>;
 }
 
-const specializations = [
-  { value: "Autism Spectrum Disorder", label: "Autism Spectrum Disorder" },
-  {
-    value: "Attention-Deficit Hyperactivity Disorder",
-    label: "Attention-Deficit Hyperactivity Disorder",
-  },
-  { value: "Global Developmental Delay", label: "GDD" },
-  { value: "Cerebral Palsy", label: "Cerebral Palsy" },
-  { value: "Down Syndrome", label: "Down Syndrome" },
-  { value: "Hearing Impairment", label: "Hearing Impairment" },
-  { value: "Cleft Lip and/or Palate", label: "Cleft Lip and/or Palate" },
-  { value: "Stroke", label: "Stroke" },
-  { value: "Stuttering", label: "Stuttering" },
-  { value: "Aphasia", label: "Aphasia" },
-  { value: "Others", label: "Others" },
-];
-
 const PersonalInfoStep = ({ control, errors }: StepProps) => (
   <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
     <FormControl>
@@ -54,7 +37,20 @@ const PersonalInfoStep = ({ control, errors }: StepProps) => (
       <Controller
         name="middleName"
         control={control}
-        render={({ field }) => <InputField {...field} />}
+        rules={{
+          pattern: {
+            value: /^[A-Za-z]*$/,
+            message:
+              "Middle name can only contain letters with no spaces or special characters",
+          },
+        }}
+        render={({ field }) => (
+          <InputField
+            {...field}
+            error={!!errors.middleName}
+            helperText={errors.middleName?.message}
+          />
+        )}
       />
     </FormControl>
 

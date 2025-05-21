@@ -3,11 +3,11 @@ import { Grid, Typography, Card } from "@mui/material";
 export default function Container({
   title,
   children,
-  size = { xs: 12, sm: 6, lg: 4 },
+  size = { xs: 12, sm: 6, md: 6, lg: 4 },
 }: {
   title: string;
   children: React.ReactNode;
-  size?: Partial<{ xs: number; sm: number; lg: number }>;
+  size?: Partial<{ xs: number; sm: number; md: number; lg: number }>;
 }) {
   return (
     <Grid size={size}>

@@ -15,7 +15,9 @@ export const useLogout = () => {
     try {
       const { data } = (await logout()) as DATA;
       showSnackbar(data.message, "success");
-      window.location.href = data.redirect;
+      setTimeout(() => {
+        window.location.href = data.redirect;
+      }, 2000);
     } catch (error) {
       if (error instanceof AxiosError) {
         setError(error.response?.data.message || "Logout failed");

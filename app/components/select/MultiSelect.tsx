@@ -48,7 +48,7 @@ export default ({
         value={filters}
         displayEmpty
         renderValue={(selected) => {
-          if (selected.length === 0) return "Appointment Status";
+          if (selected.length === 0) return "Select Filters";
           if (selected.length <= 2) return selected.join(", ");
           return (
             <Box

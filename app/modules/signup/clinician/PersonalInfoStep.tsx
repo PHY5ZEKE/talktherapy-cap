@@ -54,7 +54,20 @@ const PersonalInfoStep = ({ control, errors }: StepProps) => (
       <Controller
         name="middleName"
         control={control}
-        render={({ field }) => <InputField {...field} />}
+        rules={{
+          pattern: {
+            value: /^[A-Za-z]*$/,
+            message:
+              "Middle name can only contain letters with no spaces or special characters",
+          },
+        }}
+        render={({ field }) => (
+          <InputField
+            {...field}
+            error={!!errors.middleName}
+            helperText={errors.middleName?.message}
+          />
+        )}
       />
     </FormControl>
 
