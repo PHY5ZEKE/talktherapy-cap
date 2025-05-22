@@ -1,9 +1,9 @@
 import type { Request, Response } from "express";
 import { parseQueryParams, buildFilterQuery } from "utils/http";
-import { SAFE_PATIENT_FIELDS, SAFE_ADMIN_FIELDS } from "config/whitelist";
+import { SAFE_PATIENT_FIELDS, SAFE_CLINICIAN_FIELDS } from "config/whitelist";
 
 import Patient from "models/patient";
-import Admin from "models/admin";
+import Clinician from "models/clinician";
 
 // GET All Patients
 export const getAllPatients = async (req: Request, res: Response) => {
@@ -39,18 +39,20 @@ export const getAllPatients = async (req: Request, res: Response) => {
   }
 };
 
-// GeT All Admins
-export const getAllAdmins = async (req: Request, res: Response) => {
+// GeT All Clinicians
+export const getAllClinicians = async (req: Request, res: Response) => {
   try {
     // parse query parameters
     const { page, limit, offset, filters } = parseQueryParams(req.query);
 
-    // TODO: Implement search
-    // const filterQuery = buildFilterQuery(filters, "diagnosis");
+    const filterQuery = buildFilterQuery(filters, "specialization");
 
     const [data, totalRows] = await Promise.all([
-      Admin.find({}, SAFE_ADMIN_FIELDS).skip(offset).limit(limit).exec(),
-      Admin.countDocuments().exec(),
+      Clinician.find(filterQuery, SAFE_CLINICIAN_FIELDS)
+        .skip(offset)
+        .limit(limit)
+        .exec(),
+      Clinician.countDocuments(filterQuery).exec(),
     ]);
 
     const totalPages = Math.ceil(totalRows / limit);

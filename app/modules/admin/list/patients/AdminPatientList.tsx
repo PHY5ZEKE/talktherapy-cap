@@ -1,4 +1,4 @@
-import { Container } from "components/card";
+import { CustomContainer } from "components/card";
 
 import TablePagination from "components/table/TableOptions";
 import usePatients from "./usePatients";
@@ -8,12 +8,12 @@ import { PATIENT_FILTERS } from "config/filters";
 import { Alert } from "@mui/material";
 import { ErrorOutlineRounded } from "@mui/icons-material";
 
-export default function SuperPatientList() {
+export default function AdminPatientList() {
   const { isLoading, error, patients, page, limit, filters, handleQuery } =
     usePatients();
 
   return (
-    <Container size={{ lg: 12 }} title="Patients">
+    <CustomContainer size={{ lg: 12 }} title="Patients">
       {/* TODO: Add error component and logic */}
       {error && (
         <Alert
@@ -47,6 +47,6 @@ export default function SuperPatientList() {
         rowsPerPage={limit}
         isLoading={isLoading}
       />
-    </Container>
+    </CustomContainer>
   );
 }

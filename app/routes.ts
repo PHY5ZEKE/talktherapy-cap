@@ -27,6 +27,7 @@ export default [
   route("/login", "routes/login.tsx"),
 
   layout("components/layouts/PrivateLayout.tsx", [
+    // SUPER ADMIN ROUTES
     ...prefix("superadmin", [
       route("/", "routes/super/index.tsx"),
       // list routes
@@ -36,24 +37,25 @@ export default [
         // route("clinicians", "routes/super/list/clinicians.tsx"),
       ]),
       // create routes
+      ...prefix("create", [route("/admin", "routes/super/create/admin.tsx")]),
+    ]),
+
+    // ADMIN ROUTES
+    ...prefix("admin", [
+      route("/", "routes/admin/index.tsx"),
+      // list routes
+      ...prefix("list", [
+        route("clinicians", "routes/admin/list/clinicians.tsx"),
+        route("patients", "routes/admin/list/patients.tsx"),
+      ]),
+
+      // create routes
       ...prefix("create", [
-        route("/admin", "routes/super/create/create-admin.tsx"),
+        route("/clinician", "routes/admin/create/clinician.tsx"),
       ]),
     ]),
+
+    // PATIENT ROUTES
     ...prefix("patient", [route("/", "routes/patient/index.tsx")]),
   ]),
-
-  // super admin
-  // ...prefix("superadmin", [
-  //   layout("components/layouts/PrivateLayout.tsx", [
-  //     route("/", "routes/super/index.tsx"),
-  //   ]),
-  // ]),
-
-  // patient
-  // ...prefix("patient", [
-  //   layout("components/layouts/PrivateLayout.tsx", [
-  //     route("/", "routes/patient/index.tsx"),
-  //   ]),
-  // ]),
 ] satisfies RouteConfig;

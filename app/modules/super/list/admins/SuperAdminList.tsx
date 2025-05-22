@@ -1,19 +1,19 @@
 import { CustomContainer } from "components/card";
 
-import { APPOINTMENT_FILTERS } from "config/filters";
-
 import TablePagination from "components/table/TableOptions";
-import useAppointments from "./useAppointments";
+import useAdmins from "./useAdmins";
+
+import { PATIENT_FILTERS } from "config/filters";
 
 import { Alert } from "@mui/material";
 import { ErrorOutlineRounded } from "@mui/icons-material";
 
-export default function PatientAppointmentList() {
-  const { isLoading, error, appointments, page, limit, filters, handleQuery } =
-    useAppointments();
+export default function SuperAdminList() {
+  const { isLoading, error, admins, page, limit, filters, handleQuery } =
+    useAdmins();
 
   return (
-    <CustomContainer size={{ sm: 12, lg: 8 }} title="Appointments">
+    <CustomContainer size={{ lg: 12 }} title="Admins">
       {/* TODO: Add error component and logic */}
       {error && (
         <Alert
@@ -24,15 +24,23 @@ export default function PatientAppointmentList() {
         </Alert>
       )}
       <TablePagination
-        dataList={appointments?.data ?? []}
-        rowHeader={["Date", "Clinician", "Status", "Actions"]}
-        actions={["Join", "Cancel"]}
-        filters={APPOINTMENT_FILTERS}
+        dataList={admins?.data ?? []}
+        rowHeader={[
+          "First",
+          "Middle",
+          "Last",
+          "Email",
+          "Mobile Number",
+          "Account Status",
+          "Actions",
+        ]}
+        actions={["View", "Archive"]}
+        filters={[]}
         activeFilters={filters}
         onFilterChange={(newFilters) => {
           handleQuery(0, limit, newFilters);
         }}
-        totalRows={appointments?.total_rows ?? 0}
+        totalRows={admins?.total_rows ?? 0}
         onPageChange={handleQuery}
         page={page}
         rowsPerPage={limit}

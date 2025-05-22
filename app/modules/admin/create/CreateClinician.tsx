@@ -5,25 +5,27 @@ import {
   FormControl,
   FormLabel,
   Typography,
+  MenuItem,
 } from "@mui/material";
 import { InputField } from "components/form";
 import { Controller, useForm } from "react-hook-form";
 import { CustomContainer } from "components/card";
 
-import type { ADMIN } from "types/account";
+import type { CLINICIAN } from "types/account";
 import { validatePassword } from "utils/validation";
+import { SPECIALIZATION_OPTIONS } from "config/filters";
 
 import useCreate from "./useCreate";
 
-export default function CreateAdmin() {
-  const { isLoading, createAdmin } = useCreate();
+export default function CreateClinician() {
+  const { isLoading, createClinician } = useCreate();
 
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<ADMIN>({
+  } = useForm<CLINICIAN>({
     defaultValues: {
       firstName: "",
       middleName: "",
@@ -32,11 +34,12 @@ export default function CreateAdmin() {
       password: "",
       confPassword: "",
       mobile: "",
+      specialization: "",
     },
   });
 
-  const onSubmit = async (data: ADMIN) => {
-    await createAdmin(data);
+  const onSubmit = async (data: CLINICIAN) => {
+    await createClinician(data);
     reset();
   };
 
@@ -56,7 +59,7 @@ export default function CreateAdmin() {
               width: "100%",
             }}
           >
-            Admin Registration
+            Clinician Registration
           </Typography>
 
           <FormControl>
@@ -141,6 +144,35 @@ export default function CreateAdmin() {
                   error={!!errors.mobile}
                   helperText={errors.mobile?.message}
                 />
+              )}
+            />
+          </FormControl>
+
+          <FormControl fullWidth>
+            <FormLabel>Specialization</FormLabel>
+            <Controller
+              name="specialization"
+              control={control}
+              defaultValue=""
+              rules={{
+                required: "Please select a specialization",
+              }}
+              render={({ field }) => (
+                <InputField
+                  {...field}
+                  select
+                  error={!!errors.specialization}
+                  helperText={errors.specialization?.message}
+                >
+                  {SPECIALIZATION_OPTIONS.map((specialization) => (
+                    <MenuItem
+                      key={specialization.value}
+                      value={specialization.value}
+                    >
+                      {specialization.label}
+                    </MenuItem>
+                  ))}
+                </InputField>
               )}
             />
           </FormControl>

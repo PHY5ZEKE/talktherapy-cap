@@ -1,39 +1,59 @@
 import {
+  DashboardRounded,
   AnalyticsRounded,
   AssignmentRounded,
-  HomeRounded,
   PeopleRounded,
+  AdminPanelSettingsRounded,
+  HealthAndSafetyRounded,
+  MovieRounded,
 } from "@mui/icons-material";
 
 const navlist = {
   patient: [
-    { text: "Home", icon: <HomeRounded /> },
+    { text: "Home", icon: <DashboardRounded />, route: "/patient" },
     { text: "Feedbacks", icon: <AnalyticsRounded /> },
     { text: "Exercises", icon: <PeopleRounded /> },
     { text: "Appointments", icon: <AssignmentRounded /> },
   ],
   clinician: [
-    { text: "Home", icon: <HomeRounded /> },
+    { text: "Home", icon: <DashboardRounded /> },
     { text: "Feedbacks", icon: <AnalyticsRounded /> },
     { text: "Exercises", icon: <PeopleRounded /> },
     { text: "Appointments", icon: <AssignmentRounded /> },
   ],
   admin: [
-    { text: "Home", icon: <HomeRounded /> },
-    { text: "Feedbacks", icon: <AnalyticsRounded /> },
-    { text: "Exercises", icon: <PeopleRounded /> },
-    { text: "Appointments", icon: <AssignmentRounded /> },
+    { text: "Home", icon: <DashboardRounded />, route: "/admin" },
+    {
+      text: "Patients",
+      icon: <HealthAndSafetyRounded />,
+      route: "/admin/list/patients",
+    },
+    {
+      text: "Clinicians",
+      icon: <PeopleRounded />,
+      route: "/admin/list/clinicians",
+    },
+    {
+      text: "Exercises",
+      icon: <MovieRounded />,
+      route: "/admin/list/exercises",
+    },
+    {
+      text: "Appointments",
+      icon: <AssignmentRounded />,
+      route: "/admin/list/appointments",
+    },
   ],
   superadmin: [
-    { text: "Home", icon: <HomeRounded />, route: "/superadmin" },
+    { text: "Home", icon: <DashboardRounded />, route: "/superadmin" },
     {
       text: "Admins",
-      icon: <AnalyticsRounded />,
+      icon: <AdminPanelSettingsRounded />,
       route: "/superadmin/list/admins",
     },
     {
       text: "Patients",
-      icon: <AssignmentRounded />,
+      icon: <HealthAndSafetyRounded />,
       route: "/superadmin/list/patients",
     },
     {
@@ -43,7 +63,7 @@ const navlist = {
     },
     {
       text: "Exercises",
-      icon: <PeopleRounded />,
+      icon: <MovieRounded />,
       route: "/superadmin/list/exercises",
     },
     {

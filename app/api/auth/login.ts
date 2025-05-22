@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 
 import Clinician from "models/clinician";
 import Admin from "models/admin";
-import SuperAdmin from "~/models/super";
+import SuperAdmin from "models/super";
 import Patient from "models/patient";
 
 import jwt from "jsonwebtoken";

@@ -5,27 +5,12 @@ import { Controller } from "react-hook-form";
 import type { Control, FieldErrors } from "react-hook-form";
 import type { CLINICIAN } from "types/account";
 
+import { SPECIALIZATION_OPTIONS } from "config/filters";
+
 interface StepProps {
   control: Control<CLINICIAN>;
   errors: FieldErrors<CLINICIAN>;
 }
-
-const specializations = [
-  { value: "Autism Spectrum Disorder", label: "Autism Spectrum Disorder" },
-  {
-    value: "Attention-Deficit Hyperactivity Disorder",
-    label: "Attention-Deficit Hyperactivity Disorder",
-  },
-  { value: "Global Developmental Delay", label: "GDD" },
-  { value: "Cerebral Palsy", label: "Cerebral Palsy" },
-  { value: "Down Syndrome", label: "Down Syndrome" },
-  { value: "Hearing Impairment", label: "Hearing Impairment" },
-  { value: "Cleft Lip and/or Palate", label: "Cleft Lip and/or Palate" },
-  { value: "Stroke", label: "Stroke" },
-  { value: "Stuttering", label: "Stuttering" },
-  { value: "Aphasia", label: "Aphasia" },
-  { value: "Others", label: "Others" },
-];
 
 const PersonalInfoStep = ({ control, errors }: StepProps) => (
   <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -129,7 +114,7 @@ const PersonalInfoStep = ({ control, errors }: StepProps) => (
             error={!!errors.specialization}
             helperText={errors.specialization?.message}
           >
-            {specializations.map((specialization) => (
+            {SPECIALIZATION_OPTIONS.map((specialization) => (
               <MenuItem key={specialization.value} value={specialization.value}>
                 {specialization.label}
               </MenuItem>

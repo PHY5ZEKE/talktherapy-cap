@@ -19,4 +19,14 @@ const SAFE_ADMIN_FIELDS = {
   accountStatus: 1,
 };
 
-export { SAFE_PATIENT_FIELDS, SAFE_ADMIN_FIELDS };
+const SAFE_CLINICIAN_FIELDS = {
+  firstName: 1,
+  middleName: 1,
+  lastName: 1,
+  email: 1,
+  mobile: 1,
+  specialization: 1,
+  accountStatus: 1,
+};
+
+export { SAFE_PATIENT_FIELDS, SAFE_ADMIN_FIELDS, SAFE_CLINICIAN_FIELDS };

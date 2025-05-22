@@ -1,19 +1,19 @@
-import { Container } from "components/card";
+import { CustomContainer } from "components/card";
 
 import TablePagination from "components/table/TableOptions";
-import useAdmins from "./useAdmins";
+import useClinicians from "./useClinicians";
 
 import { PATIENT_FILTERS } from "config/filters";
 
 import { Alert } from "@mui/material";
 import { ErrorOutlineRounded } from "@mui/icons-material";
 
-export default function SuperAdminList() {
-  const { isLoading, error, admins, page, limit, filters, handleQuery } =
-    useAdmins();
+export default function AdminClinicianList() {
+  const { isLoading, error, clinicians, page, limit, filters, handleQuery } =
+    useClinicians();
 
   return (
-    <Container size={{ lg: 12 }} title="Admins">
+    <CustomContainer size={{ lg: 12 }} title="Admins">
       {/* TODO: Add error component and logic */}
       {error && (
         <Alert
@@ -24,28 +24,29 @@ export default function SuperAdminList() {
         </Alert>
       )}
       <TablePagination
-        dataList={admins?.data ?? []}
+        dataList={clinicians?.data ?? []}
         rowHeader={[
           "First",
           "Middle",
           "Last",
           "Email",
           "Mobile Number",
+          "Specialization",
           "Account Status",
           "Actions",
         ]}
         actions={["View", "Archive"]}
-        filters={[]}
+        filters={PATIENT_FILTERS}
         activeFilters={filters}
         onFilterChange={(newFilters) => {
           handleQuery(0, limit, newFilters);
         }}
-        totalRows={admins?.total_rows ?? 0}
+        totalRows={clinicians?.total_rows ?? 0}
         onPageChange={handleQuery}
         page={page}
         rowsPerPage={limit}
         isLoading={isLoading}
       />
-    </Container>
+    </CustomContainer>
   );
 }
