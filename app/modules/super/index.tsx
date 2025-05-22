@@ -1,12 +1,30 @@
 import { Grid } from "@mui/material";
 import { CardStats } from "components/card";
 
+import useCount from "./useCount";
+
 export default function index() {
+  const { isLoading, error, count, getCount } = useCount();
   return (
     <Grid container spacing={2}>
-      <CardStats title="Total Admin" value={0} color="blue" />
-      <CardStats title="Total Clinicians" value={0} color="red" />
-      <CardStats title="Total Patients" value={0} color="green" />
+      <CardStats
+        isLoading={isLoading}
+        title="Total Admin"
+        value={count.admins}
+        color="blue"
+      />
+      <CardStats
+        isLoading={isLoading}
+        title="Total Clinicians"
+        value={count.clinicians}
+        color="red"
+      />
+      <CardStats
+        isLoading={isLoading}
+        title="Total Patients"
+        value={count.patients}
+        color="green"
+      />
     </Grid>
   );
 }

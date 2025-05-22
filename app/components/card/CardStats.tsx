@@ -1,4 +1,4 @@
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Typography, Stack, Skeleton } from "@mui/material";
 import { CustomContainer } from "components/card";
 
 type GradientColor = "green" | "red" | "blue";
@@ -31,10 +31,12 @@ export default function CardStats({
   title,
   value,
   color,
+  isLoading,
 }: {
   title: string;
   value: number;
   color: "green" | "red" | "blue";
+  isLoading: boolean;
 }) {
   return (
     <CustomContainer size={{ xs: 12, md: 12, lg: 4 }}>
@@ -45,9 +47,18 @@ export default function CardStats({
         </Typography>
       </Stack>
       <Box sx={{ display: "flex", flexDirection: "column" }}>
-        <Typography variant="h5" sx={{ marginX: "auto" }}>
-          {value}
-        </Typography>
+        {isLoading ? (
+          <Skeleton
+            variant="text"
+            width={100}
+            height={40}
+            sx={{ marginX: "auto" }}
+          />
+        ) : (
+          <Typography variant="h5" sx={{ marginX: "auto" }}>
+            {value}
+          </Typography>
+        )}
         <Typography variant="caption" sx={{ marginX: "auto" }}>
           something here
         </Typography>
