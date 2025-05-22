@@ -35,6 +35,7 @@ export default [
         route("admins", "routes/super/list/admins.tsx"),
         route("patients", "routes/super/list/patients.tsx"),
         route("clinicians", "routes/super/list/clinicians.tsx"),
+        route("exercises", "routes/super/list/exercises.tsx"),
       ]),
       // create routes
       ...prefix("create", [route("/admin", "routes/super/create/admin.tsx")]),

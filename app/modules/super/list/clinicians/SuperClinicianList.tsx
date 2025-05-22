@@ -13,7 +13,7 @@ export default function SuperClinicianList() {
     useClinicians();
 
   return (
-    <CustomContainer size={{ lg: 12 }} title="Clinicians List">
+    <CustomContainer size={{ lg: 12 }} title="Clinicians">
       {/* TODO: Add error component and logic */}
       {error && (
         <Alert
