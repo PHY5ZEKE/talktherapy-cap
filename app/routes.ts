@@ -29,6 +29,12 @@ export default [
   layout("components/layouts/PrivateLayout.tsx", [
     ...prefix("superadmin", [
       route("/", "routes/super/index.tsx"),
+      // list routes
+      ...prefix("list", [
+        route("admins", "routes/super/list/admins.tsx"),
+        route("patients", "routes/super/list/patients.tsx"),
+        // route("clinicians", "routes/super/list/clinicians.tsx"),
+      ]),
       // create routes
       ...prefix("create", [
         route("/admin", "routes/super/create/create-admin.tsx"),

@@ -3,7 +3,7 @@ import type { ADMIN } from "types/account";
 
 const adminSchema = new Schema<
   Omit<ADMIN, "confPassword"> & {
-    accountStatus: "active" | "inactive" | "deleted";
+    accountStatus: "active" | "inactive" | "deleted" | "pending";
     createdAt: Date;
     updatedAt: Date;
     lastLogin: Date;

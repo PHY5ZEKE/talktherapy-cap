@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import Admin from "models/admin";
 import bcrypt from "bcryptjs";
 
-export const addAdmin = async (req: Request, res: Response) => {
+export const createAdmin = async (req: Request, res: Response) => {
   try {
     const { firstName, middleName, lastName, email, password, mobile } =
       req.body;
@@ -27,6 +27,7 @@ export const addAdmin = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       mobile,
+      accountStatus: "pending",
     });
 
     await admin.save();

@@ -25,12 +25,32 @@ const navlist = {
     { text: "Appointments", icon: <AssignmentRounded /> },
   ],
   superadmin: [
-    { text: "Home", icon: <HomeRounded /> },
-    { text: "Admins", icon: <AnalyticsRounded /> },
-    { text: "Clinicians", icon: <PeopleRounded /> },
-    { text: "Patients", icon: <AssignmentRounded /> },
-    { text: "Exercises", icon: <PeopleRounded /> },
-    { text: "Audits", icon: <AssignmentRounded /> },
+    { text: "Home", icon: <HomeRounded />, route: "/superadmin" },
+    {
+      text: "Admins",
+      icon: <AnalyticsRounded />,
+      route: "/superadmin/list/admins",
+    },
+    {
+      text: "Patients",
+      icon: <AssignmentRounded />,
+      route: "/superadmin/list/patients",
+    },
+    {
+      text: "Clinicians",
+      icon: <PeopleRounded />,
+      route: "/superadmin/list/clinicians",
+    },
+    {
+      text: "Exercises",
+      icon: <PeopleRounded />,
+      route: "/superadmin/list/exercises",
+    },
+    {
+      text: "Audits",
+      icon: <AssignmentRounded />,
+      route: "/superadmin/list/audits",
+    },
   ],
   default: [],
 };

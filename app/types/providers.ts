@@ -4,7 +4,7 @@ export type USER_ROLE =
   | "patient"
   | "clinician"
   | "admin"
-  | "super-admin"
+  | "superadmin"
   | "default";
 
 export type USER_TOKEN = {
@@ -16,6 +16,7 @@ export type USER_TOKEN = {
 export type NavItem = {
   text: string;
   icon: ReactNode;
+  route?: string;
 };
 
 export type NAV_LIST = NavItem[];

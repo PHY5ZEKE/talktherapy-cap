@@ -75,12 +75,14 @@ export const parseQueryParams = (query: ParsedQs): QueryParams => {
     filters,
   };
 };
-
-export const buildFilterQuery = (params: string[]) => {
+export const buildFilterQuery = (
+  params: string[],
+  field: string = "status"
+) => {
   if (!params || params.length === 0) return {};
 
   return {
-    status: {
+    [field]: {
       $in: params,
     },
   };

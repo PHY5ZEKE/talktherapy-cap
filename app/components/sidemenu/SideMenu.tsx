@@ -7,6 +7,7 @@ import {
   Typography,
   Button,
   Skeleton,
+  Tooltip,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { drawerClasses } from "@mui/material/Drawer";
@@ -109,21 +110,32 @@ export default function SideMenu({
             <Skeleton variant="text" width={100} height={24} />
           ) : (
             <>
-              <Typography
-                variant="body2"
-                sx={{ fontWeight: 500, lineHeight: "16px" }}
+              <Box
+                sx={{ width: 100, display: "flex", flexDirection: "column" }}
               >
-                {user.name}
-              </Typography>
-              <Typography variant="caption" sx={{ color: "text.secondary" }}>
-                {user.email}
-              </Typography>
+                <Typography
+                  variant="body2"
+                  noWrap={true}
+                  sx={{ fontWeight: 500, lineHeight: "16px" }}
+                >
+                  {user.name}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  noWrap={true}
+                  sx={{ color: "text.secondary" }}
+                >
+                  {user.email}
+                </Typography>
+              </Box>
             </>
           )}
         </Box>
-        <Button variant="text" disabled={isLoading} onClick={handleLogout}>
-          <LogoutRounded />
-        </Button>
+        <Tooltip title="Logout" placement="top">
+          <Button variant="text" disabled={isLoading} onClick={handleLogout}>
+            <LogoutRounded />
+          </Button>
+        </Tooltip>
       </Stack>
     </Drawer>
   );

@@ -41,7 +41,7 @@ export const themeOptions: ThemeOptions = {
           color: primary[900],
         },
         "*": {
-          transition: "all 0.2s ease-in-out",
+          transition: "all 0.07s ease-in-out",
         },
       },
     },

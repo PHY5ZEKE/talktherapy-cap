@@ -13,7 +13,7 @@ export default function SuperPatientList() {
     usePatients();
 
   return (
-    <Container size={{ lg: 12 }} title="Appointments">
+    <Container size={{ lg: 12 }} title="Patients">
       {/* TODO: Add error component and logic */}
       {error && (
         <Alert

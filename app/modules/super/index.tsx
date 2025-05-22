@@ -2,8 +2,6 @@ import { Box, Button, Grid } from "@mui/material";
 import { Link } from "react-router";
 import { Container } from "components/card";
 
-import SuperPatientList from "./SuperPatientList";
-
 export default function index() {
   return (
     <Grid container spacing={2}>
@@ -21,8 +19,6 @@ export default function index() {
           </Link>
         </Box>
       </Container>
-
-      <SuperPatientList />
     </Grid>
   );
 }

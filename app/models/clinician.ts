@@ -3,7 +3,7 @@ import type { CLINICIAN } from "types/account";
 
 const clinicianSchema = new Schema<
   Omit<CLINICIAN, "confPassword"> & {
-    accountStatus: "active" | "inactive" | "deleted";
+    accountStatus: "active" | "inactive" | "deleted" | "pending";
     createdAt: Date;
     updatedAt: Date;
     lastLogin: Date;

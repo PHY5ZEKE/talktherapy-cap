@@ -7,6 +7,9 @@ import {
   ListItemText,
   Skeleton,
 } from "@mui/material";
+
+import { Link, useLocation } from "react-router";
+
 import { SettingsRounded } from "@mui/icons-material";
 import type { NAV_LIST } from "types/providers";
 
@@ -17,6 +20,7 @@ export default function MenuContent({
   list: NAV_LIST;
   isLoading: boolean;
 }) {
+  const location = useLocation();
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
@@ -25,10 +29,14 @@ export default function MenuContent({
         ) : (
           list.map((item, index) => (
             <ListItem key={index} disablePadding sx={{ display: "block" }}>
-              <ListItemButton selected={index === 0}>
-                <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
+              <Link to={item.route || "/"} style={{ textDecoration: "none" }}>
+                <ListItemButton
+                  selected={location.pathname === (item.route || "/")}
+                >
+                  <ListItemIcon>{item.icon}</ListItemIcon>
+                  <ListItemText primary={item.text} />
+                </ListItemButton>
+              </Link>
             </ListItem>
           ))
         )}
