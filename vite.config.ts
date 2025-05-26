@@ -21,6 +21,9 @@ export default defineConfig({
       api: "/app/api",
     },
   },
+  optimizeDeps: {
+    include: ["react", "react-dom", "react-router"],
+  },
   server: {
     proxy: {
       "/ws": {
@@ -45,17 +48,7 @@ export default defineConfig({
     cors: true,
   },
   build: {
-    rollupOptions: {
-      input: {
-        server: "app/server.ts",
-      },
-      output: {
-        entryFileNames: (chunkInfo) => {
-          return chunkInfo.name === "server"
-            ? "server/[name].js"
-            : "client/[name].[hash].js";
-        },
-      },
-    },
+    outDir: "build",
+    emptyOutDir: true,
   },
 });
