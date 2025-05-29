@@ -1,12 +1,9 @@
 import { CustomContainer } from "components/card";
 
-import TablePagination from "components/table/TableOptions";
+import { TableOptions } from "components/table";
 import useClinicians from "./useClinicians";
 
 import { PATIENT_FILTERS } from "config/filters";
-
-import { Alert } from "@mui/material";
-import { ErrorOutlineRounded } from "@mui/icons-material";
 
 export default function SuperClinicianList() {
   const { isLoading, error, clinicians, page, limit, filters, handleQuery } =
@@ -14,17 +11,9 @@ export default function SuperClinicianList() {
 
   return (
     <CustomContainer size={{ lg: 12 }} title="Clinicians">
-      {/* TODO: Add error component and logic */}
-      {error && (
-        <Alert
-          icon={<ErrorOutlineRounded fontSize="inherit" />}
-          severity="error"
-        >
-          {error}
-        </Alert>
-      )}
-      <TablePagination
+      <TableOptions
         dataList={clinicians?.data ?? []}
+        error={error}
         rowHeader={[
           "First",
           "Middle",

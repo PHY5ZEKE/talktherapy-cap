@@ -16,10 +16,27 @@ const navlist = {
     { text: "Appointments", icon: <AssignmentRounded /> },
   ],
   clinician: [
-    { text: "Home", icon: <DashboardRounded /> },
-    { text: "Feedbacks", icon: <AnalyticsRounded /> },
-    { text: "Exercises", icon: <PeopleRounded /> },
-    { text: "Appointments", icon: <AssignmentRounded /> },
+    { text: "Home", icon: <DashboardRounded />, route: "/clinician" },
+    {
+      text: "Patients",
+      icon: <HealthAndSafetyRounded />,
+      route: "/clinician/list/patients",
+    },
+    {
+      text: "Exercises",
+      icon: <PeopleRounded />,
+      route: "/clinician/list/exercises",
+    },
+    {
+      text: "Schedule",
+      icon: <AssignmentRounded />,
+      route: "/clinician/list/schedule",
+    },
+    {
+      text: "Appointments",
+      icon: <AssignmentRounded />,
+      route: "/clinician/list/appointments",
+    },
   ],
   admin: [
     { text: "Home", icon: <DashboardRounded />, route: "/admin" },

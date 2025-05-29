@@ -26,6 +26,7 @@ export default function useClinicians() {
     setIsLoading(true);
     try {
       const { data } = await getAllClinicians(page, limit, filters);
+
       setClinicians(data as TABLE_LIST_RESPONSE);
     } catch (error) {
       if (error instanceof AxiosError) {

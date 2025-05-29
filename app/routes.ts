@@ -56,6 +56,24 @@ export default [
       ]),
     ]),
 
+    // CLINICIAN ROUTES
+    ...prefix("clinician", [
+      route("/", "routes/clinician/index.tsx"),
+
+      // list routes
+      ...prefix("list", [
+        // route("patients", "routes/clinician/list/patients.tsx"),
+        // route("appointments", "routes/clinician/list/appointments.tsx"),
+        // route("exercises", "routes/clinician/list/exercises.tsx"),
+        route("schedule", "routes/clinician/list/schedule.tsx"),
+      ]),
+
+      // create routes
+      ...prefix("create", [
+        route("/schedule", "routes/clinician/create/schedule.tsx"),
+      ]),
+    ]),
+
     // PATIENT ROUTES
     ...prefix("patient", [route("/", "routes/patient/index.tsx")]),
   ]),

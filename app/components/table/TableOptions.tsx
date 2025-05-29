@@ -8,9 +8,9 @@ import {
   Stack,
   TablePagination,
   Button,
-  Skeleton,
 } from "@mui/material";
 
+import { TableLoading, TableError } from "components/table";
 import { MultiSelect } from "components/select";
 
 import { useMemo } from "react";
@@ -27,6 +27,7 @@ type TableOptionsProps<T extends Record<string, unknown>> = {
   rowsPerPage?: number;
   isLoading?: boolean;
   onPageChange?: (page: number, limit: number, filters: string[]) => void;
+  error: string | null;
 };
 
 export default function TableOptions<T extends Record<string, unknown>>({
@@ -41,6 +42,7 @@ export default function TableOptions<T extends Record<string, unknown>>({
   rowsPerPage = 10,
   isLoading = false,
   onPageChange,
+  error = null,
 }: TableOptionsProps<T>) {
   const selectedFilters = activeFilters ?? [];
 
@@ -91,6 +93,16 @@ export default function TableOptions<T extends Record<string, unknown>>({
 
   const visibleRows = filteredRows;
 
+  // Loading state
+  if (isLoading) {
+    return <TableLoading rowHeader={rowHeader} />;
+  }
+
+  // Error state
+  if (error) {
+    return <TableError error={error} rowHeader={rowHeader} />;
+  }
+
   return (
     <>
       {filters && filters.length > 0 && (
@@ -126,66 +138,37 @@ export default function TableOptions<T extends Record<string, unknown>>({
           </TableHead>
 
           <TableBody>
-            {isLoading ? (
-              Array.from({ length: 10 }).map((_, idx) => (
-                <TableRow key={`skeleton-row-${idx}`} sx={{ height: 53 }}>
-                  {Array.from({
-                    length: rowHeader.length + (actions?.length ? 1 : 0),
-                  }).map((_, cellIdx) => (
-                    <TableCell key={`skeleton-cell-${idx}-${cellIdx}`}>
-                      <Skeleton
-                        variant="rectangular"
-                        width="100%"
-                        height={24}
-                      />
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : visibleRows.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={rowHeader.length + (actions?.length ? 1 : 0)}
-                  align="center"
-                >
-                  {dataList.length === 0
-                    ? "No data available"
-                    : "No matching records found"}
-                </TableCell>
-              </TableRow>
-            ) : (
-              visibleRows.map((data, index) => (
-                <TableRow key={`row-${index}`}>
-                  {Object.entries(data).map(([key, value], cellIndex) => (
-                    <TableCell
-                      key={`cell-${index}-${cellIndex}`}
-                      sx={{ display: key === "_id" ? "none" : "table-cell" }}
-                    >
-                      {typeof value === "object"
-                        ? JSON.stringify(value)
-                        : String(value)}
-                    </TableCell>
-                  ))}
+            {visibleRows.map((data, index) => (
+              <TableRow key={`row-${index}`}>
+                {Object.entries(data).map(([key, value], cellIndex) => (
+                  <TableCell
+                    key={`cell-${index}-${cellIndex}`}
+                    sx={{ display: key === "_id" ? "none" : "table-cell" }}
+                  >
+                    {typeof value === "object"
+                      ? JSON.stringify(value)
+                      : String(value)}
+                  </TableCell>
+                ))}
 
-                  {actions && actions.length > 0 && (
-                    <TableCell>
-                      <Stack direction="row" spacing={2}>
-                        {actions.map((action, actionIndex) => (
-                          <Button
-                            key={`action-${index}-${actionIndex}`}
-                            variant="contained"
-                            color="primary"
-                            size="small"
-                          >
-                            {action}
-                          </Button>
-                        ))}
-                      </Stack>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            )}
+                {actions && actions.length > 0 && (
+                  <TableCell>
+                    <Stack direction="row" spacing={2}>
+                      {actions.map((action, actionIndex) => (
+                        <Button
+                          key={`action-${index}-${actionIndex}`}
+                          variant="contained"
+                          color="primary"
+                          size="small"
+                        >
+                          {action}
+                        </Button>
+                      ))}
+                    </Stack>
+                  </TableCell>
+                )}
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </TableContainer>

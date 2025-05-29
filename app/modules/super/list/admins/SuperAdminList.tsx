@@ -1,12 +1,7 @@
 import { CustomContainer } from "components/card";
 
-import TablePagination from "components/table/TableOptions";
+import { TableOptions } from "components/table";
 import useAdmins from "./useAdmins";
-
-import { PATIENT_FILTERS } from "config/filters";
-
-import { Alert } from "@mui/material";
-import { ErrorOutlineRounded } from "@mui/icons-material";
 
 export default function SuperAdminList() {
   const { isLoading, error, admins, page, limit, filters, handleQuery } =
@@ -14,16 +9,8 @@ export default function SuperAdminList() {
 
   return (
     <CustomContainer size={{ lg: 12 }} title="Admins">
-      {/* TODO: Add error component and logic */}
-      {error && (
-        <Alert
-          icon={<ErrorOutlineRounded fontSize="inherit" />}
-          severity="error"
-        >
-          {error}
-        </Alert>
-      )}
-      <TablePagination
+      <TableOptions
+        error={error}
         dataList={admins?.data ?? []}
         rowHeader={[
           "First",

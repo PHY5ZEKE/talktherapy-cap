@@ -21,6 +21,9 @@ export default defineConfig({
       api: "/app/api",
     },
   },
+  optimizeDeps: {
+    include: ["@mui/material", "@mui/icons-material"],
+  },
   server: {
     proxy: {
       "/ws": {

@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 
 import type { AxiosResponse } from "axios";
 import type { ParsedQs } from "qs";
-import type { QueryParams, HttpResponse } from "~/types/response";
+import type { QueryParams, HttpResponse } from "types/response";
 
 import { getCookie } from "./cookie";
 
