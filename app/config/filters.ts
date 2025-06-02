@@ -40,4 +40,19 @@ const SPECIALIZATION_OPTIONS = [
   { value: "Others", label: "Others" },
 ];
 
-export { APPOINTMENT_FILTERS, PATIENT_FILTERS, SPECIALIZATION_OPTIONS };
+const SCHEDULE_DAY_OPTIONS = [
+  { value: "Monday", label: "Monday" },
+  { value: "Tuesday", label: "Tuesday" },
+  { value: "Wednesday", label: "Wednesday" },
+  { value: "Thursday", label: "Thursday" },
+  { value: "Friday", label: "Friday" },
+  { value: "Saturday", label: "Saturday" },
+  { value: "Sunday", label: "Sunday" },
+];
+
+export {
+  APPOINTMENT_FILTERS,
+  PATIENT_FILTERS,
+  SPECIALIZATION_OPTIONS,
+  SCHEDULE_DAY_OPTIONS,
+};
