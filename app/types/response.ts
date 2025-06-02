@@ -1,3 +1,5 @@
+import type { Request } from "express";
+
 export type HttpResponse<T> = {
   data: T;
   status: number;
@@ -24,4 +26,8 @@ export type QueryParams = {
 export interface UploadResponse {
   message: string;
   fileUrl: string;
+}
+
+export interface AuthenticateRequest extends Request {
+  user?: any;
 }

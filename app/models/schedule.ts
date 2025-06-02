@@ -1,6 +1,5 @@
 import mongoose, { Schema } from "mongoose";
 
-// Ccheck fo
 const scheduleSchema = new Schema({
   clinician_id: {
     type: mongoose.Schema.Types.ObjectId,
@@ -8,6 +7,11 @@ const scheduleSchema = new Schema({
     required: true,
   },
   clinician_name: {
+    type: String,
+    required: true,
+    ref: "Clinician",
+  },
+  clinician_specialization: {
     type: String,
     required: true,
     ref: "Clinician",
@@ -33,11 +37,42 @@ const scheduleSchema = new Schema({
     type: String,
     required: true,
   },
+  frequency: {
+    type: String,
+    default: "Weekly",
+  },
+  start_date: {
+    type: Date,
+    required: true,
+  },
+  end_date: {
+    type: Date,
+    required: true,
+  },
   status: {
     type: String,
     required: true,
     enum: ["Booked", "Available", "Pending"],
     default: "Available",
+  },
+  details: {
+    patient_id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Patient",
+      default: null,
+    },
+    patient_name: {
+      type: String,
+      default: null,
+    },
+  },
+  created_at: {
+    type: Date,
+    default: Date.now,
+  },
+  updated_at: {
+    type: Date,
+    default: Date.now,
   },
 });
 
