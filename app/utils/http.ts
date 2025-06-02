@@ -58,6 +58,30 @@ export const http = async <T>(
   }
 };
 
+// helper for file upload
+export const uploader = async <T>(
+  method: "GET" | "POST" | "PUT" | "DELETE",
+  url: string,
+  formData: FormData
+): Promise<HttpResponse<T>> => {
+  try {
+    const response = await instance.request<T>({
+      method,
+      url,
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return { data: response.data, status: response.status };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      throw error;
+    }
+    throw new Error("An unexpected error occurred during file upload");
+  }
+};
+
 export const parseQueryParams = (query: ParsedQs): QueryParams => {
   const page = Math.max(1, parseInt(String(query.page || "1")));
   const limit = Math.min(

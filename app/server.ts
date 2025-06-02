@@ -56,7 +56,7 @@ async function startServer() {
         // process.env.VITE_NODE_ENV === "production"
         //   ? process.env.VITE_ALLOWED_ORIGINS?.split(",")
         //   : "*",
-        origin: true, // Allow all origins in development
+        origin: true,
         methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
@@ -64,13 +64,10 @@ async function startServer() {
         optionsSuccessStatus: 204,
       })
     );
-
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
     app.use(cookieParser());
 
-    // Create Vite server in middleware mode
-    console.log("Creating Vite server...");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "custom",
@@ -78,12 +75,12 @@ async function startServer() {
     console.log("Vite server created successfully");
 
     console.log("Setting up API routes...");
+    app.use("/upload", express.static("upload"));
     app.use("/api", apiRoutes);
 
     console.log("Setting up Vite middleware...");
     app.use(vite.middlewares);
 
-    console.log("Creating HTTP server...");
     const server = createHttpServer(app);
     console.log("HTTP server created");
 

@@ -5,6 +5,7 @@ import patientRouter from "api/patient/router";
 import clinicianRouter from "api/clinician/router";
 import adminRouter from "api/admin/router";
 import superAdminRouter from "api/super/router";
+import uploadRouter from "api/upload/router";
 
 import authRouter from "api/auth/router";
 import signupRouter from "../signup/router";
@@ -59,5 +60,9 @@ router.use("/auth", authRouter);
 
 // signup routes
 router.use("/signup", signupRouter);
+
+// upload routes
+// todo: check which roles need file upload
+router.use("/upload", validateToken, uploadRouter);
 
 export default router;

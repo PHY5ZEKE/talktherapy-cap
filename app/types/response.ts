@@ -20,3 +20,8 @@ export type QueryParams = {
   offset: number;
   filters: string[];
 };
+
+export interface UploadResponse {
+  message: string;
+  fileUrl: string;
+}
