@@ -29,4 +29,23 @@ const SAFE_CLINICIAN_FIELDS = {
   accountStatus: 1,
 };
 
-export { SAFE_PATIENT_FIELDS, SAFE_ADMIN_FIELDS, SAFE_CLINICIAN_FIELDS };
+// VIEWING AS CLINICIAN ACCOUNT
+const SAFE_CLINICIAN_SCHEDULE_FIELDS = {
+  day: 1,
+  start_time: 1,
+  end_time: 1,
+  start_date: 1,
+  end_date: 1,
+  status: 1,
+  details: {
+    patient_name: 1,
+  },
+  frequency: 1,
+};
+
+export {
+  SAFE_PATIENT_FIELDS,
+  SAFE_ADMIN_FIELDS,
+  SAFE_CLINICIAN_FIELDS,
+  SAFE_CLINICIAN_SCHEDULE_FIELDS,
+};

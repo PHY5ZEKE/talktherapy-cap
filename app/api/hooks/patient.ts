@@ -2,7 +2,7 @@ import { http } from "utils/http";
 import type { PATIENT } from "types/account";
 
 export const signupPatient = async (data: PATIENT) => {
-  const response = await http("POST", "/api/signup/patient", data);
+  const response = await http("POST", "/api/signup/patient", { data });
   return response;
 };
 

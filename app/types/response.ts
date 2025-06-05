@@ -21,6 +21,7 @@ export type QueryParams = {
   limit: number;
   offset: number;
   filters: string[];
+  [key: string]: any;
 };
 
 export interface UploadResponse {

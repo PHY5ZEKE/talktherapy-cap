@@ -3,12 +3,12 @@ import type { ADMIN } from "types/account";
 
 // POST HOOKS
 export const signupAdmin = async (data: ADMIN) => {
-  const response = await http("POST", "/api/signup/admin", data);
+  const response = await http("POST", "/api/signup/admin", { data });
   return response;
 };
 
 export const createClinician = async (data: any) => {
-  const response = await http("POST", "/api/admin/create/clinician", data);
+  const response = await http("POST", "/api/admin/create/clinician", { data });
   return response;
 };
 

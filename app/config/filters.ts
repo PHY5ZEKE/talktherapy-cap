@@ -50,9 +50,20 @@ const SCHEDULE_DAY_OPTIONS = [
   { value: "Sunday", label: "Sunday" },
 ];
 
+const SCHEDULE_DAY = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
 export {
   APPOINTMENT_FILTERS,
   PATIENT_FILTERS,
   SPECIALIZATION_OPTIONS,
   SCHEDULE_DAY_OPTIONS,
+  SCHEDULE_DAY,
 };

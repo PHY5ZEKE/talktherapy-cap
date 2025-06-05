@@ -50,6 +50,6 @@ export const getRolesCount = async () => {
 
 // POST HOOKS
 export const createAdmin = async (data: any) => {
-  const response = await http("POST", "/api/super/create/admin", data);
+  const response = await http("POST", "/api/super/create/admin", { data });
   return response;
 };

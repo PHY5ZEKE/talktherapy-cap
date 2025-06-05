@@ -13,6 +13,10 @@ import "./app.css";
 import theme from "./config/theme";
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+
 import ToastProvider from "providers/ToastProvider";
 import CookieProvider from "providers/CookieProvider";
 
@@ -51,11 +55,13 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
-      <ToastProvider>
-        <CookieProvider>
-          <Outlet />
-        </CookieProvider>
-      </ToastProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ToastProvider>
+          <CookieProvider>
+            <Outlet />
+          </CookieProvider>
+        </ToastProvider>
+      </LocalizationProvider>
     </ThemeProvider>
   );
 }

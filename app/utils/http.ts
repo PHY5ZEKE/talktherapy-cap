@@ -6,6 +6,11 @@ import type { QueryParams, HttpResponse } from "types/response";
 
 import { getCookie } from "./cookie";
 
+type HttpOptions = {
+  data?: unknown;
+  params?: Record<string, any>;
+};
+
 const instance = axios.create({
   baseURL: import.meta.env?.VITE_SERVER_URL || process.env?.VITE_SERVER_URL,
   timeout: 5000,
@@ -40,13 +45,15 @@ instance.interceptors.response.use(
 export const http = async <T>(
   method: "GET" | "POST" | "PUT" | "DELETE",
   url: string,
-  data?: unknown
+  options: HttpOptions = {}
 ): Promise<HttpResponse<T>> => {
+  const { data, params } = options;
   try {
     const response = await instance.request<T, AxiosResponse<T>>({
       method,
       url,
       data,
+      params,
     });
     return { data: response.data, status: response.status };
   } catch (error) {
@@ -88,26 +95,42 @@ export const parseQueryParams = (query: ParsedQs): QueryParams => {
     50,
     Math.max(1, parseInt(String(query.limit || "10")))
   );
-  const filters = String(query.filters || "")
-    .split(",")
-    .filter(Boolean);
+  const filters = Array.isArray(query.filters)
+    ? query.filters.map((item) => String(item))
+    : String(query.filters || "")
+        .split(",")
+        .filter(Boolean);
 
-  return {
+  const parsed: QueryParams = {
     page,
     limit,
     offset: (page - 1) * limit,
     filters,
   };
-};
-export const buildFilterQuery = (
-  params: string[],
-  field: string = "status"
-) => {
-  if (!params || params.length === 0) return {};
 
-  return {
-    [field]: {
-      $in: params,
-    },
-  };
+  for (const key in query) {
+    if (!["page", "limit", "filters"].includes(key)) {
+      parsed[key] = Array.isArray(query[key])
+        ? query[key]
+        : String(query[key] || "")
+            .split(",")
+            .filter(Boolean);
+    }
+  }
+
+  return parsed;
+};
+
+export const buildFilterQuery = (
+  base: Record<string, any>,
+  filters: Record<string, string | string[] | undefined>
+): Record<string, any> => {
+  const query = { ...base };
+
+  for (const [field, value] of Object.entries(filters)) {
+    if (!value || (Array.isArray(value) && value.length === 0)) continue;
+    query[field] = Array.isArray(value) ? { $in: value } : value;
+  }
+
+  return query;
 };

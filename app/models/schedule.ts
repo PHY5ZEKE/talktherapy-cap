@@ -41,6 +41,10 @@ const scheduleSchema = new Schema({
     type: String,
     default: "Weekly",
   },
+  duration: {
+    type: Number,
+    default: 1,
+  },
   start_date: {
     type: Date,
     required: true,

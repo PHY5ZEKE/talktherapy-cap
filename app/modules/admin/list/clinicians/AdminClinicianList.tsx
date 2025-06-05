@@ -1,6 +1,6 @@
 import { CustomContainer } from "components/card";
 
-import TablePagination from "components/table/TableOptions";
+import { TableOptions } from "components/table";
 import useClinicians from "./useClinicians";
 
 import { PATIENT_FILTERS } from "config/filters";
@@ -23,7 +23,8 @@ export default function AdminClinicianList() {
           {error}
         </Alert>
       )}
-      <TablePagination
+      <TableOptions
+        error={error}
         dataList={clinicians?.data ?? []}
         rowHeader={[
           "First",

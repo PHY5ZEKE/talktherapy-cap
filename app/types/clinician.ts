@@ -13,8 +13,8 @@ export interface CLINICIAN_SCHEDULE {
   start_time: string;
   end_time: string;
   frequency: string;
+  duration?: number;
   start_date: string;
-  end_date: string;
   status: "Booked" | "Available" | "Pending";
   details: {
     patient_id: string | null;

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import {
   Box,
   Grid,
@@ -5,15 +6,14 @@ import {
   FormControl,
   FormLabel,
   Typography,
-  MenuItem,
 } from "@mui/material";
 import { InputField } from "components/form";
 import { Controller, useForm } from "react-hook-form";
 import { CustomContainer } from "components/card";
 import type { CLINICIAN_SCHEDULE } from "types/clinician";
-import { SCHEDULE_DAY_OPTIONS } from "config/filters";
 
 import useCreateSchedule from "./useCreateSchedule";
+import { convertToLocalDay } from "utils/date";
 
 export default function CreateSchedule() {
   const { isLoading, createSchedule } = useCreateSchedule();
@@ -22,6 +22,8 @@ export default function CreateSchedule() {
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<CLINICIAN_SCHEDULE>({
     defaultValues: {
@@ -29,14 +31,24 @@ export default function CreateSchedule() {
       start_time: "",
       end_time: "",
       start_date: "",
-      end_date: "",
+      frequency: "Weekly",
+      duration: 1,
     },
   });
+
+  const startDate = watch("start_date");
 
   const onSubmit = async (data: CLINICIAN_SCHEDULE) => {
     await createSchedule(data);
     reset();
   };
+
+  useEffect(() => {
+    if (startDate) {
+      const { dayName } = convertToLocalDay(new Date(startDate));
+      setValue("day", dayName);
+    }
+  }, [startDate, setValue]);
 
   return (
     <Grid container spacing={2}>
@@ -57,6 +69,24 @@ export default function CreateSchedule() {
             Your Schedule
           </Typography>
 
+          {/* START DATE */}
+          <FormControl>
+            <FormLabel>Start Date</FormLabel>
+            <Controller
+              name="start_date"
+              control={control}
+              rules={{ required: "Start date is required" }}
+              render={({ field }) => (
+                <InputField
+                  {...field}
+                  type="date"
+                  error={!!errors.start_date}
+                  helperText={errors.start_date?.message}
+                />
+              )}
+            />
+          </FormControl>
+
           <FormControl>
             <FormLabel>Day</FormLabel>
             <Controller
@@ -66,19 +96,15 @@ export default function CreateSchedule() {
               render={({ field }) => (
                 <InputField
                   {...field}
-                  select
                   error={!!errors.day}
                   helperText={errors.day?.message}
-                >
-                  {SCHEDULE_DAY_OPTIONS.map((day) => (
-                    <MenuItem key={day.value} value={day.value}>
-                      {day.label}
-                    </MenuItem>
-                  ))}
-                </InputField>
+                  disabled
+                  aria-readonly
+                />
               )}
             />
           </FormControl>
+
           {/* START TIME */}
           <FormControl>
             <FormLabel>Start Time</FormLabel>
@@ -115,37 +141,38 @@ export default function CreateSchedule() {
             />
           </FormControl>
 
-          {/* START DATE */}
+          {/* END DATE */}
           <FormControl>
-            <FormLabel>Start Date</FormLabel>
+            <FormLabel>Frequency</FormLabel>
             <Controller
-              name="start_date"
+              name="frequency"
               control={control}
-              rules={{ required: "Start date is required" }}
               render={({ field }) => (
                 <InputField
                   {...field}
-                  type="date"
-                  error={!!errors.start_date}
-                  helperText={errors.start_date?.message}
+                  value="Weekly"
+                  disabled
+                  aria-readonly
+                  error={!!errors.frequency}
+                  helperText={errors.frequency?.message}
                 />
               )}
             />
           </FormControl>
 
-          {/* END DATE */}
+          {/* DURATION */}
           <FormControl>
-            <FormLabel>End Date</FormLabel>
+            <FormLabel>Duration (in weeks)</FormLabel>
             <Controller
-              name="end_date"
+              name="duration"
               control={control}
-              rules={{ required: "End date is required" }}
+              rules={{ required: "Duration is required" }}
               render={({ field }) => (
                 <InputField
                   {...field}
-                  type="date"
-                  error={!!errors.end_date}
-                  helperText={errors.end_date?.message}
+                  type="number"
+                  error={!!errors.duration}
+                  helperText={errors.duration?.message}
                 />
               )}
             />

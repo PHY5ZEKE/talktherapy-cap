@@ -1,7 +1,7 @@
 import { http } from "utils/http";
 
 export const login = async (data: { email: string; password: string }) => {
-  const response = await http("POST", "/api/auth/login", data);
+  const response = await http("POST", "/api/auth/login", { data });
   return response;
 };
 
