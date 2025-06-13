@@ -8,26 +8,40 @@ import {
   Button,
   Skeleton,
   Tooltip,
+  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { drawerClasses } from "@mui/material/Drawer";
-import { LogoutRounded } from "@mui/icons-material";
+import {
+  LogoutRounded,
+  ChevronLeftRounded,
+  ChevronRightRounded,
+} from "@mui/icons-material";
 
-import MenuContent from "./MenuContent";
+import MenuContent from "./SideMenuContent";
 import { useLogout } from "utils/logout";
+import { useState } from "react";
 
-const drawerWidth = 240;
+const expandedDrawerWidth = 240;
+const collapsedDrawerWidth = 72;
 
-const Drawer = styled(MuiDrawer)({
-  width: drawerWidth,
+const Drawer = styled(MuiDrawer, {
+  shouldForwardProp: (prop) => prop !== "open",
+})(({ theme, open }) => ({
+  width: open ? expandedDrawerWidth : collapsedDrawerWidth,
   flexShrink: 0,
   boxSizing: "border-box",
   mt: 10,
   [`& .${drawerClasses.paper}`]: {
-    width: drawerWidth,
+    width: open ? expandedDrawerWidth : collapsedDrawerWidth,
     boxSizing: "border-box",
+    overflowX: "hidden",
+    transition: theme.transitions.create("width", {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
   },
-});
+}));
 
 export default function SideMenu({
   user,
@@ -39,14 +53,20 @@ export default function SideMenu({
   isLoading: boolean;
 }) {
   const { logout } = useLogout();
+  const [open, setOpen] = useState(true);
 
   const handleLogout = async () => {
     await logout();
   };
 
+  const toggleDrawer = () => {
+    setOpen(!open);
+  };
+
   return (
     <Drawer
       variant="permanent"
+      open={open}
       sx={{
         display: { xs: "none", md: "block" },
         [`& .${drawerClasses.paper}`]: {
@@ -57,13 +77,20 @@ export default function SideMenu({
       <Box
         sx={{
           display: "flex",
+          justifyContent: open ? "space-between" : "center",
+          alignItems: "center",
           mt: "calc(var(--template-frame-height, 0px) + 4px)",
           p: 1.5,
         }}
       >
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          TalkTherapy
-        </Typography>
+        {open && (
+          <Typography variant="h6" sx={{ fontWeight: 600 }}>
+            TalkTherapy
+          </Typography>
+        )}
+        <IconButton onClick={toggleDrawer} size="small">
+          {open ? <ChevronLeftRounded /> : <ChevronRightRounded />}
+        </IconButton>
       </Box>
       <Divider />
       <Box
@@ -82,34 +109,31 @@ export default function SideMenu({
             sx={{ mx: "auto", mt: 2 }}
           />
         ) : (
-          <MenuContent isLoading={isLoading} list={list} />
+          <MenuContent isLoading={isLoading} list={list} collapsed={!open} />
         )}
       </Box>
       <Stack
         direction="row"
         sx={{
-          p: 2,
+          p: open ? 2 : 1,
           gap: 1,
           alignItems: "center",
+          justifyContent: open ? "flex-start" : "center",
           borderTop: "1px solid",
           borderColor: "divider",
         }}
       >
         {isLoading ? (
           <Skeleton variant="circular" width={24} height={24} />
-        ) : (
-          <Avatar
-            sizes="small"
-            alt="Riley Carter"
-            src="https://mui.com/static/images/avatar/1.jpg"
-            sx={{ width: 36, height: 36 }}
-          />
-        )}
-        <Box sx={{ mr: "auto" }}>
-          {isLoading ? (
-            <Skeleton variant="text" width={100} height={24} />
-          ) : (
-            <>
+        ) : open ? (
+          <>
+            <Avatar
+              sizes="small"
+              alt="Riley Carter"
+              src="https://mui.com/static/images/avatar/1.jpg"
+              sx={{ width: 36, height: 36 }}
+            />
+            <Box sx={{ mr: "auto" }}>
               <Box
                 sx={{ width: 100, display: "flex", flexDirection: "column" }}
               >
@@ -128,14 +152,28 @@ export default function SideMenu({
                   {user.email}
                 </Typography>
               </Box>
-            </>
-          )}
-        </Box>
-        <Tooltip title="Logout" placement="top">
-          <Button variant="text" disabled={isLoading} onClick={handleLogout}>
-            <LogoutRounded />
-          </Button>
-        </Tooltip>
+            </Box>
+            <Tooltip title="Logout" placement="top">
+              <Button
+                variant="text"
+                disabled={isLoading}
+                onClick={handleLogout}
+              >
+                <LogoutRounded />
+              </Button>
+            </Tooltip>
+          </>
+        ) : (
+          <Tooltip title="Logout" placement="right">
+            <IconButton
+              disabled={isLoading}
+              onClick={handleLogout}
+              size="small"
+            >
+              <LogoutRounded />
+            </IconButton>
+          </Tooltip>
+        )}
       </Stack>
     </Drawer>
   );

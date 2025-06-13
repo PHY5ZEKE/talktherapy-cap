@@ -1,4 +1,4 @@
 import SideMenu from "./SideMenu";
-import MenuContent from "./MenuContent";
+import MenuContent from "./SideMenuContent";
 
 export { SideMenu, MenuContent };
