@@ -10,7 +10,6 @@ export default function ClinicianScheduleList() {
   return (
     <Grid container spacing={2}>
       <div>
-        <p>Date Picker</p>
         <StaticDatePicker
           value={selectedDate}
           onChange={(newValue) => setSelectedDate(newValue)}
@@ -18,12 +17,10 @@ export default function ClinicianScheduleList() {
         />
       </div>
       <div>
-        <p>Schedule List</p>
         <ScheduleList
           selectedDate={selectedDate ? selectedDate.format("YYYY-MM-DD") : null}
         />
       </div>
-      <div>Schedule Details</div>
     </Grid>
   );
 }

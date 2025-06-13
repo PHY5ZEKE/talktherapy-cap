@@ -2,7 +2,7 @@ import { CustomContainer } from "components/card";
 
 import { TableOptions } from "components/table";
 import useClinicians from "./useClinicians";
-
+import TableActions from "./TableActions";
 import { PATIENT_FILTERS } from "config/filters";
 
 import { Alert } from "@mui/material";
@@ -36,7 +36,7 @@ export default function AdminClinicianList() {
           "Account Status",
           "Actions",
         ]}
-        actions={["View", "Archive"]}
+        actions={(data) => <TableActions data={data} />}
         filters={PATIENT_FILTERS}
         activeFilters={filters}
         onFilterChange={(newFilters) => {

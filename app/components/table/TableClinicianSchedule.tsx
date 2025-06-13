@@ -120,12 +120,6 @@ export default function TableClinicianSchedule<
                   )}`}
                 </TableCell>
 
-                <TableCell>{String(data.clinician_name) ?? ""}</TableCell>
-
-                <TableCell>
-                  {String(data.clinician_specialization) ?? ""}
-                </TableCell>
-
                 {/* Status */}
                 <TableCell>{String(data.status ?? "")}</TableCell>
 
