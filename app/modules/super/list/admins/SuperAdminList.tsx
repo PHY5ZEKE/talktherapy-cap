@@ -1,8 +1,10 @@
 import { CustomContainer } from "components/card";
 
 import { TableOptions } from "components/table";
+import TableActions from "./TableActions";
 import useAdmins from "./useAdmins";
 
+import type { VIEW_ADMIN } from "types/account";
 export default function SuperAdminList() {
   const { isLoading, error, admins, page, limit, filters, handleQuery } =
     useAdmins();
@@ -21,7 +23,9 @@ export default function SuperAdminList() {
           "Account Status",
           "Actions",
         ]}
-        actions={["View", "Archive"]}
+        actions={(rowData) => (
+          <TableActions data={rowData as Record<VIEW_ADMIN, string>} />
+        )}
         filters={[]}
         activeFilters={filters}
         onFilterChange={(newFilters) => {

@@ -1,6 +1,8 @@
 import { CustomContainer } from "components/card";
 
 import { TableOptions } from "components/table";
+import TableActions from "./TableActions";
+
 import useClinicians from "./useClinicians";
 
 import { PATIENT_FILTERS } from "config/filters";
@@ -24,7 +26,7 @@ export default function SuperClinicianList() {
           "Account Status",
           "Actions",
         ]}
-        actions={["View", "Archive"]}
+        actions={(data) => <TableActions data={data} />}
         filters={PATIENT_FILTERS}
         activeFilters={filters}
         onFilterChange={(newFilters) => {

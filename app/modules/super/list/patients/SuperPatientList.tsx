@@ -2,7 +2,7 @@ import { CustomContainer } from "components/card";
 
 import { TableOptions } from "components/table";
 import usePatients from "./usePatients";
-
+import TableActions from "./TableActions";
 import { PATIENT_FILTERS } from "config/filters";
 
 export default function SuperPatientList() {
@@ -24,7 +24,7 @@ export default function SuperPatientList() {
           "Account Status",
           "Actions",
         ]}
-        actions={["View", "Archive"]}
+        actions={(data) => <TableActions data={data} />}
         filters={PATIENT_FILTERS}
         activeFilters={filters}
         onFilterChange={(newFilters) => {

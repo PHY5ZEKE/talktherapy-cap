@@ -18,7 +18,7 @@ import { useMemo } from "react";
 type TableOptionsProps<T extends Record<string, unknown>> = {
   dataList: T[];
   rowHeader: string[];
-  actions?: string[];
+  actions?: (data: T) => React.ReactNode;
   filters?: string[];
   activeFilters?: string[];
   onFilterChange?: (filters: string[]) => void;
@@ -151,20 +151,10 @@ export default function TableOptions<T extends Record<string, unknown>>({
                   </TableCell>
                 ))}
 
-                {actions && actions.length > 0 && (
+                {actions && (
                   <TableCell>
-                    <Stack direction="row" spacing={2}>
-                      {actions.map((action, actionIndex) => (
-                        <Button
-                          key={`action-${index}-${actionIndex}`}
-                          variant="contained"
-                          color="primary"
-                          size="small"
-                        >
-                          {action}
-                        </Button>
-                      ))}
-                    </Stack>
+                    {actions(data)}{" "}
+                    {/* This ensures each row gets its own data */}
                   </TableCell>
                 )}
               </TableRow>

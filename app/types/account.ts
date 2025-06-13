@@ -61,4 +61,14 @@ export type PATIENT = Pick<
   | "consent"
 >;
 
+// VIEWING FIELDS
+export type VIEW_ADMIN =
+  | "_id"
+  | "firstName"
+  | "middleName"
+  | "lastName"
+  | "email"
+  | "mobile"
+  | "accountStatus";
+
 export type USER_TYPE = ADMIN | CLINICIAN | PATIENT;

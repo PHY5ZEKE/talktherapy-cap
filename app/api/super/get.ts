@@ -20,7 +20,7 @@ export const getAllPatients = async (req: Request, res: Response) => {
 
     const filterQuery = buildFilterQuery(
       {
-        ...filters,
+        ...(filters.length > 0 ? { diagnosis: filters } : {}),
       },
       rest
     );
@@ -93,7 +93,7 @@ export const getAllClinicians = async (req: Request, res: Response) => {
 
     const filterQuery = buildFilterQuery(
       {
-        ...filters,
+        ...(filters.length > 0 ? { specialization: filters } : {}),
       },
       rest
     );
