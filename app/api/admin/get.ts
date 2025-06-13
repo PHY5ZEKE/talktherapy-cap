@@ -9,9 +9,11 @@ import Clinician from "models/clinician";
 export const getAllPatients = async (req: Request, res: Response) => {
   try {
     // parse query parameters
-    const { page, limit, offset, filters } = parseQueryParams(req.query);
+    const { page, limit, offset, filters, ...rest } = parseQueryParams(
+      req.query
+    );
 
-    const filterQuery = buildFilterQuery(filters, "diagnosis");
+    const filterQuery = buildFilterQuery({ ...filters }, rest);
 
     const [data, totalRows] = await Promise.all([
       Patient.find(filterQuery, SAFE_PATIENT_FIELDS)
@@ -43,9 +45,16 @@ export const getAllPatients = async (req: Request, res: Response) => {
 export const getAllClinicians = async (req: Request, res: Response) => {
   try {
     // parse query parameters
-    const { page, limit, offset, filters } = parseQueryParams(req.query);
+    const { page, limit, offset, filters, ...rest } = parseQueryParams(
+      req.query
+    );
 
-    const filterQuery = buildFilterQuery(filters, "specialization");
+    const filterQuery = buildFilterQuery(
+      {
+        ...filters,
+      },
+      rest
+    );
 
     const [data, totalRows] = await Promise.all([
       Clinician.find(filterQuery, SAFE_CLINICIAN_FIELDS)

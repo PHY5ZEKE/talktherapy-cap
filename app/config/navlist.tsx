@@ -11,9 +11,21 @@ import {
 const navlist = {
   patient: [
     { text: "Home", icon: <DashboardRounded />, route: "/patient" },
-    { text: "Feedbacks", icon: <AnalyticsRounded /> },
-    { text: "Exercises", icon: <PeopleRounded /> },
-    { text: "Appointments", icon: <AssignmentRounded /> },
+    {
+      text: "Feedbacks",
+      icon: <AnalyticsRounded />,
+      route: "/patient/list/feedbacks",
+    },
+    {
+      text: "Exercises",
+      icon: <PeopleRounded />,
+      route: "/patient/list/exercises",
+    },
+    {
+      text: "Appointments",
+      icon: <AssignmentRounded />,
+      route: "/patient/list/appointments",
+    },
   ],
   clinician: [
     { text: "Home", icon: <DashboardRounded />, route: "/clinician" },

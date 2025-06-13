@@ -4,26 +4,24 @@ import dayjs from "dayjs";
 import { StaticDatePicker } from "@mui/x-date-pickers";
 
 import ScheduleList from "./ScheduleList";
-export default function ClinicianScheduleList() {
-  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>();
+export default function ClinicianAppointments() {
+  const [selectedDate, setSelectedDate] = useState<dayjs.Dayjs | null>(null);
 
   return (
-    <Grid container spacing={2}>
-      <div>
-        <p>Date Picker</p>
+    <>
+      <Grid size={{ xs: 12, sm: 12, md: 12, lg: 4 }}>
         <StaticDatePicker
           value={selectedDate}
           onChange={(newValue) => setSelectedDate(newValue)}
           slotProps={{ actionBar: { actions: ["today", "clear"] } }}
         />
-      </div>
-      <div>
-        <p>Schedule List</p>
+      </Grid>
+
+      <Grid size={{ xs: 12, sm: 12, md: 12, lg: 8 }}>
         <ScheduleList
           selectedDate={selectedDate ? selectedDate.format("YYYY-MM-DD") : null}
         />
-      </div>
-      <div>Schedule Details</div>
-    </Grid>
+      </Grid>
+    </>
   );
 }

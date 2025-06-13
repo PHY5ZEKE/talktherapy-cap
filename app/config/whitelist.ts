@@ -43,9 +43,22 @@ const SAFE_CLINICIAN_SCHEDULE_FIELDS = {
   frequency: 1,
 };
 
+// VIEWING AS PATIENT ACCOUNT
+const SAFE_CLINICIAN_SCHEDULE_FIELDS_PATIENT = {
+  clinician_name: 1,
+  clinician_specialization: 1,
+  day: 1,
+  start_time: 1,
+  end_time: 1,
+  start_date: 1,
+  end_date: 1,
+  status: 1,
+};
+
 export {
   SAFE_PATIENT_FIELDS,
   SAFE_ADMIN_FIELDS,
   SAFE_CLINICIAN_FIELDS,
   SAFE_CLINICIAN_SCHEDULE_FIELDS,
+  SAFE_CLINICIAN_SCHEDULE_FIELDS_PATIENT,
 };

@@ -11,16 +11,19 @@ import {
 } from "@mui/material";
 
 import { TableLoading, TableError } from "components/table";
+import { MultiSelect } from "components/select";
 
 import { useMemo } from "react";
 import { formatTime } from "utils/time";
 
-type TableClinicianScheduleOptions<T extends Record<string, unknown>> = {
+type TablePatientScheduleOptions<T extends Record<string, unknown>> = {
   dataList: T[];
   rowHeader: string[];
   actions?: string[];
   selectedDate?: string | null;
   activeFilters?: string[];
+  onFilterChange?: (filters: string[]) => void;
+  filters?: string[];
   totalRows?: number;
   page?: number;
   rowsPerPage?: number;
@@ -28,12 +31,13 @@ type TableClinicianScheduleOptions<T extends Record<string, unknown>> = {
   onPageChange?: (
     page: number,
     limit: number,
-    selectedDate: string | null
+    selectedDate?: string | null,
+    filters?: string[]
   ) => void;
   error: string | null;
 };
 
-export default function TableClinicianSchedule<
+export default function TablePatientSchedule<
   T extends Record<string, unknown>
 >({
   dataList,
@@ -41,13 +45,15 @@ export default function TableClinicianSchedule<
   actions,
   selectedDate,
   activeFilters = [],
+  onFilterChange = () => {},
+  filters,
   totalRows,
   page = 0,
   rowsPerPage = 10,
   isLoading = false,
   onPageChange,
   error = null,
-}: TableClinicianScheduleOptions<T>) {
+}: TablePatientScheduleOptions<T>) {
   const selectedFilters = activeFilters ?? [];
 
   const handleChangePage = (_event: unknown, newPage: number) => {
@@ -62,6 +68,18 @@ export default function TableClinicianSchedule<
     const newLimit = parseInt(event.target.value, 10);
     if (onPageChange) {
       onPageChange(0, newLimit, selectedDate || null);
+    }
+  };
+
+  const handleFilterChange = (newFilters: string[]) => {
+    if (onFilterChange) {
+      onFilterChange(newFilters);
+    }
+  };
+
+  const resetFilters = () => {
+    if (onFilterChange) {
+      onFilterChange([]);
     }
   };
 
@@ -97,6 +115,28 @@ export default function TableClinicianSchedule<
 
   return (
     <>
+      {filters && filters.length > 0 && (
+        <Stack direction="row" spacing={2} mb={2}>
+          <MultiSelect
+            placeholder="Filter"
+            options={filters || []}
+            filters={selectedFilters}
+            onChange={handleFilterChange}
+          />
+
+          {selectedFilters.length > 0 && (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={resetFilters}
+              sx={{ height: "42px" }}
+            >
+              Reset
+            </Button>
+          )}
+        </Stack>
+      )}
+
       <TableContainer>
         <Table>
           <TableHead>
@@ -120,24 +160,16 @@ export default function TableClinicianSchedule<
                   )}`}
                 </TableCell>
 
-                <TableCell>{String(data.clinician_name) ?? ""}</TableCell>
+                {/* Clinician name */}
+                <TableCell>{String(data.clinician_name ?? "")}</TableCell>
 
+                {/* Clinician specialization */}
                 <TableCell>
-                  {String(data.clinician_specialization) ?? ""}
+                  {String(data.clinician_specialization ?? "")}
                 </TableCell>
 
                 {/* Status */}
                 <TableCell>{String(data.status ?? "")}</TableCell>
-
-                {/* Patient */}
-                <TableCell>
-                  {typeof data.details === "object" && data.details
-                    ? String(
-                        (data.details as { patient_name?: string })
-                          .patient_name || "Unassigned"
-                      )
-                    : "Unassigned"}
-                </TableCell>
 
                 {actions && actions.length > 0 && (
                   <TableCell>

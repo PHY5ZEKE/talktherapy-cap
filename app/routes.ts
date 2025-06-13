@@ -75,6 +75,12 @@ export default [
     ]),
 
     // PATIENT ROUTES
-    ...prefix("patient", [route("/", "routes/patient/index.tsx")]),
+    ...prefix("patient", [
+      route("/", "routes/patient/index.tsx"),
+
+      ...prefix("list", [
+        route("/appointments", "routes/patient/list/appointments.tsx"),
+      ]),
+    ]),
   ]),
 ] satisfies RouteConfig;
